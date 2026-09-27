@@ -81,7 +81,7 @@ async function runMigrations() {
 const PORT = process.env.PORT || 3000;
 runMigrations().then(() => {
   app.listen(PORT, () => {
-    console.log(`Pravaah Signage API running on port ${PORT}`);
+    console.log(`SignageCMS API running on port ${PORT}`);
     startScheduler();
   });
 });

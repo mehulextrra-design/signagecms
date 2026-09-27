@@ -1,5 +1,5 @@
--- Pravaah Signage CMS — Initial Schema
--- Run: psql -U postgres -d pravaah_signage -f migrations/001_initial_schema.sql
+-- SignageCMS — Initial Schema
+-- Run: psql -U postgres -d signagecms -f migrations/001_initial_schema.sql
 
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
@@ -208,7 +208,7 @@ CREATE INDEX IF NOT EXISTS idx_notifications_user ON notifications(user_id, is_r
 -- Password: ChangeThisImmediately123! (bcrypt hash, update before production)
 INSERT INTO users (email, password_hash, role, first_name, last_name, is_verified, is_active)
 VALUES (
-  'admin@pravaahads.in',
+  'admin@signagecms.in',
   '$2b$10$rWnm.5F5yO7Z3JEbZKEkwO5H5dK.y5G5vW5qI5Z8Z7Z6Z5Z4Z3ZQ',
   'superadmin', 'Platform', 'Admin', TRUE, TRUE
 ) ON CONFLICT (email) DO NOTHING;

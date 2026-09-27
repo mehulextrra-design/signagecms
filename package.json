@@ -1,7 +1,7 @@
 {
-  "name": "pravaah-signage-backend",
+  "name": "signagecms-backend",
   "version": "1.0.0",
-  "description": "Pravaah Digital Signage CMS Backend API",
+  "description": "SignageCMS Digital Signage Platform Backend API",
   "main": "src/app.js",
   "scripts": {
     "start": "node src/app.js",
