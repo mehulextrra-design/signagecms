@@ -205,10 +205,10 @@ CREATE TABLE IF NOT EXISTS notifications (
 CREATE INDEX IF NOT EXISTS idx_notifications_user ON notifications(user_id, is_read);
 
 -- ── SEED: admin user ──────────────────────────────────────────────────────
--- Password: ChangeThisImmediately123! (bcrypt hash, update before production)
+-- Password: Admin@123
 INSERT INTO users (email, password_hash, role, first_name, last_name, is_verified, is_active)
 VALUES (
   'admin@signagecms.in',
-  '$2b$10$rWnm.5F5yO7Z3JEbZKEkwO5H5dK.y5G5vW5qI5Z8Z7Z6Z5Z4Z3ZQ',
+  '$2a$10$n0xZxZPBVjOj66S2sjW2mOI2bxN3WlJZo8FA5zw3oY.rC4PC6A/Lu',
   'superadmin', 'Platform', 'Admin', TRUE, TRUE
-) ON CONFLICT (email) DO NOTHING;
+) ON CONFLICT (email) DO UPDATE SET password_hash='$2a$10$n0xZxZPBVjOj66S2sjW2mOI2bxN3WlJZo8FA5zw3oY.rC4PC6A/Lu', is_active=TRUE;
