@@ -1,0 +1,69 @@
+require('dotenv').config();
+const express = require('express');
+const cors = require('cors');
+const helmet = require('helmet');
+const path = require('path');
+const rateLimit = require('express-rate-limit');
+
+const authRoutes = require('./routes/auth');
+const screenRoutes = require('./routes/screens');
+const campaignRoutes = require('./routes/campaigns');
+const contentRoutes = require('./routes/content');
+const playerRoutes = require('./routes/player');
+const reportRoutes = require('./routes/reports');
+const userRoutes = require('./routes/users');
+const billingRoutes = require('./routes/billing');
+const couponRoutes = require('./routes/coupons');
+
+const { startScheduler } = require('./services/scheduler');
+
+const app = express();
+
+app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
+app.use(cors({ origin: process.env.CMS_ORIGIN || '*', credentials: true }));
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true }));
+
+// Static files — uploaded content
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+
+// Rate limiting
+const apiLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 200 });
+const authLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 20, message: { error: 'Too many attempts, try again later' } });
+
+app.use('/api/', apiLimiter);
+app.use('/api/auth/', authLimiter);
+
+// Routes
+app.use('/api/auth', authRoutes);
+app.use('/api/screens', screenRoutes);
+app.use('/api/campaigns', campaignRoutes);
+app.use('/api/content', contentRoutes);
+app.use('/api/player', playerRoutes);
+app.use('/api/reports', reportRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/billing', billingRoutes);
+app.use('/api/coupons', couponRoutes);
+
+// Health check
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok', time: new Date().toISOString(), version: '1.0.0' });
+});
+
+// 404
+app.use((req, res) => res.status(404).json({ error: 'Route not found' }));
+
+// Global error handler
+app.use((err, req, res, next) => {
+  console.error('[ERROR]', err.stack);
+  const status = err.status || 500;
+  res.status(status).json({ error: err.message || 'Internal server error' });
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Pravaah Signage API running on port ${PORT}`);
+  startScheduler();
+});
+
+module.exports = app;
