@@ -3,7 +3,9 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const path = require('path');
+const fs = require('fs');
 const rateLimit = require('express-rate-limit');
+const { Pool } = require('pg');
 
 const authRoutes = require('./routes/auth');
 const screenRoutes = require('./routes/screens');
@@ -60,10 +62,28 @@ app.use((err, req, res, next) => {
   res.status(status).json({ error: err.message || 'Internal server error' });
 });
 
+async function runMigrations() {
+  const pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl: process.env.DATABASE_URL ? { rejectUnauthorized: false } : false,
+  });
+  try {
+    const sql = fs.readFileSync(path.join(__dirname, '../migrations/001_initial_schema.sql'), 'utf8');
+    await pool.query(sql);
+    console.log('[DB] Migrations applied successfully');
+  } catch (err) {
+    console.error('[DB] Migration error:', err.message);
+  } finally {
+    await pool.end();
+  }
+}
+
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Pravaah Signage API running on port ${PORT}`);
-  startScheduler();
+runMigrations().then(() => {
+  app.listen(PORT, () => {
+    console.log(`Pravaah Signage API running on port ${PORT}`);
+    startScheduler();
+  });
 });
 
 module.exports = app;
