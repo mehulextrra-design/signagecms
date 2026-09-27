@@ -205,10 +205,18 @@ CREATE TABLE IF NOT EXISTS notifications (
 CREATE INDEX IF NOT EXISTS idx_notifications_user ON notifications(user_id, is_read);
 
 -- ── SEED: admin user ──────────────────────────────────────────────────────
--- Password: Admin@123
+-- Admin: admin@signagecms.in / Admin@123
 INSERT INTO users (email, password_hash, role, first_name, last_name, is_verified, is_active)
 VALUES (
   'admin@signagecms.in',
   '$2a$10$n0xZxZPBVjOj66S2sjW2mOI2bxN3WlJZo8FA5zw3oY.rC4PC6A/Lu',
   'superadmin', 'Platform', 'Admin', TRUE, TRUE
 ) ON CONFLICT (email) DO UPDATE SET password_hash='$2a$10$n0xZxZPBVjOj66S2sjW2mOI2bxN3WlJZo8FA5zw3oY.rC4PC6A/Lu', is_active=TRUE;
+
+-- Test advertiser: raj@dominos.in / Test@1234
+INSERT INTO users (email, password_hash, role, first_name, last_name, business_name, business_type, city, is_verified, is_active)
+VALUES (
+  'raj@dominos.in',
+  '$2a$10$rDlDmDuZEBuAgFYeHuuY3OC3fqAEsoOSJ2ojQZEUGFzKDQKj7wQtC',
+  'advertiser', 'Raj', 'Sharma', 'Domino''s Pizza — Raj Stores', 'Restaurant / Food & Beverage', 'Pune, Maharashtra', TRUE, TRUE
+) ON CONFLICT (email) DO UPDATE SET password_hash='$2a$10$rDlDmDuZEBuAgFYeHuuY3OC3fqAEsoOSJ2ojQZEUGFzKDQKj7wQtC', is_active=TRUE;
