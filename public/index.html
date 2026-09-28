@@ -21,7 +21,7 @@
     --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1),0 4px 6px -2px rgba(0,0,0,0.05);
     --radius: 8px; --radius-sm: 6px; --radius-lg: 12px;
   }
-  html,body { height:100%; font-family:'Inter',-apple-system,sans-serif; font-size:14px; color:var(--text); background:var(--bg); }
+  html,body { height:100%; font-family:'Inter',-apple-system,sans-serif; font-size:14px; color:var(--text); background:var(--bg); overflow-x:hidden; }
   .hidden { display:none !important; }
 
   /* AUTH */
@@ -90,7 +90,7 @@
   .sidebar-user-role { font-size:11px;color:var(--sidebar-text); }
 
   /* MAIN */
-  .main { flex:1;display:flex;flex-direction:column;overflow:hidden; }
+  .main { flex:1;min-width:0;display:flex;flex-direction:column;overflow:hidden; }
   .topbar { height:56px;flex-shrink:0;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:12px; }
   .topbar-title { font-size:16px;font-weight:600; }
   .topbar-actions { margin-left:auto;display:flex;align-items:center;gap:8px; }
@@ -240,8 +240,8 @@
   @media(max-width:640px){
     .sidebar { position:fixed;top:0;left:0;bottom:0;z-index:200;transform:translateX(-100%);transition:transform 0.25s ease; }
     .mobile-topbar { display:flex; }
-    #app { flex-direction:column; }
-    .main { height:calc(100vh - 52px); }
+    #app { flex-direction:column;width:100%;overflow:hidden; }
+    .main { height:calc(100vh - 52px);width:100%;max-width:100%; }
     .topbar { display:none; }
     .content { padding:16px; }
     .form-row { grid-template-columns:1fr; }
