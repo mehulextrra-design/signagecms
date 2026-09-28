@@ -314,7 +314,7 @@
       <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
     </button>
     <span class="mobile-logo-name">SignageCMS</span>
-    <button class="btn btn-primary btn-sm" style="margin-left:auto;" onclick="navigate('new-campaign')">+ Book</button>
+    <button class="btn btn-primary btn-sm" style="margin-left:auto;" onclick="navigate('new-campaign')">+ Book Campaign</button>
   </div>
   <!-- Sidebar overlay for mobile -->
   <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleMobileMenu()"></div>
@@ -397,19 +397,9 @@
             <div class="stat-label">Pending Actions</div><div class="stat-value" id="stat-pending">—</div><div class="stat-change" id="stat-pending-sub">Loading…</div>
           </div>
         </div>
-        <div class="two-col">
-          <div>
-            <div class="section-header"><div class="section-title">Recent Campaigns</div><button class="btn btn-ghost btn-sm" onclick="navigate('campaigns')">View all</button></div>
-            <div class="card"><div id="recent-campaigns-list" style="padding:16px;color:var(--text2);">Loading…</div></div>
-          </div>
-          <div>
-            <div class="section-header"><div class="section-title">Quick Actions</div></div>
-            <div class="card card-body" style="display:flex;flex-direction:column;gap:10px;">
-              <button class="btn btn-primary btn-full" onclick="navigate('new-campaign')"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>Book a New Campaign</button>
-              <button class="btn btn-ghost btn-full" onclick="navigate('screens')"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>Browse Available Screens</button>
-              <button class="btn btn-ghost btn-full" onclick="navigate('invoices')"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>View Invoices</button>
-            </div>
-          </div>
+        <div>
+          <div class="section-header"><div class="section-title">Recent Campaigns</div><button class="btn btn-ghost btn-sm" onclick="navigate('campaigns')">View all</button></div>
+          <div class="card"><div id="recent-campaigns-list" style="padding:16px;color:var(--text2);">Loading…</div></div>
         </div>
       </div>
 
@@ -438,14 +428,14 @@
             <div class="filter-tab" onclick="filterCampaigns('pending',this)">Pending</div>
             <div class="filter-tab" onclick="filterCampaigns('completed',this)">Completed</div>
           </div>
-          <button class="btn btn-primary btn-sm" onclick="navigate('new-campaign')">+ New</button>
+          <button class="btn btn-primary btn-sm" onclick="navigate('new-campaign')">+ Book Campaign</button>
         </div>
         <div class="card"><div id="campaigns-table-wrap"><div class="empty-state"><div class="empty-icon"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg></div><div class="empty-title">No campaigns yet</div><div class="empty-sub">Book your first campaign on premium DOOH screens.</div><button class="btn btn-primary" onclick="navigate('new-campaign')">Book Campaign</button></div></div></div>
       </div>
 
       <!-- SCREENS -->
       <div id="page-screens" class="page">
-        <div class="section-header" style="margin-bottom:16px;"><div class="section-title">Available Screens</div><button class="btn btn-primary btn-sm" onclick="navigate('new-campaign')">Book Campaign</button></div>
+        <div class="section-header" style="margin-bottom:16px;"><div class="section-title">Available Screens</div></div>
         <div id="screens-grid" class="screens-grid"><div style="grid-column:1/-1;" class="empty-state"><div class="empty-title">Loading screens…</div></div></div>
       </div>
 
@@ -678,6 +668,12 @@ function navigate(page){
     if(n.getAttribute('onclick')&&n.getAttribute('onclick').includes(`'${page}'`))n.classList.add('active');
   });
   document.getElementById('topbar-title').textContent=PAGE_TITLES[page]||page;
+  // Hide "Book Campaign" topbar button when already on that page
+  const topbarBookBtn=document.querySelector('.topbar-actions .btn-primary');
+  if(topbarBookBtn)topbarBookBtn.style.display=page==='new-campaign'?'none':'';
+  const mobileBookBtn=document.querySelector('.mobile-topbar .btn-primary');
+  if(mobileBookBtn)mobileBookBtn.style.display=page==='new-campaign'?'none':'';
+
   // Close mobile sidebar on navigate
   const sb=document.querySelector('.sidebar');const ov=document.getElementById('sidebar-overlay');
   if(sb&&sb.classList.contains('mobile-open')){sb.classList.remove('mobile-open');ov&&ov.classList.remove('visible');}
@@ -746,6 +742,7 @@ async function loadDashboard(){
     const rclEl=document.getElementById('recent-campaigns-list');
     if(!recent.length){
       rclEl.innerHTML=`<div class="empty-state" style="padding:32px 20px;"><div class="empty-title" style="font-size:14px;">No campaigns yet</div><div class="empty-sub">Book your first campaign to get started.</div><button class="btn btn-primary btn-sm" onclick="navigate('new-campaign')">+ Book Campaign</button></div>`;
+
     }else{
       rclEl.innerHTML=`<div class="table-wrap"><table><thead><tr><th>Campaign</th><th>Status</th><th>Dates</th><th>Amount</th></tr></thead><tbody>${recent.map(c=>`
         <tr><td class="td-bold">${c.title||c.campaign_code}</td><td>${statusBadge(c.status)}</td><td style="font-size:12px;color:var(--text2);">${fmtDate(c.start_date)} – ${fmtDate(c.end_date)}</td><td style="font-weight:600;">₹${parseFloat(c.amount_total||0).toLocaleString('en-IN')}</td></tr>`).join('')}</tbody></table></div>`;
