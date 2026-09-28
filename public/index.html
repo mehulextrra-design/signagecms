@@ -353,14 +353,15 @@
       </div>
     </div>
     <div class="sidebar-footer">
-      <div class="nav-item" onclick="navigate('profile')">
-        <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-        Settings
-      </div>
-      <div class="sidebar-user" onclick="doLogout()">
+      <div class="sidebar-user" onclick="navigate('profile')" style="cursor:pointer;">
         <div class="sidebar-avatar" id="sidebar-avatar">R</div>
-        <div><div class="sidebar-user-name" id="sidebar-username">User</div><div class="sidebar-user-role" id="sidebar-role">Advertiser</div></div>
-        <svg style="margin-left:auto;width:14px;height:14px;color:var(--sidebar-text);" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+        <div style="flex:1;min-width:0;">
+          <div class="sidebar-user-name" id="sidebar-username" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">User</div>
+          <div class="sidebar-user-role" id="sidebar-role">Advertiser</div>
+        </div>
+        <button onclick="event.stopPropagation();doLogout()" title="Sign out" style="flex-shrink:0;width:28px;height:28px;background:rgba(255,255,255,0.06);border:none;border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--sidebar-text);">
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+        </button>
       </div>
     </div>
   </nav>
@@ -428,9 +429,8 @@
             <div class="filter-tab" onclick="filterCampaigns('pending',this)">Pending</div>
             <div class="filter-tab" onclick="filterCampaigns('completed',this)">Completed</div>
           </div>
-          <button class="btn btn-primary btn-sm" onclick="navigate('new-campaign')">+ Book Campaign</button>
         </div>
-        <div class="card"><div id="campaigns-table-wrap"><div class="empty-state"><div class="empty-icon"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg></div><div class="empty-title">No campaigns yet</div><div class="empty-sub">Book your first campaign on premium DOOH screens.</div><button class="btn btn-primary" onclick="navigate('new-campaign')">Book Campaign</button></div></div></div>
+        <div class="card"><div id="campaigns-table-wrap"><div class="empty-state"><div class="empty-icon"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg></div><div class="empty-title">No campaigns yet</div><div class="empty-sub">Book your first campaign on premium DOOH screens.</div><button class="btn btn-primary" onclick="navigate('new-campaign')">+ Book Campaign</button></div></div></div>
       </div>
 
       <!-- SCREENS -->
@@ -536,36 +536,49 @@
 
       <!-- PROFILE -->
       <div id="page-profile" class="page">
-        <div class="profile-section">
-          <div class="profile-section-title">Personal Information</div>
-          <div style="display:flex;align-items:center;gap:16px;margin-bottom:24px;">
+        <div style="max-width:600px;">
+
+          <!-- Identity card -->
+          <div class="profile-section" style="display:flex;align-items:center;gap:16px;padding:20px 24px;">
             <div class="profile-avatar" id="profile-avatar">R</div>
-            <div><div style="font-size:16px;font-weight:700;" id="profile-fullname">—</div><div style="font-size:13px;color:var(--text2);" id="profile-email-disp">—</div></div>
+            <div style="flex:1;min-width:0;">
+              <div style="font-size:16px;font-weight:700;margin-bottom:2px;" id="profile-fullname">—</div>
+              <div style="font-size:13px;color:var(--text2);" id="profile-email-disp">—</div>
+            </div>
           </div>
-          <div class="form-row">
-            <div class="form-group"><label class="form-label">First Name</label><input type="text" id="prof-first" class="form-input"></div>
-            <div class="form-group"><label class="form-label">Last Name</label><input type="text" id="prof-last" class="form-input"></div>
+
+          <!-- Edit form -->
+          <div class="profile-section">
+            <div class="profile-section-title">Account Details</div>
+            <div class="form-row" style="margin-bottom:0;">
+              <div class="form-group"><label class="form-label">First Name</label><input type="text" id="prof-first" class="form-input"></div>
+              <div class="form-group"><label class="form-label">Last Name</label><input type="text" id="prof-last" class="form-input"></div>
+            </div>
+            <div class="form-row" style="margin-bottom:0;">
+              <div class="form-group"><label class="form-label">Mobile</label><input type="tel" id="prof-mobile" class="form-input"></div>
+              <div class="form-group"><label class="form-label">City</label><input type="text" id="prof-city" class="form-input"></div>
+            </div>
+            <div class="form-row" style="margin-bottom:0;">
+              <div class="form-group"><label class="form-label">Business Name</label><input type="text" id="prof-biz" class="form-input"></div>
+              <div class="form-group"><label class="form-label">Business Type</label><input type="text" id="prof-biz-type" class="form-input"></div>
+            </div>
+            <div class="form-row" style="margin-bottom:0;">
+              <div class="form-group"><label class="form-label">GST Number</label><input type="text" id="prof-gst" class="form-input" placeholder="27AABCM1234A1ZD"></div>
+              <div class="form-group"></div>
+            </div>
+            <button class="btn btn-primary" onclick="saveProfile()">Save Changes</button>
           </div>
-          <div class="form-group"><label class="form-label">Mobile</label><input type="tel" id="prof-mobile" class="form-input"></div>
-          <button class="btn btn-primary" onclick="saveProfile()">Save Changes</button>
-        </div>
-        <div class="profile-section">
-          <div class="profile-section-title">Business Details</div>
-          <div class="form-row">
-            <div class="form-group"><label class="form-label">Business Name</label><input type="text" id="prof-biz" class="form-input"></div>
-            <div class="form-group"><label class="form-label">Business Type</label><input type="text" id="prof-biz-type" class="form-input"></div>
+
+          <!-- Password -->
+          <div class="profile-section">
+            <div class="profile-section-title">Change Password</div>
+            <div class="form-row" style="margin-bottom:0;">
+              <div class="form-group"><label class="form-label">Current Password</label><input type="password" id="prof-pass-cur" class="form-input"></div>
+              <div class="form-group"><label class="form-label">New Password</label><input type="password" id="prof-pass-new" class="form-input"></div>
+            </div>
+            <button class="btn btn-ghost" onclick="changePassword()">Update Password</button>
           </div>
-          <div class="form-row">
-            <div class="form-group"><label class="form-label">GST Number</label><input type="text" id="prof-gst" class="form-input" placeholder="27AABCM1234A1ZD"></div>
-            <div class="form-group"><label class="form-label">City</label><input type="text" id="prof-city" class="form-input"></div>
-          </div>
-          <button class="btn btn-primary" onclick="saveProfile()">Save Changes</button>
-        </div>
-        <div class="profile-section">
-          <div class="profile-section-title">Change Password</div>
-          <div class="form-group"><label class="form-label">Current Password</label><input type="password" id="prof-pass-cur" class="form-input"></div>
-          <div class="form-group"><label class="form-label">New Password</label><input type="password" id="prof-pass-new" class="form-input"></div>
-          <button class="btn btn-ghost" onclick="changePassword()">Update Password</button>
+
         </div>
       </div>
 
@@ -658,7 +671,7 @@ function updateSidebarUser(){
   document.getElementById('sidebar-role').textContent=currentUser.role==='superadmin'?'Super Admin':currentUser.role==='admin'?'Admin':'Advertiser';
 }
 
-const PAGE_TITLES={dashboard:'Dashboard',analytics:'Analytics',campaigns:'My Campaigns','new-campaign':'Book Campaign',screens:'Browse Screens',invoices:'Invoices',profile:'Settings'};
+const PAGE_TITLES={dashboard:'Dashboard',analytics:'Analytics',campaigns:'My Campaigns','new-campaign':'Book Campaign',screens:'Browse Screens',invoices:'Invoices',profile:'Profile & Settings'};
 
 function navigate(page){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
@@ -806,17 +819,26 @@ async function loadAnalytics(){
 }
 
 async function loadProfile(){
-  if(!currentUser)return;const u=currentUser;
-  document.getElementById('profile-avatar').textContent=((u.first_name||'?')[0]+(u.last_name||'?')[0]).toUpperCase();
-  document.getElementById('profile-fullname').textContent=[u.first_name,u.last_name].filter(Boolean).join(' ')||u.email;
-  document.getElementById('profile-email-disp').textContent=u.email;
-  document.getElementById('prof-first').value=u.first_name||'';
-  document.getElementById('prof-last').value=u.last_name||'';
-  document.getElementById('prof-mobile').value=u.mobile||'';
-  document.getElementById('prof-biz').value=u.business_name||'';
-  document.getElementById('prof-biz-type').value=u.business_type||'';
-  document.getElementById('prof-gst').value=u.gst_number||'';
-  document.getElementById('prof-city').value=u.city||'';
+  try{
+    const data=await api('/auth/me');
+    const u=data.user||data;
+    currentUser={...currentUser,...u};
+    const name=[u.first_name,u.last_name].filter(Boolean).join(' ')||u.email;
+    const initials=name===u.email
+      ? u.email.slice(0,2).toUpperCase()
+      : name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    document.getElementById('profile-avatar').textContent=initials;
+    document.getElementById('profile-fullname').textContent=name;
+    document.getElementById('profile-email-disp').textContent=u.email;
+    document.getElementById('prof-first').value=u.first_name||'';
+    document.getElementById('prof-last').value=u.last_name||'';
+    document.getElementById('prof-mobile').value=u.mobile||'';
+    document.getElementById('prof-biz').value=u.business_name||'';
+    document.getElementById('prof-biz-type').value=u.business_type||'';
+    document.getElementById('prof-gst').value=u.gst_number||'';
+    document.getElementById('prof-city').value=u.city||'';
+    updateSidebarUser();
+  }catch(e){toast('Could not load profile','error');}
 }
 
 async function saveProfile(){
