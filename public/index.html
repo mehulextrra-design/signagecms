@@ -673,7 +673,7 @@ function updateSidebarUser(){
 
 const PAGE_TITLES={dashboard:'Dashboard',analytics:'Analytics',campaigns:'My Campaigns','new-campaign':'Book Campaign',screens:'Browse Screens',invoices:'Invoices',profile:'Profile & Settings'};
 
-function navigate(page){
+function navigate(page, fromPopstate){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   const el=document.getElementById(`page-${page}`);if(el)el.classList.add('active');
@@ -690,6 +690,12 @@ function navigate(page){
   // Close mobile sidebar on navigate
   const sb=document.querySelector('.sidebar');const ov=document.getElementById('sidebar-overlay');
   if(sb&&sb.classList.contains('mobile-open')){sb.classList.remove('mobile-open');ov&&ov.classList.remove('visible');}
+
+  // Push history entry so Android/browser back button works within the SPA
+  if(!fromPopstate){
+    history.pushState({page}, '', '#' + page);
+  }
+
   if(page==='dashboard')loadDashboard();
   if(page==='campaigns')loadCampaigns();
   if(page==='invoices')loadInvoices();
@@ -698,6 +704,12 @@ function navigate(page){
   if(page==='screens')renderScreensList();
   if(page==='new-campaign')initWizard();
 }
+
+// Android / browser back button — navigate within SPA, don't exit the app
+window.addEventListener('popstate', function(e){
+  const page = (e.state && e.state.page) || 'dashboard';
+  navigate(page, true);
+});
 
 async function api(path,opts={}){
   const headers={'Content-Type':'application/json',...(opts.headers||{})};
