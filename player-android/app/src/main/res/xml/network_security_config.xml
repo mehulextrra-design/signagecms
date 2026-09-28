@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Android 5/6 pe TLS issues fix — Railway HTTPS ke saath kaam kare.
+  China boards mein outdated trust anchors hote hain, isiliye cleartext
+  allowed nahi hai but TLS 1.2 force karte hain OkHttp se.
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <certificates src="system" />
+            <certificates src="user" />
+        </trust-anchors>
+    </base-config>
+</network-security-config>

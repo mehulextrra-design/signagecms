@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.Player" parent="Theme.AppCompat.NoActionBar">
+        <item name="colorPrimary">@color/teal</item>
+        <item name="android:windowBackground">@color/black</item>
+    </style>
+
+    <style name="Theme.Player.Setup" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">@color/teal</item>
+        <item name="android:windowBackground">@color/teal_dark</item>
+        <item name="android:statusBarColor">@color/teal_dark</item>
+    </style>
+
+    <style name="Theme.Player.Fullscreen" parent="Theme.AppCompat.NoActionBar">
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowBackground">@color/black</item>
+        <item name="android:windowKeepScreenOn">true</item>
+        <item name="android:windowNoTitle">true</item>
+    </style>
+</resources>
