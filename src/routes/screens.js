@@ -80,6 +80,15 @@ router.put('/:id', authenticate, requireAdmin, async (req, res, next) => {
   } catch (err) { next(err); }
 });
 
+// DELETE /api/screens/:id — admin only
+router.delete('/:id', authenticate, requireAdmin, async (req, res, next) => {
+  try {
+    const result = await query('DELETE FROM screens WHERE id=$1 RETURNING id', [req.params.id]);
+    if (!result.rows.length) return res.status(404).json({ error: 'Screen not found' });
+    res.json({ message: 'Screen deleted' });
+  } catch (err) { next(err); }
+});
+
 // POST /api/screens/:id/register-device — generates player token for a device
 router.post('/:id/register-device', authenticate, requireAdmin, async (req, res, next) => {
   const jwt = require('jsonwebtoken');

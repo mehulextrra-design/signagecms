@@ -55,6 +55,23 @@ router.post('/', authenticate, requireAdmin, async (req, res, next) => {
   }
 });
 
+// PUT /api/coupons/:id — admin: update coupon
+router.put('/:id', authenticate, requireAdmin, async (req, res, next) => {
+  const { code, type, value, min_order, max_discount, usage_limit, valid_from, valid_until, description, is_active } = req.body;
+  try {
+    const result = await query(
+      `UPDATE coupons SET code=$1, type=$2, value=$3, min_order=$4, max_discount=$5, usage_limit=$6,
+       valid_from=$7, valid_until=$8, description=$9, is_active=$10 WHERE id=$11 RETURNING *`,
+      [code?.toUpperCase(), type, value, min_order || 0, max_discount, usage_limit, valid_from, valid_until, description, is_active !== undefined ? is_active : true, req.params.id]
+    );
+    if (!result.rows.length) return res.status(404).json({ error: 'Coupon not found' });
+    res.json(result.rows[0]);
+  } catch (err) {
+    if (err.code === '23505') return res.status(409).json({ error: 'Coupon code already exists' });
+    next(err);
+  }
+});
+
 // PUT /api/coupons/:id/deactivate — admin
 router.put('/:id/deactivate', authenticate, requireAdmin, async (req, res, next) => {
   try {

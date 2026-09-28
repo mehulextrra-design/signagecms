@@ -27,6 +27,19 @@ const upload = multer({
   },
 });
 
+// GET /api/content/all — admin: all content
+router.get('/all', authenticate, async (req, res, next) => {
+  if (!['admin', 'superadmin'].includes(req.user.role)) return res.status(403).json({ error: 'Admin only' });
+  try {
+    const result = await query(
+      `SELECT c.*, u.email, u.first_name, u.business_name FROM content c
+       LEFT JOIN users u ON u.id = c.user_id
+       WHERE c.status='active' ORDER BY c.created_at DESC LIMIT 200`
+    );
+    res.json(result.rows);
+  } catch (err) { next(err); }
+});
+
 // GET /api/content — user's own library
 router.get('/', authenticate, async (req, res, next) => {
   try {

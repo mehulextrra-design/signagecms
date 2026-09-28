@@ -16,6 +16,7 @@ const reportRoutes = require('./routes/reports');
 const userRoutes = require('./routes/users');
 const billingRoutes = require('./routes/billing');
 const couponRoutes = require('./routes/coupons');
+const notificationRoutes = require('./routes/notifications');
 
 const { startScheduler } = require('./services/scheduler');
 
@@ -62,6 +63,12 @@ app.use('/api/reports', reportRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/billing', billingRoutes);
 app.use('/api/coupons', couponRoutes);
+app.use('/api/notifications', notificationRoutes);
+
+// Admin panel shortcut
+app.get('/admin', (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/admin.html'));
+});
 
 // Health check
 app.get('/health', (req, res) => {
