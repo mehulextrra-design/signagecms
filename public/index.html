@@ -196,9 +196,15 @@
   .coupon-row { display:flex;gap:8px;margin-top:12px; }
 
   /* PROFILE */
-  .profile-section { background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px;margin-bottom:20px;box-shadow:var(--shadow); }
-  .profile-section-title { font-size:15px;font-weight:600;margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid var(--border); }
-  .profile-avatar { width:64px;height:64px;border-radius:50%;background:var(--primary);color:#fff;font-size:22px;font-weight:700;display:flex;align-items:center;justify-content:center; }
+  .profile-section { background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px 18px;margin-bottom:10px;box-shadow:var(--shadow); }
+  .profile-section-title { font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--text2);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border); }
+  .profile-avatar { width:48px;height:48px;border-radius:50%;background:var(--primary);color:#fff;font-size:17px;font-weight:700;display:flex;align-items:center;justify-content:center; }
+  .prof-row { display:grid;grid-template-columns:1fr 1fr;gap:10px; }
+  .prof-group { margin-bottom:10px; }
+  .prof-group:last-of-type { margin-bottom:0; }
+  .prof-label { display:block;font-size:11px;font-weight:600;color:var(--text2);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.04em; }
+  .prof-input { width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:13px;color:var(--text);background:var(--surface);font-family:inherit;transition:border-color 0.15s; }
+  .prof-input:focus { outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(13,148,136,0.1); }
 
   /* BAR CHART */
   .bar-chart { display:flex;align-items:flex-end;gap:10px;height:140px; }
@@ -585,47 +591,54 @@
 
       <!-- PROFILE -->
       <div id="page-profile" class="page">
-        <div style="max-width:600px;">
+        <div style="max-width:460px;">
 
           <!-- Identity card -->
-          <div class="profile-section" style="display:flex;align-items:center;gap:16px;padding:20px 24px;">
+          <div class="profile-section" style="display:flex;align-items:center;gap:12px;padding:14px 18px;margin-bottom:10px;">
             <div class="profile-avatar" id="profile-avatar">R</div>
             <div style="flex:1;min-width:0;">
-              <div style="font-size:16px;font-weight:700;margin-bottom:2px;" id="profile-fullname">—</div>
-              <div style="font-size:13px;color:var(--text2);" id="profile-email-disp">—</div>
+              <div style="font-size:15px;font-weight:700;margin-bottom:1px;" id="profile-fullname">—</div>
+              <div style="font-size:12px;color:var(--text2);" id="profile-email-disp">—</div>
             </div>
           </div>
 
-          <!-- Edit form -->
+          <!-- Personal -->
           <div class="profile-section">
-            <div class="profile-section-title">Account Details</div>
-            <div class="form-row" style="margin-bottom:0;">
-              <div class="form-group"><label class="form-label">First Name</label><input type="text" id="prof-first" class="form-input"></div>
-              <div class="form-group"><label class="form-label">Last Name</label><input type="text" id="prof-last" class="form-input"></div>
+            <div class="profile-section-title">Personal Info</div>
+            <div class="prof-row">
+              <div class="prof-group"><label class="prof-label">First Name</label><input type="text" id="prof-first" class="prof-input"></div>
+              <div class="prof-group"><label class="prof-label">Last Name</label><input type="text" id="prof-last" class="prof-input"></div>
             </div>
-            <div class="form-row" style="margin-bottom:0;">
-              <div class="form-group"><label class="form-label">Mobile</label><input type="tel" id="prof-mobile" class="form-input"></div>
-              <div class="form-group"><label class="form-label">City</label><input type="text" id="prof-city" class="form-input"></div>
+            <div class="prof-row">
+              <div class="prof-group"><label class="prof-label">Mobile</label><input type="tel" id="prof-mobile" class="prof-input"></div>
+              <div class="prof-group"><label class="prof-label">City</label><input type="text" id="prof-city" class="prof-input"></div>
             </div>
-            <div class="form-row" style="margin-bottom:0;">
-              <div class="form-group"><label class="form-label">Business Name</label><input type="text" id="prof-biz" class="form-input"></div>
-              <div class="form-group"><label class="form-label">Business Type</label><input type="text" id="prof-biz-type" class="form-input"></div>
+          </div>
+
+          <!-- Business -->
+          <div class="profile-section">
+            <div class="profile-section-title">Business</div>
+            <div class="prof-row">
+              <div class="prof-group"><label class="prof-label">Business Name</label><input type="text" id="prof-biz" class="prof-input"></div>
+              <div class="prof-group"><label class="prof-label">Type</label><input type="text" id="prof-biz-type" class="prof-input"></div>
             </div>
-            <div class="form-row" style="margin-bottom:0;">
-              <div class="form-group"><label class="form-label">GST Number</label><input type="text" id="prof-gst" class="form-input" placeholder="27AABCM1234A1ZD"></div>
-              <div class="form-group"></div>
+            <div class="prof-group" style="max-width:50%;">
+              <label class="prof-label">GST Number</label><input type="text" id="prof-gst" class="prof-input" placeholder="27AABCM1234A1ZD">
             </div>
-            <button class="btn btn-primary" onclick="saveProfile()">Save Changes</button>
+          </div>
+
+          <div style="margin-bottom:10px;">
+            <button class="btn btn-primary btn-sm" onclick="saveProfile()">Save Changes</button>
           </div>
 
           <!-- Password -->
           <div class="profile-section">
             <div class="profile-section-title">Change Password</div>
-            <div class="form-row" style="margin-bottom:0;">
-              <div class="form-group"><label class="form-label">Current Password</label><input type="password" id="prof-pass-cur" class="form-input"></div>
-              <div class="form-group"><label class="form-label">New Password</label><input type="password" id="prof-pass-new" class="form-input"></div>
+            <div class="prof-row">
+              <div class="prof-group"><label class="prof-label">Current</label><input type="password" id="prof-pass-cur" class="prof-input" placeholder="Current password"></div>
+              <div class="prof-group"><label class="prof-label">New</label><input type="password" id="prof-pass-new" class="prof-input" placeholder="New password"></div>
             </div>
-            <button class="btn btn-ghost" onclick="changePassword()">Update Password</button>
+            <button class="btn btn-ghost btn-sm" onclick="changePassword()">Update Password</button>
           </div>
 
         </div>
