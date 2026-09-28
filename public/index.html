@@ -227,6 +227,26 @@
   .loading-spinner { display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.6s linear infinite; }
   @keyframes spin { to{transform:rotate(360deg)} }
 
+  /* NOTIFICATIONS */
+  .notif-bell { position:relative;width:34px;height:34px;border:1.5px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text2);flex-shrink:0;transition:background 0.15s; }
+  .notif-bell:hover { background:var(--surface2); }
+  .notif-badge { position:absolute;top:-5px;right:-5px;min-width:16px;height:16px;background:var(--danger);color:#fff;border-radius:8px;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid var(--surface);padding:0 3px; }
+  .notif-panel { position:fixed;top:60px;right:20px;width:340px;max-height:460px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow-lg);z-index:500;display:flex;flex-direction:column;overflow:hidden; }
+  .notif-panel-hdr { padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0; }
+  .notif-panel-title { font-size:14px;font-weight:600; }
+  .notif-list { flex:1;overflow-y:auto; }
+  .notif-list::-webkit-scrollbar { width:4px; }
+  .notif-list::-webkit-scrollbar-thumb { background:var(--border);border-radius:2px; }
+  .notif-item { padding:12px 16px;border-bottom:1px solid var(--border);cursor:pointer;transition:background 0.1s;display:flex;gap:10px;align-items:flex-start; }
+  .notif-item:last-child { border-bottom:none; }
+  .notif-item:hover { background:var(--surface2); }
+  .notif-item.unread { background:var(--primary-light); }
+  .notif-item-title { font-size:13px;font-weight:600;margin-bottom:3px;line-height:1.3; }
+  .notif-item-body { font-size:12px;color:var(--text2);line-height:1.4; }
+  .notif-item-time { font-size:11px;color:var(--text3);margin-top:4px; }
+  .notif-dot { width:8px;height:8px;border-radius:50%;background:var(--primary);flex-shrink:0;margin-top:4px; }
+  @media(max-width:640px){ .notif-panel { right:8px;left:8px;width:auto;top:56px; } }
+
   /* MOBILE NAV */
   .mobile-topbar { display:none;height:52px;background:var(--sidebar-bg);align-items:center;padding:0 16px;gap:12px;flex-shrink:0; }
   .mobile-menu-btn { width:36px;height:36px;background:rgba(255,255,255,0.08);border:none;border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff; }
@@ -314,7 +334,11 @@
       <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
     </button>
     <span class="mobile-logo-name">SignageCMS</span>
-    <button class="btn btn-primary btn-sm" style="margin-left:auto;" onclick="navigate('new-campaign')">+ Book Campaign</button>
+    <button class="notif-bell" id="notif-bell-mobile" onclick="toggleNotifPanel()" title="Notifications" style="margin-left:auto;border-color:rgba(255,255,255,0.15);background:rgba(255,255,255,0.08);color:#fff;">
+      <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+      <span class="notif-badge hidden" id="notif-badge-mobile">0</span>
+    </button>
+    <button class="btn btn-primary btn-sm" onclick="navigate('new-campaign')">+ Book Campaign</button>
   </div>
   <!-- Sidebar overlay for mobile -->
   <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleMobileMenu()"></div>
@@ -370,6 +394,10 @@
     <div class="topbar">
       <span class="topbar-title" id="topbar-title">Dashboard</span>
       <div class="topbar-actions">
+        <button class="notif-bell" id="notif-bell" onclick="toggleNotifPanel()" title="Notifications">
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+          <span class="notif-badge hidden" id="notif-badge">0</span>
+        </button>
         <button class="btn btn-primary btn-sm" onclick="navigate('new-campaign')">
           <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
           Book Campaign
@@ -586,6 +614,17 @@
   </div>
 </div>
 
+<!-- NOTIFICATION PANEL -->
+<div class="notif-panel hidden" id="notif-panel">
+  <div class="notif-panel-hdr">
+    <span class="notif-panel-title">Notifications</span>
+    <button class="btn btn-ghost btn-sm" onclick="markAllRead()" style="font-size:12px;padding:4px 10px;">Mark all read</button>
+  </div>
+  <div class="notif-list" id="notif-list">
+    <div style="padding:40px 20px;text-align:center;color:var(--text2);">Loading…</div>
+  </div>
+</div>
+
 <div id="toast-area"></div>
 
 <script>
@@ -659,7 +698,7 @@ async function loadUserInfo(){
 function showApp(){
   document.getElementById('auth-overlay').classList.add('hidden');
   document.getElementById('app').classList.remove('hidden');
-  updateSidebarUser();navigate('dashboard');loadScreens();
+  updateSidebarUser();navigate('dashboard');loadScreens();loadNotifications();
 }
 
 function updateSidebarUser(){
@@ -1021,6 +1060,89 @@ function toast(msg,type='info'){
   const el=document.createElement('div');el.className=`toast toast-${type}`;
   const icons={success:'✓',error:'✕',info:'ℹ'};el.innerHTML=`<span>${icons[type]||'ℹ'}</span> ${msg}`;
   document.getElementById('toast-area').appendChild(el);setTimeout(()=>el.remove(),4000);
+}
+
+/* ── NOTIFICATIONS ── */
+let allNotifications=[];
+let notifOpen=false;
+
+async function loadNotifications(){
+  try{
+    const data=await api('/notifications?limit=30');
+    allNotifications=data.notifications||data.data||[];
+    renderNotifBadge();
+  }catch(e){allNotifications=[];}
+}
+
+function renderNotifBadge(){
+  const unread=allNotifications.filter(n=>!n.is_read).length;
+  ['notif-badge','notif-badge-mobile'].forEach(id=>{
+    const b=document.getElementById(id);if(!b)return;
+    if(unread>0){b.textContent=unread>9?'9+':unread;b.classList.remove('hidden');}
+    else{b.classList.add('hidden');}
+  });
+}
+
+function renderNotifList(){
+  const list=document.getElementById('notif-list');
+  if(!allNotifications.length){
+    list.innerHTML=`<div style="padding:48px 20px;text-align:center;"><div style="font-size:32px;margin-bottom:10px;">🔔</div><div style="font-size:14px;font-weight:600;margin-bottom:4px;">All caught up!</div><div style="font-size:12px;color:var(--text2);">No notifications yet</div></div>`;
+    return;
+  }
+  list.innerHTML=allNotifications.map(n=>`
+    <div class="notif-item ${n.is_read?'':'unread'}" onclick="markRead('${n.id}')">
+      ${!n.is_read?'<div class="notif-dot"></div>':'<div style="width:8px;flex-shrink:0;"></div>'}
+      <div style="flex:1;min-width:0;">
+        <div class="notif-item-title">${n.title}</div>
+        ${n.body?`<div class="notif-item-body">${n.body}</div>`:''}
+        <div class="notif-item-time">${timeAgo(n.created_at)}</div>
+      </div>
+    </div>`).join('');
+}
+
+function toggleNotifPanel(){
+  notifOpen=!notifOpen;
+  const panel=document.getElementById('notif-panel');
+  panel.classList.toggle('hidden',!notifOpen);
+  if(notifOpen){renderNotifList();}
+}
+
+document.addEventListener('click',function(e){
+  if(!notifOpen)return;
+  const panel=document.getElementById('notif-panel');
+  const b1=document.getElementById('notif-bell');
+  const b2=document.getElementById('notif-bell-mobile');
+  if(!panel.contains(e.target)&&!b1?.contains(e.target)&&!b2?.contains(e.target)){
+    notifOpen=false;panel.classList.add('hidden');
+  }
+});
+
+async function markRead(id){
+  try{
+    await api(`/notifications/${id}/read`,{method:'PUT'});
+    const n=allNotifications.find(x=>x.id===id);if(n)n.is_read=true;
+    renderNotifBadge();renderNotifList();
+  }catch(e){}
+}
+
+async function markAllRead(){
+  try{
+    await api('/notifications/read-all',{method:'PUT'});
+    allNotifications.forEach(n=>n.is_read=true);
+    renderNotifBadge();renderNotifList();
+  }catch(e){}
+}
+
+function timeAgo(dateStr){
+  if(!dateStr)return '';
+  const diff=Date.now()-new Date(dateStr).getTime();
+  const min=Math.floor(diff/60000);
+  if(min<1)return 'Just now';
+  if(min<60)return `${min}m ago`;
+  const hr=Math.floor(min/60);
+  if(hr<24)return `${hr}h ago`;
+  const d=Math.floor(hr/24);
+  return d===1?'Yesterday':`${d} days ago`;
 }
 </script>
 </body>
