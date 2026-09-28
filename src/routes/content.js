@@ -57,7 +57,8 @@ router.post('/upload', authenticate, upload.single('file'), async (req, res, nex
   try {
     const { originalname, filename, mimetype, size } = req.file;
     const type = mimetype.startsWith('video/') ? 'video' : 'image';
-    const fileUrl = `${process.env.BASE_URL || 'http://localhost:3000'}/uploads/${filename}`;
+    const base = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
+    const fileUrl = `${base}/uploads/${filename}`;
 
     const result = await query(
       `INSERT INTO content (user_id, original_name, stored_name, file_path, file_url, mime_type, file_size, type)

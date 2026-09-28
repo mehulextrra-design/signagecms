@@ -1,6 +1,7 @@
 package `in`.signagecms.player.utils
 
 import android.content.Context
+import `in`.signagecms.player.BuildConfig
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -8,6 +9,16 @@ import java.net.HttpURLConnection
 import java.net.URL
 
 object ContentDownloader {
+
+    private fun fixUrl(url: String): String {
+        if (url.contains("localhost") || url.contains("127.0.0.1")) {
+            val serverBase = BuildConfig.API_BASE_URL
+                .removeSuffix("api/").removeSuffix("/")
+            val filePart = url.substringAfter("/uploads/", "")
+            if (filePart.isNotEmpty()) return "$serverBase/uploads/$filePart"
+        }
+        return url
+    }
 
     // Download file and save to app's private cache directory.
     // Returns local File path on success, null on failure.
@@ -20,7 +31,7 @@ object ContentDownloader {
                 // Already downloaded
                 if (destFile.exists() && destFile.length() > 0) return@withContext destFile
 
-                val url = URL(fileUrl)
+                val url = URL(fixUrl(fileUrl))
                 val conn = url.openConnection() as HttpURLConnection
                 conn.connectTimeout = 30_000
                 conn.readTimeout = 120_000

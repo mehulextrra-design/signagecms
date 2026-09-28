@@ -347,8 +347,19 @@ class PlayerActivity : AppCompatActivity() {
         return if (localFile != null && localFile.exists() && localFile.length() > 0) {
             android.net.Uri.fromFile(localFile)
         } else {
-            android.net.Uri.parse(campaign.fileUrl)
+            android.net.Uri.parse(fixServerUrl(campaign.fileUrl))
         }
+    }
+
+    // Fix localhost URLs left in DB from dev deployments
+    private fun fixServerUrl(url: String): String {
+        if (url.contains("localhost") || url.contains("127.0.0.1")) {
+            val serverBase = BuildConfig.API_BASE_URL
+                .removeSuffix("api/").removeSuffix("/")
+            val filePart = url.substringAfter("/uploads/", "")
+            if (filePart.isNotEmpty()) return "$serverBase/uploads/$filePart"
+        }
+        return url
     }
 
     private fun showIdle(message: String) {
