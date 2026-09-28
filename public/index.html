@@ -871,7 +871,7 @@ async function api(path,opts={}){
 }
 
 async function loadScreens(){
-  try{const data=await api('/screens?limit=50');allScreens=data.screens||data.data||[];}catch(e){allScreens=[];}
+  try{const data=await api('/screens?limit=50');allScreens=Array.isArray(data)?data:(data.screens||data.data||[]);}catch(e){allScreens=[];}
 }
 
 function renderScreensList(){
