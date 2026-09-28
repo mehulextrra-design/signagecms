@@ -63,6 +63,16 @@
             android:layout_marginTop="4dp"
             android:textColor="#475569"
             android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/tvDownloadStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text=""
+            android:textColor="#0D9488"
+            android:textSize="12sp"
+            android:visibility="gone" />
     </LinearLayout>
 
     <!-- Status overlay (bottom-left corner, small) -->

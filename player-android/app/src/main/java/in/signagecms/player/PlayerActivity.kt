@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.graphics.drawable.Drawable
 import android.net.ConnectivityManager
 import android.os.Build
 import android.os.Bundle
@@ -18,6 +19,10 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
 import `in`.signagecms.player.api.RetrofitClient
 import `in`.signagecms.player.api.models.HeartbeatRequest
 import `in`.signagecms.player.api.models.PlayEntry
@@ -29,7 +34,6 @@ import `in`.signagecms.player.db.entities.PlayLogEntity
 import `in`.signagecms.player.utils.ContentDownloader
 import `in`.signagecms.player.utils.Prefs
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -208,14 +212,26 @@ class PlayerActivity : AppCompatActivity() {
     }
 
     private suspend fun downloadContent(campaigns: List<CampaignEntity>) {
-        campaigns.forEach { campaign ->
-            val existing = db.campaignDao().getById(campaign.campaignId)
-            if (existing?.isDownloaded == true) return@forEach
-
+        val toDownload = campaigns.filter { c ->
+            db.campaignDao().getById(c.campaignId)?.isDownloaded != true
+        }
+        if (toDownload.isNotEmpty()) {
+            withContext(Dispatchers.Main) {
+                binding.tvDownloadStatus.visibility = View.VISIBLE
+                binding.tvDownloadStatus.text = "⬇ Downloading content (0/${toDownload.size})…"
+            }
+        }
+        toDownload.forEachIndexed { idx, campaign ->
+            withContext(Dispatchers.Main) {
+                binding.tvDownloadStatus.text = "⬇ Downloading ${idx + 1}/${toDownload.size}: ${campaign.title}"
+            }
             val file = ContentDownloader.download(this, campaign.fileUrl, campaign.storedName)
             if (file != null) {
                 db.campaignDao().markDownloaded(campaign.campaignId, file.absolutePath)
             }
+        }
+        withContext(Dispatchers.Main) {
+            binding.tvDownloadStatus.visibility = View.GONE
         }
         // Prune old files
         val activeNames = campaigns.map { it.storedName }.toSet()
@@ -300,12 +316,26 @@ class PlayerActivity : AppCompatActivity() {
         releasePlayer()
 
         val uri = getContentUri(campaign)
+        val durationMs = (campaign.durationSec * 1000).toLong().coerceAtLeast(3000L)
+
         Glide.with(this)
             .load(uri)
+            .listener(object : RequestListener<Drawable> {
+                override fun onLoadFailed(
+                    e: GlideException?, model: Any?,
+                    target: Target<Drawable>, isFirstResource: Boolean
+                ): Boolean {
+                    // Image failed — skip to next after short delay
+                    handler.postDelayed({ playNext() }, 2000)
+                    return true
+                }
+                override fun onResourceReady(
+                    resource: Drawable, model: Any, target: Target<Drawable>?,
+                    dataSource: DataSource, isFirstResource: Boolean
+                ): Boolean = false
+            })
             .into(binding.ivImage)
 
-        // Show image for duration_sec, then next
-        val durationMs = (campaign.durationSec * 1000).toLong().coerceAtLeast(3000L)
         handler.postDelayed({
             logPlay(campaign)
             playNext()
@@ -327,7 +357,8 @@ class PlayerActivity : AppCompatActivity() {
         binding.ivImage.visibility = View.GONE
         binding.layoutIdle.visibility = View.VISIBLE
         binding.tvIdleMessage.text = message
-        binding.tvNextCheck.text = "Next check in ${prefs.syncIntervalSec / 60} min"
+        binding.tvNextCheck.text = "Next sync in ${prefs.syncIntervalSec / 60} min · Screen: ${prefs.screenCode ?: "—"}"
+        binding.tvDownloadStatus.visibility = View.GONE
         binding.layoutStatus.visibility = View.GONE
     }
 
