@@ -157,6 +157,18 @@ CREATE TABLE IF NOT EXISTS heartbeats (
 
 CREATE INDEX IF NOT EXISTS idx_heartbeats_screen ON heartbeats(screen_id);
 
+-- ── REMOTE COMMANDS ───────────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS remote_commands (
+  id          UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  screen_id   UUID NOT NULL REFERENCES screens(id) ON DELETE CASCADE,
+  command     VARCHAR(50) NOT NULL,  -- reload | reboot | clear_cache
+  payload     TEXT,
+  status      VARCHAR(20) DEFAULT 'pending',  -- pending | delivered
+  created_at  TIMESTAMPTZ DEFAULT NOW(),
+  delivered_at TIMESTAMPTZ
+);
+CREATE INDEX IF NOT EXISTS idx_remote_commands_screen ON remote_commands(screen_id, status);
+
 -- ── ACTIVITY LOG ──────────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS activity_log (
   id          UUID PRIMARY KEY DEFAULT uuid_generate_v4(),

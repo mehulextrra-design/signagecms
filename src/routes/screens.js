@@ -89,6 +89,20 @@ router.delete('/:id', authenticate, requireAdmin, async (req, res, next) => {
   } catch (err) { next(err); }
 });
 
+// POST /api/screens/:id/command — admin sends remote command to device
+router.post('/:id/command', authenticate, requireAdmin, async (req, res, next) => {
+  const { command, payload } = req.body;
+  const allowed = ['reload', 'reboot', 'clear_cache'];
+  if (!allowed.includes(command)) return res.status(400).json({ error: 'Invalid command' });
+  try {
+    await query(
+      `INSERT INTO remote_commands (screen_id, command, payload) VALUES ($1,$2,$3)`,
+      [req.params.id, command, payload || null]
+    );
+    res.json({ ok: true, command, screen_id: req.params.id });
+  } catch (err) { next(err); }
+});
+
 // POST /api/screens/:id/register-device — generates player token for a device
 router.post('/:id/register-device', authenticate, requireAdmin, async (req, res, next) => {
   const jwt = require('jsonwebtoken');

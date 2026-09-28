@@ -479,7 +479,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
           <button class="btn btn-primary" onclick="openScreenModal()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add Screen</button>
         </div>
         <div class="table-card">
-          <div class="table-wrap"><table><thead><tr><th>Code</th><th>Name</th><th>Location</th><th>Zone</th><th>Resolution</th><th>₹/Day</th><th>Status</th><th>Last Heartbeat</th><th>Actions</th></tr></thead><tbody id="screens-table"></tbody></table></div>
+          <div class="table-wrap"><table><thead><tr><th>Code</th><th>Name</th><th>Location</th><th>Zone</th><th>Resolution</th><th>₹/Day</th><th>Status</th><th>Last Heartbeat</th><th>Remote</th><th>Actions</th></tr></thead><tbody id="screens-table"></tbody></table></div>
         </div>
       </div>
 
@@ -1051,10 +1051,15 @@ async function loadScreens() {
         </td>
         <td style="font-size:12px;color:var(--text3);">${timeAgo(s.last_heartbeat)}</td>
         <td>
+          <button class="btn btn-ghost btn-xs" title="Reload schedule" onclick="sendCommand('${s.id}','reload',this)" style="padding:4px 6px;">↺</button>
+          <button class="btn btn-ghost btn-xs" title="Reboot app" onclick="sendCommand('${s.id}','reboot',this)" style="padding:4px 6px;margin-left:2px;">⟳</button>
+          <button class="btn btn-ghost btn-xs" title="Clear cache" onclick="sendCommand('${s.id}','clear_cache',this)" style="padding:4px 6px;margin-left:2px;">⌫</button>
+        </td>
+        <td>
           <button class="btn btn-ghost btn-xs" onclick="editScreen(${JSON.stringify(s).replace(/"/g,'&quot;')})">Edit</button>
           <button class="btn btn-danger btn-xs" style="margin-left:4px;" onclick="deleteScreen('${s.id}', '${s.screen_code}')">Del</button>
         </td>
-      </tr>`).join('') || emptyRow(9, 'No screens. Add your first screen!');
+      </tr>`).join('') || emptyRow(10, 'No screens. Add your first screen!');
   } catch(e) { tbody.innerHTML = emptyRow(9, 'Error: ' + e.message); }
 }
 
@@ -1079,6 +1084,17 @@ function openScreenModal(screen = null) {
 }
 
 function editScreen(s) { openScreenModal(s); }
+
+async function sendCommand(screenId, command, btn) {
+  const labels = { reload: 'Reload', reboot: 'Reboot', clear_cache: 'Clear Cache' };
+  const orig = btn.textContent;
+  btn.disabled = true; btn.textContent = '…';
+  try {
+    await api(`/screens/${screenId}/command`, { method: 'POST', body: JSON.stringify({ command }) });
+    showToast(`${labels[command]} command queued — will execute on next heartbeat (~60s)`, 'success');
+  } catch(e) { showToast('Error: ' + e.message, 'error'); }
+  finally { btn.textContent = orig; btn.disabled = false; }
+}
 
 async function saveScreen() {
   const id = document.getElementById('sc-id').value;

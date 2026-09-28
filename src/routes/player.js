@@ -99,11 +99,13 @@ router.post('/heartbeat', authenticatePlayer, async (req, res, next) => {
       [screenId, ip_address, app_version, android_version, uptime_sec, is_playing, current_campaign_id || null]
     );
 
-    // Check for pending remote commands
+    // Check for pending remote commands + mark as delivered
     const cmds = await query(
-      `SELECT command, payload FROM remote_commands WHERE screen_id=$1 AND status='pending' ORDER BY created_at ASC`,
+      `UPDATE remote_commands SET status='delivered', delivered_at=NOW()
+       WHERE screen_id=$1 AND status='pending'
+       RETURNING command, payload`,
       [screenId]
-    ).catch(() => ({ rows: [] }));  // table may not exist in early deploys
+    ).catch(() => ({ rows: [] }));
 
     res.json({
       ok: true,
