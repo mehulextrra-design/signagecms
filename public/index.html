@@ -307,6 +307,44 @@ tr:hover td{background:var(--i50);}
 .notif-item:not(.notif-unread) .notif-dot{visibility:hidden;}
 /* ── PROFILE ── */
 .prof-av{width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,var(--t400),var(--t700));display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:white;flex-shrink:0;}
+
+/* ── ALWAYS HIDE DEV TAB BAR ── */
+.tabs{display:none!important;}
+
+/* ── WIZARD PROGRESS BAR ── */
+.wizard-bar{display:flex;align-items:center;padding:10px 20px;background:white;border-bottom:1px solid var(--i200);gap:0;overflow-x:auto;flex-shrink:0;}
+.wizard-bar::-webkit-scrollbar{display:none;}
+.wz-step{display:flex;align-items:center;gap:0;flex-shrink:0;}
+.wz-dot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0;transition:all .2s;}
+.wz-lbl{font-size:11px;font-weight:600;margin-left:7px;white-space:nowrap;}
+.wz-line{width:28px;height:2px;background:var(--i200);margin:0 4px;flex-shrink:0;}
+.wz-done .wz-dot{background:var(--green);color:white;}
+.wz-done .wz-lbl{color:var(--green);}
+.wz-done .wz-line{background:var(--green);}
+.wz-active .wz-dot{background:var(--t600);color:white;box-shadow:0 0 0 4px rgba(13,148,136,.18);}
+.wz-active .wz-lbl{color:var(--t700);font-weight:700;}
+.wz-active .wz-line{background:var(--i200);}
+.wz-pending .wz-dot{background:var(--i100);color:var(--i400);border:2px solid var(--i200);}
+.wz-pending .wz-lbl{color:var(--i400);}
+.wz-pending .wz-line{background:var(--i200);}
+@media(max-width:600px){.wz-lbl{display:none;}.wz-line{width:16px;}}
+
+/* ── UNIFIED SIDEBAR NAV ── */
+.unav{display:flex;flex-direction:column;gap:0;}
+.unav .sb-sec{margin-top:8px;}
+
+/* ── EMPTY STATE ── */
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:56px 24px;text-align:center;gap:14px;}
+.empty-ico{font-size:44px;opacity:.5;}
+.empty-title{font-size:15px;font-weight:700;color:var(--i800);}
+.empty-body{font-size:12px;color:var(--i500);max-width:280px;line-height:1.6;}
+
+/* ── FOCUS STYLES ── */
+.fi:focus{outline:none;border-color:var(--t500);box-shadow:0 0 0 3px rgba(20,184,166,.15);}
+.btn-login:focus{outline:none;box-shadow:0 0 0 3px rgba(20,184,166,.3);}
+
+/* ── LOADING STATE ── */
+.btn[disabled],.btn-login[disabled]{opacity:.6;cursor:not-allowed;pointer-events:none;}
 </style>
 </head>
 <body>
@@ -2775,7 +2813,12 @@ async function loadCampaigns(){
   try{
     const campaigns = await api('/campaigns');
     const tbody = document.querySelector('#s-tracker table tbody');
-    if(!tbody||!campaigns.length) return;
+    if(!tbody) return;
+    if(!campaigns.length){
+      const table = tbody.closest('table');
+      if(table) table.closest('.card')?.querySelector('.tbl-wrap')?.replaceWith(Object.assign(document.createElement('div'),{innerHTML:'<div class="empty-state"><div class="empty-ico">📋</div><div class="empty-title">No campaigns yet</div><div class="empty-body">Book your first ad on a digital screen — it takes less than 5 minutes.</div><button class="btn btn-p btn-sm" style="margin-top:4px" onclick="go(\'map\')">+ Book Screens</button></div>'}));
+      return;
+    }
     tbody.innerHTML = campaigns.map(c=>{
       const statusColors={live:'b-g',pending_payment:'b-y',pending_approval:'b-y',approved:'b-b',rejected:'b-r',completed:'b-g',paused:'b-y',cancelled:'b-r'};
       const statusLabels={live:'● Live',pending_payment:'⏳ Payment',pending_approval:'⏳ Approval',approved:'✓ Approved',rejected:'✗ Rejected',completed:'✓ Done',paused:'⏸ Paused',cancelled:'✗ Cancelled'};
@@ -2803,7 +2846,12 @@ async function loadInvoices(){
   try{
     const invoices = await api('/billing/invoices');
     const tbody = document.querySelector('#s-invoices table tbody');
-    if(!tbody||!invoices.length) return;
+    if(!tbody) return;
+    if(!invoices.length){
+      const wrap = tbody.closest('.tbl-wrap');
+      if(wrap) wrap.innerHTML='<div class="empty-state"><div class="empty-ico">🧾</div><div class="empty-title">No invoices yet</div><div class="empty-body">Invoices are generated automatically when you book a campaign.</div><button class="btn btn-p btn-sm" style="margin-top:4px" onclick="go(\'map\')">+ Book Screens</button></div>';
+      return;
+    }
     tbody.innerHTML = invoices.map(inv=>{
       const base = +inv.amount||0;
       const gst = +(inv.gst_amount||0);
@@ -2887,6 +2935,214 @@ go = function(id){
   else if(id==='profile') loadProfile();
 };
 
+/* ══════════════════════════════════════════════════════
+   UX IMPROVEMENTS — INDUSTRY STANDARD
+   ══════════════════════════════════════════════════════ */
+
+/* ── UNIFIED SIDEBAR DEFINITION ── */
+const SIDEBAR_NAV = [
+  {id:'dash',   label:'Dashboard',    sec:'main', svg:'<rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>'},
+  {id:'tracker',label:'My Campaigns', sec:'main', svg:'<path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>'},
+  {id:'map',    label:'Book Screens', sec:'main', svg:'<polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/>'},
+  {id:'assets', label:'Media Library',sec:'main', svg:'<rect x="2" y="2" width="20" height="20" rx="2"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/>'},
+  {id:'pop',    label:'Analytics',    sec:'reports',svg:'<line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>'},
+  {id:'invoices',label:'Invoices',    sec:'reports',svg:'<rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/>'},
+  {id:'notif',  label:'Notifications',sec:'reports',svg:'<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>'},
+  {id:'support',label:'Support',     sec:'account',svg:'<path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>'},
+  {id:'profile',label:'Account',     sec:'account',svg:'<path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/>'},
+];
+
+function buildSidebar(activeId, sbId){
+  const sb = document.getElementById(sbId);
+  if(!sb) return;
+  const user = getUser();
+  const initials = user ? ((user.first_name||user.email||'U')[0].toUpperCase() + (user.last_name||'')[0].toUpperCase()) : 'U';
+  const name = user?.business_name || ((user?.first_name||'')+(user?.last_name?' '+user.last_name:'')) || user?.email?.split('@')[0] || 'User';
+  const role = {superadmin:'Super Admin',admin:'Admin',advertiser:'Advertiser'}[user?.role] || 'User';
+
+  const makeItem = (item) => `
+    <button class="sb-item${item.id===activeId?' on':''}" onclick="go('${item.id}')">
+      <svg class="sb-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${item.svg}</svg>
+      ${item.label}
+    </button>`;
+
+  const mainItems = SIDEBAR_NAV.filter(n=>n.sec==='main').map(makeItem).join('');
+  const reportItems = SIDEBAR_NAV.filter(n=>n.sec==='reports').map(makeItem).join('');
+  const accountItems = SIDEBAR_NAV.filter(n=>n.sec==='account').map(makeItem).join('');
+
+  sb.innerHTML = `
+    <div class="sb-brand">
+      <div class="sb-logo"><svg viewBox="0 0 24 24" fill="white"><path d="M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H3V5h18v14zm-10-7h9v5h-9z"/></svg></div>
+      <span class="sb-name">SignageCMS</span>
+    </div>
+    <div class="sb-sec">Main</div>
+    ${mainItems}
+    <div class="sb-sec">Reports</div>
+    ${reportItems}
+    <div class="sb-sec">Account</div>
+    ${accountItems}
+    <div class="sb-footer" style="margin-top:auto">
+      <div class="av">${initials}</div>
+      <div><div class="av-name">${name}</div><div class="av-role">${role}</div></div>
+      <button class="logout-btn" onclick="doLogout()" title="Log out">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+      </button>
+    </div>`;
+
+  // Mobile nav support
+  if(window.innerWidth<=700){
+    const mn = sb.querySelector('.mob-full-nav');
+    if(mn) mn.remove();
+  }
+}
+
+/* ── WIZARD PROGRESS BAR ── */
+const WIZARD_STEPS = [
+  {id:'map',     label:'Select Screens'},
+  {id:'upload',  label:'Upload Media'},
+  {id:'playlist',label:'Build Playlist'},
+  {id:'schedule',label:'Set Schedule'},
+  {id:'payment', label:'Pay & Launch'},
+];
+const WIZARD_SCREEN_IDS = new Set(WIZARD_STEPS.map(s=>s.id));
+
+function updateWizardBar(activeId){
+  // Remove any existing wizard bar
+  document.querySelectorAll('.wizard-bar').forEach(el=>el.remove());
+  if(!WIZARD_SCREEN_IDS.has(activeId)) return;
+
+  const activeIdx = WIZARD_STEPS.findIndex(s=>s.id===activeId);
+  const bar = document.createElement('div');
+  bar.className = 'wizard-bar';
+  bar.innerHTML = WIZARD_STEPS.map((step,i)=>{
+    const state = i < activeIdx ? 'wz-done' : i === activeIdx ? 'wz-active' : 'wz-pending';
+    const icon = i < activeIdx ? '✓' : (i+1);
+    const line = i < WIZARD_STEPS.length-1 ? `<div class="wz-step ${state}"><div class="wz-line"></div></div>` : '';
+    return `<div class="wz-step ${state}">
+      <div class="wz-dot">${icon}</div>
+      <div class="wz-lbl">${step.label}</div>
+    </div>${line}`;
+  }).join('');
+
+  const screen = document.getElementById('s-'+activeId);
+  if(screen){
+    const mainEl = screen.querySelector('.main');
+    if(mainEl) mainEl.insertBefore(bar, mainEl.firstChild);
+  }
+}
+
+/* ── SMART TIME-BASED GREETING ── */
+function updateGreeting(){
+  const h = new Date().getHours();
+  const greet = h<12?'Good morning':h<17?'Good afternoon':'Good evening';
+  const user = getUser();
+  const name = user?.first_name || user?.name || '';
+  document.querySelectorAll('.ph-title').forEach(el=>{
+    if(/good (morning|afternoon|evening)/i.test(el.textContent)){
+      el.textContent = name ? `${greet}, ${name} 👋` : `${greet} 👋`;
+    }
+  });
+}
+
+/* ── WIZARD SIDEBAR (minimal nav for booking flow) ── */
+function buildWizardSidebar(activeId, sbId){
+  const sb = document.getElementById(sbId);
+  if(!sb) return;
+
+  // Keep existing wizard step content but fix brand and add back button + footer
+  const existingBrand = sb.querySelector('.sb-brand');
+  const existingFooter = sb.querySelector('.sb-footer');
+
+  // Add "back to dashboard" link after brand if not exists
+  if(existingBrand && !sb.querySelector('.wz-back-btn')){
+    const back = document.createElement('button');
+    back.className = 'sb-item wz-back-btn';
+    back.innerHTML = `<svg class="sb-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg> Back to Dashboard`;
+    back.onclick = ()=>go('dash');
+    existingBrand.insertAdjacentElement('afterend', back);
+  }
+
+  // Fix footer logout
+  if(existingFooter){
+    existingFooter.querySelectorAll('.logout-btn').forEach(btn=>{
+      btn.onclick = (e)=>{e.stopPropagation();doLogout();};
+    });
+  }
+}
+
+/* ── EMPTY STATES ── */
+function showEmptyState(containerId, title, body, ctaLabel, ctaAction){
+  const el = document.querySelector(containerId);
+  if(!el) return;
+  el.innerHTML = `<div class="empty-state">
+    <div class="empty-ico">📭</div>
+    <div class="empty-title">${title}</div>
+    <div class="empty-body">${body}</div>
+    ${ctaLabel ? `<button class="btn btn-p btn-sm" style="margin-top:4px" onclick="${ctaAction}">${ctaLabel}</button>` : ''}
+  </div>`;
+}
+
+/* ── ENHANCED GO FUNCTION ── */
+const _go_ux = go;
+go = function(id){
+  _go_ux(id);
+
+  // Wizard screens — use minimal sidebar
+  if(WIZARD_SCREEN_IDS.has(id)){
+    const sbId = 'sb-'+id;
+    buildWizardSidebar(id, sbId);
+    updateWizardBar(id);
+    return;
+  }
+
+  // All authenticated screens get unified sidebar
+  const sbMap = {
+    dash:'sb-dash', tracker:'sb-tracker', pop:'sb-pop',
+    invoices:'sb-invoices', assets:'sb-assets', notif:'sb-notif',
+    profile:'sb-profile', support:'sb-support', calendar:'sb-calendar',
+    remote:'sb-remote', audience:'sb-audience'
+  };
+  const sbId = sbMap[id];
+  if(sbId) buildSidebar(id, sbId);
+
+  // Post-navigation actions
+  if(id==='dash') updateGreeting();
+};
+
+/* ── ENTER KEY ON LOGIN ── */
+function setupLoginKeyboard(){
+  const emailInput = document.getElementById('login-email');
+  const pwInput = document.getElementById('login-password');
+  if(emailInput) emailInput.addEventListener('keydown', e=>{
+    if(e.key==='Enter'){ e.preventDefault(); pwInput?.focus(); }
+  });
+  if(pwInput) pwInput.addEventListener('keydown', e=>{
+    if(e.key==='Enter'){ e.preventDefault(); doLogin(); }
+  });
+}
+
+/* ── GOOGLE BUTTON — DISABLE BYPASS ── */
+function fixGoogleButtons(){
+  document.querySelectorAll('.btn-goo').forEach(btn=>{
+    btn.onclick = ()=>toast('Google login coming soon — use email & password for now','🔜','var(--blue)');
+  });
+}
+
+/* ── NOTIFICATION COUNT FROM STORAGE ── */
+function updateNotifBadge(count){
+  document.querySelectorAll('[id*="nf-badge"]').forEach(el=>{ if(count>0) el.textContent=count; else el.remove(); });
+  const bells = document.querySelectorAll('.ph button svg path[d*="M18 8"]');
+  bells.forEach(svg=>{
+    const parent = svg.closest('button');
+    if(!parent) return;
+    let badge = parent.querySelector('span[style*="background:var(--red)"]');
+    if(count>0 && !badge){ badge=document.createElement('span'); badge.style.cssText='position:absolute;top:-3px;right:-3px;width:14px;height:14px;background:var(--red);border-radius:50%;font-size:8px;color:white;display:flex;align-items:center;justify-content:center;font-weight:700;border:2px solid white'; badge.textContent=count; parent.style.position='relative'; parent.appendChild(badge); }
+    else if(count===0 && badge) badge.remove();
+  });
+}
+
 /* ── WIRE LOGOUT BUTTONS ── */
 document.querySelectorAll('.logout-btn').forEach(btn=>{
   btn.addEventListener('click', function(e){e.stopPropagation();doLogout();});
@@ -2895,14 +3151,19 @@ document.querySelectorAll('.logout-btn').forEach(btn=>{
 
 /* ── AUTO LOGIN CHECK ON LOAD ── */
 window.addEventListener('DOMContentLoaded', function(){
+  setupLoginKeyboard();
+  fixGoogleButtons();
+
   const token = getToken();
   const user = getUser();
   if(token && user){
     applyUserToUI(user);
     go('dash');
+    updateGreeting();
   }
-  // Link stat cards on dashboard
-  const links=[['Active Screens','map'],['Live Campaigns','tracker'],['Plays Today','pop'],['Spent This Month','payment']];
+
+  // Dashboard stat card click links
+  const links=[['Active Screens','map'],['Live Campaigns','tracker'],['Plays Today','pop'],['Spent This Month','invoices']];
   document.querySelectorAll('#s-dash .scard').forEach((c,i)=>{
     if(links[i]){c.style.cursor='pointer';c.title='View '+links[i][0];c.addEventListener('click',()=>go(links[i][1]));}
   });
