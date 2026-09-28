@@ -68,5 +68,4 @@ dependencies {
 
     // Images
     implementation(libs.glide)
-    ksp(libs.glide.compiler)
 }
