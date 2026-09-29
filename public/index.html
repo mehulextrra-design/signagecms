@@ -101,17 +101,17 @@
   .page.active { display:block; }
 
   /* STATS */
-  .stat-grid { display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px; }
-  .stat-card { background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;box-shadow:var(--shadow); }
-  .stat-label { font-size:12px;font-weight:500;color:var(--text2);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px; }
-  .stat-value { font-size:28px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1; }
-  .stat-change { font-size:12px;margin-top:6px;color:var(--text2); }
-  .stat-icon { float:right;width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-top:-4px; }
+  .stat-grid { display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px; }
+  .stat-card { background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:12px 14px;box-shadow:var(--shadow); }
+  .stat-label { font-size:11px;font-weight:500;color:var(--text2);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:5px; }
+  .stat-value { font-size:22px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1; }
+  .stat-change { font-size:11px;margin-top:4px;color:var(--text2); }
+  .stat-icon { float:right;width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;margin-top:-2px; }
   .two-col { display:grid;grid-template-columns:1fr 1fr;gap:20px; }
   .section-header { display:flex;align-items:center;justify-content:space-between;margin-bottom:16px; }
   .section-title { font-size:15px;font-weight:600; }
   .card { background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow); }
-  .card-body { padding:20px; }
+  .card-body { padding:14px 16px; }
 
   /* TABLE */
   .table-wrap { overflow-x:auto; }
@@ -162,14 +162,14 @@
   .wizard-nav { display:flex;align-items:center;justify-content:space-between;margin-top:24px;padding-top:20px;border-top:1px solid var(--border); }
 
   /* SCREEN CARDS */
-  .screens-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px; }
-  .screen-card { background:var(--surface);border:2px solid var(--border);border-radius:var(--radius-lg);padding:16px;cursor:pointer;transition:all 0.15s;position:relative; }
+  .screens-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px; }
+  .screen-card { background:var(--surface);border:2px solid var(--border);border-radius:var(--radius-lg);padding:12px;cursor:pointer;transition:all 0.15s;position:relative; }
   .screen-card:hover { border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-light); }
   .screen-card.selected { border-color:var(--primary);background:var(--primary-light); }
-  .screen-card.selected::after { content:'✓';position:absolute;top:10px;right:10px;width:20px;height:20px;background:var(--primary);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700; }
-  .screen-name { font-size:14px;font-weight:600;margin-bottom:4px; }
-  .screen-loc { font-size:12px;color:var(--text2);margin-bottom:10px; }
-  .screen-price { font-size:13px;font-weight:700;color:var(--primary); }
+  .screen-card.selected::after { content:'✓';position:absolute;top:8px;right:8px;width:18px;height:18px;background:var(--primary);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700; }
+  .screen-name { font-size:13px;font-weight:600;margin-bottom:2px; }
+  .screen-loc { font-size:11px;color:var(--text2);margin-bottom:8px; }
+  .screen-price { font-size:12px;font-weight:700;color:var(--primary); }
 
   /* UPLOAD */
   .upload-zone { border:2px dashed var(--border);border-radius:var(--radius-lg);padding:48px 24px;text-align:center;cursor:pointer;transition:all 0.2s;background:var(--surface); }
@@ -907,17 +907,17 @@ function renderScreensList(){
     return;
   }
   grid.innerHTML=allScreens.map(s=>`
-    <div class="card card-body" style="display:flex;gap:12px;align-items:flex-start;">
-      <div style="width:64px;height:40px;background:var(--sidebar-bg);border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-        <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="rgba(255,255,255,0.4)"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+    <div class="card" style="display:flex;gap:10px;align-items:flex-start;padding:10px 12px;">
+      <div style="width:48px;height:30px;background:var(--sidebar-bg);border-radius:5px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="rgba(255,255,255,0.4)"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
       </div>
-      <div style="flex:1;">
-        <div style="font-weight:600;margin-bottom:2px;">${s.name}</div>
-        <div style="font-size:12px;color:var(--text2);margin-bottom:8px;">${s.location||s.city||'—'}</div>
-        <div style="display:flex;align-items:center;gap:10px;">
-          <span style="font-size:13px;font-weight:700;color:var(--primary);">₹${(s.price_per_day||0).toLocaleString('en-IN')}/day</span>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:13px;font-weight:600;margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${s.name}</div>
+        <div style="font-size:11px;color:var(--text2);margin-bottom:6px;">${s.location||s.city||'—'}</div>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+          <span style="font-size:12px;font-weight:700;color:var(--primary);">₹${(s.price_per_day||0).toLocaleString('en-IN')}/day</span>
           <span class="badge ${s.status==='online'?'badge-live':'badge-pending'}">${s.status||'unknown'}</span>
-          <span style="font-size:12px;color:var(--text2);">${(s.daily_impressions||0).toLocaleString('en-IN')} imp/day</span>
+          <span style="font-size:11px;color:var(--text2);">${(s.daily_impressions||0).toLocaleString('en-IN')} imp/day</span>
         </div>
       </div>
     </div>`).join('');
