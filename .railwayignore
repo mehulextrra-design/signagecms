@@ -1,0 +1,5 @@
+player-android/
+seed-test-campaigns.js
+uploads/
+*.log
+.DS_Store
