@@ -52,6 +52,7 @@ class PlayerActivity : AppCompatActivity() {
     private var currentIndex = 0
     private var currentCampaignId: String? = null
     private var playStartTime: Long = 0L
+    private var activeContentView: android.view.View? = null
 
     private val handler = Handler(Looper.getMainLooper())
     private var wakeLock: PowerManager.WakeLock? = null
@@ -281,22 +282,35 @@ class PlayerActivity : AppCompatActivity() {
         }
     }
 
-    private fun playVideo(campaign: CampaignEntity) {
+    private fun crossFade(fadeOut: android.view.View?, fadeIn: android.view.View, duration: Long = 500) {
         binding.layoutIdle.visibility = View.GONE
-        binding.ivImage.visibility = View.GONE
-        binding.playerView.visibility = View.VISIBLE
+        fadeIn.alpha = if (fadeOut == null) 1f else 0f
+        fadeIn.visibility = View.VISIBLE
+        if (fadeOut == null || fadeOut === fadeIn) return
+        fadeIn.animate().alpha(1f).setDuration(duration).start()
+        fadeOut.animate().alpha(0f).setDuration(duration).withEndAction {
+            fadeOut.visibility = View.GONE
+            fadeOut.alpha = 1f
+        }.start()
+        activeContentView = fadeIn
+    }
 
+    private fun playVideo(campaign: CampaignEntity) {
         releasePlayer()
         val player = ExoPlayer.Builder(this).build()
         exoPlayer = player
         binding.playerView.player = player
         binding.playerView.useController = false
 
-        // Use local file if downloaded, else stream from URL
         val uri = getContentUri(campaign)
+        var fadeDone = false
 
         player.addListener(object : Player.Listener {
             override fun onPlaybackStateChanged(state: Int) {
+                if (state == Player.STATE_READY && !fadeDone) {
+                    fadeDone = true
+                    crossFade(activeContentView, binding.playerView)
+                }
                 if (state == Player.STATE_ENDED) {
                     logPlay(campaign)
                     handler.post { playNext() }
@@ -310,10 +324,6 @@ class PlayerActivity : AppCompatActivity() {
     }
 
     private fun showImage(campaign: CampaignEntity) {
-        binding.playerView.visibility = View.GONE
-        binding.layoutIdle.visibility = View.GONE
-        binding.ivImage.visibility = View.VISIBLE
-
         releasePlayer()
 
         val uri = getContentUri(campaign)
@@ -333,9 +343,20 @@ class PlayerActivity : AppCompatActivity() {
                 override fun onResourceReady(
                     resource: Drawable, model: Any, target: Target<Drawable>?,
                     dataSource: DataSource, isFirstResource: Boolean
-                ): Boolean = false
+                ): Boolean {
+                    // Fade from whatever was playing (video/idle/image) into ivImage
+                    if (activeContentView !== binding.ivImage) {
+                        crossFade(activeContentView, binding.ivImage)
+                    }
+                    return false
+                }
             })
             .into(binding.ivImage)
+
+        // If image was already active, ensure it's visible
+        if (activeContentView === binding.ivImage) {
+            binding.ivImage.visibility = View.VISIBLE
+        }
 
         handler.postDelayed({
             logPlay(campaign)
@@ -365,6 +386,7 @@ class PlayerActivity : AppCompatActivity() {
 
     private fun showIdle(message: String) {
         releasePlayer()
+        activeContentView = null
         binding.playerView.visibility = View.GONE
         binding.ivImage.visibility = View.GONE
         binding.layoutIdle.visibility = View.VISIBLE
