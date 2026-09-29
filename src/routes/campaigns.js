@@ -41,7 +41,7 @@ router.get('/', authenticate, async (req, res, next) => {
     if (!isAdmin) { params.push(req.user.id); sql += ` AND c.user_id = $${params.length}`; }
     if (status) { params.push(status); sql += ` AND c.status = $${params.length}`; }
 
-    sql += ` GROUP BY c.id, u.first_name, u.last_name, u.business_name, u.email
+    sql += ` GROUP BY c.id, u.first_name, u.last_name, u.business_name, u.email, ct.file_url, ct.type, ct.original_name
              ORDER BY c.created_at DESC LIMIT $${params.length + 1} OFFSET $${params.length + 2}`;
     params.push(limit, offset);
 
