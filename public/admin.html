@@ -468,7 +468,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
       <div id="page-approvals" class="page">
         <div class="section-head"><h2>Pending Approvals</h2><button class="btn btn-primary" onclick="loadApprovals()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>Refresh</button></div>
         <div class="table-card">
-          <div class="table-wrap"><table><thead><tr><th>Code</th><th>Title</th><th>Advertiser</th><th>Screens</th><th>Dates</th><th>Amount</th><th>AI Review</th><th>Action</th></tr></thead><tbody id="approvals-table"></tbody></table></div>
+          <div class="table-wrap"><table><thead><tr><th>Code</th><th>Creative</th><th>Title</th><th>Advertiser</th><th>Screens</th><th>Dates</th><th>Amount</th><th>AI Review</th><th>Action</th></tr></thead><tbody id="approvals-table"></tbody></table></div>
         </div>
       </div>
 
@@ -974,11 +974,11 @@ function filterCampaigns() {
 // ── APPROVALS ─────────────────────────────────────────────────────────────
 async function loadApprovals() {
   const tbody = document.getElementById('approvals-table');
-  tbody.innerHTML = loadingRow(7);
+  tbody.innerHTML = loadingRow(9);
   try {
     const data = await api('/campaigns?status=pending_approval&limit=100');
     const arr = Array.isArray(data) ? data : (data.data||[]);
-    if(!arr.length) { tbody.innerHTML = emptyRow(7, 'No pending approvals — all clear!'); return; }
+    if(!arr.length) { tbody.innerHTML = emptyRow(9, 'No pending approvals — all clear!'); return; }
     tbody.innerHTML = arr.map(c => {
       const aiStatus = c.ai_review_status;
       const aiNote = c.ai_review_notes || '';
@@ -987,9 +987,15 @@ async function loadApprovals() {
         : aiStatus === 'rejected'
         ? `<span style="color:var(--danger);font-size:12px;font-weight:600;" title="${aiNote}">✗ Flagged</span>`
         : `<span style="color:var(--warning);font-size:12px;" title="${aiNote || 'Pending review'}">⏳ Pending${aiNote ? '<br><small style=\'color:var(--text2);font-size:10px;\'>'+aiNote.substring(0,50)+'</small>' : ''}</span>`;
+      const creativeTd = c.creative_url && c.creative_type === 'image'
+        ? `<td style="width:70px;"><img src="${c.creative_url}" alt="creative" style="width:64px;height:48px;object-fit:cover;border-radius:6px;border:1px solid var(--border);cursor:pointer;" onclick="window.open('${c.creative_url}','_blank')" title="${c.creative_name||''}"></td>`
+        : c.creative_url && c.creative_type === 'video'
+        ? `<td style="width:70px;"><div style="width:64px;height:48px;background:var(--surface2);border-radius:6px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:24px;cursor:pointer;" onclick="window.open('${c.creative_url}','_blank')">🎬</div></td>`
+        : `<td style="width:70px;"><div style="width:64px;height:48px;background:var(--surface2);border-radius:6px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:11px;">—</div></td>`;
       return `<tr>
         <td><code style="font-size:11px;background:var(--surface2);padding:2px 6px;border-radius:4px;">${c.campaign_code}</code></td>
-        <td style="font-weight:500;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${c.title}</td>
+        ${creativeTd}
+        <td style="font-weight:500;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${c.title}</td>
         <td style="font-size:12px;">${c.first_name||''} ${c.last_name||''}<br><span style="color:var(--text3);">${c.email||''}</span></td>
         <td style="font-size:12px;">${(c.screens||[]).join(', ') || '—'}</td>
         <td style="font-size:12px;">${fmtDate(c.start_date)} – ${fmtDate(c.end_date)}</td>
@@ -1000,7 +1006,7 @@ async function loadApprovals() {
           <button class="btn btn-danger btn-xs" style="margin-left:4px;" onclick="openRejectModal('${c.id}')">✕ Reject</button>
         </td>
       </tr>`;}).join('');
-  } catch(e) { tbody.innerHTML = emptyRow(7, 'Error: ' + e.message); }
+  } catch(e) { tbody.innerHTML = emptyRow(9, 'Error: ' + e.message); }
 }
 
 async function approveQuick(id) {
