@@ -40,8 +40,15 @@ app.use(cors({ origin: process.env.CMS_ORIGIN || '*', credentials: true }));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
-// CMS frontend
-app.use(express.static(path.join(__dirname, '../public')));
+// CMS frontend — HTML files never cached, assets cached 1 day
+app.use(express.static(path.join(__dirname, '../public'), {
+  setHeaders(res, filePath) {
+    if (filePath.endsWith('.html')) {
+      res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+      res.setHeader('Pragma', 'no-cache');
+    }
+  }
+}));
 
 // Rate limiting
 const apiLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 200 });
@@ -62,8 +69,10 @@ app.use('/api/billing', billingRoutes);
 app.use('/api/coupons', couponRoutes);
 app.use('/api/notifications', notificationRoutes);
 
-// Admin panel shortcut
+// Admin panel shortcut — no-cache
 app.get('/admin', (req, res) => {
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+  res.setHeader('Pragma', 'no-cache');
   res.sendFile(path.join(__dirname, '../public/admin.html'));
 });
 
