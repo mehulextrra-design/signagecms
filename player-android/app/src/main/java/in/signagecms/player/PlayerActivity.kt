@@ -21,6 +21,7 @@ import androidx.media3.exoplayer.ExoPlayer
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import `in`.signagecms.player.api.RetrofitClient
@@ -320,12 +321,12 @@ class PlayerActivity : AppCompatActivity() {
 
         Glide.with(this)
             .load(uri)
+            .transition(DrawableTransitionOptions.withCrossFade(600))
             .listener(object : RequestListener<Drawable> {
                 override fun onLoadFailed(
                     e: GlideException?, model: Any?,
                     target: Target<Drawable>, isFirstResource: Boolean
                 ): Boolean {
-                    // Image failed — skip to next after short delay
                     handler.postDelayed({ playNext() }, 2000)
                     return true
                 }
