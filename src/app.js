@@ -40,9 +40,6 @@ app.use(cors({ origin: process.env.CMS_ORIGIN || '*', credentials: true }));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
-// Static files — uploaded content
-app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
-
 // CMS frontend
 app.use(express.static(path.join(__dirname, '../public')));
 

@@ -1,7 +1,7 @@
 const express = require('express');
 const multer = require('multer');
-const path = require('path');
-const { v4: uuidv4 } = require('uuid');
+const { v2: cloudinary } = require('cloudinary');
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const { query } = require('../db');
 const { authenticate } = require('../middleware/auth');
 
@@ -10,11 +10,26 @@ const router = express.Router();
 const ALLOWED_MIME = ['video/mp4', 'video/webm', 'image/jpeg', 'image/png', 'image/webp', 'image/gif'];
 const MAX_SIZE_MB = parseInt(process.env.MAX_FILE_SIZE_MB || 200);
 
-const storage = multer.diskStorage({
-  destination: path.join(__dirname, '../../uploads'),
-  filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname).toLowerCase();
-    cb(null, `${uuidv4()}${ext}`);
+// Configure Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+// Cloudinary storage — permanent, survives redeploys
+const storage = new CloudinaryStorage({
+  cloudinary,
+  params: async (req, file) => {
+    const isVideo = file.mimetype.startsWith('video/');
+    return {
+      folder: 'signagecms',
+      resource_type: isVideo ? 'video' : 'image',
+      // Keep original filename in public_id for traceability
+      public_id: `${Date.now()}-${file.originalname.replace(/[^a-zA-Z0-9._-]/g, '_')}`,
+      // For images: auto optimize quality
+      ...(isVideo ? {} : { transformation: [{ quality: 'auto', fetch_format: 'auto' }] }),
+    };
   },
 });
 
@@ -55,15 +70,18 @@ router.get('/', authenticate, async (req, res, next) => {
 router.post('/upload', authenticate, upload.single('file'), async (req, res, next) => {
   if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
   try {
-    const { originalname, filename, mimetype, size } = req.file;
+    const { originalname, mimetype, size } = req.file;
     const type = mimetype.startsWith('video/') ? 'video' : 'image';
-    const base = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
-    const fileUrl = `${base}/uploads/${filename}`;
+
+    // Cloudinary gives us the permanent URL directly
+    const fileUrl = req.file.path;                      // permanent Cloudinary URL
+    const storedName = req.file.filename;               // public_id
+    const filePath = req.file.filename;
 
     const result = await query(
       `INSERT INTO content (user_id, original_name, stored_name, file_path, file_url, mime_type, file_size, type)
        VALUES ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING *`,
-      [req.user.id, originalname, filename, `uploads/${filename}`, fileUrl, mimetype, size, type]
+      [req.user.id, originalname, storedName, filePath, fileUrl, mimetype, size, type]
     );
     res.status(201).json(result.rows[0]);
   } catch (err) { next(err); }
@@ -72,7 +90,6 @@ router.post('/upload', authenticate, upload.single('file'), async (req, res, nex
 // DELETE /api/content/:id
 router.delete('/:id', authenticate, async (req, res, next) => {
   try {
-    // Check if in active campaign
     const inUse = await query(
       `SELECT c.campaign_code FROM campaigns c
        WHERE c.content_id=$1 AND c.user_id=$2 AND c.status NOT IN ('cancelled','completed','rejected')`,
