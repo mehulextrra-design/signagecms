@@ -1,6 +1,7 @@
 const express = require('express');
 const { query, getClient } = require('../db');
 const { authenticate, requireAdmin } = require('../middleware/auth');
+const { reviewCampaign } = require('../services/aiReview');
 
 const router = express.Router();
 
@@ -25,7 +26,8 @@ router.get('/', authenticate, async (req, res, next) => {
 
     let sql = `
       SELECT c.*, u.first_name, u.last_name, u.business_name, u.email,
-        ARRAY_AGG(DISTINCT s.screen_code) FILTER (WHERE s.id IS NOT NULL) AS screens
+        ARRAY_AGG(DISTINCT s.screen_code) FILTER (WHERE s.id IS NOT NULL) AS screens,
+        c.rejection_reason, c.ai_review_status, c.ai_review_notes
       FROM campaigns c
       JOIN users u ON u.id = c.user_id
       LEFT JOIN campaign_screens cs ON cs.campaign_id = c.id
@@ -157,6 +159,11 @@ router.post('/:id/confirm-payment', authenticate, async (req, res, next) => {
 
     await client.query('COMMIT');
     res.json({ campaign, invoice_number: invNum });
+
+    // Async AI content review — runs after response sent
+    reviewCampaign(campaign.id).catch(err =>
+      console.error('[AI Review] Background review failed:', err.message)
+    );
   } catch (err) { await client.query('ROLLBACK'); next(err); }
   finally { client.release(); }
 });

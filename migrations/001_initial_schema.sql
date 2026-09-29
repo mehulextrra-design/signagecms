@@ -232,3 +232,7 @@ VALUES (
   '$2a$10$rDlDmDuZEBuAgFYeHuuY3OC3fqAEsoOSJ2ojQZEUGFzKDQKj7wQtC',
   'advertiser', 'Raj', 'Sharma', 'Domino''s Pizza — Raj Stores', 'Restaurant / Food & Beverage', 'Pune, Maharashtra', TRUE, TRUE
 ) ON CONFLICT (email) DO UPDATE SET password_hash='$2a$10$rDlDmDuZEBuAgFYeHuuY3OC3fqAEsoOSJ2ojQZEUGFzKDQKj7wQtC', is_active=TRUE;
+
+-- ── AI REVIEW COLUMNS (added later) ───────────────────────────────────────
+ALTER TABLE campaigns ADD COLUMN IF NOT EXISTS ai_review_status VARCHAR(20);
+ALTER TABLE campaigns ADD COLUMN IF NOT EXISTS ai_review_notes TEXT;

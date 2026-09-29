@@ -468,7 +468,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
       <div id="page-approvals" class="page">
         <div class="section-head"><h2>Pending Approvals</h2><button class="btn btn-primary" onclick="loadApprovals()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>Refresh</button></div>
         <div class="table-card">
-          <div class="table-wrap"><table><thead><tr><th>Code</th><th>Title</th><th>Advertiser</th><th>Screens</th><th>Dates</th><th>Amount</th><th>Action</th></tr></thead><tbody id="approvals-table"></tbody></table></div>
+          <div class="table-wrap"><table><thead><tr><th>Code</th><th>Title</th><th>Advertiser</th><th>Screens</th><th>Dates</th><th>Amount</th><th>AI Review</th><th>Action</th></tr></thead><tbody id="approvals-table"></tbody></table></div>
         </div>
       </div>
 
@@ -487,7 +487,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
       <div id="page-content" class="page">
         <div class="section-head"><h2>Content Library</h2></div>
         <div class="table-card">
-          <div class="table-wrap"><table><thead><tr><th>File</th><th>Type</th><th>Advertiser</th><th>Size</th><th>Uploaded</th></tr></thead><tbody id="content-table"></tbody></table></div>
+          <div class="table-wrap"><table><thead><tr><th>Preview</th><th>File</th><th>Type</th><th>Advertiser</th><th>Size</th><th>Uploaded</th></tr></thead><tbody id="content-table"></tbody></table></div>
         </div>
       </div>
 
@@ -979,19 +979,27 @@ async function loadApprovals() {
     const data = await api('/campaigns?status=pending_approval&limit=100');
     const arr = Array.isArray(data) ? data : (data.data||[]);
     if(!arr.length) { tbody.innerHTML = emptyRow(7, 'No pending approvals — all clear!'); return; }
-    tbody.innerHTML = arr.map(c => `
-      <tr>
+    tbody.innerHTML = arr.map(c => {
+      const aiStatus = c.ai_review_status;
+      const aiNote = c.ai_review_notes || '';
+      const aiBadge = aiStatus === 'approved'
+        ? `<span style="color:var(--success);font-size:12px;font-weight:600;" title="${aiNote}">✓ Clean</span>`
+        : aiStatus === 'rejected'
+        ? `<span style="color:var(--danger);font-size:12px;font-weight:600;" title="${aiNote}">✗ Flagged</span>`
+        : `<span style="color:var(--warning);font-size:12px;" title="${aiNote || 'Pending review'}">⏳ Pending${aiNote ? '<br><small style=\'color:var(--text2);font-size:10px;\'>'+aiNote.substring(0,50)+'</small>' : ''}</span>`;
+      return `<tr>
         <td><code style="font-size:11px;background:var(--surface2);padding:2px 6px;border-radius:4px;">${c.campaign_code}</code></td>
-        <td style="font-weight:500;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${c.title}</td>
+        <td style="font-weight:500;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${c.title}</td>
         <td style="font-size:12px;">${c.first_name||''} ${c.last_name||''}<br><span style="color:var(--text3);">${c.email||''}</span></td>
         <td style="font-size:12px;">${(c.screens||[]).join(', ') || '—'}</td>
         <td style="font-size:12px;">${fmtDate(c.start_date)} – ${fmtDate(c.end_date)}</td>
         <td style="font-weight:600;">₹${fmt(c.amount_total||0)}</td>
+        <td>${aiBadge}</td>
         <td>
           <button class="btn btn-success btn-xs" onclick="approveQuick('${c.id}')">✓ Approve</button>
           <button class="btn btn-danger btn-xs" style="margin-left:4px;" onclick="openRejectModal('${c.id}')">✕ Reject</button>
         </td>
-      </tr>`).join('');
+      </tr>`;}).join('');
   } catch(e) { tbody.innerHTML = emptyRow(7, 'Error: ' + e.message); }
 }
 
@@ -1144,7 +1152,12 @@ async function loadContent() {
     if(!arr.length) { tbody.innerHTML = emptyRow(5, 'No content uploaded yet'); return; }
     tbody.innerHTML = arr.map(c => `
       <tr>
-        <td style="font-weight:500;font-size:13px;">${c.original_name}</td>
+        <td style="width:72px;">
+          ${c.type==='image'
+            ? `<img src="${c.file_url}" style="width:64px;height:40px;object-fit:cover;border-radius:4px;background:var(--surface2);" onerror="this.style.display='none'">`
+            : `<div style="width:64px;height:40px;background:var(--surface2);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:20px;">🎬</div>`}
+        </td>
+        <td style="font-weight:500;font-size:13px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${c.original_name}">${c.original_name}</td>
         <td><span class="badge ${c.type==='video'?'badge-blue':'badge-green'}">${c.type||'—'}</span></td>
         <td style="font-size:12px;color:var(--text2);">${c.first_name||''} ${c.business_name ? '· '+c.business_name : ''}<br>${c.email||''}</td>
         <td style="font-size:12px;">${c.file_size ? (c.file_size/1024/1024).toFixed(1)+' MB' : '—'}</td>

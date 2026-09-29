@@ -179,6 +179,19 @@
   .upload-sub { font-size:13px;color:var(--text2); }
   .upload-preview { margin-top:16px;padding:12px 14px;background:var(--surface2);border-radius:var(--radius-sm);display:flex;align-items:center;gap:10px; }
   .upload-preview-name { font-size:13px;font-weight:500;flex:1; }
+  /* MEDIA LIBRARY TABS */
+  .creative-tabs { display:flex;gap:6px;margin-bottom:14px; }
+  .creative-tab { padding:7px 16px;border-radius:var(--radius-sm);font-size:13px;font-weight:500;cursor:pointer;border:1.5px solid var(--border);background:transparent;color:var(--text2);transition:all 0.15s; }
+  .creative-tab.active { background:var(--primary);color:#fff;border-color:var(--primary); }
+  .library-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:10px;max-height:260px;overflow-y:auto;padding:4px 2px; }
+  .lib-item { border:2px solid var(--border);border-radius:var(--radius-sm);padding:8px;cursor:pointer;transition:all 0.15s;text-align:center; }
+  .lib-item:hover,.lib-item.selected { border-color:var(--primary);background:var(--primary-light); }
+  .lib-thumb { width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:4px;background:var(--surface2);margin-bottom:5px;display:block; }
+  .lib-thumb-vid { width:100%;aspect-ratio:16/9;border-radius:4px;background:var(--surface2);margin-bottom:5px;display:flex;align-items:center;justify-content:center;font-size:22px; }
+  .lib-name { font-size:11px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+  .lib-type { font-size:10px;color:var(--text3);margin-top:2px; }
+  /* REJECTION REASON */
+  .rejection-reason { font-size:11px;color:#991B1B;background:var(--danger-light);border-radius:4px;padding:3px 7px;margin-top:4px;display:inline-block;max-width:260px;word-break:break-word; }
   .upload-preview-size { font-size:12px;color:var(--text2); }
 
   /* SCHEDULE */
@@ -519,15 +532,27 @@
 
           <!-- Step 2 -->
           <div class="wizard-panel" id="wp2">
-            <div class="section-title" style="margin-bottom:6px;">Upload Your Creative</div>
-            <div style="font-size:13px;color:var(--text2);margin-bottom:20px;">Accepted: MP4, MOV, JPG, PNG · Max 200 MB</div>
+            <div class="section-title" style="margin-bottom:6px;">Your Creative</div>
+            <div style="font-size:13px;color:var(--text2);margin-bottom:14px;">Upload a new file or choose from your media library.</div>
             <div class="form-group"><label class="form-label">Campaign Name</label><input type="text" id="cmp-name" class="form-input" placeholder="e.g. Domino's Weekend Offer — July"></div>
-            <div class="upload-zone" id="upload-zone" onclick="document.getElementById('file-input').click()" ondragover="handleDragOver(event)" ondrop="handleDrop(event)">
-              <div class="upload-icon"><svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="#0D9488"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg></div>
-              <div class="upload-title">Drag &amp; drop or click to browse</div>
-              <div class="upload-sub">MP4 · MOV · JPG · PNG · max 200 MB</div>
+            <div class="creative-tabs">
+              <button class="creative-tab active" id="tab-upload" onclick="switchCreativeTab('upload')">Upload New</button>
+              <button class="creative-tab" id="tab-library" onclick="switchCreativeTab('library')">My Library</button>
             </div>
-            <input type="file" id="file-input" accept="video/*,image/*" style="display:none" onchange="handleFileSelect(event)">
+            <!-- Upload tab -->
+            <div id="creative-upload-section">
+              <div class="upload-zone" id="upload-zone" onclick="document.getElementById('file-input').click()" ondragover="handleDragOver(event)" ondrop="handleDrop(event)">
+                <div class="upload-icon"><svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="#0D9488"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg></div>
+                <div class="upload-title">Drag &amp; drop or click to browse</div>
+                <div class="upload-sub">MP4 · MOV · JPG · PNG · max 200 MB</div>
+              </div>
+              <input type="file" id="file-input" accept="video/*,image/*" style="display:none" onchange="handleFileSelect(event)">
+            </div>
+            <!-- Library tab -->
+            <div id="creative-library-section" style="display:none;">
+              <div id="library-grid" class="library-grid"><div style="color:var(--text2);font-size:13px;padding:20px;text-align:center;">Loading library…</div></div>
+            </div>
+            <!-- Shared preview -->
             <div id="upload-preview" style="display:none;" class="upload-preview">
               <div style="width:32px;height:32px;background:var(--primary-light);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:18px;" id="preview-icon">🎬</div>
               <div><div class="upload-preview-name" id="preview-name">—</div><div class="upload-preview-size" id="preview-size">—</div></div>
@@ -946,7 +971,23 @@ function renderCampaignsTable(campaigns){
   const wrap=document.getElementById('campaigns-table-wrap');
   if(!campaigns.length){wrap.innerHTML=`<div class="empty-state"><div class="empty-icon"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg></div><div class="empty-title">No campaigns found</div></div>`;return;}
   wrap.innerHTML=`<div class="table-wrap"><table><thead><tr><th>Campaign</th><th>Status</th><th>Start</th><th>End</th><th>Amount</th><th>Payment</th><th>Action</th></tr></thead><tbody>${campaigns.map(c=>`
-    <tr><td><div class="td-bold">${c.title||c.campaign_code}</div><div style="font-size:11px;color:var(--text2);">${c.campaign_code||''}</div></td><td>${statusBadge(c.status)}</td><td style="font-size:13px;">${fmtDate(c.start_date)}</td><td style="font-size:13px;">${fmtDate(c.end_date)}</td><td style="font-weight:600;">₹${parseFloat(c.amount_total||0).toLocaleString('en-IN')}</td><td>${payBadge(c.payment_status)}</td><td>${c.status==='pending_payment'?`<button class="btn btn-primary btn-sm" onclick="submitForApproval('${c.id}',this)">Submit for Approval</button>`:'-'}</td></tr>`).join('')}</tbody></table></div>`;
+    <tr>
+      <td><div class="td-bold">${c.title||c.campaign_code}</div><div style="font-size:11px;color:var(--text2);">${c.campaign_code||''}</div></td>
+      <td>
+        ${statusBadge(c.status)}
+        ${c.ai_review_status==='approved'?'<div style="font-size:10px;color:var(--success);margin-top:2px;">✓ AI Approved</div>':c.ai_review_status==='pending'&&c.status==='pending_approval'?'<div style="font-size:10px;color:var(--warning);margin-top:2px;">⏳ AI Review…</div>':''}
+        ${c.status==='rejected'&&c.rejection_reason?`<div class="rejection-reason" title="${c.rejection_reason}">✗ ${c.rejection_reason.substring(0,80)}${c.rejection_reason.length>80?'…':''}</div>`:''}
+      </td>
+      <td style="font-size:13px;">${fmtDate(c.start_date)}</td>
+      <td style="font-size:13px;">${fmtDate(c.end_date)}</td>
+      <td style="font-weight:600;">₹${parseFloat(c.amount_total||0).toLocaleString('en-IN')}</td>
+      <td>${payBadge(c.payment_status)}</td>
+      <td>
+        ${c.status==='pending_payment'?`<button class="btn btn-primary btn-sm" onclick="submitForApproval('${c.id}',this)">Submit for Approval</button>`:''}
+        ${c.status==='rejected'?`<button class="btn btn-ghost btn-sm" onclick="navigate('new-campaign')" title="Book a new campaign with corrected content">Book Again</button>`:''}
+        ${!['pending_payment','rejected'].includes(c.status)?'-':''}
+      </td>
+    </tr>`).join('')}</tbody></table></div>`;
 }
 
 async function loadInvoices(){
@@ -1026,6 +1067,11 @@ function initWizard(){
   document.getElementById('cmp-name').value='';
   document.getElementById('upload-preview').style.display='none';
   document.getElementById('upload-zone').style.display='';
+  // Reset creative tabs
+  document.getElementById('tab-upload').classList.add('active');
+  document.getElementById('tab-library').classList.remove('active');
+  document.getElementById('creative-upload-section').style.display='';
+  document.getElementById('creative-library-section').style.display='none';
   document.getElementById('btn-next-1').disabled=true;
   document.getElementById('btn-next-2').disabled=true;
   document.getElementById('coupon-input').value='';
@@ -1146,9 +1192,45 @@ async function submitForApproval(id,btn){
   const orig=btn.innerHTML;btn.innerHTML='…';btn.disabled=true;
   try{
     await api(`/campaigns/${id}/confirm-payment`,{method:'POST',body:JSON.stringify({payment_id:'PAY-'+Date.now(),payment_method:'online'})});
-    toast('Campaign submitted for approval!','success');
+    toast('Campaign submitted for approval! AI review running…','success');
     await loadCampaigns();
   }catch(e){toast(e.message,'error');btn.innerHTML=orig;btn.disabled=false;}
+}
+
+function switchCreativeTab(tab){
+  document.getElementById('tab-upload').classList.toggle('active',tab==='upload');
+  document.getElementById('tab-library').classList.toggle('active',tab==='library');
+  document.getElementById('creative-upload-section').style.display=tab==='upload'?'':'none';
+  document.getElementById('creative-library-section').style.display=tab==='library'?'':'none';
+  if(tab==='library')loadLibraryGrid();
+}
+
+let userLibrary=[];
+async function loadLibraryGrid(){
+  const grid=document.getElementById('library-grid');
+  grid.innerHTML='<div style="color:var(--text2);font-size:13px;padding:20px;text-align:center;">Loading…</div>';
+  try{
+    const data=await api('/content');
+    userLibrary=Array.isArray(data)?data:[];
+    if(!userLibrary.length){grid.innerHTML='<div style="color:var(--text2);font-size:13px;padding:20px;text-align:center;">No uploads yet — use "Upload New".</div>';return;}
+    grid.innerHTML=userLibrary.map(c=>`
+      <div class="lib-item${uploadedContentId===c.id?' selected':''}" onclick="selectFromLibrary('${c.id}','${c.original_name.replace(/'/g,"\\'")}','${c.type}')">
+        ${c.type==='image'?`<img class="lib-thumb" src="${c.file_url}" onerror="this.parentNode.querySelector('.lib-thumb').style.display='none'">`:`<div class="lib-thumb-vid">🎬</div>`}
+        <div class="lib-name" title="${c.original_name}">${c.original_name}</div>
+        <div class="lib-type">${c.type}${c.file_size?' · '+(c.file_size/1048576).toFixed(1)+'MB':''}</div>
+      </div>`).join('');
+  }catch(e){grid.innerHTML=`<div style="color:var(--danger);font-size:13px;padding:20px;">${e.message}</div>`;}
+}
+
+function selectFromLibrary(id,name,type){
+  uploadedContentId=id;uploadedFile=null;
+  document.querySelectorAll('.lib-item').forEach(el=>el.classList.remove('selected'));
+  event.currentTarget.classList.add('selected');
+  document.getElementById('upload-preview').style.display='flex';
+  document.getElementById('preview-icon').textContent=type==='video'?'🎬':'🖼️';
+  document.getElementById('preview-name').textContent=name;
+  document.getElementById('preview-size').textContent='From library';
+  document.getElementById('btn-next-2').disabled=false;
 }
 
 function handleFileSelect(e){const file=e.target.files[0];if(file)setUploadFile(file);}
