@@ -284,15 +284,15 @@ class PlayerActivity : AppCompatActivity() {
 
     private fun crossFade(fadeOut: android.view.View?, fadeIn: android.view.View, duration: Long = 500) {
         binding.layoutIdle.visibility = View.GONE
+        activeContentView = fadeIn               // always update — must be before early return
         fadeIn.alpha = if (fadeOut == null) 1f else 0f
         fadeIn.visibility = View.VISIBLE
-        if (fadeOut == null || fadeOut === fadeIn) return
+        if (fadeOut == null || fadeOut === fadeIn) return   // nothing to animate
         fadeIn.animate().alpha(1f).setDuration(duration).start()
         fadeOut.animate().alpha(0f).setDuration(duration).withEndAction {
             fadeOut.visibility = View.GONE
             fadeOut.alpha = 1f
         }.start()
-        activeContentView = fadeIn
     }
 
     private fun playVideo(campaign: CampaignEntity) {
@@ -303,13 +303,31 @@ class PlayerActivity : AppCompatActivity() {
         binding.playerView.useController = false
 
         val uri = getContentUri(campaign)
+        val prevView = activeContentView
         var fadeDone = false
+
+        // Show playerView immediately so screen is never blank.
+        // Start transparent and fade in once video is actually ready.
+        binding.layoutIdle.visibility = View.GONE
+        activeContentView = binding.playerView
+        binding.playerView.alpha = 0f
+        binding.playerView.visibility = View.VISIBLE
+
+        // Timeout: if STATE_READY hasn't fired in 6 s, force-show anyway
+        val readyTimeout = Runnable {
+            if (!fadeDone) {
+                fadeDone = true
+                crossFade(prevView, binding.playerView)
+            }
+        }
+        handler.postDelayed(readyTimeout, 6_000)
 
         player.addListener(object : Player.Listener {
             override fun onPlaybackStateChanged(state: Int) {
                 if (state == Player.STATE_READY && !fadeDone) {
                     fadeDone = true
-                    crossFade(activeContentView, binding.playerView)
+                    handler.removeCallbacks(readyTimeout)
+                    crossFade(prevView, binding.playerView)
                 }
                 if (state == Player.STATE_ENDED) {
                     logPlay(campaign)
@@ -328,35 +346,41 @@ class PlayerActivity : AppCompatActivity() {
 
         val uri = getContentUri(campaign)
         val durationMs = (campaign.durationSec * 1000).toLong().coerceAtLeast(3000L)
+        val imageToImage = activeContentView === binding.ivImage
 
-        Glide.with(this)
-            .load(uri)
-            .transition(DrawableTransitionOptions.withCrossFade(600))
+        // Show ivImage immediately — don't wait for Glide callback.
+        // This ensures we never get a blank screen if Glide is slow.
+        if (!imageToImage) {
+            crossFade(activeContentView, binding.ivImage)
+        }
+
+        val glideRequest = Glide.with(this).load(uri)
+        // For image→image use Glide's built-in crossfade; for other transitions
+        // we already faded the view above so skip Glide's drawable fade.
+        val withTransition = if (imageToImage) {
+            glideRequest.transition(DrawableTransitionOptions.withCrossFade(600))
+        } else {
+            glideRequest
+        }
+
+        withTransition
             .listener(object : RequestListener<Drawable> {
                 override fun onLoadFailed(
                     e: GlideException?, model: Any?,
                     target: Target<Drawable>, isFirstResource: Boolean
                 ): Boolean {
+                    // ivImage is already visible from crossFade above; skip to next
                     handler.postDelayed({ playNext() }, 2000)
-                    return true
+                    return false
                 }
                 override fun onResourceReady(
                     resource: Drawable, model: Any, target: Target<Drawable>?,
                     dataSource: DataSource, isFirstResource: Boolean
                 ): Boolean {
-                    // Fade from whatever was playing (video/idle/image) into ivImage
-                    if (activeContentView !== binding.ivImage) {
-                        crossFade(activeContentView, binding.ivImage)
-                    }
-                    return false
+                    return false   // let Glide set the drawable normally
                 }
             })
             .into(binding.ivImage)
-
-        // If image was already active, ensure it's visible
-        if (activeContentView === binding.ivImage) {
-            binding.ivImage.visibility = View.VISIBLE
-        }
 
         handler.postDelayed({
             logPlay(campaign)
