@@ -549,14 +549,38 @@ textarea.form-input{resize:vertical;min-height:80px;}
       <div id="page-pop" class="page">
         <div class="section-head">
           <h2>Proof of Play</h2>
-          <div style="display:flex;gap:8px;">
-            <input type="date" class="form-input" id="pop-start" style="width:150px;">
-            <input type="date" class="form-input" id="pop-end" style="width:150px;">
-            <button class="btn btn-ghost" onclick="loadPop()">Filter</button>
+          <button class="btn btn-primary" onclick="loadPop()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>Refresh</button>
+        </div>
+        <!-- Filters -->
+        <div class="table-card" style="margin-bottom:12px;padding:14px 16px;">
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;">
+            <div style="flex:1;min-width:130px;">
+              <div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em;">From</div>
+              <input type="date" class="form-input" id="pop-start" style="width:100%;">
+            </div>
+            <div style="flex:1;min-width:130px;">
+              <div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em;">To</div>
+              <input type="date" class="form-input" id="pop-end" style="width:100%;">
+            </div>
+            <div style="flex:1;min-width:150px;">
+              <div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em;">Screen</div>
+              <select id="pop-screen" class="form-input" style="width:100%;"><option value="">All Screens</option></select>
+            </div>
+            <div style="flex:1;min-width:150px;">
+              <div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em;">Campaign</div>
+              <select id="pop-campaign" class="form-input" style="width:100%;"><option value="">All Campaigns</option></select>
+            </div>
+            <div style="flex:1;min-width:150px;">
+              <div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em;">Advertiser</div>
+              <select id="pop-user" class="form-input" style="width:100%;"><option value="">All Advertisers</option></select>
+            </div>
+            <button class="btn btn-primary" onclick="loadPop()" style="flex-shrink:0;margin-top:18px;">Apply Filter</button>
+            <button class="btn btn-ghost" onclick="resetPopFilters()" style="flex-shrink:0;margin-top:18px;">Clear</button>
           </div>
         </div>
         <div class="table-card">
-          <div class="table-wrap"><table><thead><tr><th>Screen</th><th>Campaign</th><th>Played At</th><th>Duration (s)</th><th>Play Count</th></tr></thead><tbody id="pop-table"></tbody></table></div>
+          <div style="font-size:12px;color:var(--text2);padding:8px 4px 4px;" id="pop-count"></div>
+          <div class="table-wrap"><table><thead><tr><th>Screen</th><th>Advertiser</th><th>Campaign</th><th>Played At</th><th>Duration (s)</th><th>Play Count</th></tr></thead><tbody id="pop-table"></tbody></table></div>
         </div>
       </div>
 
@@ -757,6 +781,14 @@ let token = null, currentUser = null;
 let allCampaigns = [], allAdvertisers = [], allInvoices = [], allScreens = [], allCoupons = [];
 
 // ── AUTH ──────────────────────────────────────────────────────────────────
+function applySession(tok, user) {
+  token = tok; currentUser = user;
+  try { localStorage.setItem('scms_admin_token', tok); localStorage.setItem('scms_admin_user', JSON.stringify(user)); } catch(e) {}
+  document.getElementById('auth-overlay').classList.add('hidden');
+  document.getElementById('sb-name').textContent = user.first_name || user.email;
+  document.getElementById('sb-avatar').textContent = (user.first_name || 'A')[0].toUpperCase();
+}
+
 async function doLogin() {
   const email = document.getElementById('auth-email').value.trim();
   const password = document.getElementById('auth-password').value;
@@ -772,12 +804,7 @@ async function doLogin() {
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || 'Login failed');
     if (!['admin','superadmin'].includes(data.user?.role)) throw new Error('Access denied. Admin credentials required.');
-    token = data.token;
-    currentUser = data.user;
-    document.getElementById('auth-overlay').classList.add('hidden');
-    document.getElementById('sb-name').textContent = currentUser.first_name || currentUser.email;
-    const av = document.getElementById('sb-avatar');
-    av.textContent = (currentUser.first_name || 'A')[0].toUpperCase();
+    applySession(data.token, data.user);
     navigate('dashboard');
   } catch(e) {
     errEl.textContent = e.message; errEl.style.display = 'block';
@@ -790,8 +817,30 @@ document.addEventListener('keydown', e => {
   if(e.key === 'Enter' && !document.getElementById('auth-overlay').classList.contains('hidden')) doLogin();
 });
 
+// Auto-restore session on page load / refresh
+(async function restoreSession() {
+  try {
+    const savedToken = localStorage.getItem('scms_admin_token');
+    const savedUser = JSON.parse(localStorage.getItem('scms_admin_user') || 'null');
+    if (!savedToken || !savedUser) return;
+    // Verify token is still valid
+    const res = await fetch(`${API}/auth/me`, { headers: { Authorization: `Bearer ${savedToken}` } });
+    if (res.ok) {
+      const data = await res.json();
+      if (['admin','superadmin'].includes(data.role || data.user?.role)) {
+        applySession(savedToken, data.user || data);
+        navigate('dashboard');
+      }
+    } else {
+      localStorage.removeItem('scms_admin_token');
+      localStorage.removeItem('scms_admin_user');
+    }
+  } catch(e) {}
+})();
+
 function doLogout() {
   token = null; currentUser = null;
+  try { localStorage.removeItem('scms_admin_token'); localStorage.removeItem('scms_admin_user'); } catch(e) {}
   document.getElementById('auth-overlay').classList.remove('hidden');
   document.getElementById('auth-password').value = '';
 }
@@ -1449,25 +1498,70 @@ async function loadAnalytics() {
 // ── PROOF OF PLAY ─────────────────────────────────────────────────────────
 async function loadPop() {
   const tbody = document.getElementById('pop-table');
-  tbody.innerHTML = loadingRow(5);
+  tbody.innerHTML = loadingRow(6);
+  // Populate filter dropdowns on first load
+  await populatePopFilters();
   try {
-    const start = document.getElementById('pop-start').value;
-    const end = document.getElementById('pop-end').value;
-    let url = '/reports/proof-of-play?';
-    if(start) url += 'start=' + start + '&';
-    if(end) url += 'end=' + end + '&';
-    const data = await api(url.slice(0,-1)||'/reports/proof-of-play');
+    const start      = document.getElementById('pop-start').value;
+    const end        = document.getElementById('pop-end').value;
+    const screenId   = document.getElementById('pop-screen').value;
+    const campaignId = document.getElementById('pop-campaign').value;
+    const userId     = document.getElementById('pop-user').value;
+    const params = new URLSearchParams();
+    if(start)      params.set('start', start);
+    if(end)        params.set('end', end);
+    if(screenId)   params.set('screen_id', screenId);
+    if(campaignId) params.set('campaign_id', campaignId);
+    if(userId)     params.set('user_id', userId);
+    const qs = params.toString();
+    const data = await api('/reports/proof-of-play' + (qs ? '?' + qs : ''));
     const arr = Array.isArray(data) ? data : [];
-    if(!arr.length) { tbody.innerHTML = emptyRow(5, 'No play logs found'); return; }
+    document.getElementById('pop-count').textContent = arr.length ? `${arr.length} record${arr.length>1?'s':''} found` : '';
+    if(!arr.length) { tbody.innerHTML = emptyRow(6, 'No play logs found for selected filters'); return; }
     tbody.innerHTML = arr.map(p => `
       <tr>
-        <td><code style="font-size:11px;background:var(--surface2);padding:2px 6px;border-radius:4px;">${p.screen_code}</code> ${p.screen_name||''}</td>
-        <td style="font-size:12px;">${p.campaign_title||'—'}</td>
+        <td><code style="font-size:11px;background:var(--surface2);padding:2px 6px;border-radius:4px;">${p.screen_code||'—'}</code> <span style="font-size:12px;">${p.screen_name||''}</span></td>
+        <td style="font-size:12px;color:var(--text2);">${p.advertiser_name||p.user_email||'—'}</td>
+        <td style="font-size:12px;">${p.campaign_title||'—'}<br><span style="font-size:10px;color:var(--text3);">${p.campaign_code||''}</span></td>
         <td style="font-size:12px;">${fmtDateTime(p.played_at)}</td>
         <td style="font-variant-numeric:tabular-nums;">${p.duration_sec||'—'}</td>
         <td style="font-variant-numeric:tabular-nums;">${p.play_count||1}</td>
       </tr>`).join('');
-  } catch(e) { tbody.innerHTML = emptyRow(5, 'Error: ' + e.message); }
+  } catch(e) { tbody.innerHTML = emptyRow(6, 'Error: ' + e.message); }
+}
+
+let popFiltersLoaded = false;
+async function populatePopFilters() {
+  if(popFiltersLoaded) return;
+  popFiltersLoaded = true;
+  try {
+    const [screens, campaigns, users] = await Promise.all([
+      api('/screens').catch(()=>[]),
+      api('/campaigns?limit=200').catch(()=>[]),
+      api('/users').catch(()=>[])
+    ]);
+    const scrSel = document.getElementById('pop-screen');
+    (Array.isArray(screens)?screens:(screens.screens||[])).forEach(s => {
+      scrSel.innerHTML += `<option value="${s.id}">${s.screen_code} — ${s.name||s.location||''}</option>`;
+    });
+    const cmpSel = document.getElementById('pop-campaign');
+    (Array.isArray(campaigns)?campaigns:[]).forEach(c => {
+      cmpSel.innerHTML += `<option value="${c.id}">${c.campaign_code} — ${c.title}</option>`;
+    });
+    const usrSel = document.getElementById('pop-user');
+    (Array.isArray(users)?users:[]).forEach(u => {
+      usrSel.innerHTML += `<option value="${u.id}">${u.first_name||''} ${u.last_name||''} (${u.email})</option>`;
+    });
+  } catch(e) {}
+}
+
+function resetPopFilters() {
+  document.getElementById('pop-start').value = '';
+  document.getElementById('pop-end').value = '';
+  document.getElementById('pop-screen').value = '';
+  document.getElementById('pop-campaign').value = '';
+  document.getElementById('pop-user').value = '';
+  loadPop();
 }
 
 // ── NOTIFICATIONS PAGE ────────────────────────────────────────────────────

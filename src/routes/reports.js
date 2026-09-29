@@ -4,24 +4,29 @@ const { authenticate, requireAdmin } = require('../middleware/auth');
 
 const router = express.Router();
 
-// GET /api/reports/proof-of-play?campaign_id=...&start=...&end=...
+// GET /api/reports/proof-of-play?campaign_id=&screen_id=&user_id=&start=&end=
 router.get('/proof-of-play', authenticate, async (req, res, next) => {
   try {
-    const { campaign_id, start, end } = req.query;
+    const { campaign_id, screen_id, user_id, start, end } = req.query;
     const isAdmin = ['admin', 'superadmin'].includes(req.user.role);
     let sql = `
-      SELECT pl.*, s.screen_code, s.name AS screen_name, c.title AS campaign_title
+      SELECT pl.*, s.screen_code, s.name AS screen_name,
+             c.title AS campaign_title, c.campaign_code,
+             u.first_name AS advertiser_name, u.email AS user_email
       FROM play_logs pl
       JOIN screens s ON s.id = pl.screen_id
       JOIN campaigns c ON c.id = pl.campaign_id
+      LEFT JOIN users u ON u.id = c.user_id
       WHERE 1=1
     `;
     const params = [];
     if (!isAdmin) { params.push(req.user.id); sql += ` AND c.user_id = $${params.length}`; }
     if (campaign_id) { params.push(campaign_id); sql += ` AND pl.campaign_id = $${params.length}`; }
-    if (start) { params.push(start); sql += ` AND pl.played_at >= $${params.length}`; }
-    if (end) { params.push(end); sql += ` AND pl.played_at <= $${params.length}`; }
-    sql += ' ORDER BY pl.played_at DESC LIMIT 1000';
+    if (screen_id)   { params.push(screen_id);   sql += ` AND pl.screen_id = $${params.length}`; }
+    if (user_id)     { params.push(user_id);      sql += ` AND c.user_id = $${params.length}`; }
+    if (start) { params.push(start); sql += ` AND pl.played_at >= $${params.length}::date`; }
+    if (end)   { params.push(end);   sql += ` AND pl.played_at < ($${params.length}::date + interval '1 day')`; }
+    sql += ' ORDER BY pl.played_at DESC LIMIT 2000';
     const result = await query(sql, params);
     res.json(result.rows);
   } catch (err) { next(err); }
