@@ -27,11 +27,13 @@ router.get('/', authenticate, async (req, res, next) => {
     let sql = `
       SELECT c.*, u.first_name, u.last_name, u.business_name, u.email,
         ARRAY_AGG(DISTINCT s.screen_code) FILTER (WHERE s.id IS NOT NULL) AS screens,
-        c.rejection_reason, c.ai_review_status, c.ai_review_notes
+        c.rejection_reason, c.ai_review_status, c.ai_review_notes,
+        ct.file_url AS creative_url, ct.type AS creative_type, ct.original_name AS creative_name
       FROM campaigns c
       JOIN users u ON u.id = c.user_id
       LEFT JOIN campaign_screens cs ON cs.campaign_id = c.id
       LEFT JOIN screens s ON s.id = cs.screen_id
+      LEFT JOIN content ct ON ct.id = c.content_id
       WHERE 1=1
     `;
     const params = [];
