@@ -623,6 +623,16 @@ textarea.form-input{resize:vertical;min-height:80px;}
 
 <!-- MODALS -->
 
+<!-- Creative Lightbox -->
+<div id="creative-lightbox" onclick="closeLightbox()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;display:none;align-items:center;justify-content:center;cursor:zoom-out;">
+  <div onclick="event.stopPropagation()" style="position:relative;max-width:90vw;max-height:90vh;">
+    <button onclick="closeLightbox()" style="position:absolute;top:-36px;right:0;background:none;border:none;color:#fff;font-size:28px;cursor:pointer;line-height:1;">×</button>
+    <img id="lightbox-img" src="" alt="" style="max-width:90vw;max-height:85vh;object-fit:contain;border-radius:8px;display:block;">
+    <video id="lightbox-vid" src="" controls style="max-width:90vw;max-height:85vh;border-radius:8px;display:none;"></video>
+    <div id="lightbox-name" style="color:#ccc;font-size:12px;text-align:center;margin-top:8px;"></div>
+  </div>
+</div>
+
 <!-- Reject Campaign Modal -->
 <div class="modal-backdrop hidden" id="reject-modal">
   <div class="modal">
@@ -837,6 +847,28 @@ function navigate(page) {
 }
 
 // ── TOAST ─────────────────────────────────────────────────────────────────
+function openLightbox(url, name, type) {
+  const lb = document.getElementById('creative-lightbox');
+  const img = document.getElementById('lightbox-img');
+  const vid = document.getElementById('lightbox-vid');
+  document.getElementById('lightbox-name').textContent = name || '';
+  if (type === 'video') {
+    img.style.display = 'none'; vid.src = url; vid.style.display = 'block'; vid.play().catch(()=>{});
+  } else {
+    vid.style.display = 'none'; vid.src = ''; img.src = url; img.style.display = 'block';
+  }
+  lb.style.display = 'flex';
+  document.addEventListener('keydown', _lbEsc);
+}
+function closeLightbox() {
+  const lb = document.getElementById('creative-lightbox');
+  lb.style.display = 'none';
+  const vid = document.getElementById('lightbox-vid');
+  vid.pause(); vid.src = '';
+  document.removeEventListener('keydown', _lbEsc);
+}
+function _lbEsc(e) { if (e.key === 'Escape') closeLightbox(); }
+
 let toastTimer;
 function showToast(msg, type = '') {
   const t = document.getElementById('toast');
@@ -988,9 +1020,9 @@ async function loadApprovals() {
         ? `<span style="color:var(--danger);font-size:12px;font-weight:600;" title="${aiNote}">✗ Flagged</span>`
         : `<span style="color:var(--warning);font-size:12px;" title="${aiNote || 'Pending review'}">⏳ Pending${aiNote ? '<br><small style=\'color:var(--text2);font-size:10px;\'>'+aiNote.substring(0,50)+'</small>' : ''}</span>`;
       const creativeTd = c.creative_url && c.creative_type === 'image'
-        ? `<td style="width:70px;"><img src="${c.creative_url}" alt="creative" style="width:64px;height:48px;object-fit:cover;border-radius:6px;border:1px solid var(--border);cursor:pointer;" onclick="window.open('${c.creative_url}','_blank')" title="${c.creative_name||''}"></td>`
+        ? `<td style="width:70px;"><img src="${c.creative_url}" alt="creative" style="width:64px;height:48px;object-fit:cover;border-radius:6px;border:1px solid var(--border);cursor:zoom-in;" onclick="openLightbox('${c.creative_url}','${(c.creative_name||'').replace(/'/g,"\\'")}','image')" title="Click to preview"></td>`
         : c.creative_url && c.creative_type === 'video'
-        ? `<td style="width:70px;"><div style="width:64px;height:48px;background:var(--surface2);border-radius:6px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:24px;cursor:pointer;" onclick="window.open('${c.creative_url}','_blank')">🎬</div></td>`
+        ? `<td style="width:70px;"><div style="width:64px;height:48px;background:var(--surface2);border-radius:6px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:24px;cursor:zoom-in;" onclick="openLightbox('${c.creative_url}','${(c.creative_name||'').replace(/'/g,"\\'")}','video')" title="Click to preview">🎬</div></td>`
         : `<td style="width:70px;"><div style="width:64px;height:48px;background:var(--surface2);border-radius:6px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:11px;">—</div></td>`;
       return `<tr>
         <td><code style="font-size:11px;background:var(--surface2);padding:2px 6px;border-radius:4px;">${c.campaign_code}</code></td>
