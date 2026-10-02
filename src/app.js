@@ -106,12 +106,44 @@ app.use((err, req, res, next) => {
   res.status(status).json({ error: err.message || 'Internal server error' });
 });
 
+// Critical column fixes — run before file-based migrations, every startup.
+// These are hardcoded here so they ALWAYS execute regardless of migration file state.
+async function applyCriticalFixes(pool) {
+  const fixes = [
+    // play_logs.duration_sec must be NUMERIC(10,3) — APK sends decimal seconds (e.g. 10.005)
+    // OID 23=int4, 21=int2, 20=int8 — convert any integer variant to NUMERIC
+    `DO $$ BEGIN
+       IF EXISTS (
+         SELECT 1 FROM pg_attribute
+         WHERE attrelid = 'play_logs'::regclass
+           AND attname = 'duration_sec'
+           AND atttypid IN (23, 21, 20)
+           AND NOT attisdropped
+       ) THEN
+         ALTER TABLE play_logs ALTER COLUMN duration_sec TYPE NUMERIC(10,3)
+           USING duration_sec::NUMERIC(10,3);
+         RAISE NOTICE '[Fix] play_logs.duration_sec converted INTEGER -> NUMERIC(10,3)';
+       END IF;
+     END $$`,
+  ];
+  for (const sql of fixes) {
+    try {
+      await pool.query(sql);
+    } catch (err) {
+      console.warn('[DB] Critical fix warn:', err.message);
+    }
+  }
+  console.log('[DB] Critical column fixes applied');
+}
+
 async function runMigrations() {
   const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
     ssl: process.env.DATABASE_URL ? { rejectUnauthorized: false } : false,
   });
   try {
+    await applyCriticalFixes(pool);
+
     const migrationsDir = path.join(__dirname, '../migrations');
     const files = fs.readdirSync(migrationsDir)
       .filter(f => f.endsWith('.sql'))
