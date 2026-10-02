@@ -733,22 +733,22 @@
             <!-- hidden end date kept for backend compatibility -->
             <input type="hidden" id="sch-end">
             <!-- Network summary bar -->
-            <div id="pkg-network-summary" style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin-bottom:14px;display:flex;flex-wrap:wrap;gap:16px;align-items:center;">
-              <div style="flex:1;min-width:120px;">
-                <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;font-weight:600;">Screens Selected</div>
-                <div style="font-size:20px;font-weight:700;color:var(--primary)" id="sum-screens">—</div>
+            <div id="pkg-network-summary" style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin-bottom:14px;display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+              <div>
+                <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;font-weight:600;">Screens</div>
+                <div style="font-size:18px;font-weight:700;color:var(--primary)" id="sum-screens">—</div>
               </div>
-              <div style="flex:1;min-width:120px;">
-                <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;font-weight:600;">Est. Impressions/Day</div>
-                <div style="font-size:20px;font-weight:700;" id="sum-impressions">—</div>
+              <div>
+                <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;font-weight:600;">Package Rate</div>
+                <div style="font-size:18px;font-weight:700;color:var(--primary)" id="sum-cpd">—</div>
               </div>
-              <div style="flex:1;min-width:120px;">
-                <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;font-weight:600;">Est. Impressions/Month</div>
-                <div style="font-size:20px;font-weight:700;" id="sum-impressions-mo">—</div>
+              <div>
+                <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;font-weight:600;">Plays / Day</div>
+                <div style="font-size:18px;font-weight:700;" id="sum-impressions">—</div>
               </div>
-              <div style="flex:1;min-width:120px;">
-                <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;font-weight:600;">Cost / Day</div>
-                <div style="font-size:20px;font-weight:700;color:var(--primary)" id="sum-cpd">—</div>
+              <div>
+                <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;font-weight:600;">Plays / Month</div>
+                <div style="font-size:18px;font-weight:700;" id="sum-impressions-mo">—</div>
               </div>
             </div>
 
@@ -1812,10 +1812,11 @@ function updateNetworkSummary(){
   const impMo=impDay*30;
   const dur=parseInt(document.getElementById('sch-duration')?.value)||30;
   const cost=rate.fixedDays?rate.flat:rate.ppd*dur;
+  const pkgRateLabel=rate.fixedDays?`₹${rate.flat.toLocaleString('en-IN')} flat`:`₹${rate.monthly.toLocaleString('en-IN')}/mo`;
   document.getElementById('sum-screens').textContent=n+' screens';
-  document.getElementById('sum-impressions').textContent=impDay.toLocaleString('en-IN');
-  document.getElementById('sum-impressions-mo').textContent=impMo.toLocaleString('en-IN');
-  document.getElementById('sum-cpd').textContent='₹'+rate.ppd.toLocaleString('en-IN');
+  document.getElementById('sum-impressions').textContent='~'+impDay.toLocaleString('en-IN');
+  document.getElementById('sum-impressions-mo').textContent='~'+impMo.toLocaleString('en-IN');
+  document.getElementById('sum-cpd').textContent=pkgRateLabel;
   // Update impression badges on each card
   ['trial','spot','regular','premium','exclusive'].forEach(p=>{
     const el=document.getElementById('pkg-imp-'+p);if(!el)return;
