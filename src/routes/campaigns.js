@@ -55,14 +55,22 @@ router.get('/:id', authenticate, async (req, res, next) => {
   try {
     const result = await query(
       `SELECT c.*, u.first_name, u.business_name, u.email, u.gst_number,
-        ARRAY_AGG(s.id) AS screen_ids,
-        ARRAY_AGG(s.screen_code) AS screen_codes,
-        ARRAY_AGG(s.name) AS screen_names
+        ARRAY_AGG(DISTINCT s.id)          FILTER (WHERE s.id IS NOT NULL) AS screen_ids,
+        ARRAY_AGG(DISTINCT s.screen_code) FILTER (WHERE s.id IS NOT NULL) AS screen_codes,
+        ARRAY_AGG(DISTINCT s.name)        FILTER (WHERE s.id IS NOT NULL) AS screen_names,
+        ct.file_url       AS creative_url,
+        ct.type           AS creative_type,
+        ct.original_name  AS creative_name,
+        ct.duration_sec   AS creative_duration,
+        ct.file_size      AS creative_size
        FROM campaigns c
        JOIN users u ON u.id = c.user_id
        LEFT JOIN campaign_screens cs ON cs.campaign_id = c.id
        LEFT JOIN screens s ON s.id = cs.screen_id
-       WHERE c.id = $1 GROUP BY c.id, u.first_name, u.business_name, u.email, u.gst_number`,
+       LEFT JOIN content ct ON ct.id = c.content_id
+       WHERE c.id = $1
+       GROUP BY c.id, u.first_name, u.business_name, u.email, u.gst_number,
+                ct.file_url, ct.type, ct.original_name, ct.duration_sec, ct.file_size`,
       [req.params.id]
     );
     if (!result.rows.length) return res.status(404).json({ error: 'Campaign not found' });
@@ -75,12 +83,13 @@ router.get('/:id', authenticate, async (req, res, next) => {
   } catch (err) { next(err); }
 });
 
-// Slot duration config: package name → seconds
+// Slot duration + flat-rate pricing (entire network, not per-screen)
 const PACKAGES = {
-  spot:      { slot_duration_sec: 10, name: 'spot' },
-  regular:   { slot_duration_sec: 15, name: 'regular' },
-  premium:   { slot_duration_sec: 20, name: 'premium' },
-  exclusive: { slot_duration_sec: 30, name: 'exclusive' },
+  trial:     { slot_duration_sec: 10, name: 'trial',     ppd: 285,  flat: 1999, fixedDays: 7 },
+  spot:      { slot_duration_sec: 10, name: 'spot',      ppd: 267,  monthly: 8000 },
+  regular:   { slot_duration_sec: 15, name: 'regular',   ppd: 433,  monthly: 13000 },
+  premium:   { slot_duration_sec: 20, name: 'premium',   ppd: 600,  monthly: 18000 },
+  exclusive: { slot_duration_sec: 30, name: 'exclusive', ppd: 833,  monthly: 25000 },
 };
 
 // POST /api/campaigns — create + pay
@@ -114,14 +123,15 @@ router.post('/', authenticate, async (req, res, next) => {
       }
     }
 
-    // Fetch screens + calculate price
+    // Validate screens exist
     const screenResult = await client.query(
-      'SELECT id, price_per_day FROM screens WHERE id = ANY($1)', [screen_ids]
+      'SELECT id FROM screens WHERE id = ANY($1)', [screen_ids]
     );
     if (screenResult.rows.length !== screen_ids.length) throw { status: 400, message: 'Invalid screen IDs' };
 
+    // Package flat-rate pricing (entire network — not per screen)
     const days = Math.ceil((new Date(end_date) - new Date(start_date)) / 86400000) + 1;
-    let amount_base = screenResult.rows.reduce((sum, s) => sum + parseFloat(s.price_per_day), 0) * days;
+    let amount_base = pkg.fixedDays ? pkg.flat : pkg.ppd * days;
     let discount = 0;
 
     // Apply coupon
