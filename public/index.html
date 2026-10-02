@@ -717,8 +717,8 @@
                 </select>
                 <div class="form-hint" id="sch-end-display" style="color:var(--primary);font-weight:500;"></div>
               </div>
-              <div class="form-group"><label class="form-label">Daily Start Time</label><input type="time" id="sch-time-start" class="form-input" value="08:00"></div>
-              <div class="form-group"><label class="form-label">Daily End Time</label><input type="time" id="sch-time-end" class="form-input" value="22:00"></div>
+              <div class="form-group"><label class="form-label">Daily Start Time <span style="color:var(--text3);font-weight:400;font-size:11px;">(08:00–23:00)</span></label><input type="time" id="sch-time-start" class="form-input" value="08:00" min="08:00" max="23:00"></div>
+              <div class="form-group"><label class="form-label">Daily End Time <span style="color:var(--text3);font-weight:400;font-size:11px;">(max 11:00 PM)</span></label><input type="time" id="sch-time-end" class="form-input" value="22:00" min="08:00" max="23:00" onchange="clampEndTime(this)"></div>
             </div>
             <!-- hidden end date kept for backend compatibility -->
             <input type="hidden" id="sch-end">
@@ -1712,7 +1712,10 @@ async function wizardNext(step){
   }else if(step===3){
     const start=document.getElementById('sch-start').value;
     const dur=document.getElementById('sch-duration').value;
+    const endTime=document.getElementById('sch-time-end').value;
     if(!start||!dur){toast('Set a start date','error');return;}
+    if(endTime>'23:00'){toast('Daily end time cannot be after 11:00 PM','error');document.getElementById('sch-time-end').value='23:00';return;}
+    if(document.getElementById('sch-time-start').value>=endTime){toast('End time must be after start time','error');return;}
     updateEndFromDuration();
     calcCost();renderReview();updateWizardUI(4);
   }
@@ -1736,6 +1739,11 @@ function selectPkg(pkg){
   else{durEl.disabled=false;}
   updateEndFromDuration();
   updateNetworkSummary();
+}
+
+function clampEndTime(el){
+  if(el.value>'23:00'){el.value='23:00';}
+  if(el.value<'08:00'){el.value='08:00';}
 }
 
 function updateEndFromDuration(){
