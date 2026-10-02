@@ -39,7 +39,7 @@ router.post('/register', async (req, res, next) => {
         width_px: screen.width_px,
         height_px: screen.height_px,
       },
-      sync_interval_sec: 300,
+      sync_interval_sec: 600,
       heartbeat_interval_sec: 60,
     });
   } catch (err) { next(err); }
@@ -49,9 +49,10 @@ router.post('/register', async (req, res, next) => {
 router.get('/schedule', authenticatePlayer, async (req, res, next) => {
   try {
     const { screenId } = req.player;
+    const clientVersion = req.query.v || null; // APK sends ?v=<content_version> to check if stale
     const now = new Date();
     const todayStr = now.toISOString().split('T')[0];
-    console.log(`[Schedule] screen=${screenId} date=${todayStr}`);
+    console.log(`[Schedule] screen=${screenId} date=${todayStr} clientVer=${clientVersion||'none'}`);
 
     // Get screen config (airtime splits, city, venue)
     const screenRes = await query(
@@ -188,6 +189,11 @@ router.get('/schedule', authenticatePlayer, async (req, res, next) => {
 
     console.log(`[Schedule] screen=${screenId} paid=${paidItems.length} filler=${fillerItems.length} total=${allItems.length} sequence=${finalPlaylist.length} ver=${contentVersion}`);
     allItems.forEach(p => console.log(`[Schedule:item] camp=${p.campaign_id||'filler'} code=${p.campaign_code||p.title||''} type=${p.content_type} w=${p.weight}`));
+
+    // If APK already has this version, send 304 to save bandwidth
+    if (clientVersion && clientVersion === contentVersion) {
+      return res.status(304).json({ not_modified: true, content_version: contentVersion });
+    }
 
     // Build campaigns array for APK (expected field name + all required fields)
     // Filler/venue items get synthetic campaign_id derived from content_id
