@@ -43,7 +43,7 @@ interface PlayLogDao {
 
 @Database(
     entities = [CampaignEntity::class, PlayLogEntity::class],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {

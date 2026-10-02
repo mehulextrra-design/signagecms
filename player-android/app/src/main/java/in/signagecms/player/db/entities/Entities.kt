@@ -18,7 +18,8 @@ data class CampaignEntity(
     val storedName: String,
     val contentType: String,   // video | image
     val durationSec: Double,
-    val localFilePath: String? = null,  // downloaded file path
+    val contentTier: String = "paid",
+    val localFilePath: String? = null,
     val isDownloaded: Boolean = false,
     val updatedAt: Long = System.currentTimeMillis()
 )
@@ -28,9 +29,10 @@ data class PlayLogEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val campaignId: String,
     val contentId: String,
-    val playedAt: String,     // ISO 8601
+    val playedAt: String,      // ISO 8601
     val durationSec: Double,
     val playCount: Int = 1,
+    val contentTier: String? = "paid",
     val synced: Boolean = false,
     val createdAt: Long = System.currentTimeMillis()
 )
