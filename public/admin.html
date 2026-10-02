@@ -427,9 +427,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
   <main class="main">
     <div class="topbar">
       <span class="topbar-title" id="topbar-title">Dashboard</span>
-      <div class="topbar-right">
-        <span style="font-size:12px;color:var(--text3);padding:4px 10px;background:var(--primary-light);color:var(--primary);border-radius:4px;font-weight:600;">ADMIN PANEL</span>
-      </div>
+      <div id="topbar-actions" class="topbar-right"></div>
     </div>
     <div class="content">
 
@@ -1204,6 +1202,21 @@ function navigate(page) {
   if (navEl) navEl.classList.add('active');
   document.getElementById('topbar-title').textContent = pageTitles[page] || page;
   document.getElementById('mobile-topbar-title').textContent = pageTitles[page] || page;
+
+  // Move first section-head's controls into topbar-actions, hide the section-head
+  const actionsEl = document.getElementById('topbar-actions');
+  actionsEl.innerHTML = '';
+  const pageEl = document.getElementById('page-' + page);
+  if (pageEl) {
+    const sh = pageEl.querySelector('.section-head');
+    if (sh) {
+      [...sh.children].forEach(child => {
+        if (child.tagName !== 'H2') actionsEl.innerHTML += child.outerHTML;
+      });
+      sh.style.display = 'none';
+    }
+  }
+
   closeSidebar();
   const loaders = {
     dashboard: loadDashboard, campaigns: loadCampaigns, approvals: loadApprovals,
