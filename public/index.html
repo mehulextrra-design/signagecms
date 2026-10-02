@@ -703,7 +703,7 @@
             <div class="schedule-grid">
               <div class="form-group">
                 <label class="form-label">Start Date</label>
-                <input type="date" id="sch-start" class="form-input" onchange="updateEndFromDuration()">
+                <input type="date" id="sch-start" class="form-input" onchange="onStartDateChange()">
                 <div class="form-hint">Campaign starts after approval.</div>
               </div>
               <div class="form-group">
@@ -717,8 +717,14 @@
                 </select>
                 <div class="form-hint" id="sch-end-display" style="color:var(--primary);font-weight:500;"></div>
               </div>
-              <div class="form-group"><label class="form-label">Daily Start Time <span style="color:var(--text3);font-weight:400;font-size:11px;">(08:00–23:00)</span></label><input type="time" id="sch-time-start" class="form-input" value="08:00" min="08:00" max="23:00"></div>
-              <div class="form-group"><label class="form-label">Daily End Time <span style="color:var(--text3);font-weight:400;font-size:11px;">(max 11:00 PM)</span></label><input type="time" id="sch-time-end" class="form-input" value="22:00" min="08:00" max="23:00" onchange="clampEndTime(this)"></div>
+              <div class="form-group">
+                <label class="form-label">Campaign Start Time <span style="color:var(--text3);font-weight:400;font-size:11px;">(auto-set to now)</span></label>
+                <input type="time" id="sch-time-start" class="form-input" value="08:00" min="08:00" max="23:00" onchange="onStartTimeChange()">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Campaign End Time <span style="color:var(--text3);font-weight:400;font-size:11px;">(auto: 1 min before start)</span></label>
+                <input type="time" id="sch-time-end" class="form-input" value="07:59" min="07:59" max="23:00" readonly style="background:var(--surface2);cursor:not-allowed;opacity:0.8;">
+              </div>
             </div>
             <!-- hidden end date kept for backend compatibility -->
             <input type="hidden" id="sch-end">
@@ -1712,10 +1718,7 @@ async function wizardNext(step){
   }else if(step===3){
     const start=document.getElementById('sch-start').value;
     const dur=document.getElementById('sch-duration').value;
-    const endTime=document.getElementById('sch-time-end').value;
     if(!start||!dur){toast('Set a start date','error');return;}
-    if(endTime>'23:00'){toast('Daily end time cannot be after 11:00 PM','error');document.getElementById('sch-time-end').value='23:00';return;}
-    if(document.getElementById('sch-time-start').value>=endTime){toast('End time must be after start time','error');return;}
     updateEndFromDuration();
     calcCost();renderReview();updateWizardUI(4);
   }
@@ -1743,18 +1746,57 @@ function selectPkg(pkg){
 
 function clampEndTime(el){
   if(el.value>'23:00'){el.value='23:00';}
-  if(el.value<'08:00'){el.value='08:00';}
+  if(el.value<'07:59'){el.value='07:59';}
+}
+
+function onStartDateChange(){
+  const startVal=document.getElementById('sch-start').value;
+  const today=new Date().toISOString().split('T')[0];
+  if(startVal===today){
+    const now=new Date();
+    const hh=String(now.getHours()).padStart(2,'0');
+    const mm=String(now.getMinutes()).padStart(2,'0');
+    document.getElementById('sch-time-start').value=`${hh}:${mm}`;
+  }
+  onStartTimeChange();
+  updateEndFromDuration();
+}
+
+function onStartTimeChange(){
+  const startTime=document.getElementById('sch-time-start').value;
+  if(!startTime)return;
+  const [h,m]=startTime.split(':').map(Number);
+  // end_time = start_time - 1 minute (campaign expires exactly duration days after it starts)
+  let endH=h, endM=m-1;
+  if(endM<0){endM=59;endH=(endH-1+24)%24;}
+  // Clamp between 07:59 and 23:00
+  if(endH>23||(endH===23&&endM>0)){endH=23;endM=0;}
+  if(endH<8&&!(endH===7&&endM===59)){endH=7;endM=59;}
+  document.getElementById('sch-time-end').value=`${String(endH).padStart(2,'0')}:${String(endM).padStart(2,'0')}`;
+  updateEndFromDuration();
 }
 
 function updateEndFromDuration(){
   const start=document.getElementById('sch-start').value;
   const dur=parseInt(document.getElementById('sch-duration').value)||30;
   if(!start)return;
-  const end=new Date(start);end.setDate(end.getDate()+dur-1);
+  // end = start + dur full days (campaign started at 17:00, ends 7 days later at 16:59)
+  const end=new Date(start);end.setDate(end.getDate()+dur);
   const endStr=end.toISOString().split('T')[0];
   document.getElementById('sch-end').value=endStr;
-  document.getElementById('sch-end-display').textContent=`Ends: ${end.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})} (${dur} days)`;
+  // Show end time in display
+  const endTime=document.getElementById('sch-time-end').value||'';
+  const endTimeDisplay=endTime?` at ${fmtTime12(endTime)}`:'';
+  document.getElementById('sch-end-display').textContent=`Ends: ${end.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})}${endTimeDisplay} (${dur} days)`;
   updateNetworkSummary();
+}
+
+function fmtTime12(t){
+  if(!t)return'';
+  const [h,m]=t.split(':').map(Number);
+  const ampm=h>=12?'PM':'AM';
+  const h12=h%12||12;
+  return`${h12}:${String(m).padStart(2,'0')} ${ampm}`;
 }
 
 function updateNetworkSummary(){
