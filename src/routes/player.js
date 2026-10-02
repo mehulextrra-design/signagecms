@@ -335,9 +335,29 @@ router.post('/proof-of-play', authenticatePlayer, async (req, res, next) => {
         );
         inserted++;
       } catch (rowErr) {
-        // One bad row should not drop the whole batch
-        errored++;
-        console.error(`[PoP] row error screen=${screenId} cid=${play.campaign_id} err=${rowErr.message}`);
+        if (rowErr.message && rowErr.message.includes('invalid input syntax for type integer')) {
+          // duration_sec column is still INTEGER — insert rounded value so log is not lost,
+          // then fire ALTER TABLE to fix the column type for all future inserts.
+          try {
+            await query(
+              `INSERT INTO play_logs (screen_id, campaign_id, content_id, played_at, duration_sec, play_count, content_tier, source)
+               VALUES ($1,$2,$3,$4,$5,$6,$7,'apk')`,
+              [screenId, campaignId, contentId, play.played_at,
+               Math.round(durSec), parseInt(play.play_count, 10) || 1, play.content_tier || 'paid']
+            );
+            inserted++;
+            // Fix the column type once (fire and forget — safe to run even if already NUMERIC)
+            query(`ALTER TABLE play_logs ALTER COLUMN duration_sec TYPE NUMERIC(10,3) USING duration_sec::NUMERIC(10,3)`)
+              .then(() => console.log('[player] duration_sec column fixed to NUMERIC(10,3)'))
+              .catch(e => console.warn('[player] duration_sec fix warn:', e.message));
+          } catch (retryErr) {
+            errored++;
+            console.error(`[PoP] retry error screen=${screenId} cid=${play.campaign_id} err=${retryErr.message}`);
+          }
+        } else {
+          errored++;
+          console.error(`[PoP] row error screen=${screenId} cid=${play.campaign_id} err=${rowErr.message}`);
+        }
       }
     }
     if (skipped) console.log(`[PoP] screen=${screenId} skipped=${skipped} errored=${errored}`);
