@@ -88,11 +88,11 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);font-
 
 /* ── CARDS & STATS ── */
 .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;}
-.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:12px 14px;box-shadow:var(--shadow);}
-.stat-label{font-size:11px;font-weight:600;color:var(--text2);margin-bottom:4px;}
-.stat-value{font-size:20px;font-weight:800;color:var(--text);line-height:1;font-variant-numeric:tabular-nums;}
-.stat-sub{font-size:11px;color:var(--text3);margin-top:3px;}
-.stat-icon{width:28px;height:28px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;margin-bottom:8px;}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:10px 12px;box-shadow:var(--shadow);}
+.stat-label{font-size:11px;font-weight:600;color:var(--text2);margin-bottom:2px;}
+.stat-value{font-size:16px;font-weight:800;color:var(--text);line-height:1;font-variant-numeric:tabular-nums;}
+.stat-sub{font-size:11px;color:var(--text3);margin-top:2px;}
+.stat-icon{width:24px;height:24px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;margin-bottom:6px;}
 .si-teal{background:var(--primary-light);color:var(--primary);}
 .si-green{background:var(--success-light);color:var(--success);}
 .si-yellow{background:var(--warning-light);color:var(--warning);}
@@ -241,11 +241,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
   /* Stats */
   .stat-grid{grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;}
   .stat-card{padding:10px 12px;}
-  .stat-icon{width:22px;height:22px;margin-bottom:6px;}
-  .stat-icon svg{width:13px;height:13px;}
-  .stat-label{font-size:10px;margin-bottom:2px;}
-  .stat-value{font-size:16px;}
-  .stat-sub{font-size:10px;}
+  .stat-value{font-size:15px;}
 
   /* Dashboard two-col → one col */
   #page-dashboard > div[style*="grid-template-columns:1fr 1fr"]{display:block!important;}
