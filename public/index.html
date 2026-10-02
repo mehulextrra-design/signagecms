@@ -1654,7 +1654,7 @@ async function renderWizardScreens(){
     groupsWrap.style.display='none';
   }
 
-  grid.innerHTML=allScreens.map(s=>`<div class="screen-card ${selectedScreenIds.includes(s.id)?'selected':''}" id="sc-card-${s.id}" onclick="toggleScreen('${s.id}',this)"><div class="screen-name">${s.name}</div><div class="screen-loc">${s.location||s.city||'—'}</div><div style="display:flex;align-items:center;justify-content:space-between;"><div class="screen-price">₹${(s.price_per_day||0).toLocaleString('en-IN')}/day</div><div style="width:7px;height:7px;border-radius:50%;background:${s.status==='online'?'var(--success)':'var(--warning)'};"></div></div><div style="font-size:11px;color:var(--text2);margin-top:6px;">${(s.daily_impressions||0).toLocaleString('en-IN')} imp/day · ${s.zone||'A'} zone</div></div>`).join('');
+  grid.innerHTML=allScreens.map(s=>`<div class="screen-card ${selectedScreenIds.includes(s.id)?'selected':''}" id="sc-card-${s.id}" onclick="toggleScreen('${s.id}',this)"><div class="screen-name">${s.name}</div><div class="screen-loc">${s.location||s.city||'—'}</div><div style="display:flex;align-items:center;justify-content:space-between;"><div class="screen-price">~2,700 plays/day</div><div style="width:7px;height:7px;border-radius:50%;background:${s.status==='online'?'var(--success)':'var(--warning)'};"></div></div><div style="font-size:11px;color:var(--text2);margin-top:6px;">Regular pkg (15s) · ${s.zone||'A'} zone</div></div>`).join('');
 }
 
 function selectGroup(groupId){
