@@ -1203,13 +1203,12 @@ function renderScreensMap(){
       <svg style="transform:rotate(45deg)" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#fff" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
     </div>`;
     const icon=L.divIcon({html:markerHtml,className:'',iconSize:[36,36],iconAnchor:[18,36],popupAnchor:[0,-38]});
-    const impr=s.daily_impressions>=1000?((s.daily_impressions/1000).toFixed(1)+'K'):(s.daily_impressions||0);
     const popup=`<div style="font-family:Inter,sans-serif;min-width:180px;">
       <div style="font-size:14px;font-weight:700;margin-bottom:2px;">${s.name}</div>
       <div style="font-size:12px;color:#6b7280;margin-bottom:8px;">${s.location||s.city||''}</div>
       <div style="display:flex;gap:12px;margin-bottom:10px;">
-        <div><div style="font-size:13px;font-weight:700;">₹${(s.price_per_day||0).toLocaleString('en-IN')}</div><div style="font-size:10px;color:#9ca3af;">per day</div></div>
-        <div><div style="font-size:13px;font-weight:700;">${impr}</div><div style="font-size:10px;color:#9ca3af;">imp/day</div></div>
+        <div><div style="font-size:13px;font-weight:700;">~2,700</div><div style="font-size:10px;color:#9ca3af;">plays/day</div></div>
+        <div><div style="font-size:13px;font-weight:700;color:#10b981;">Regular</div><div style="font-size:10px;color:#9ca3af;">pkg (15s)</div></div>
       </div>
       <button onclick="navigate('new-campaign')" style="width:100%;padding:7px;background:#10b981;color:#fff;border:none;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">Book Campaign →</button>
     </div>`;
@@ -1222,8 +1221,10 @@ function renderScreensMap(){
 
 let _sbcSelected = new Set(); // selected screen ids
 
+// Plays/screen/day for Regular package (40,500s paid airtime ÷ 15s slot)
+const _PLAYS_PER_SCREEN = Math.floor(40500/15); // 2,700
+
 function _sbcCard(s){
-  const impr=s.daily_impressions>=1000?((s.daily_impressions/1000).toFixed(1)+'K'):(s.daily_impressions||0);
   const sel=_sbcSelected.has(s.id);
   return `<div class="screen-browse-card${sel?' sbc-selected':''}" id="sbc-card-${s.id}" onclick="_sbcToggle('${s.id}',event)">
     <div class="sbc-visual">
@@ -1244,9 +1245,9 @@ function _sbcCard(s){
       </div>
       <div class="sbc-divider"></div>
       <div class="sbc-stats">
-        <div class="sbc-stat"><div class="sbc-stat-val">₹${(s.price_per_day||0).toLocaleString('en-IN')}</div><div class="sbc-stat-lbl">per day</div></div>
+        <div class="sbc-stat"><div class="sbc-stat-val">~2,700</div><div class="sbc-stat-lbl">plays/day</div></div>
         <div class="sbc-stat-sep"></div>
-        <div class="sbc-stat"><div class="sbc-stat-val">${impr}</div><div class="sbc-stat-lbl">imp/day</div></div>
+        <div class="sbc-stat"><div class="sbc-stat-val" style="color:var(--primary);">Regular</div><div class="sbc-stat-lbl">15s pkg</div></div>
       </div>
       <button class="sbc-book-btn" onclick="_sbcBookOne('${s.id}',event)">Book Campaign →</button>
     </div>
@@ -1297,8 +1298,8 @@ function _sbcUpdateBar(){
   if(!bar) return;
   if(_sbcSelected.size===0){ bar.style.display='none'; return; }
   bar.style.display='flex';
-  const total=[..._sbcSelected].reduce((s,id)=>{ const sc=allScreens.find(x=>x.id===id); return s+parseFloat(sc?.price_per_day||0); },0);
-  cnt.textContent=`${_sbcSelected.size} screen${_sbcSelected.size>1?'s':''} selected · ₹${total.toLocaleString('en-IN')}/day`;
+  const totalPlays=_sbcSelected.size * _PLAYS_PER_SCREEN;
+  cnt.textContent=`${_sbcSelected.size} screen${_sbcSelected.size>1?'s':''} selected · ~${totalPlays.toLocaleString('en-IN')} plays/day (Regular pkg)`;
 }
 
 function _sbcClearSelection(){
@@ -1347,7 +1348,7 @@ async function renderScreensList(){
   const groupedIds=new Set();
   let html='';
 
-  function groupSection(id, name, desc, screenIds, totalPPD, onlineCount, cards){
+  function groupSection(id, name, desc, screenIds, playsPerDay, onlineCount, cards){
     return `<div class="sbc-group-section">
       <div class="sbc-group-header" onclick="_sbcAccordion('${id}',event)">
         <div style="display:flex;align-items:center;gap:8px;min-width:0;">
@@ -1363,7 +1364,7 @@ async function renderScreensList(){
             <span style="color:var(--text3);">·</span>
             <span style="color:#22c55e;">${onlineCount} online</span>
             <span style="color:var(--text3);">·</span>
-            <span style="font-weight:700;">₹${totalPPD.toLocaleString('en-IN')}/day</span>
+            <span style="font-weight:700;">~${playsPerDay.toLocaleString('en-IN')} plays/day</span>
           </div>
           <svg id="sbc-chev-${id}" class="sbc-chevron open" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
         </div>
@@ -1375,19 +1376,19 @@ async function renderScreensList(){
   groups.forEach(g=>{
     if(!g.screens.length) return;
     const screenIds=g.screens.map(gs=>(allScreens.find(x=>x.id===gs.id)||gs).id);
-    const totalPPD=g.screens.reduce((s,sc)=>s+parseFloat(sc.price_per_day||0),0);
+    const playsPerDay=g.screens.length * _PLAYS_PER_SCREEN;
     const onlineCount=g.screens.filter(sc=>sc.status==='online').length;
     const cards=g.screens.map(gs=>{ const s=allScreens.find(x=>x.id===gs.id)||gs; groupedIds.add(s.id); return _sbcCard(s); }).join('');
-    html+=groupSection(g.id, g.name, g.description||'', screenIds, totalPPD, onlineCount, cards);
+    html+=groupSection(g.id, g.name, g.description||'', screenIds, playsPerDay, onlineCount, cards);
   });
 
   const ungrouped=allScreens.filter(s=>!groupedIds.has(s.id));
   if(ungrouped.length){
     if(groups.length){
       const uIds=ungrouped.map(s=>s.id);
-      const uPPD=ungrouped.reduce((s,sc)=>s+parseFloat(sc.price_per_day||0),0);
+      const uPlays=ungrouped.length * _PLAYS_PER_SCREEN;
       const uOnline=ungrouped.filter(s=>s.status==='online').length;
-      html+=groupSection('__ungrouped','Other Screens','',uIds,uPPD,uOnline,ungrouped.map(_sbcCard).join(''));
+      html+=groupSection('__ungrouped','Other Screens','',uIds,uPlays,uOnline,ungrouped.map(_sbcCard).join(''));
     } else {
       html=`<div class="screens-grid">${ungrouped.map(_sbcCard).join('')}</div>`;
     }
