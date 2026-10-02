@@ -192,12 +192,25 @@ class PlayerActivity : AppCompatActivity() {
                         )
                     }
 
-                    db.campaignDao().insertAll(entities)
-                    if (entities.isNotEmpty()) {
-                        db.campaignDao().deleteNotIn(entities.map { it.campaignId })
+                    // Preserve existing download state — insertAll(REPLACE) would reset
+                    // localFilePath=null on every sync, breaking offline playback.
+                    // Only clear download state when content actually changed (storedName differs).
+                    val existingMap = db.campaignDao().getAll().associateBy { it.campaignId }
+                    val mergedEntities = entities.map { newEntity ->
+                        val old = existingMap[newEntity.campaignId]
+                        if (old != null && old.storedName == newEntity.storedName && old.isDownloaded) {
+                            newEntity.copy(localFilePath = old.localFilePath, isDownloaded = true)
+                        } else {
+                            newEntity
+                        }
                     }
 
-                    downloadContent(entities)
+                    db.campaignDao().insertAll(mergedEntities)
+                    if (mergedEntities.isNotEmpty()) {
+                        db.campaignDao().deleteNotIn(mergedEntities.map { it.campaignId })
+                    }
+
+                    downloadContent(mergedEntities)
 
                     val versionChanged = newVersion != null && newVersion != lastSyncedContentVersion
                     if (versionChanged) lastSyncedContentVersion = newVersion
@@ -215,8 +228,10 @@ class PlayerActivity : AppCompatActivity() {
 
     private suspend fun downloadContent(campaigns: List<CampaignEntity>) {
         campaigns.forEach { campaign ->
-            val existing = db.campaignDao().getById(campaign.campaignId)
-            if (existing?.isDownloaded == true) return@forEach
+            // Check physical file on disk, not just DB flag — file may have been pruned by OS
+            val cachedFile = ContentDownloader.getCachedFile(this, campaign.storedName)
+            if (campaign.isDownloaded && cachedFile != null) return@forEach
+
             val file = ContentDownloader.download(this, campaign.fileUrl, campaign.storedName)
             if (file != null) {
                 db.campaignDao().markDownloaded(campaign.campaignId, file.absolutePath)
@@ -334,12 +349,19 @@ class PlayerActivity : AppCompatActivity() {
     }
 
     private fun getContentUri(campaign: CampaignEntity): android.net.Uri {
+        // 1. Try the stored local path
         val localFile = campaign.localFilePath?.let { File(it) }
-        return if (localFile != null && localFile.exists() && localFile.length() > 0) {
-            android.net.Uri.fromFile(localFile)
-        } else {
-            android.net.Uri.parse(campaign.fileUrl)
+        if (localFile != null && localFile.exists() && localFile.length() > 0) {
+            return android.net.Uri.fromFile(localFile)
         }
+        // 2. Fallback: look up by filename in the cache directory (covers cases where
+        //    localFilePath was reset to null by a sync but the file is still on disk)
+        val cachedFile = ContentDownloader.getCachedFile(this, campaign.storedName)
+        if (cachedFile != null) {
+            return android.net.Uri.fromFile(cachedFile)
+        }
+        // 3. Last resort: remote URL (only works when online)
+        return android.net.Uri.parse(campaign.fileUrl)
     }
 
     private fun showIdle(message: String) {
