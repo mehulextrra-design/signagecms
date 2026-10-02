@@ -170,6 +170,8 @@
   .pkg-opt .pkg-price { font-size:15px;font-weight:700;color:var(--primary); }
   .pkg-opt .pkg-ppd { font-size:11px;color:var(--text3);margin-top:2px; }
   .pkg-opt .pkg-desc { font-size:11px;color:var(--text2);margin-top:6px;line-height:1.4; }
+  .pkg-opt .pkg-imp { font-size:11px;color:var(--success,#16a34a);font-weight:600;margin-top:4px; }
+  .pkg-trial-badge { font-size:10px;background:#fef3c7;color:#92400e;border-radius:4px;padding:1px 5px;font-weight:700;display:inline-block;margin-left:4px; }
 
   /* WIZARD */
   .wizard-container { max-width:780px;margin:0 auto; }
@@ -699,44 +701,92 @@
             <div class="section-title" style="margin-bottom:6px;">Set Your Schedule</div>
             <div style="font-size:13px;color:var(--text2);margin-bottom:20px;">Choose when your ad runs.</div>
             <div class="schedule-grid">
-              <div class="form-group"><label class="form-label">Start Date</label><input type="date" id="sch-start" class="form-input"><div class="form-hint">Campaigns start after approval.</div></div>
-              <div class="form-group"><label class="form-label">End Date</label><input type="date" id="sch-end" class="form-input"></div>
+              <div class="form-group">
+                <label class="form-label">Start Date</label>
+                <input type="date" id="sch-start" class="form-input" onchange="updateEndFromDuration()">
+                <div class="form-hint">Campaign starts after approval.</div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Duration</label>
+                <select id="sch-duration" class="select-input" onchange="updateEndFromDuration()">
+                  <option value="7">7 Days — Trial 🎯</option>
+                  <option value="15">15 Days — Half Month</option>
+                  <option value="30" selected>30 Days — 1 Month</option>
+                  <option value="60">60 Days — 2 Months</option>
+                  <option value="90">90 Days — 3 Months</option>
+                </select>
+                <div class="form-hint" id="sch-end-display" style="color:var(--primary);font-weight:500;"></div>
+              </div>
               <div class="form-group"><label class="form-label">Daily Start Time</label><input type="time" id="sch-time-start" class="form-input" value="08:00"></div>
               <div class="form-group"><label class="form-label">Daily End Time</label><input type="time" id="sch-time-end" class="form-input" value="22:00"></div>
             </div>
-            <div class="form-group" style="margin-top:8px;">
+            <!-- hidden end date kept for backend compatibility -->
+            <input type="hidden" id="sch-end">
+            <!-- Network summary bar -->
+            <div id="pkg-network-summary" style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin-bottom:14px;display:flex;flex-wrap:wrap;gap:16px;align-items:center;">
+              <div style="flex:1;min-width:120px;">
+                <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;font-weight:600;">Screens Selected</div>
+                <div style="font-size:20px;font-weight:700;color:var(--primary)" id="sum-screens">—</div>
+              </div>
+              <div style="flex:1;min-width:120px;">
+                <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;font-weight:600;">Est. Impressions/Day</div>
+                <div style="font-size:20px;font-weight:700;" id="sum-impressions">—</div>
+              </div>
+              <div style="flex:1;min-width:120px;">
+                <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;font-weight:600;">Est. Impressions/Month</div>
+                <div style="font-size:20px;font-weight:700;" id="sum-impressions-mo">—</div>
+              </div>
+              <div style="flex:1;min-width:120px;">
+                <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;font-weight:600;">Cost / Day</div>
+                <div style="font-size:20px;font-weight:700;color:var(--primary)" id="sum-cpd">—</div>
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-top:4px;">
               <label class="form-label">Select Package <span style="color:var(--text3);font-weight:400;">(entire network · all screens)</span></label>
-              <div class="pkg-selector" id="pkg-selector">
+              <div class="pkg-selector" id="pkg-selector" style="grid-template-columns:repeat(5,1fr);">
+                <div class="pkg-opt" data-pkg="trial" onclick="selectPkg('trial')" style="border-color:#f59e0b;">
+                  <div class="pkg-name">Trial <span class="pkg-trial-badge">7 DAYS</span></div>
+                  <div class="pkg-slot">10 sec</div>
+                  <div class="pkg-price" style="font-size:22px;">₹1,999<span style="font-size:11px;font-weight:400;color:var(--text3)"> flat</span></div>
+                  <div class="pkg-ppd">≈ ₹285/day · one time</div>
+                  <div id="pkg-imp-trial" class="pkg-imp"></div>
+                  <div class="pkg-desc"><span style="color:var(--text3);font-size:10px;">Best suited for:</span><br>First-time advertisers, event promos</div>
+                </div>
                 <div class="pkg-opt" data-pkg="spot" onclick="selectPkg('spot')">
                   <div class="pkg-name">Spot</div>
                   <div class="pkg-slot">10 sec</div>
                   <div class="pkg-price">₹8,000<span style="font-size:11px;font-weight:400;color:var(--text3)">/mo</span></div>
                   <div class="pkg-ppd">≈ ₹267/day</div>
-                  <div class="pkg-desc">Tea shops, salons, tuition</div>
+                  <div id="pkg-imp-spot" class="pkg-imp"></div>
+                  <div class="pkg-desc"><span style="color:var(--text3);font-size:10px;">Best suited for:</span><br>Tea shops, salons, tuition</div>
                 </div>
                 <div class="pkg-opt selected" data-pkg="regular" onclick="selectPkg('regular')">
                   <div class="pkg-name">Regular ⭐</div>
                   <div class="pkg-slot">15 sec</div>
                   <div class="pkg-price">₹13,000<span style="font-size:11px;font-weight:400;color:var(--text3)">/mo</span></div>
                   <div class="pkg-ppd">≈ ₹433/day</div>
-                  <div class="pkg-desc">Restaurants, clinics, coaching</div>
+                  <div id="pkg-imp-regular" class="pkg-imp"></div>
+                  <div class="pkg-desc"><span style="color:var(--text3);font-size:10px;">Best suited for:</span><br>Restaurants, clinics, coaching</div>
                 </div>
                 <div class="pkg-opt" data-pkg="premium" onclick="selectPkg('premium')">
                   <div class="pkg-name">Premium</div>
                   <div class="pkg-slot">20 sec</div>
                   <div class="pkg-price">₹18,000<span style="font-size:11px;font-weight:400;color:var(--text3)">/mo</span></div>
                   <div class="pkg-ppd">≈ ₹600/day</div>
-                  <div class="pkg-desc">Real estate, jewellers</div>
+                  <div id="pkg-imp-premium" class="pkg-imp"></div>
+                  <div class="pkg-desc"><span style="color:var(--text3);font-size:10px;">Best suited for:</span><br>Real estate, jewellers, hospitals</div>
                 </div>
                 <div class="pkg-opt" data-pkg="exclusive" onclick="selectPkg('exclusive')">
                   <div class="pkg-name">Exclusive</div>
                   <div class="pkg-slot">30 sec</div>
                   <div class="pkg-price">₹25,000<span style="font-size:11px;font-weight:400;color:var(--text3)">/mo</span></div>
                   <div class="pkg-ppd">≈ ₹833/day</div>
-                  <div class="pkg-desc">Banks, builders, showrooms</div>
+                  <div id="pkg-imp-exclusive" class="pkg-imp"></div>
+                  <div class="pkg-desc"><span style="color:var(--text3);font-size:10px;">Best suited for:</span><br>Banks, builders, showrooms</div>
                 </div>
               </div>
-              <p style="font-size:12px;color:var(--text3);margin-top:8px;">Content duration must match your package slot (±20%). Longer content = upload rejected at booking.</p>
+              <p style="font-size:12px;color:var(--text3);margin-top:8px;">Content duration must match your package slot (±20%). Longer content = rejected at upload.</p>
             </div>
             <div class="wizard-nav"><button class="btn btn-ghost" onclick="wizardBack(3)">← Back</button><button class="btn btn-primary" onclick="wizardNext(3)">Continue →</button></div>
           </div>
@@ -1658,28 +1708,73 @@ async function wizardNext(step){
       }catch(e){toast(e.message,'error');document.getElementById('btn-next-2').innerHTML='Continue →';document.getElementById('btn-next-2').disabled=false;return;}
       document.getElementById('btn-next-2').innerHTML='Continue →';
     }
-    updateWizardUI(3);
+    updateWizardUI(3);updateNetworkSummary();
   }else if(step===3){
-    const start=document.getElementById('sch-start').value;const end=document.getElementById('sch-end').value;
-    if(!start||!end){toast('Set start and end dates','error');return;}
-    if(new Date(end)<=new Date(start)){toast('End date must be after start date','error');return;}
+    const start=document.getElementById('sch-start').value;
+    const dur=document.getElementById('sch-duration').value;
+    if(!start||!dur){toast('Set a start date','error');return;}
+    updateEndFromDuration();
     calcCost();renderReview();updateWizardUI(4);
   }
 }
 
-const PKG_RATES={spot:{ppd:267,monthly:8000,slot:10,label:'Spot (10s)'},regular:{ppd:433,monthly:13000,slot:15,label:'Regular (15s)'},premium:{ppd:600,monthly:18000,slot:20,label:'Premium (20s)'},exclusive:{ppd:833,monthly:25000,slot:30,label:'Exclusive (30s)'}};
+const PKG_RATES={
+  trial:    {ppd:285, flat:1999, monthly:1999, slot:10, label:'Trial (10s · 7 days)', fixedDays:7},
+  spot:     {ppd:267, monthly:8000,  slot:10, label:'Spot (10s)'},
+  regular:  {ppd:433, monthly:13000, slot:15, label:'Regular (15s)'},
+  premium:  {ppd:600, monthly:18000, slot:20, label:'Premium (20s)'},
+  exclusive:{ppd:833, monthly:25000, slot:30, label:'Exclusive (30s)'},
+};
 let selectedPkg='regular';
 
 function selectPkg(pkg){
   selectedPkg=pkg;
   document.querySelectorAll('.pkg-opt').forEach(el=>el.classList.toggle('selected',el.dataset.pkg===pkg));
+  // Trial locks duration to 7 days
+  const durEl=document.getElementById('sch-duration');
+  if(pkg==='trial'){durEl.value='7';durEl.disabled=true;}
+  else{durEl.disabled=false;}
+  updateEndFromDuration();
+  updateNetworkSummary();
+}
+
+function updateEndFromDuration(){
+  const start=document.getElementById('sch-start').value;
+  const dur=parseInt(document.getElementById('sch-duration').value)||30;
+  if(!start)return;
+  const end=new Date(start);end.setDate(end.getDate()+dur-1);
+  const endStr=end.toISOString().split('T')[0];
+  document.getElementById('sch-end').value=endStr;
+  document.getElementById('sch-end-display').textContent=`Ends: ${end.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})} (${dur} days)`;
+  updateNetworkSummary();
+}
+
+function updateNetworkSummary(){
+  const n=selectedScreenIds.length||36;
+  const rate=PKG_RATES[selectedPkg]||PKG_RATES.regular;
+  const playsPerScreen=Math.floor(40500/rate.slot); // 15h × 75% paid ÷ slot
+  const impDay=playsPerScreen*n;
+  const impMo=impDay*30;
+  const dur=parseInt(document.getElementById('sch-duration')?.value)||30;
+  const cost=rate.fixedDays?rate.flat:rate.ppd*dur;
+  document.getElementById('sum-screens').textContent=n+' screens';
+  document.getElementById('sum-impressions').textContent=impDay.toLocaleString('en-IN');
+  document.getElementById('sum-impressions-mo').textContent=impMo.toLocaleString('en-IN');
+  document.getElementById('sum-cpd').textContent='₹'+rate.ppd.toLocaleString('en-IN');
+  // Update impression badges on each card
+  ['trial','spot','regular','premium','exclusive'].forEach(p=>{
+    const el=document.getElementById('pkg-imp-'+p);if(!el)return;
+    const r=PKG_RATES[p];const plays=Math.floor(40500/r.slot)*n;
+    el.textContent='~'+plays.toLocaleString('en-IN')+' plays/day';
+  });
 }
 
 function calcCost(){
   const start=document.getElementById('sch-start').value;const end=document.getElementById('sch-end').value;
   const days=Math.max(1,Math.round((new Date(end)-new Date(start))/(1000*60*60*24))+1);
   const rate=PKG_RATES[selectedPkg]||PKG_RATES.regular;
-  const base=rate.ppd*days;const gst=Math.round(base*0.18);
+  const base=rate.fixedDays?rate.flat:rate.ppd*days;
+  const gst=Math.round(base*0.18);
   campaignCost={base,gst,total:base+gst,discount:0};
 }
 
