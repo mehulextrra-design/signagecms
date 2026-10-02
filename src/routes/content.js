@@ -87,15 +87,19 @@ router.post('/upload', authenticate, upload.single('file'), async (req, res, nex
     const { originalname, mimetype, size } = req.file;
     const type = mimetype.startsWith('video/') ? 'video' : 'image';
 
-    // Cloudinary gives us the permanent URL directly
-    const fileUrl = req.file.path;                      // permanent Cloudinary URL
-    const storedName = req.file.filename;               // public_id
+    const fileUrl = req.file.path;
+    const storedName = req.file.filename;
     const filePath = req.file.filename;
 
+    // Cloudinary returns duration (seconds) for video uploads
+    const durationSec = type === 'video' && req.file.duration
+      ? parseFloat(parseFloat(req.file.duration).toFixed(3))
+      : null;
+
     const result = await query(
-      `INSERT INTO content (user_id, original_name, stored_name, file_path, file_url, mime_type, file_size, type)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING *`,
-      [req.user.id, originalname, storedName, filePath, fileUrl, mimetype, size, type]
+      `INSERT INTO content (user_id, original_name, stored_name, file_path, file_url, mime_type, file_size, type, duration_sec)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING *`,
+      [req.user.id, originalname, storedName, filePath, fileUrl, mimetype, size, type, durationSec]
     );
     res.status(201).json(result.rows[0]);
   } catch (err) { next(err); }

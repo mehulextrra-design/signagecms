@@ -1,5 +1,6 @@
 const cron = require('node-cron');
 const { query } = require('../db');
+const { sendWeeklyReports } = require('./whatsapp');
 
 const startScheduler = () => {
   // Every minute: auto-activate approved campaigns that have reached start_date
@@ -59,6 +60,15 @@ const startScheduler = () => {
       );
     } catch (err) {
       console.error('[Scheduler] Coupon expiry error:', err.message);
+    }
+  });
+
+  // Every Monday at 9:00 AM: send weekly WhatsApp PoP reports to all active advertisers
+  cron.schedule('0 9 * * 1', async () => {
+    try {
+      await sendWeeklyReports();
+    } catch (err) {
+      console.error('[Scheduler] WhatsApp weekly report error:', err.message);
     }
   });
 

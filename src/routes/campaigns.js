@@ -75,14 +75,44 @@ router.get('/:id', authenticate, async (req, res, next) => {
   } catch (err) { next(err); }
 });
 
+// Slot duration config: package name → seconds
+const PACKAGES = {
+  spot:      { slot_duration_sec: 10, name: 'spot' },
+  regular:   { slot_duration_sec: 15, name: 'regular' },
+  premium:   { slot_duration_sec: 20, name: 'premium' },
+  exclusive: { slot_duration_sec: 30, name: 'exclusive' },
+};
+
 // POST /api/campaigns — create + pay
 router.post('/', authenticate, async (req, res, next) => {
   const client = await getClient();
   try {
     await client.query('BEGIN');
-    const { screen_ids, content_id, title, start_date, end_date, start_time, end_time, coupon_code } = req.body;
+    const { screen_ids, content_id, title, start_date, end_date, start_time, end_time, coupon_code, package_name } = req.body;
 
     if (!screen_ids?.length) throw { status: 400, message: 'At least one screen required' };
+
+    // Resolve package → slot duration
+    const pkg = PACKAGES[(package_name || 'regular').toLowerCase()] || PACKAGES.regular;
+    const slot_duration_sec = pkg.slot_duration_sec;
+
+    // Validate video content duration against slot
+    if (content_id) {
+      const contentRow = await client.query('SELECT type, duration_sec FROM content WHERE id=$1', [content_id]);
+      if (contentRow.rows.length) {
+        const { type, duration_sec } = contentRow.rows[0];
+        if (type === 'video' && duration_sec != null) {
+          const minSec = slot_duration_sec * 0.8;
+          const maxSec = slot_duration_sec * 1.2;
+          if (duration_sec > maxSec) {
+            throw { status: 400, message: `Video too long for ${pkg.name} package (${slot_duration_sec}s slot). Your video is ${duration_sec}s — max allowed: ${maxSec}s. Please trim or choose a longer slot package.` };
+          }
+          if (duration_sec < minSec) {
+            throw { status: 400, message: `Video too short for ${pkg.name} package (${slot_duration_sec}s slot). Your video is ${duration_sec}s — min allowed: ${minSec}s.` };
+          }
+        }
+      }
+    }
 
     // Fetch screens + calculate price
     const screenResult = await client.query(
@@ -117,10 +147,10 @@ router.post('/', authenticate, async (req, res, next) => {
     const code = await generateCampaignCode();
     const campResult = await client.query(
       `INSERT INTO campaigns (campaign_code, user_id, content_id, title, start_date, end_date, start_time, end_time,
-        amount_base, amount_gst, amount_total, coupon_code, discount_amount, status)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,'pending_payment') RETURNING *`,
+        amount_base, amount_gst, amount_total, coupon_code, discount_amount, slot_duration_sec, package_name, status)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,'pending_payment') RETURNING *`,
       [code, req.user.id, content_id, title, start_date, end_date, start_time || '00:00:00', end_time || '23:59:59',
-       amount_base, amount_gst, amount_total, coupon_code, discount]
+       amount_base, amount_gst, amount_total, coupon_code, discount, slot_duration_sec, pkg.name]
     );
     const campaign = campResult.rows[0];
 

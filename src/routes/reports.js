@@ -1,6 +1,7 @@
 const express = require('express');
 const { query } = require('../db');
 const { authenticate, requireAdmin } = require('../middleware/auth');
+const { sendWeeklyReports, sendReportForUser, buildWeeklyReport } = require('../services/whatsapp');
 
 const router = express.Router();
 
@@ -206,6 +207,29 @@ router.get('/activity', authenticate, requireAdmin, async (req, res, next) => {
       [limit, offset]
     );
     res.json(result.rows);
+  } catch (err) { next(err); }
+});
+
+// POST /api/reports/whatsapp/send-all — admin: trigger weekly report for all live advertisers
+router.post('/whatsapp/send-all', authenticate, requireAdmin, async (req, res, next) => {
+  try {
+    const result = await sendWeeklyReports();
+    res.json({ message: 'WhatsApp reports triggered', ...result });
+  } catch (err) { next(err); }
+});
+
+// POST /api/reports/whatsapp/send/:user_id — admin: send report for one advertiser
+router.post('/whatsapp/send/:user_id', authenticate, requireAdmin, async (req, res, next) => {
+  try {
+    const preview = await buildWeeklyReport(req.params.user_id);
+    if (!preview) return res.status(404).json({ error: 'No active campaigns or data for this user' });
+
+    if (req.query.preview === '1') {
+      return res.json({ preview: true, phone: preview.phone, message: preview.message });
+    }
+
+    const result = await sendReportForUser(req.params.user_id);
+    res.json({ sent: true, ...result });
   } catch (err) { next(err); }
 });
 
