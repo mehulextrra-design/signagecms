@@ -295,6 +295,7 @@ router.post('/proof-of-play', authenticatePlayer, async (req, res, next) => {
         // Normalize duration: if APK sends milliseconds (>3600), convert to seconds
         let durSec = parseFloat(play.duration_sec) || 0;
         if (durSec > 3600) durSec = parseFloat((durSec / 1000).toFixed(3));
+        durSec = parseFloat(durSec.toFixed(3)); // ensure always decimal, never integer-like
 
         // Resolve campaign_id: must be a valid UUID referencing campaigns table
         const campaignId = (play.campaign_id && UUID_RE.test(play.campaign_id))
@@ -316,7 +317,7 @@ router.post('/proof-of-play', authenticatePlayer, async (req, res, next) => {
           `INSERT INTO play_logs (screen_id, campaign_id, content_id, played_at, duration_sec, play_count, content_tier)
            VALUES ($1,$2,$3,$4,$5,$6,$7)`,
           [screenId, campaignId, play.content_id, play.played_at,
-           durSec, play.play_count || 1, play.content_tier || 'paid']
+           durSec, parseInt(play.play_count, 10) || 1, play.content_tier || 'paid']
         );
         inserted++;
       } catch (rowErr) {
