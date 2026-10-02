@@ -975,9 +975,7 @@ async function loadUserInfo(){
 }
 
 function showApp(){
-  if(currentUser&&(currentUser.role==='admin'||currentUser.role==='superadmin')){
-    window.location.href='/admin';return;
-  }
+
   document.getElementById('auth-overlay').classList.add('hidden');
   document.getElementById('app').classList.remove('hidden');
   updateSidebarUser();navigate('dashboard');loadScreens();loadNotifications();
