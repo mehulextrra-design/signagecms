@@ -204,7 +204,7 @@
   }
 
   /* SCREEN CARDS */
-  .screens-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px; }
+  .screens-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px; }
   .screen-card { background:var(--surface);border:2px solid var(--border);border-radius:var(--radius-lg);padding:12px;cursor:pointer;transition:all 0.15s;position:relative; }
   .screen-card:hover { border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-light); }
   .screen-card.selected { border-color:var(--primary);background:var(--primary-light); }
@@ -397,9 +397,9 @@
     .content { padding:16px;padding-bottom:8px; }
     .bottom-nav { display:block; }
     .form-row { grid-template-columns:1fr; }
-    .schedule-grid { grid-template-columns:1fr; }
+    .schedule-grid { grid-template-columns:1fr 1fr;gap:10px; }
     .stat-grid { grid-template-columns:1fr 1fr;gap:10px; }
-    .screens-grid { grid-template-columns:1fr; }
+    .screens-grid { grid-template-columns:1fr 1fr;gap:8px; }
     .wizard-steps { overflow-x:auto;gap:4px; }
     .ws-label { display:none; }
     .auth-card { padding:28px 20px; }
@@ -409,6 +409,10 @@
     .review-total { font-size:15px; }
     .coupon-row input { min-width:0; }
     .card-body { padding:14px; }
+    .screen-card { padding:10px 9px; }
+    .screen-name { font-size:12px; }
+    .screen-loc { font-size:10px;margin-bottom:6px; }
+    .screen-price { font-size:11px; }
   }
 </style>
 </head>
