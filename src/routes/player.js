@@ -309,25 +309,27 @@ router.post('/proof-of-play', authenticatePlayer, async (req, res, next) => {
           : null;
 
         // Resolve content_id: APK may prefix filler/venue IDs with "filler_" or "venue_"
-        // Strip synthetic prefix and validate as UUID before any DB query
+        // Strip synthetic prefix and validate as UUID — store null if not a UUID (don't skip)
         const rawContent = (play.content_id || '').replace(/^(filler_|venue_|cross_)/i, '');
         const contentId = UUID_RE.test(rawContent) ? rawContent : null;
-        if (!contentId) { skipped++; continue; }
 
         // Dedup: skip if identical play already recorded in last 5 minutes
         const dup = await query(
           `SELECT 1 FROM play_logs
-           WHERE screen_id=$1 AND content_id=$2
-             AND played_at BETWEEN ($3::timestamptz - interval '5 minutes') AND ($3::timestamptz + interval '5 minutes')
-             AND duration_sec BETWEEN ($4 - 1) AND ($4 + 1)
+           WHERE screen_id=$1
+             AND (content_id=$2 OR ($2 IS NULL AND content_id IS NULL))
+             AND (campaign_id=$3 OR ($3 IS NULL AND campaign_id IS NULL))
+             AND played_at BETWEEN ($4::timestamptz - interval '5 minutes') AND ($4::timestamptz + interval '5 minutes')
+             AND duration_sec BETWEEN ($5 - 1) AND ($5 + 1)
+             AND source = 'apk'
            LIMIT 1`,
-          [screenId, contentId, play.played_at, durSec]
+          [screenId, contentId, campaignId, play.played_at, durSec]
         );
         if (dup.rows.length) { skipped++; continue; }
 
         await query(
-          `INSERT INTO play_logs (screen_id, campaign_id, content_id, played_at, duration_sec, play_count, content_tier)
-           VALUES ($1,$2,$3,$4,$5,$6,$7)`,
+          `INSERT INTO play_logs (screen_id, campaign_id, content_id, played_at, duration_sec, play_count, content_tier, source)
+           VALUES ($1,$2,$3,$4,$5,$6,$7,'apk')`,
           [screenId, campaignId, contentId, play.played_at,
            durSec, parseInt(play.play_count, 10) || 1, play.content_tier || 'paid']
         );

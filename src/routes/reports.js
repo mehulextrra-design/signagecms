@@ -13,9 +13,10 @@ router.get('/proof-of-play', authenticate, async (req, res, next) => {
     let sql = `
       SELECT pl.id, pl.screen_id, pl.campaign_id, pl.content_id,
              pl.played_at,
-             (pl.played_at + (pl.duration_sec || ' seconds')::interval) AS played_until,
+             (pl.played_at + (COALESCE(pl.duration_sec,0) || ' seconds')::interval) AS played_until,
              pl.duration_sec, pl.play_count,
              COALESCE(pl.content_tier,'paid') AS content_tier,
+             COALESCE(pl.source,'apk') AS source,
              s.screen_code, s.name AS screen_name, s.city AS screen_city,
              c.title AS campaign_title, c.campaign_code,
              u.first_name AS advertiser_name, u.email AS user_email
@@ -26,7 +27,15 @@ router.get('/proof-of-play', authenticate, async (req, res, next) => {
       WHERE 1=1
     `;
     const params = [];
-    if (!isAdmin) { params.push(req.user.id); sql += ` AND c.user_id = $${params.length}`; }
+    if (!isAdmin) {
+      // Show logs where campaign belongs to this user, OR where screen is assigned to their campaign
+      params.push(req.user.id);
+      sql += ` AND (c.user_id = $${params.length} OR pl.screen_id IN (
+        SELECT DISTINCT cs.screen_id FROM campaign_screens cs
+        JOIN campaigns cc ON cc.id = cs.campaign_id
+        WHERE cc.user_id = $${params.length}
+      ))`;
+    }
     if (campaign_id) { params.push(campaign_id); sql += ` AND pl.campaign_id = $${params.length}`; }
     if (screen_id)   { params.push(screen_id);   sql += ` AND pl.screen_id = $${params.length}`; }
     if (user_id)     { params.push(user_id);      sql += ` AND c.user_id = $${params.length}`; }
@@ -97,7 +106,7 @@ router.get('/analytics', authenticate, async (req, res, next) => {
 
     const where = 'WHERE ' + conditions.join(' AND ');
     const trunc = period === 'day' ? 'hour' : period === 'year' ? 'month' : period === 'quarter' ? 'week' : 'day';
-    const base = `FROM play_logs pl JOIN campaigns c ON c.id = pl.campaign_id ${where}`;
+    const base = `FROM play_logs pl LEFT JOIN campaigns c ON c.id = pl.campaign_id ${where}`;
 
     const projParams = isAdmin ? [] : [req.user.id];
     const projWhere = isAdmin ? '' : 'AND c.user_id = $1';
