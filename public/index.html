@@ -1136,9 +1136,9 @@ function navigate(page, fromPopstate){
   // Close More sheet on navigate (mobile)
   if(moreSheetOpen){moreSheetOpen=false;document.getElementById('more-sheet').classList.remove('open');document.getElementById('more-overlay').classList.remove('visible');}
 
-  // Hide bottom nav inside wizard, show on all other pages
+  // Hide bottom nav inside wizard and screens, show on all other pages
   const bottomNav=document.getElementById('bottom-nav');
-  if(bottomNav) bottomNav.style.display=page==='new-campaign'?'none':'';
+  if(bottomNav) bottomNav.style.display=['new-campaign','screens'].includes(page)?'none':'';
 
   // Sync bottom nav active state (mobile)
   const bnMap={dashboard:'bn-dashboard',campaigns:'bn-campaigns',screens:'bn-screens'};
