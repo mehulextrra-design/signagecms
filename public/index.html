@@ -491,6 +491,10 @@
         <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
         Analytics
       </div>
+      <div class="nav-item" onclick="navigate('pop')">
+        <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+        Proof of Play
+      </div>
       <div class="nav-section-label">Campaigns</div>
       <div class="nav-item" onclick="navigate('campaigns')">
         <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
@@ -604,6 +608,50 @@
         </div>
         <div class="section-header"><div class="section-title">Campaign Performance</div></div>
         <div class="card"><div id="analytics-table"><div class="empty-state"><div class="empty-icon"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg></div><div class="empty-title">No analytics yet</div><div class="empty-sub">Launch a campaign to see performance data.</div></div></div></div>
+      </div>
+
+      <!-- PROOF OF PLAY -->
+      <div id="page-pop" class="page">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;">
+            <div>
+              <div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em;">From</div>
+              <input type="date" class="form-input" id="pop-start" style="padding:6px 10px;font-size:13px;">
+            </div>
+            <div>
+              <div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em;">To</div>
+              <input type="date" class="form-input" id="pop-end" style="padding:6px 10px;font-size:13px;">
+            </div>
+            <div>
+              <div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em;">Campaign</div>
+              <select id="pop-campaign-filter" class="form-input" style="min-width:160px;padding:6px 10px;font-size:13px;"><option value="">All Campaigns</option></select>
+            </div>
+            <button class="btn btn-primary" style="padding:7px 14px;" onclick="loadPop()">Apply</button>
+            <button class="btn btn-ghost" style="padding:7px 14px;" onclick="resetPopFilters()">Clear</button>
+          </div>
+          <button class="btn btn-ghost" id="pop-export-btn" style="display:none;" onclick="exportPopCsv()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+            Export CSV
+          </button>
+        </div>
+        <div id="pop-summary" style="display:none;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin-bottom:14px;display:none;gap:24px;flex-wrap:wrap;">
+          <div><div style="font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.04em;font-weight:600;margin-bottom:2px;">Total Plays</div><div style="font-size:20px;font-weight:700;" id="pop-total-plays">—</div></div>
+          <div><div style="font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.04em;font-weight:600;margin-bottom:2px;">Records</div><div style="font-size:20px;font-weight:700;" id="pop-total-records">—</div></div>
+        </div>
+        <div class="card" style="overflow:auto;">
+          <table style="width:100%;border-collapse:collapse;font-size:13px;" id="pop-table-wrap">
+            <thead><tr style="border-bottom:1px solid var(--border);">
+              <th style="padding:10px 12px;text-align:left;font-weight:600;color:var(--text2);white-space:nowrap;">Played At</th>
+              <th style="padding:10px 12px;text-align:left;font-weight:600;color:var(--text2);white-space:nowrap;">Screen</th>
+              <th style="padding:10px 12px;text-align:left;font-weight:600;color:var(--text2);white-space:nowrap;">City</th>
+              <th style="padding:10px 12px;text-align:left;font-weight:600;color:var(--text2);white-space:nowrap;">Campaign</th>
+              <th style="padding:10px 12px;text-align:right;font-weight:600;color:var(--text2);white-space:nowrap;">Duration (s)</th>
+              <th style="padding:10px 12px;text-align:right;font-weight:600;color:var(--text2);white-space:nowrap;">Plays</th>
+              <th style="padding:10px 12px;text-align:left;font-weight:600;color:var(--text2);white-space:nowrap;">Source</th>
+            </tr></thead>
+            <tbody id="pop-tbody"><tr><td colspan="7" style="text-align:center;padding:40px;color:var(--text2);">Select a date range and click Apply</td></tr></tbody>
+          </table>
+        </div>
       </div>
 
       <!-- CAMPAIGNS -->
@@ -997,6 +1045,10 @@
     <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
     Analytics
   </button>
+  <button class="more-item" onclick="moreNav('pop')">
+    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+    Proof of Play
+  </button>
   <button class="more-item" onclick="moreNav('invoices')">
     <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
     Invoices
@@ -1121,7 +1173,7 @@ function toggleMoreSheet(){
 }
 function moreNav(page){toggleMoreSheet();navigate(page);}
 
-const PAGE_TITLES={dashboard:'Dashboard',analytics:'Analytics',campaigns:'My Campaigns','new-campaign':'Book Campaign',screens:'Browse Screens',invoices:'Invoices',wallet:'My Wallet',profile:'Profile & Settings'};
+const PAGE_TITLES={dashboard:'Dashboard',analytics:'Analytics',pop:'Proof of Play',campaigns:'My Campaigns','new-campaign':'Book Campaign',screens:'Browse Screens',invoices:'Invoices',wallet:'My Wallet',profile:'Profile & Settings'};
 
 function navigate(page, fromPopstate){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
@@ -1148,7 +1200,7 @@ function navigate(page, fromPopstate){
   const bnMap={dashboard:'bn-dashboard',campaigns:'bn-campaigns',screens:'bn-screens'};
   document.querySelectorAll('.bn-item').forEach(b=>b.classList.remove('active'));
   if(bnMap[page]){const b=document.getElementById(bnMap[page]);if(b)b.classList.add('active');}
-  if(['analytics','invoices','profile'].includes(page)){
+  if(['analytics','pop','invoices','profile'].includes(page)){
     const b=document.getElementById('bn-more');if(b)b.classList.add('active');
   }
 
@@ -1161,6 +1213,7 @@ function navigate(page, fromPopstate){
   if(page==='campaigns')loadCampaigns();
   if(page==='invoices')loadInvoices();
   if(page==='analytics')loadAnalytics();
+  if(page==='pop')initPop();
   if(page==='profile')loadProfile();
   if(page==='screens'){ loadScreens().then(()=>{ renderScreensList(); if(_screensView==='map') renderScreensMap(); }); }
   if(page==='new-campaign')initWizard();
@@ -1523,6 +1576,87 @@ function renderInvoicesTable(invoices){
   if(!invoices.length){wrap.innerHTML=`<div class="empty-state"><div class="empty-icon"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg></div><div class="empty-title">No invoices found</div></div>`;return;}
   wrap.innerHTML=`<div class="table-wrap"><table><thead><tr><th>Invoice #</th><th>Campaign</th><th>Date</th><th>Base</th><th>GST (18%)</th><th>Total</th><th>Status</th></tr></thead><tbody>${invoices.map(i=>`
     <tr><td class="td-bold">${i.invoice_number}</td><td style="font-size:13px;">${i.campaign_code||'—'}</td><td style="font-size:13px;">${fmtDate(i.issued_at)}</td><td>₹${parseFloat(i.amount_base||0).toLocaleString('en-IN')}</td><td>₹${parseFloat(i.amount_gst||0).toLocaleString('en-IN')}</td><td style="font-weight:600;">₹${parseFloat(i.amount_total||0).toLocaleString('en-IN')}</td><td>${payBadge(i.status)}</td></tr>`).join('')}</tbody></table></div>`;
+}
+
+// ── PROOF OF PLAY ────────────────────────────────────────────────────────
+let _popCampaigns=[];
+
+async function initPop(){
+  // Set default date range: last 30 days
+  const today=new Date();
+  const ago30=new Date(today); ago30.setDate(ago30.getDate()-29);
+  const fmt=d=>d.toISOString().slice(0,10);
+  if(!document.getElementById('pop-start').value) document.getElementById('pop-start').value=fmt(ago30);
+  if(!document.getElementById('pop-end').value)   document.getElementById('pop-end').value=fmt(today);
+  // Populate campaign filter
+  try{
+    if(!_popCampaigns.length){
+      const camps=await api('/campaigns?limit=100');
+      _popCampaigns=camps;
+      const sel=document.getElementById('pop-campaign-filter');
+      sel.innerHTML='<option value="">All Campaigns</option>'+camps.map(c=>`<option value="${c.id}">${c.title||c.campaign_code}</option>`).join('');
+    }
+  }catch(e){}
+  await loadPop();
+}
+
+async function loadPop(){
+  const tbody=document.getElementById('pop-tbody');
+  const summary=document.getElementById('pop-summary');
+  tbody.innerHTML=`<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text2);">Loading…</td></tr>`;
+  const start=document.getElementById('pop-start').value;
+  const end=document.getElementById('pop-end').value;
+  const campId=document.getElementById('pop-campaign-filter').value;
+  let url='/reports/proof-of-play?';
+  if(start) url+='start='+start+'&';
+  if(end)   url+='end='+end+'&';
+  if(campId) url+='campaign_id='+campId;
+  try{
+    const data=await api(url);
+    const rows=data.rows||[];
+    document.getElementById('pop-total-plays').textContent=fmtNum(data.total_plays||0);
+    document.getElementById('pop-total-records').textContent=fmtNum(rows.length);
+    summary.style.display=rows.length?'flex':'none';
+    document.getElementById('pop-export-btn').style.display=rows.length?'':'none';
+    if(!rows.length){
+      tbody.innerHTML=`<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--text2);">No play records found for this period.</td></tr>`;
+      return;
+    }
+    tbody.innerHTML=rows.map(r=>{
+      const playedAt=r.played_at?new Date(r.played_at).toLocaleString('en-IN',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}):'—';
+      const srcBadge=r.source==='server'?`<span style="font-size:10px;background:#fef3c7;color:#92400e;border-radius:4px;padding:1px 6px;font-weight:600;">estimated</span>`:`<span style="font-size:10px;background:#f0fdf4;color:#166534;border-radius:4px;padding:1px 6px;font-weight:600;">live</span>`;
+      return`<tr style="border-bottom:1px solid var(--border);">
+        <td style="padding:9px 12px;white-space:nowrap;">${playedAt}</td>
+        <td style="padding:9px 12px;font-weight:500;">${r.screen_name||r.screen_code||'—'}</td>
+        <td style="padding:9px 12px;color:var(--text2);">${r.screen_city||'—'}</td>
+        <td style="padding:9px 12px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${r.campaign_title||''}">${r.campaign_title||'—'}</td>
+        <td style="padding:9px 12px;text-align:right;">${r.duration_sec||'—'}</td>
+        <td style="padding:9px 12px;text-align:right;font-weight:600;">${fmtNum(r.play_count||1)}</td>
+        <td style="padding:9px 12px;">${srcBadge}</td>
+      </tr>`;
+    }).join('');
+  }catch(e){tbody.innerHTML=`<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--danger);">Error: ${e.message}</td></tr>`;}
+}
+
+function resetPopFilters(){
+  const today=new Date();
+  const ago30=new Date(today); ago30.setDate(ago30.getDate()-29);
+  const fmt=d=>d.toISOString().slice(0,10);
+  document.getElementById('pop-start').value=fmt(ago30);
+  document.getElementById('pop-end').value=fmt(today);
+  document.getElementById('pop-campaign-filter').value='';
+  loadPop();
+}
+
+function exportPopCsv(){
+  const start=document.getElementById('pop-start').value;
+  const end=document.getElementById('pop-end').value;
+  const campId=document.getElementById('pop-campaign-filter').value;
+  let url='/api/reports/proof-of-play?format=csv';
+  if(start) url+='&start='+start;
+  if(end)   url+='&end='+end;
+  if(campId) url+='&campaign_id='+campId;
+  const a=document.createElement('a'); a.href=url; a.download='proof-of-play.csv'; a.click();
 }
 
 let anPeriod='week';
