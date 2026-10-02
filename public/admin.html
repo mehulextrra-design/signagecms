@@ -42,11 +42,11 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);font-
 
 /* ── LAYOUT ── */
 #app{display:flex;height:100vh;overflow:hidden;}
-.sidebar{width:220px;background:var(--sidebar-bg);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto;}
-.sidebar-logo{display:flex;align-items:center;gap:10px;padding:20px 16px 16px;}
-.sidebar-logo-mark{width:32px;height:32px;background:var(--primary);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:12px;}
-.sidebar-logo-name{font-size:15px;font-weight:800;color:#fff;}
-.sidebar-logo-sub{font-size:10px;color:var(--primary);font-weight:600;background:rgba(13,148,136,0.2);border-radius:4px;padding:1px 5px;margin-left:2px;}
+.sidebar{width:230px;background:var(--sidebar-bg);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto;}
+.sidebar-logo{display:flex;align-items:center;gap:10px;padding:18px 16px 14px;flex-wrap:nowrap;}
+.sidebar-logo-mark{width:34px;height:34px;background:var(--primary);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:13px;flex-shrink:0;}
+.sidebar-logo-name{font-size:15px;font-weight:800;color:#fff;white-space:nowrap;}
+.sidebar-logo-sub{font-size:10px;color:var(--primary);font-weight:600;background:rgba(13,148,136,0.2);border-radius:4px;padding:1px 5px;margin-left:2px;white-space:nowrap;}
 .sidebar-section{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:rgba(148,163,184,0.6);padding:12px 16px 4px;}
 .sidebar-item{display:flex;align-items:center;gap:10px;padding:9px 16px;cursor:pointer;color:var(--sidebar-text);font-size:13px;font-weight:500;transition:background 0.12s,color 0.12s;border:none;background:none;width:100%;text-align:left;}
 .sidebar-item:hover{background:var(--sidebar-hover);color:#fff;}
@@ -81,14 +81,18 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);font-
 .btn-sm{padding:5px 10px;font-size:12px;}
 .btn-xs{padding:3px 8px;font-size:11px;}
 .btn svg{width:14px;height:14px;}
+.ia-btn{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:6px;border:none;background:transparent;cursor:pointer;transition:background 0.13s,color 0.13s;color:var(--text2);position:relative;}
+.ia-btn:hover::after{content:attr(title);position:absolute;bottom:calc(100% + 5px);left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.78);color:#fff;font-size:11px;white-space:nowrap;padding:3px 7px;border-radius:5px;pointer-events:none;z-index:99;}
+.ia-btn:hover{background:var(--surface2);}
+.ia-btn.ia-danger{color:#dc2626;} .ia-btn.ia-danger:hover{background:#fee2e2;}
 
 /* ── CARDS & STATS ── */
-.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px;}
-.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:10px 12px;box-shadow:var(--shadow);position:relative;}
-.stat-label{font-size:10px;font-weight:600;color:var(--text2);margin-bottom:2px;text-transform:uppercase;letter-spacing:0.04em;}
-.stat-value{font-size:18px;font-weight:800;color:var(--text);line-height:1;font-variant-numeric:tabular-nums;}
-.stat-sub{font-size:10px;color:var(--text3);margin-top:2px;}
-.stat-icon{width:30px;height:30px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;position:absolute;top:10px;right:12px;}
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:12px 14px;box-shadow:var(--shadow);}
+.stat-label{font-size:11px;font-weight:600;color:var(--text2);margin-bottom:4px;}
+.stat-value{font-size:20px;font-weight:800;color:var(--text);line-height:1;font-variant-numeric:tabular-nums;}
+.stat-sub{font-size:11px;color:var(--text3);margin-top:3px;}
+.stat-icon{width:28px;height:28px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;margin-bottom:8px;}
 .si-teal{background:var(--primary-light);color:var(--primary);}
 .si-green{background:var(--success-light);color:var(--success);}
 .si-yellow{background:var(--warning-light);color:var(--warning);}
@@ -111,10 +115,14 @@ tr:hover td{background:var(--surface2);}
 .badge-green{background:var(--success-light);color:var(--success);}
 .badge-yellow{background:var(--warning-light);color:var(--warning);}
 .badge-red{background:var(--danger-light);color:var(--danger);}
-.badge-blue{background:#EFF6FF;color:#2563EB;}
+.badge-blue{background:rgba(37,99,235,0.1);color:#2563EB;}
 .badge-gray{background:var(--surface2);color:var(--text2);}
 .badge-teal{background:var(--primary-light);color:var(--primary);}
 .badge-dot{width:5px;height:5px;border-radius:50%;background:currentColor;}
+.zone-tag{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:5px;font-size:11px;font-weight:700;letter-spacing:0.02em;}
+.zone-A{background:rgba(13,148,136,0.12);color:var(--primary);}
+.zone-B{background:rgba(37,99,235,0.12);color:#2563EB;}
+.zone-C{background:rgba(124,58,237,0.12);color:#7c3aed;}
 
 /* ── MODAL ── */
 .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:600;display:flex;align-items:center;justify-content:center;padding:20px;}
@@ -360,6 +368,15 @@ textarea.form-input{resize:vertical;min-height:80px;}
       <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 10l4.553-2.069A1 1 0 0121 8.87v6.26a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/></svg>
       Content Library
     </button>
+    <div class="sidebar-section">Network</div>
+    <button class="sidebar-item" id="nav-venues" onclick="navigate('venues')">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Venue Partners
+    </button>
+    <button class="sidebar-item" id="nav-filler" onclick="navigate('filler')">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+      Filler Content
+    </button>
     <div class="sidebar-section">Users</div>
     <button class="sidebar-item" id="nav-advertisers" onclick="navigate('advertisers')">
       <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
@@ -466,7 +483,13 @@ textarea.form-input{resize:vertical;min-height:80px;}
 
       <!-- PENDING APPROVALS -->
       <div id="page-approvals" class="page">
-        <div class="section-head"><h2>Pending Approvals</h2><button class="btn btn-primary" onclick="loadApprovals()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>Refresh</button></div>
+        <div class="section-head" style="flex-wrap:wrap;gap:8px;">
+          <h2>Pending Approvals</h2>
+          <div style="display:flex;align-items:center;gap:8px;margin-left:auto;">
+            <input id="approvals-search" type="text" placeholder="Filter by advertiser…" oninput="filterApprovals()" style="padding:5px 10px;border-radius:7px;border:1.5px solid var(--border);background:var(--surface);color:var(--text);font-size:12px;width:180px;font-family:inherit;">
+            <button class="btn btn-primary" onclick="loadApprovals()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>Refresh</button>
+          </div>
+        </div>
         <div class="table-card">
           <div class="table-wrap"><table><thead><tr><th>Code</th><th>Creative</th><th>Title</th><th>Advertiser</th><th>Screens</th><th>Dates</th><th>Amount</th><th>AI Review</th><th>Action</th></tr></thead><tbody id="approvals-table"></tbody></table></div>
         </div>
@@ -479,15 +502,62 @@ textarea.form-input{resize:vertical;min-height:80px;}
           <button class="btn btn-primary" onclick="openScreenModal()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add Screen</button>
         </div>
         <div class="table-card">
-          <div class="table-wrap"><table><thead><tr><th>Code</th><th>Name</th><th>Location</th><th>Zone</th><th>Resolution</th><th>₹/Day</th><th>Status</th><th>Last Heartbeat</th><th>Remote</th><th>Actions</th></tr></thead><tbody id="screens-table"></tbody></table></div>
+          <div class="table-wrap"><table><thead><tr><th>Code</th><th>Name</th><th>Location</th><th>Zone</th><th>Resolution</th><th>₹/Day</th><th>Status</th><th>Last Heartbeat</th><th>Actions</th></tr></thead><tbody id="screens-table"></tbody></table></div>
+        </div>
+
+        <!-- Screen Groups -->
+        <div class="section-head" style="margin-top:28px;">
+          <h2>Screen Groups</h2>
+          <button class="btn btn-primary" onclick="openGroupModal()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>New Group</button>
+        </div>
+        <div class="table-card">
+          <div class="table-wrap"><table><thead><tr><th>Group Name</th><th>Screens</th><th>Total ₹/Day</th><th>Actions</th></tr></thead><tbody id="groups-table"></tbody></table></div>
         </div>
       </div>
 
       <!-- CONTENT LIBRARY -->
       <div id="page-content" class="page">
-        <div class="section-head"><h2>Content Library</h2></div>
+        <div class="section-head">
+          <h2>Content Library</h2>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+            <div class="search-wrap">
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+              <input type="text" class="search-input" id="content-adv-search" placeholder="Filter by advertiser name…" oninput="filterContent()">
+            </div>
+            <select id="content-type-filter" onchange="filterContent()" style="padding:7px 10px;border:1px solid var(--border);border-radius:6px;font-size:13px;background:var(--surface);color:var(--text);cursor:pointer;">
+              <option value="">All Types</option>
+              <option value="image">Image</option>
+              <option value="video">Video</option>
+            </select>
+          </div>
+        </div>
         <div class="table-card">
           <div class="table-wrap"><table><thead><tr><th>Preview</th><th>File</th><th>Type</th><th>Advertiser</th><th>Size</th><th>Uploaded</th></tr></thead><tbody id="content-table"></tbody></table></div>
+        </div>
+      </div>
+
+      <!-- FILLER CONTENT -->
+      <div id="page-filler" class="page">
+        <div class="section-head">
+          <h2>Filler Content</h2>
+          <button class="btn btn-primary btn-sm" onclick="document.getElementById('filler-file-input').click()">+ Upload Filler</button>
+        </div>
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px 16px;margin-bottom:16px;font-size:13px;color:var(--text2);">
+          Filler content plays when no paid or venue content is scheduled (approx. 2% of screen time).
+          Upload your branding slides, platform promos, or local announcements here.
+        </div>
+        <input type="file" id="filler-file-input" accept="video/*,image/*" style="display:none" onchange="uploadFiller(event)">
+        <div id="filler-upload-progress" style="display:none;margin-bottom:12px;">
+          <div style="height:4px;background:var(--border);border-radius:3px;overflow:hidden;">
+            <div id="filler-prog-fill" style="height:100%;background:var(--primary);width:0%;transition:width 0.3s;border-radius:3px;"></div>
+          </div>
+          <div style="font-size:11px;color:var(--text2);margin-top:4px;" id="filler-prog-text">Uploading…</div>
+        </div>
+        <div class="table-card">
+          <table class="data-table">
+            <thead><tr><th>Preview</th><th>Title</th><th>Type</th><th>Duration</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody id="filler-table"><tr><td colspan="6" style="text-align:center;color:var(--text3);padding:32px;">Loading…</td></tr></tbody>
+          </table>
         </div>
       </div>
 
@@ -549,7 +619,10 @@ textarea.form-input{resize:vertical;min-height:80px;}
       <div id="page-pop" class="page">
         <div class="section-head">
           <h2>Proof of Play</h2>
-          <button class="btn btn-primary" onclick="loadPop()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>Refresh</button>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-ghost" onclick="exportPopCsv()" id="pop-export-btn" style="display:none;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>Export CSV</button>
+            <button class="btn btn-primary" onclick="loadPop()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>Refresh</button>
+          </div>
         </div>
         <!-- Filters -->
         <div class="table-card" style="margin-bottom:12px;padding:14px 16px;">
@@ -578,9 +651,15 @@ textarea.form-input{resize:vertical;min-height:80px;}
             <button class="btn btn-ghost" onclick="resetPopFilters()" style="flex-shrink:0;margin-top:18px;">Clear</button>
           </div>
         </div>
+        <!-- Summary stats bar -->
+        <div id="pop-summary" style="display:none;background:var(--surface2);border-radius:8px;padding:10px 14px;margin-bottom:10px;display:flex;gap:20px;flex-wrap:wrap;">
+          <span style="font-size:12px;color:var(--text2);">Log entries: <strong id="pop-stat-records">—</strong></span>
+          <span style="font-size:12px;color:var(--text2);">Total plays: <strong id="pop-stat-plays" style="color:var(--primary);">—</strong></span>
+          <span style="font-size:12px;color:var(--text2);">Total in DB: <strong id="pop-stat-db">—</strong></span>
+        </div>
         <div class="table-card">
           <div style="font-size:12px;color:var(--text2);padding:8px 4px 4px;" id="pop-count"></div>
-          <div class="table-wrap"><table><thead><tr><th>Screen</th><th>Advertiser</th><th>Campaign</th><th>Played At</th><th>Duration (s)</th><th>Play Count</th></tr></thead><tbody id="pop-table"></tbody></table></div>
+          <div class="table-wrap"><table><thead><tr><th>Screen</th><th>Advertiser</th><th>Campaign</th><th>Played At</th><th>Played Until</th><th>Duration (s)</th><th>Plays</th><th>Tier</th></tr></thead><tbody id="pop-table"></tbody></table></div>
         </div>
       </div>
 
@@ -633,6 +712,30 @@ textarea.form-input{resize:vertical;min-height:80px;}
         </div>
       </div>
 
+      <!-- VENUE PARTNERS -->
+      <div id="page-venues" class="page">
+        <div class="section-head">
+          <h2>Venue Partners</h2>
+          <button class="btn btn-primary btn-sm" onclick="openVenueModal()">+ Add Venue Partner</button>
+        </div>
+        <!-- Stats row -->
+        <div class="stat-grid" style="margin-bottom:16px;">
+          <div class="stat-card"><div class="stat-label">Total Venues</div><div class="stat-value" id="vn-total">—</div></div>
+          <div class="stat-card"><div class="stat-label">Active Screens</div><div class="stat-value" id="vn-screens">—</div></div>
+          <div class="stat-card"><div class="stat-label">Revenue Earned (Total)</div><div class="stat-value" id="vn-revenue">—</div></div>
+          <div class="stat-card"><div class="stat-label">Pending Settlement</div><div class="stat-value" id="vn-pending">—</div></div>
+        </div>
+        <div class="table-card">
+          <table class="data-table">
+            <thead><tr>
+              <th>Business</th><th>Category</th><th>City</th>
+              <th>Screens</th><th>Rev Share</th><th>Total Earned</th><th>Status</th><th>Actions</th>
+            </tr></thead>
+            <tbody id="venues-table"></tbody>
+          </table>
+        </div>
+      </div>
+
       <!-- ACTIVITY LOG -->
       <div id="page-activity" class="page">
         <div class="section-head"><h2>Activity Log</h2><button class="btn btn-ghost btn-sm" onclick="loadActivity()">Refresh</button></div>
@@ -647,17 +750,173 @@ textarea.form-input{resize:vertical;min-height:80px;}
 
 <!-- MODALS -->
 
+<!-- Venue Partner Modal -->
+<div class="modal-backdrop hidden" id="venue-modal">
+  <div class="modal" style="max-width:560px;width:95%;">
+    <div class="modal-header">
+      <span class="modal-title" id="venue-modal-title">Add Venue Partner</span>
+      <button class="modal-close" onclick="closeModal('venue-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="venue-edit-id">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div class="form-group" style="grid-column:span 2;">
+          <label class="form-label">Business Name *</label>
+          <input type="text" id="vn-business" class="form-input" placeholder="FitLife Gym">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Category</label>
+          <select id="vn-category" class="select-input">
+            <option value="gym">Gym / Fitness</option>
+            <option value="cafe">Cafe / Coffee Shop</option>
+            <option value="restaurant">Restaurant</option>
+            <option value="clinic">Clinic / Hospital</option>
+            <option value="retail">Retail Store</option>
+            <option value="hotel">Hotel / Hospitality</option>
+            <option value="salon">Salon / Spa</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">City *</label>
+          <input type="text" id="vn-city" class="form-input" placeholder="Pune">
+        </div>
+        <div class="form-group" style="grid-column:span 2;">
+          <label class="form-label">Address</label>
+          <input type="text" id="vn-address" class="form-input" placeholder="123 MG Road, Koregaon Park">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Contact Person</label>
+          <input type="text" id="vn-contact" class="form-input" placeholder="Raj Kumar">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Contact Phone</label>
+          <input type="text" id="vn-phone" class="form-input" placeholder="9876543210">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Revenue Share %</label>
+          <input type="number" id="vn-revshare" class="form-input" value="30" min="0" max="60" step="5">
+        </div>
+        <div class="form-group" id="vn-login-group">
+          <label class="form-label">Login Email *</label>
+          <input type="email" id="vn-email" class="form-input" placeholder="raj@fitlifegym.in">
+        </div>
+        <div class="form-group" id="vn-pass-group">
+          <label class="form-label">Password <span style="color:var(--text3);font-weight:400;">(leave blank = auto)</span></label>
+          <input type="text" id="vn-password" class="form-input" placeholder="auto-generate">
+        </div>
+      </div>
+      <div id="vn-cred-box" style="display:none;margin-top:12px;background:var(--surface2);border:1.5px solid var(--primary);border-radius:8px;padding:12px;">
+        <div style="font-size:11px;font-weight:700;color:var(--primary);margin-bottom:6px;">✓ Venue Portal Credentials — Share with venue:</div>
+        <div style="font-size:12px;color:var(--text);line-height:2;">
+          Portal URL: <strong id="vn-cred-url"></strong><br>
+          Email: <strong id="vn-cred-email"></strong><br>
+          Password: <strong id="vn-cred-pass"></strong>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('venue-modal')">Cancel</button>
+      <button class="btn btn-primary" id="vn-save-btn" onclick="saveVenuePartner()">Create Venue Partner</button>
+    </div>
+  </div>
+</div>
+
+<!-- Venue Revenue Modal -->
+<div class="modal-backdrop hidden" id="venue-revenue-modal">
+  <div class="modal" style="max-width:520px;width:95%;">
+    <div class="modal-header">
+      <span class="modal-title" id="vrm-title">Revenue Details</span>
+      <button class="modal-close" onclick="closeModal('venue-revenue-modal')">✕</button>
+    </div>
+    <div class="modal-body" id="vrm-body">Loading…</div>
+  </div>
+</div>
+
 <!-- Creative Lightbox -->
-<div id="creative-lightbox" onclick="closeLightbox()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;display:none;align-items:center;justify-content:center;cursor:zoom-out;">
-  <div onclick="event.stopPropagation()" style="position:relative;max-width:90vw;max-height:90vh;">
-    <button onclick="closeLightbox()" style="position:absolute;top:-36px;right:0;background:none;border:none;color:#fff;font-size:28px;cursor:pointer;line-height:1;">×</button>
-    <img id="lightbox-img" src="" alt="" style="max-width:90vw;max-height:85vh;object-fit:contain;border-radius:8px;display:block;">
-    <video id="lightbox-vid" src="" controls style="max-width:90vw;max-height:85vh;border-radius:8px;display:none;"></video>
-    <div id="lightbox-name" style="color:#ccc;font-size:12px;text-align:center;margin-top:8px;"></div>
+<div id="creative-lightbox" onclick="closeLightbox()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:9999;align-items:center;justify-content:center;cursor:zoom-out;">
+  <div onclick="event.stopPropagation()" style="position:relative;max-width:92vw;max-height:92vh;display:flex;flex-direction:column;align-items:center;">
+    <button onclick="closeLightbox()" style="position:absolute;top:-40px;right:0;background:rgba(255,255,255,0.12);border:none;color:#fff;font-size:22px;cursor:pointer;line-height:1;width:32px;height:32px;border-radius:50%;">×</button>
+    <img id="lightbox-img" src="" alt="" style="max-width:88vw;max-height:82vh;object-fit:contain;border-radius:8px;display:block;">
+    <video id="lightbox-vid" src="" controls autoplay playsinline style="max-width:88vw;max-height:82vh;border-radius:8px;display:none;background:#000;outline:none;"></video>
+    <div id="lightbox-name" style="color:rgba(255,255,255,0.6);font-size:12px;text-align:center;margin-top:10px;"></div>
   </div>
 </div>
 
 <!-- Reject Campaign Modal -->
+<!-- Campaign Detail Modal -->
+<div class="modal-backdrop hidden" id="camp-detail-modal">
+  <div class="modal" style="max-width:680px;width:95%;">
+    <div class="modal-header">
+      <span class="modal-title" id="cdm-title">Campaign Detail</span>
+      <button class="modal-close" onclick="closeModal('camp-detail-modal')">✕</button>
+    </div>
+    <div class="modal-body" style="padding:0;">
+      <!-- Creative preview -->
+      <div id="cdm-creative-wrap" style="background:#0f1420;display:flex;align-items:center;justify-content:center;min-height:180px;max-height:340px;overflow:hidden;border-radius:0;">
+        <div id="cdm-creative-inner" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;"></div>
+      </div>
+      <!-- Pending creative banner -->
+      <div id="cdm-pending-wrap" style="display:none;background:var(--warning-light);border-bottom:1px solid var(--border);padding:10px 20px;display:none;align-items:center;justify-content:space-between;gap:10px;">
+        <div>
+          <div style="font-size:12px;font-weight:700;color:var(--warning);">New Creative Pending Review</div>
+          <div id="cdm-pending-name" style="font-size:11px;color:var(--text2);margin-top:2px;"></div>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-success btn-xs" id="cdm-approve-creative-btn">✓ Approve</button>
+          <button class="btn btn-ghost btn-xs" id="cdm-reject-creative-btn">✕ Reject</button>
+        </div>
+      </div>
+      <div style="padding:20px;display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        <!-- Left col -->
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <div>
+            <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">Advertiser</div>
+            <div id="cdm-advertiser" style="font-size:13px;font-weight:600;"></div>
+            <div id="cdm-email" style="font-size:11.5px;color:var(--text2);margin-top:1px;"></div>
+          </div>
+          <div>
+            <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">Campaign</div>
+            <div id="cdm-code" style="font-size:11.5px;color:var(--text2);margin-bottom:2px;"></div>
+            <div id="cdm-dates" style="font-size:12px;"></div>
+            <div id="cdm-time" style="font-size:11.5px;color:var(--text2);margin-top:1px;"></div>
+          </div>
+          <div>
+            <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">Screens</div>
+            <div id="cdm-screens" style="font-size:12px;line-height:1.6;"></div>
+          </div>
+        </div>
+        <!-- Right col -->
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <div>
+            <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">Amount</div>
+            <div id="cdm-amount" style="font-size:18px;font-weight:800;color:var(--primary);"></div>
+            <div id="cdm-amount-detail" style="font-size:11px;color:var(--text2);margin-top:2px;"></div>
+          </div>
+          <div>
+            <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">Status</div>
+            <div id="cdm-status"></div>
+          </div>
+          <div id="cdm-creative-info-wrap">
+            <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">Creative</div>
+            <div id="cdm-creative-info" style="font-size:11.5px;color:var(--text2);"></div>
+          </div>
+          <div id="cdm-notes-wrap" style="display:none;">
+            <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">Notes / Rejection</div>
+            <div id="cdm-notes" style="font-size:12px;color:var(--danger);"></div>
+          </div>
+          <div id="cdm-checklist" style="margin-top:4px;">
+            <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;">Review Checklist</div>
+            <div style="display:flex;flex-direction:column;gap:5px;" id="cdm-checklist-items"></div>
+          </div>
+        </div>
+      </div>
+      <!-- Footer actions -->
+      <div id="cdm-footer" style="padding:14px 20px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end;"></div>
+    </div>
+  </div>
+</div>
+
 <div class="modal-backdrop hidden" id="reject-modal">
   <div class="modal">
     <div class="modal-header">
@@ -680,6 +939,34 @@ textarea.form-input{resize:vertical;min-height:80px;}
 </div>
 
 <!-- Screen Modal -->
+<!-- Device Register / Connect Modal -->
+<div class="modal-backdrop hidden" id="device-register-modal">
+  <div class="modal" style="max-width:560px;">
+    <div class="modal-header">
+      <span class="modal-title" id="device-register-title">Connect Device</span>
+      <button class="modal-close" onclick="closeModal('device-register-modal')">✕</button>
+    </div>
+    <div class="modal-body" id="device-register-body" style="max-height:75vh;overflow-y:auto;"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('device-register-modal')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Schedule Preview Modal -->
+<div class="modal-backdrop hidden" id="schedule-preview-modal">
+  <div class="modal" style="max-width:700px;">
+    <div class="modal-header">
+      <span class="modal-title" id="schedule-preview-title">Schedule Preview</span>
+      <button class="modal-close" onclick="closeModal('schedule-preview-modal')">✕</button>
+    </div>
+    <div class="modal-body" id="schedule-preview-body" style="max-height:70vh;overflow-y:auto;"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('schedule-preview-modal')">Close</button>
+    </div>
+  </div>
+</div>
+
 <div class="modal-backdrop hidden" id="screen-modal">
   <div class="modal">
     <div class="modal-header">
@@ -714,11 +1001,41 @@ textarea.form-input{resize:vertical;min-height:80px;}
         <label class="form-label">Status</label>
         <select class="form-select" id="sc-status"><option value="online">Online</option><option value="offline">Offline</option><option value="maintenance">Maintenance</option></select>
       </div>
+      <div class="form-group">
+        <label class="form-label">Audio</label>
+        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
+          <input type="checkbox" id="sc-audio" style="width:16px;height:16px;accent-color:var(--primary);">
+          <span style="font-size:13px;color:var(--text2);">Enable audio on this screen <span style="color:var(--warning);font-size:11px;">(default: muted)</span></span>
+        </label>
+      </div>
       <input type="hidden" id="sc-id">
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('screen-modal')">Cancel</button>
       <button class="btn btn-primary" onclick="saveScreen()" id="sc-save-btn">Save Screen</button>
+    </div>
+  </div>
+</div>
+
+<!-- Screen Group Modal -->
+<div class="modal-backdrop hidden" id="group-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="group-modal-title">New Screen Group</span>
+      <button class="modal-close" onclick="closeModal('group-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">Group Name *</label><input type="text" class="form-input" id="grp-name" placeholder="e.g. Vasna Cluster, SG Highway Zone"></div>
+      <div class="form-group"><label class="form-label">Description</label><input type="text" class="form-input" id="grp-desc" placeholder="Optional description"></div>
+      <div class="form-group">
+        <label class="form-label">Select Screens</label>
+        <div id="grp-screens-list" style="max-height:220px;overflow-y:auto;border:1px solid var(--border);border-radius:8px;padding:8px;display:flex;flex-direction:column;gap:6px;"></div>
+      </div>
+      <input type="hidden" id="grp-id">
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('group-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveGroup()" id="grp-save-btn">Save Group</button>
     </div>
   </div>
 </div>
@@ -873,7 +1190,9 @@ const pageTitles = {
   dashboard: 'Dashboard', campaigns: 'All Campaigns', approvals: 'Pending Approvals',
   screens: 'Screens', content: 'Content Library', advertisers: 'Advertisers',
   invoices: 'Invoices', coupons: 'Coupons', analytics: 'Analytics',
-  pop: 'Proof of Play', notifications: 'Notifications', activity: 'Activity Log'
+  pop: 'Proof of Play', notifications: 'Notifications', activity: 'Activity Log',
+  venues: 'Venue Partners',
+  filler: 'Filler Content'
 };
 
 function navigate(page) {
@@ -890,9 +1209,268 @@ function navigate(page) {
     dashboard: loadDashboard, campaigns: loadCampaigns, approvals: loadApprovals,
     screens: loadScreens, content: loadContent, advertisers: loadAdvertisers,
     invoices: loadInvoices, coupons: loadCoupons, analytics: loadAnalytics,
-    pop: loadPop, notifications: loadNotificationsPage, activity: loadActivity
+    pop: loadPop, notifications: loadNotificationsPage, activity: loadActivity,
+    venues: loadVenues,
+    filler: loadFiller
   };
   if (loaders[page]) loaders[page]();
+}
+
+// ── VENUE PARTNERS ────────────────────────────────────────────────────────
+const VENUE_CAT_LABELS = { gym:'Gym / Fitness', cafe:'Cafe', restaurant:'Restaurant', clinic:'Clinic', retail:'Retail', hotel:'Hotel', salon:'Salon', other:'Other' };
+
+async function loadVenues() {
+  const tbody = document.getElementById('venues-table');
+  tbody.innerHTML = loadingRow(8);
+  try {
+    const venues = await api('/venue-partners');
+    // stats
+    document.getElementById('vn-total').textContent = venues.length;
+    document.getElementById('vn-screens').textContent = venues.reduce((a,v)=>a+parseInt(v.screen_count||0),0);
+    document.getElementById('vn-revenue').textContent = '₹'+fmt(venues.reduce((a,v)=>a+parseFloat(v.total_revenue_earned||0),0));
+    document.getElementById('vn-pending').textContent = '—';
+
+    if (!venues.length) { tbody.innerHTML = emptyRow(8,'No venue partners yet — add your first one!'); return; }
+    tbody.innerHTML = venues.map(v => `
+      <tr>
+        <td>
+          <div style="font-weight:600;">${v.business_name}</div>
+          <div style="font-size:11px;color:var(--text2);">${v.email||''}</div>
+        </td>
+        <td><span class="badge badge-blue">${VENUE_CAT_LABELS[v.venue_category]||v.venue_category}</span></td>
+        <td style="font-size:12px;">${v.city||'—'}</td>
+        <td style="text-align:center;font-weight:600;">${v.screen_count||0}</td>
+        <td style="text-align:center;font-weight:600;color:var(--primary);">${v.revenue_share_pct}%</td>
+        <td style="font-weight:600;">₹${fmt(v.total_revenue_earned||0)}</td>
+        <td>${v.is_active ? '<span class="badge badge-green">Active</span>' : '<span class="badge" style="background:var(--surface2);color:var(--text2);">Inactive</span>'}</td>
+        <td>
+          <div style="display:flex;align-items:center;gap:2px;">
+            <button class="ia-btn" title="View Revenue" onclick="openVenueRevenue('${v.id}','${v.business_name.replace(/'/g,"\\'")}')" style="color:var(--primary);">
+              <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+            </button>
+            <button class="ia-btn" title="Edit" onclick="openVenueModal('${v.id}')">
+              <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+            </button>
+            <button class="ia-btn" title="Copy Portal Link" onclick="copyVenueLink('${v.email||''}')">
+              <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+            </button>
+            <button class="ia-btn ia-danger" title="Deactivate" onclick="toggleVenue('${v.id}',${!v.is_active})">
+              <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="${v.is_active ? 'M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636' : 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z'}"/></svg>
+            </button>
+          </div>
+        </td>
+      </tr>`).join('');
+  } catch(e) { tbody.innerHTML = emptyRow(8, 'Error: '+e.message); }
+}
+
+function openVenueModal(id) {
+  const isEdit = !!id;
+  document.getElementById('venue-modal-title').textContent = isEdit ? 'Edit Venue Partner' : 'Add Venue Partner';
+  document.getElementById('vn-save-btn').textContent = isEdit ? 'Save Changes' : 'Create Venue Partner';
+  document.getElementById('venue-edit-id').value = id || '';
+  document.getElementById('vn-cred-box').style.display = 'none';
+  document.getElementById('vn-login-group').style.display = isEdit ? 'none' : '';
+  document.getElementById('vn-pass-group').style.display = isEdit ? 'none' : '';
+  // clear fields
+  ['vn-business','vn-city','vn-address','vn-contact','vn-phone','vn-email','vn-password'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('vn-revshare').value = 30;
+  document.getElementById('vn-category').value = 'gym';
+
+  if (isEdit) {
+    api('/venue-partners/'+id).then(v => {
+      document.getElementById('vn-business').value = v.business_name || '';
+      document.getElementById('vn-category').value = v.venue_category || 'other';
+      document.getElementById('vn-city').value = v.city || '';
+      document.getElementById('vn-address').value = v.address || '';
+      document.getElementById('vn-contact').value = v.contact_name || '';
+      document.getElementById('vn-phone').value = v.contact_phone || '';
+      document.getElementById('vn-revshare').value = v.revenue_share_pct || 30;
+    }).catch(e => showToast('Error: '+e.message,'error'));
+  }
+  document.getElementById('venue-modal').classList.remove('hidden');
+}
+
+async function saveVenuePartner() {
+  const id = document.getElementById('venue-edit-id').value;
+  const body = {
+    business_name: document.getElementById('vn-business').value.trim(),
+    venue_category: document.getElementById('vn-category').value,
+    city: document.getElementById('vn-city').value.trim(),
+    address: document.getElementById('vn-address').value.trim(),
+    contact_name: document.getElementById('vn-contact').value.trim(),
+    contact_phone: document.getElementById('vn-phone').value.trim(),
+    revenue_share_pct: parseFloat(document.getElementById('vn-revshare').value)||30,
+  };
+  if (!body.business_name) return showToast('Business name required','error');
+
+  try {
+    if (id) {
+      await api('/venue-partners/'+id, { method:'PUT', body: JSON.stringify(body) });
+      showToast('Venue partner updated','success');
+      closeModal('venue-modal');
+    } else {
+      body.email = document.getElementById('vn-email').value.trim();
+      body.password = document.getElementById('vn-password').value.trim() || undefined;
+      if (!body.email) return showToast('Email required','error');
+      const res = await api('/venue-partners', { method:'POST', body: JSON.stringify(body) });
+      const portalUrl = window.location.origin + '/venue';
+      document.getElementById('vn-cred-url').textContent = portalUrl;
+      document.getElementById('vn-cred-email').textContent = body.email;
+      document.getElementById('vn-cred-pass').textContent = res.generated_password || '(password you set)';
+      document.getElementById('vn-cred-box').style.display = 'block';
+      document.getElementById('vn-save-btn').textContent = 'Done';
+      document.getElementById('vn-save-btn').onclick = () => { closeModal('venue-modal'); loadVenues(); };
+      showToast('Venue partner created','success');
+    }
+    loadVenues();
+  } catch(e) { showToast('Error: '+e.message,'error'); }
+}
+
+async function toggleVenue(id, setActive) {
+  if (!confirm(setActive ? 'Activate this venue partner?' : 'Deactivate this venue partner?')) return;
+  try {
+    const v = await api('/venue-partners/'+id);
+    await api('/venue-partners/'+id, { method:'PUT', body: JSON.stringify({ ...v, is_active: setActive }) });
+    showToast(setActive ? 'Venue activated' : 'Venue deactivated', 'success');
+    loadVenues();
+  } catch(e) { showToast('Error: '+e.message,'error'); }
+}
+
+async function openVenueRevenue(id, name) {
+  document.getElementById('vrm-title').textContent = name + ' — Revenue';
+  document.getElementById('vrm-body').innerHTML = '<div style="padding:20px;text-align:center;color:var(--text2);">Loading…</div>';
+  document.getElementById('venue-revenue-modal').classList.remove('hidden');
+  try {
+    const r = await api('/venue-partners/'+id+'/revenue');
+    const s = r.summary;
+    document.getElementById('vrm-body').innerHTML = `
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px;">
+        <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:8px;padding:12px;text-align:center;">
+          <div style="font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;margin-bottom:4px;">Total Earned</div>
+          <div style="font-size:20px;font-weight:800;color:var(--primary);">₹${fmt(s.total_earned)}</div>
+        </div>
+        <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:8px;padding:12px;text-align:center;">
+          <div style="font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;margin-bottom:4px;">Settled</div>
+          <div style="font-size:20px;font-weight:800;color:#16a34a;">₹${fmt(s.total_settled)}</div>
+        </div>
+        <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:8px;padding:12px;text-align:center;">
+          <div style="font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;margin-bottom:4px;">Pending</div>
+          <div style="font-size:20px;font-weight:800;color:#f59e0b;">₹${fmt(s.pending_settlement)}</div>
+        </div>
+      </div>
+      <div style="font-size:11px;font-weight:700;color:var(--text2);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.04em;">Monthly Breakdown</div>
+      ${r.monthly.length ? `<table class="data-table"><thead><tr><th>Month</th><th>Plays</th><th>Earned</th><th>Status</th><th></th></tr></thead><tbody>
+        ${r.monthly.map(m=>`<tr>
+          <td>${m.month}</td>
+          <td>${Number(m.plays||0).toLocaleString()}</td>
+          <td style="font-weight:600;color:var(--primary);">₹${fmt(m.earned)}</td>
+          <td><span class="status-badge ${m.settled?'badge-green':'badge-yellow'}">${m.settled?'Settled':'Pending'}</span></td>
+          <td>${!m.settled ? `<button class="btn btn-sm" style="font-size:11px;padding:3px 10px;" onclick="settleVenueMonth('${id}','${m.month}',this)">Mark Settled</button>` : ''}</td>
+        </tr>`).join('')}
+      </tbody></table>` : '<div style="color:var(--text2);font-size:13px;text-align:center;padding:20px;">No revenue data yet</div>'}
+    `;
+  } catch(e) { document.getElementById('vrm-body').innerHTML = '<div style="padding:20px;color:var(--danger);">Error: '+e.message+'</div>'; }
+}
+
+async function settleVenueMonth(venueId, month, btn) {
+  btn.disabled = true; btn.textContent = '…';
+  try {
+    const r = await api('/venue-partners/'+venueId+'/settle', { method:'POST', body: JSON.stringify({ month }) });
+    showToast(`${r.settled_rows} rows settled for ${month}`, 'success');
+    btn.closest('tr').querySelector('td:nth-child(4)').innerHTML = '<span class="status-badge badge-green">Settled</span>';
+    btn.closest('td').innerHTML = '';
+  } catch(e) { showToast('Error: '+e.message, 'error'); btn.disabled=false; btn.textContent='Mark Settled'; }
+}
+
+function copyVenueLink(email) {
+  const link = window.location.origin + '/venue';
+  navigator.clipboard.writeText(link).then(()=>showToast('Portal link copied: ' + link,'success')).catch(()=>showToast('Venue portal: ' + link));
+}
+
+// ── FILLER CONTENT ────────────────────────────────────────────────────────────
+async function loadFiller() {
+  const tbody = document.getElementById('filler-table');
+  tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text3);padding:32px;">Loading…</td></tr>';
+  try {
+    const items = await api('/filler');
+    if (!items.length) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text3);padding:40px;">No filler content yet — upload your first file above.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = items.map(f => {
+      const isVideo = f.type === 'video';
+      const thumb = isVideo
+        ? `<div style="width:60px;height:38px;background:var(--surface2);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:18px;">🎬</div>`
+        : `<img src="${f.file_url}" style="width:60px;height:38px;object-fit:cover;border-radius:4px;background:var(--surface2);" onerror="this.style.background='var(--surface2)'">`;
+      return `<tr>
+        <td>${thumb}</td>
+        <td style="font-weight:600;">${f.title||'—'}</td>
+        <td><span class="status-badge" style="background:var(--surface2);color:var(--text2);">${f.type}</span></td>
+        <td>${f.duration_sec}s</td>
+        <td>
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:12px;">
+            <input type="checkbox" ${f.is_active?'checked':''} onchange="toggleFiller('${f.id}',this.checked)" style="cursor:pointer;">
+            ${f.is_active ? '<span style="color:#16a34a;font-weight:600;">Active</span>' : '<span style="color:var(--text3);">Inactive</span>'}
+          </label>
+        </td>
+        <td>
+          <button class="ia-btn ia-danger" title="Delete" onclick="deleteFiller('${f.id}',this)">
+            <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+        </td>
+      </tr>`;
+    }).join('');
+  } catch(e) { tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--danger);padding:24px;">${e.message}</td></tr>`; }
+}
+
+async function uploadFiller(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const prog = document.getElementById('filler-upload-progress');
+  const fill = document.getElementById('filler-prog-fill');
+  const text = document.getElementById('filler-prog-text');
+  prog.style.display = 'block'; fill.style.width = '10%';
+  text.textContent = 'Uploading ' + file.name + '…';
+
+  const fd = new FormData();
+  fd.append('file', file);
+  fd.append('title', file.name.replace(/\.[^.]+$/, ''));
+
+  const xhr = new XMLHttpRequest();
+  xhr.open('POST', '/api/filler/upload');
+  xhr.setRequestHeader('Authorization', 'Bearer ' + token);
+  xhr.upload.onprogress = ev => { if (ev.lengthComputable) fill.style.width = Math.round(ev.loaded/ev.total*85)+'%'; };
+  xhr.onload = () => {
+    if (xhr.status < 300) {
+      fill.style.width = '100%'; text.textContent = '✓ Uploaded!';
+      setTimeout(() => { prog.style.display='none'; fill.style.width='0%'; }, 1800);
+      loadFiller();
+    } else {
+      const err = JSON.parse(xhr.responseText);
+      text.textContent = 'Error: ' + (err.error||'Upload failed');
+      setTimeout(() => prog.style.display='none', 3000);
+    }
+  };
+  xhr.onerror = () => { text.textContent = 'Upload failed'; };
+  xhr.send(fd);
+  e.target.value = '';
+}
+
+async function toggleFiller(id, active) {
+  try {
+    await api('/filler/'+id, { method:'PATCH', body: JSON.stringify({ is_active: active }) });
+    showToast(active ? 'Filler activated' : 'Filler deactivated', 'success');
+  } catch(e) { showToast('Error: '+e.message, 'error'); loadFiller(); }
+}
+
+async function deleteFiller(id, btn) {
+  if (!confirm('Delete this filler item?')) return;
+  btn.disabled = true;
+  try {
+    await api('/filler/'+id, { method:'DELETE' });
+    showToast('Filler deleted', 'success');
+    loadFiller();
+  } catch(e) { showToast('Error: '+e.message, 'error'); btn.disabled=false; }
 }
 
 // ── TOAST ─────────────────────────────────────────────────────────────────
@@ -949,7 +1527,14 @@ function loadingRow(cols) {
   return `<tr class="loading-row"><td colspan="${cols}"><div class="spinner"></div></td></tr>`;
 }
 
-function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+function openModal(id) {
+  document.getElementById(id).classList.remove('hidden');
+}
+function closeModal(id) {
+  document.getElementById(id).classList.add('hidden');
+  // Stop any playing video inside modal
+  document.getElementById(id)?.querySelectorAll('video').forEach(v=>{ v.pause(); v.src=''; });
+}
 
 // ── DASHBOARD ─────────────────────────────────────────────────────────────
 async function loadDashboard() {
@@ -1005,8 +1590,10 @@ async function loadDashboard() {
         <td style="color:var(--text2);">${c.first_name||''} ${c.last_name||''}<br><span style="font-size:11px;">${c.email||''}</span></td>
         <td style="font-weight:600;">₹${fmt(c.amount_total||0)}</td>
         <td>
-          <button class="btn btn-success btn-xs" onclick="approveQuick('${c.id}')">Approve</button>
-          <button class="btn btn-ghost btn-xs" onclick="openRejectModal('${c.id}')">Reject</button>
+          <div style="display:flex;align-items:center;gap:2px;">
+            <button class="ia-btn" title="Approve" style="color:#16a34a;" onclick="approveQuick('${c.id}')"><svg width="17" height="17" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></button>
+            <button class="ia-btn ia-danger" title="Reject" onclick="openRejectModal('${c.id}')"><svg width="17" height="17" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button>
+          </div>
         </td>
       </tr>`).join('');
   } catch(e) { console.error(e); showToast('Dashboard load error: ' + e.message, 'error'); }
@@ -1027,20 +1614,140 @@ function renderCampaigns(data) {
   const tbody = document.getElementById('camp-table');
   if(!data.length) { tbody.innerHTML = emptyRow(7); return; }
   tbody.innerHTML = data.map(c => `
-    <tr>
+    <tr style="cursor:pointer;" onclick="openCampaignDetail('${c.id}')">
       <td><code style="font-size:11px;background:var(--surface2);padding:2px 6px;border-radius:4px;">${c.campaign_code}</code></td>
       <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500;">${c.title}</td>
       <td style="color:var(--text2);font-size:12px;">${c.first_name||''} ${c.last_name||''}<br>${c.business_name||c.email||''}</td>
       <td style="font-size:12px;">${fmtDate(c.start_date)} – ${fmtDate(c.end_date)}</td>
       <td style="font-weight:600;font-variant-numeric:tabular-nums;">₹${fmt(c.amount_total||0)}</td>
       <td>${statusBadge(c.status)}</td>
-      <td>
+      <td onclick="event.stopPropagation()">
         ${c.status === 'pending_approval' ? `
-          <button class="btn btn-success btn-xs" onclick="approveQuick('${c.id}')">Approve</button>
-          <button class="btn btn-ghost btn-xs" onclick="openRejectModal('${c.id}')">Reject</button>
+          <div style="display:flex;align-items:center;gap:2px;">
+            <button class="ia-btn" title="Approve" style="color:#16a34a;" onclick="approveQuick('${c.id}')"><svg width="17" height="17" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></button>
+            <button class="ia-btn ia-danger" title="Reject" onclick="openRejectModal('${c.id}')"><svg width="17" height="17" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button>
+          </div>
+        ` : c.creative_change_status === 'pending' ? `
+          <div style="display:flex;align-items:center;gap:2px;">
+            <button class="ia-btn" title="Approve Creative" style="color:#16a34a;" onclick="approveCreative('${c.id}')"><svg width="17" height="17" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></button>
+            <button class="ia-btn ia-danger" title="Reject Creative" onclick="rejectCreative('${c.id}')"><svg width="17" height="17" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button>
+          </div>
         ` : '—'}
       </td>
     </tr>`).join('');
+}
+
+async function openCampaignDetail(id) {
+  openModal('camp-detail-modal');
+  // Show loading state
+  document.getElementById('cdm-title').textContent = 'Loading…';
+  document.getElementById('cdm-creative-inner').innerHTML = '<div style="color:rgba(255,255,255,0.3);font-size:13px;">Loading…</div>';
+  document.getElementById('cdm-footer').innerHTML = '';
+  try {
+    const c = await api('/campaigns/' + id);
+
+    // Title
+    document.getElementById('cdm-title').textContent = c.title;
+
+    // Creative preview
+    const inner = document.getElementById('cdm-creative-inner');
+    if (c.creative_url) {
+      if (c.creative_type === 'video') {
+        inner.innerHTML = `<video src="${c.creative_url}" controls autoplay playsinline style="max-width:100%;max-height:340px;display:block;background:#000;"></video>`;
+      } else {
+        inner.innerHTML = `<img src="${c.creative_url}" style="max-width:100%;max-height:340px;object-fit:contain;display:block;">`;
+      }
+    } else {
+      inner.innerHTML = `<div style="color:rgba(255,255,255,0.25);font-size:13px;padding:40px;">No creative uploaded</div>`;
+    }
+
+    // Pending creative
+    const pendingWrap = document.getElementById('cdm-pending-wrap');
+    if (c.pending_creative_url && c.creative_change_status === 'pending') {
+      pendingWrap.style.display = 'flex';
+      document.getElementById('cdm-pending-name').textContent = c.pending_creative_name || 'New file';
+      document.getElementById('cdm-approve-creative-btn').onclick = () => { closeModal('camp-detail-modal'); approveCreative(id); };
+      document.getElementById('cdm-reject-creative-btn').onclick  = () => { closeModal('camp-detail-modal'); rejectCreative(id); };
+    } else { pendingWrap.style.display = 'none'; }
+
+    // Advertiser
+    document.getElementById('cdm-advertiser').textContent = (c.first_name||'') + ' ' + (c.last_name||'') + (c.business_name ? ' · ' + c.business_name : '');
+    document.getElementById('cdm-email').textContent = c.email || '';
+
+    // Campaign info
+    document.getElementById('cdm-code').textContent = c.campaign_code;
+    document.getElementById('cdm-dates').textContent = fmtDate(c.start_date) + ' → ' + fmtDate(c.end_date);
+    document.getElementById('cdm-time').textContent = (c.start_time||'00:00').slice(0,5) + ' – ' + (c.end_time||'23:59').slice(0,5) + ' daily';
+
+    // Screens
+    const names = (c.screen_names||[]).filter(Boolean);
+    document.getElementById('cdm-screens').innerHTML = names.length
+      ? names.map(n=>`<span style="display:inline-block;background:var(--surface2);border-radius:4px;padding:1px 7px;margin:2px;font-size:11px;">${n}</span>`).join('')
+      : '<span style="color:var(--text3);">—</span>';
+
+    // Amount
+    document.getElementById('cdm-amount').textContent = '₹' + fmt(c.amount_total||0);
+    document.getElementById('cdm-amount-detail').textContent = `Base ₹${fmt(c.amount_base||0)} + GST ₹${fmt(c.amount_gst||0)}${c.discount_amount>0?' · Discount ₹'+fmt(c.discount_amount):''}`;
+
+    // Status
+    document.getElementById('cdm-status').innerHTML = statusBadge(c.status);
+
+    // Creative info
+    const parts = [];
+    if (c.creative_name) parts.push(c.creative_name);
+    if (c.creative_type) parts.push(c.creative_type.toUpperCase());
+    if (c.creative_duration) parts.push(c.creative_duration + 's');
+    if (c.creative_size) parts.push((c.creative_size/1024/1024).toFixed(1) + ' MB');
+    document.getElementById('cdm-creative-info').textContent = parts.join(' · ') || '—';
+
+    // Notes / rejection reason
+    const notesWrap = document.getElementById('cdm-notes-wrap');
+    if (c.rejection_reason || c.notes) {
+      notesWrap.style.display = 'block';
+      document.getElementById('cdm-notes').textContent = c.rejection_reason || c.notes;
+    } else { notesWrap.style.display = 'none'; }
+
+    // Checklist
+    const checks = [
+      { label: 'Creative uploaded', ok: !!c.creative_url },
+      { label: 'Screens assigned', ok: !!(c.screen_names||[]).filter(Boolean).length },
+      { label: 'Valid dates', ok: c.start_date && c.end_date && new Date(c.end_date) >= new Date(c.start_date) },
+      { label: 'Payment received', ok: c.payment_status === 'paid' },
+      { label: 'No pending creative change', ok: c.creative_change_status !== 'pending' },
+    ];
+    document.getElementById('cdm-checklist-items').innerHTML = checks.map(ch => `
+      <div style="display:flex;align-items:center;gap:7px;font-size:12px;">
+        <span style="width:16px;height:16px;border-radius:50%;background:${ch.ok?'#22c55e':'#f87171'};display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;">
+          <svg width="9" height="9" fill="none" viewBox="0 0 24 24" stroke="#fff" stroke-width="3">
+            ${ch.ok?'<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>':'<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>'}
+          </svg>
+        </span>
+        <span style="color:${ch.ok?'var(--text)':'var(--text2)'};">${ch.label}</span>
+      </div>`).join('');
+
+    // Footer actions
+    const footer = document.getElementById('cdm-footer');
+    if (c.status === 'pending_approval') {
+      const startDate = (c.start_date||'').slice(0,10);
+      const today = new Date().toISOString().slice(0,10);
+      const isFuture = startDate > today;
+      footer.innerHTML = `
+        <button class="btn btn-success" onclick="approveQuick('${id}');closeModal('camp-detail-modal');">✓ Approve</button>
+        ${isFuture ? `<button class="btn btn-primary" style="font-size:12px;" onclick="approveQuick('${id}',true);closeModal('camp-detail-modal');">⚡ Approve &amp; Start Today</button>` : ''}
+        <button class="btn btn-ghost" onclick="closeModal('camp-detail-modal');openRejectModal('${id}');">✕ Reject</button>`;
+    } else if (c.status === 'approved' || c.status === 'live') {
+      const startDate = (c.start_date||'').slice(0,10);
+      const today = new Date().toISOString().slice(0,10);
+      footer.innerHTML = `
+        ${startDate > today ? `<button class="btn btn-primary" style="font-size:12px;" onclick="forceLiveCampaign('${id}')">⚡ Force Live Now</button>` : ''}
+        <button class="btn btn-ghost" onclick="closeModal('camp-detail-modal')">Close</button>`;
+    } else {
+      footer.innerHTML = `<button class="btn btn-ghost" onclick="closeModal('camp-detail-modal')">Close</button>`;
+    }
+  } catch(e) {
+    document.getElementById('cdm-title').textContent = 'Error loading campaign';
+    document.getElementById('cdm-creative-inner').innerHTML = '';
+  }
 }
 
 function filterCampaigns() {
@@ -1053,13 +1760,28 @@ function filterCampaigns() {
 }
 
 // ── APPROVALS ─────────────────────────────────────────────────────────────
+let _approvalsData = [];
 async function loadApprovals() {
   const tbody = document.getElementById('approvals-table');
   tbody.innerHTML = loadingRow(9);
   try {
     const data = await api('/campaigns?status=pending_approval&limit=100');
-    const arr = Array.isArray(data) ? data : (data.data||[]);
-    if(!arr.length) { tbody.innerHTML = emptyRow(9, 'No pending approvals — all clear!'); return; }
+    _approvalsData = Array.isArray(data) ? data : (data.data||[]);
+    renderApprovals(_approvalsData);
+  } catch(e) { tbody.innerHTML = emptyRow(9, 'Error: ' + e.message); }
+}
+function filterApprovals() {
+  const q = (document.getElementById('approvals-search')?.value||'').toLowerCase();
+  renderApprovals(q ? _approvalsData.filter(c =>
+    (c.first_name||'').toLowerCase().includes(q) ||
+    (c.last_name||'').toLowerCase().includes(q) ||
+    (c.business_name||'').toLowerCase().includes(q) ||
+    (c.email||'').toLowerCase().includes(q)
+  ) : _approvalsData);
+}
+function renderApprovals(arr) {
+  const tbody = document.getElementById('approvals-table');
+  if(!arr.length) { tbody.innerHTML = emptyRow(9, 'No pending approvals — all clear!'); return; }
     tbody.innerHTML = arr.map(c => {
       const aiStatus = c.ai_review_status;
       const aiNote = c.ai_review_notes || '';
@@ -1069,11 +1791,11 @@ async function loadApprovals() {
         ? `<span style="color:var(--danger);font-size:12px;font-weight:600;" title="${aiNote}">✗ Flagged</span>`
         : `<span style="color:var(--warning);font-size:12px;" title="${aiNote || 'Pending review'}">⏳ Pending${aiNote ? '<br><small style=\'color:var(--text2);font-size:10px;\'>'+aiNote.substring(0,50)+'</small>' : ''}</span>`;
       const creativeTd = c.creative_url && c.creative_type === 'image'
-        ? `<td style="width:70px;"><img src="${c.creative_url}" alt="creative" style="width:64px;height:48px;object-fit:cover;border-radius:6px;border:1px solid var(--border);cursor:zoom-in;" onclick="openLightbox('${c.creative_url}','${(c.creative_name||'').replace(/'/g,"\\'")}','image')" title="Click to preview"></td>`
+        ? `<td onclick="event.stopPropagation()" style="width:70px;"><img src="${c.creative_url}" alt="creative" style="width:64px;height:48px;object-fit:cover;border-radius:6px;border:1px solid var(--border);cursor:zoom-in;" onclick="openLightbox('${c.creative_url}','${(c.creative_name||'').replace(/'/g,"\\'")}','image')" title="Click to preview"></td>`
         : c.creative_url && c.creative_type === 'video'
-        ? `<td style="width:70px;"><div style="width:64px;height:48px;background:var(--surface2);border-radius:6px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:24px;cursor:zoom-in;" onclick="openLightbox('${c.creative_url}','${(c.creative_name||'').replace(/'/g,"\\'")}','video')" title="Click to preview">🎬</div></td>`
-        : `<td style="width:70px;"><div style="width:64px;height:48px;background:var(--surface2);border-radius:6px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:11px;">—</div></td>`;
-      return `<tr>
+        ? `<td onclick="event.stopPropagation()" style="width:70px;"><div style="width:64px;height:48px;background:var(--surface2);border-radius:6px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:24px;cursor:zoom-in;" onclick="openLightbox('${c.creative_url}','${(c.creative_name||'').replace(/'/g,"\\'")}','video')" title="Click to preview">🎬</div></td>`
+        : `<td onclick="event.stopPropagation()" style="width:70px;"><div style="width:64px;height:48px;background:var(--surface2);border-radius:6px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:11px;">—</div></td>`;
+      return `<tr style="cursor:pointer;" onclick="openCampaignDetail('${c.id}')">
         <td><code style="font-size:11px;background:var(--surface2);padding:2px 6px;border-radius:4px;">${c.campaign_code}</code></td>
         ${creativeTd}
         <td style="font-weight:500;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${c.title}</td>
@@ -1082,23 +1804,83 @@ async function loadApprovals() {
         <td style="font-size:12px;">${fmtDate(c.start_date)} – ${fmtDate(c.end_date)}</td>
         <td style="font-weight:600;">₹${fmt(c.amount_total||0)}</td>
         <td>${aiBadge}</td>
-        <td>
-          <button class="btn btn-success btn-xs" onclick="approveQuick('${c.id}')">✓ Approve</button>
-          <button class="btn btn-danger btn-xs" style="margin-left:4px;" onclick="openRejectModal('${c.id}')">✕ Reject</button>
+        <td onclick="event.stopPropagation()">
+          <div style="display:flex;align-items:center;gap:2px;">
+            <button class="ia-btn" title="Approve" style="color:#16a34a;" onclick="approveQuick('${c.id}')"><svg width="17" height="17" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></button>
+            <button class="ia-btn ia-danger" title="Reject" onclick="openRejectModal('${c.id}')"><svg width="17" height="17" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button>
+          </div>
         </td>
       </tr>`;}).join('');
-  } catch(e) { tbody.innerHTML = emptyRow(9, 'Error: ' + e.message); }
 }
 
-async function approveQuick(id) {
+async function refreshPendingBadge() {
   try {
-    await api(`/campaigns/${id}/approve`, { method: 'POST' });
-    showToast('Campaign approved', 'success');
-    // Reload current page
+    const r = await api('/campaigns?status=pending_approval&limit=100');
+    const count = Array.isArray(r) ? r.length : 0;
+    const pb = document.getElementById('sidebar-pending-count');
+    if (count > 0) { pb.textContent = count; pb.classList.remove('hidden'); }
+    else pb.classList.add('hidden');
+  } catch(e) { /* silent */ }
+}
+
+async function approveQuick(id, forceStartToday) {
+  // Find start_date from cached data to warn if it's in the future
+  const camp = (allCampaigns||[]).find(c=>c.id===id) || {};
+  const startDate = camp.start_date ? camp.start_date.slice(0,10) : null;
+  const today = new Date().toISOString().slice(0,10);
+  let startToday = forceStartToday;
+
+  if (startDate && startDate > today && forceStartToday === undefined) {
+    const choice = confirm(
+      `⚠️ Campaign start date is ${fmtDate(startDate)} (future date).\n\n` +
+      `Player will NOT show this campaign until that date.\n\n` +
+      `Click OK → Override start date to TODAY (run immediately)\n` +
+      `Click Cancel → Keep original date (${fmtDate(startDate)})`
+    );
+    startToday = choice;
+  }
+
+  try {
+    const body = startToday ? JSON.stringify({ start_today: true }) : undefined;
+    await api(`/campaigns/${id}/approve`, {
+      method: 'POST',
+      ...(body ? { body, headers: { 'Content-Type': 'application/json' } } : {})
+    });
+    showToast(startToday ? 'Campaign approved — starts today!' : 'Campaign approved', 'success');
+    refreshPendingBadge();
     const activePage = document.querySelector('.page.active')?.id?.replace('page-','');
     if(activePage === 'approvals') loadApprovals();
     else if(activePage === 'dashboard') loadDashboard();
-    else if(activePage === 'campaigns') loadCampaigns();
+    else loadCampaigns();
+  } catch(e) { showToast('Error: ' + e.message, 'error'); }
+}
+
+async function forceLiveCampaign(id) {
+  if(!confirm('Override start date to TODAY and set campaign LIVE immediately?\n\nScreens will reload within 60 seconds.')) return;
+  try {
+    await api(`/campaigns/${id}/force-live`, { method: 'POST' });
+    showToast('Campaign is now live — screens will update within 60 sec', 'success');
+    closeModal('camp-detail-modal');
+    loadCampaigns();
+  } catch(e) { showToast('Error: ' + e.message, 'error'); }
+}
+
+async function approveCreative(id) {
+  if(!confirm('Approve this creative change? New creative will go live immediately.')) return;
+  try {
+    await api(`/campaigns/${id}/approve-creative`, { method: 'POST' });
+    showToast('Creative change approved', 'success');
+    loadCampaigns();
+  } catch(e) { showToast('Error: ' + e.message, 'error'); }
+}
+
+async function rejectCreative(id) {
+  const reason = prompt('Reason for rejecting creative change (shown to advertiser):');
+  if(!reason) return;
+  try {
+    await api(`/campaigns/${id}/reject-creative`, { method: 'POST', body: JSON.stringify({ reason }) });
+    showToast('Creative change rejected', 'success');
+    loadCampaigns();
   } catch(e) { showToast('Error: ' + e.message, 'error'); }
 }
 
@@ -1116,6 +1898,7 @@ async function confirmReject() {
     await api(`/campaigns/${id}/reject`, { method: 'POST', body: JSON.stringify({ reason }) });
     closeModal('reject-modal');
     showToast('Campaign rejected', 'success');
+    refreshPendingBadge();
     const activePage = document.querySelector('.page.active')?.id?.replace('page-','');
     if(activePage === 'approvals') loadApprovals();
     else if(activePage === 'dashboard') loadDashboard();
@@ -1130,12 +1913,14 @@ async function loadScreens() {
   try {
     allScreens = await api('/screens');
     if(!Array.isArray(allScreens)) allScreens = [];
+    allScreensData = allScreens;
+    loadScreenGroups();
     tbody.innerHTML = allScreens.map(s => `
       <tr>
         <td><code style="font-size:11px;background:var(--surface2);padding:2px 6px;border-radius:4px;">${s.screen_code}</code></td>
         <td style="font-weight:500;">${s.name}</td>
         <td style="font-size:12px;color:var(--text2);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${s.location||'—'}<br>${s.city||''}</td>
-        <td><span class="badge badge-${s.zone==='A'?'teal':s.zone==='B'?'blue':'gray'}">Zone ${s.zone||'A'}</span></td>
+        <td><span class="zone-tag zone-${s.zone||'A'}">${s.zone||'A'}</span></td>
         <td style="font-size:12px;font-variant-numeric:tabular-nums;">${s.width_px}×${s.height_px}</td>
         <td style="font-variant-numeric:tabular-nums;font-weight:600;">₹${fmt(s.price_per_day)}</td>
         <td>
@@ -1146,13 +1931,17 @@ async function loadScreens() {
         </td>
         <td style="font-size:12px;color:var(--text3);">${timeAgo(s.last_heartbeat)}</td>
         <td>
-          <button class="btn btn-ghost btn-xs" title="Reload schedule" onclick="sendCommand('${s.id}','reload',this)" style="padding:4px 6px;">↺</button>
-          <button class="btn btn-ghost btn-xs" title="Reboot app" onclick="sendCommand('${s.id}','reboot',this)" style="padding:4px 6px;margin-left:2px;">⟳</button>
-          <button class="btn btn-ghost btn-xs" title="Clear cache" onclick="sendCommand('${s.id}','clear_cache',this)" style="padding:4px 6px;margin-left:2px;">⌫</button>
-        </td>
-        <td>
-          <button class="btn btn-ghost btn-xs" onclick="editScreen(${JSON.stringify(s).replace(/"/g,'&quot;')})">Edit</button>
-          <button class="btn btn-danger btn-xs" style="margin-left:4px;" onclick="deleteScreen('${s.id}', '${s.screen_code}')">Del</button>
+          <div style="display:flex;align-items:center;gap:2px;flex-wrap:nowrap;">
+            <button class="ia-btn" title="Reload schedule" onclick="sendCommand('${s.id}','reload',this)"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg></button>
+            <button class="ia-btn" title="Reboot app" onclick="sendCommand('${s.id}','reboot',this)"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg></button>
+            <button class="ia-btn" title="Clear cache" onclick="sendCommand('${s.id}','clear_cache',this)"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
+            <button class="ia-btn" title="Register Device (generate player token)" onclick="registerDevice('${s.id}','${s.screen_code}')"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg></button>
+            <button class="ia-btn" title="Preview Schedule — what this screen will play today" onclick="previewSchedule('${s.id}','${s.screen_code}')"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg></button>
+            <div style="width:1px;height:18px;background:var(--border);margin:0 2px;"></div>
+            <button class="ia-btn" title="Edit" onclick="editScreen(${JSON.stringify(s).replace(/"/g,'&quot;')})"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></button>
+            <button class="ia-btn" title="Copy / Duplicate" onclick="copyScreen(${JSON.stringify(s).replace(/"/g,'&quot;')})"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg></button>
+            <button class="ia-btn ia-danger" title="Delete" onclick="deleteScreen('${s.id}', '${s.screen_code}')"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
+          </div>
         </td>
       </tr>`).join('') || emptyRow(10, 'No screens. Add your first screen!');
   } catch(e) { tbody.innerHTML = emptyRow(9, 'Error: ' + e.message); }
@@ -1175,10 +1964,21 @@ function openScreenModal(screen = null) {
   document.getElementById('sc-lng').value = screen?.longitude || '';
   document.getElementById('sc-status-group').style.display = screen ? 'block' : 'none';
   document.getElementById('sc-status').value = screen?.status || 'online';
+  document.getElementById('sc-audio').checked = screen?.audio_enabled || false;
   document.getElementById('screen-modal').classList.remove('hidden');
 }
 
 function editScreen(s) { openScreenModal(s); }
+
+function copyScreen(s) {
+  // Open Add Screen modal with all fields pre-filled except screen_code (must be unique)
+  openScreenModal({ ...s, id: '', screen_code: '' });
+  document.getElementById('screen-modal-title').textContent = 'Copy Screen — Enter new Screen Code';
+  document.getElementById('sc-code').disabled = false;
+  document.getElementById('sc-code').value = '';
+  document.getElementById('sc-code').placeholder = s.screen_code + '-COPY';
+  document.getElementById('sc-status-group').style.display = 'none';
+}
 
 async function sendCommand(screenId, command, btn) {
   const labels = { reload: 'Reload', reboot: 'Reboot', clear_cache: 'Clear Cache' };
@@ -1189,6 +1989,102 @@ async function sendCommand(screenId, command, btn) {
     showToast(`${labels[command]} command queued — will execute on next heartbeat (~60s)`, 'success');
   } catch(e) { showToast('Error: ' + e.message, 'error'); }
   finally { btn.textContent = orig; btn.disabled = false; }
+}
+
+async function previewSchedule(screenId, screenCode) {
+  const modal = document.getElementById('schedule-preview-modal');
+  const body = document.getElementById('schedule-preview-body');
+  document.getElementById('schedule-preview-title').textContent = `Schedule Preview — ${screenCode}`;
+  body.innerHTML = '<p style="text-align:center;padding:32px;color:var(--text3);">Loading…</p>';
+  modal.classList.remove('hidden');
+  try {
+    const d = await api(`/reports/schedule-preview/${screenId}`);
+    const s = d.screen;
+    const hb = s.last_heartbeat ? new Date(s.last_heartbeat) : null;
+    const hbStr = hb ? hb.toLocaleString('en-IN', {timeZone:'Asia/Kolkata'}) : 'Never';
+    const statusColor = d.diagnosis.paid_count > 0 ? 'var(--green)' : 'var(--warning)';
+
+    let html = `
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;">
+        <div style="background:var(--surface2);border-radius:8px;padding:12px;text-align:center;">
+          <div style="font-size:24px;font-weight:700;color:${statusColor};">${d.diagnosis.paid_count}</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:2px;">Active Campaigns Today</div>
+        </div>
+        <div style="background:var(--surface2);border-radius:8px;padding:12px;text-align:center;">
+          <div style="font-size:24px;font-weight:700;">${d.diagnosis.filler_count}</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:2px;">Filler Items</div>
+        </div>
+        <div style="background:var(--surface2);border-radius:8px;padding:12px;text-align:center;">
+          <div style="font-size:14px;font-weight:600;">${d.diagnosis.screen_online ? '🟢 Online' : '🔴 Offline'}</div>
+          <div style="font-size:10px;color:var(--text3);margin-top:2px;">Last heartbeat: ${hbStr}</div>
+        </div>
+      </div>`;
+
+    if (d.active_campaigns_in_schedule.length === 0) {
+      html += `<div style="background:#fff3cd;border:1px solid #ffc107;border-radius:8px;padding:12px;margin-bottom:16px;color:#856404;">
+        <strong>⚠️ No active campaigns for today (${d.today})</strong><br>
+        <small>Either no campaigns are assigned to this screen, or assigned campaigns have future/past dates.</small>
+      </div>`;
+    } else {
+      html += `<h4 style="font-size:13px;font-weight:600;margin-bottom:8px;">Campaigns in Today's Schedule</h4>
+      <table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:16px;">
+        <thead><tr style="border-bottom:1px solid var(--border);">
+          <th style="text-align:left;padding:6px 8px;font-weight:600;color:var(--text2);">Campaign</th>
+          <th style="padding:6px 8px;font-weight:600;color:var(--text2);">Status</th>
+          <th style="padding:6px 8px;font-weight:600;color:var(--text2);">Dates</th>
+          <th style="padding:6px 8px;font-weight:600;color:var(--text2);">Time</th>
+          <th style="padding:6px 8px;font-weight:600;color:var(--text2);">Type</th>
+        </tr></thead>
+        <tbody>`;
+      for (const c of d.active_campaigns_in_schedule) {
+        const st = c.start_time ? c.start_time.slice(0,5) : '00:00';
+        const et = c.end_time   ? c.end_time.slice(0,5)   : '23:59';
+        html += `<tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:6px 8px;"><strong>${c.title||'—'}</strong><br><span style="color:var(--text3);font-size:11px;">${c.campaign_code||''}</span></td>
+          <td style="padding:6px 8px;text-align:center;"><span class="status-badge status-${c.status}">${c.status}</span></td>
+          <td style="padding:6px 8px;text-align:center;font-variant-numeric:tabular-nums;">${c.start_date?.slice(0,10)||'—'} → ${c.end_date?.slice(0,10)||'—'}</td>
+          <td style="padding:6px 8px;text-align:center;">${st} – ${et}</td>
+          <td style="padding:6px 8px;text-align:center;">${c.content_type||'—'} ${c.duration_sec?'('+parseFloat(c.duration_sec).toFixed(1)+'s)':''}</td>
+        </tr>`;
+      }
+      html += '</tbody></table>';
+    }
+
+    if (d.all_assigned_campaigns.length > 0) {
+      html += `<details style="margin-bottom:16px;"><summary style="font-size:13px;font-weight:600;cursor:pointer;padding:4px 0;">All Assigned Campaigns (${d.all_assigned_campaigns.length})</summary>
+      <table style="width:100%;border-collapse:collapse;font-size:12px;margin-top:8px;">
+        <thead><tr style="border-bottom:1px solid var(--border);">
+          <th style="text-align:left;padding:4px 8px;color:var(--text2);">Campaign</th>
+          <th style="padding:4px 8px;color:var(--text2);">Status</th>
+          <th style="padding:4px 8px;color:var(--text2);">Dates</th>
+        </tr></thead><tbody>`;
+      for (const c of d.all_assigned_campaigns) {
+        const isActive = c.start_date?.slice(0,10) <= d.today && c.end_date?.slice(0,10) >= d.today;
+        const rowStyle = isActive ? '' : 'color:var(--text3);';
+        html += `<tr style="border-bottom:1px solid var(--border);${rowStyle}">
+          <td style="padding:4px 8px;">${c.title||'—'} <span style="font-size:10px;color:var(--text3);">${c.campaign_code||''}</span></td>
+          <td style="padding:4px 8px;text-align:center;"><span class="status-badge status-${c.status}">${c.status}</span></td>
+          <td style="padding:4px 8px;text-align:center;font-variant-numeric:tabular-nums;font-size:11px;">${c.start_date?.slice(0,10)||'—'} → ${c.end_date?.slice(0,10)||'—'}</td>
+        </tr>`;
+      }
+      html += '</tbody></table></details>';
+    }
+
+    if (d.filler_items.length > 0) {
+      html += `<details><summary style="font-size:13px;font-weight:600;cursor:pointer;padding:4px 0;">Filler Content (${d.filler_items.length} items)</summary>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;">`;
+      for (const f of d.filler_items) {
+        html += `<div style="background:var(--surface2);border-radius:6px;padding:6px 10px;font-size:11px;">${f.title||f.id} <span style="color:var(--text3);">${f.type||''} ${f.duration_sec?parseFloat(f.duration_sec).toFixed(1)+'s':''}</span></div>`;
+      }
+      html += '</div></details>';
+    } else {
+      html += `<div style="background:var(--surface2);border-radius:8px;padding:10px;font-size:12px;color:var(--text3);">No filler content configured. Add filler to fill screen time when no campaigns are running.</div>`;
+    }
+
+    body.innerHTML = html;
+  } catch(e) {
+    body.innerHTML = `<p style="color:var(--danger);padding:16px;">Error: ${e.message}</p>`;
+  }
 }
 
 async function saveScreen() {
@@ -1206,6 +2102,7 @@ async function saveScreen() {
     latitude: document.getElementById('sc-lat').value || null,
     longitude: document.getElementById('sc-lng').value || null,
     status: document.getElementById('sc-status').value || 'online',
+    audio_enabled: document.getElementById('sc-audio').checked,
   };
   if(!body.screen_code || !body.name) { showToast('Screen Code and Name required', 'error'); return; }
   const btn = document.getElementById('sc-save-btn');
@@ -1220,6 +2117,75 @@ async function saveScreen() {
   finally { btn.disabled = false; btn.textContent = 'Save Screen'; }
 }
 
+// ── SCREEN GROUPS ─────────────────────────────────────────────────────────────
+let allScreensData = [];
+
+async function loadScreenGroups() {
+  try {
+    const groups = await api('/screens/groups');
+    const tbody = document.getElementById('groups-table');
+    if (!groups.length) { tbody.innerHTML = emptyRow(4, 'No groups yet. Create your first group.'); return; }
+    tbody.innerHTML = groups.map(g => {
+      const screenNames = g.screens.map(s => s.name).join(', ') || '—';
+      const totalPPD = g.screens.reduce((s, sc) => s + parseFloat(sc.price_per_day || 0), 0);
+      return `<tr>
+        <td><div style="font-weight:600;">${g.name}</div>${g.description ? `<div style="font-size:11px;color:var(--text3);">${g.description}</div>` : ''}</td>
+        <td style="font-size:12px;max-width:280px;white-space:normal;">${g.screens.length} screen${g.screens.length!==1?'s':''}<br><span style="color:var(--text3);font-size:11px;">${screenNames}</span></td>
+        <td style="font-weight:600;">₹${totalPPD.toLocaleString('en-IN')}</td>
+        <td>
+          <button class="ia-btn" title="Edit" onclick="openGroupModal(${JSON.stringify(g).replace(/"/g,'&quot;')})"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></button>
+          <button class="ia-btn ia-danger" title="Delete" onclick="deleteGroup('${g.id}','${g.name.replace(/'/g,"\\'")}')"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
+        </td>
+      </tr>`;
+    }).join('');
+  } catch(e) { console.error(e); }
+}
+
+function openGroupModal(group = null) {
+  document.getElementById('group-modal-title').textContent = group ? 'Edit Group' : 'New Screen Group';
+  document.getElementById('grp-id').value = group?.id || '';
+  document.getElementById('grp-name').value = group?.name || '';
+  document.getElementById('grp-desc').value = group?.description || '';
+  const memberIds = new Set((group?.screens || []).map(s => s.id));
+  const list = document.getElementById('grp-screens-list');
+  list.innerHTML = allScreensData.map(s => `
+    <label style="display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;cursor:pointer;transition:background 0.1s;" onmouseover="this.style.background='var(--hover)'" onmouseout="this.style.background=''">
+      <input type="checkbox" value="${s.id}" ${memberIds.has(s.id)?'checked':''} style="width:15px;height:15px;accent-color:var(--primary);">
+      <div>
+        <div style="font-size:13px;font-weight:600;">${s.name} <span style="font-size:11px;color:var(--text3);font-weight:400;">${s.screen_code}</span></div>
+        <div style="font-size:11px;color:var(--text3);">${s.location||s.city||'—'} · ₹${parseFloat(s.price_per_day||0).toLocaleString('en-IN')}/day</div>
+      </div>
+    </label>`).join('');
+  document.getElementById('group-modal').classList.remove('hidden');
+}
+
+async function saveGroup() {
+  const id = document.getElementById('grp-id').value;
+  const name = document.getElementById('grp-name').value.trim();
+  if (!name) { showToast('Group name required', 'error'); return; }
+  const screen_ids = [...document.querySelectorAll('#grp-screens-list input[type=checkbox]:checked')].map(c => c.value);
+  const body = { name, description: document.getElementById('grp-desc').value.trim() || null, screen_ids };
+  const btn = document.getElementById('grp-save-btn');
+  btn.disabled = true; btn.textContent = 'Saving…';
+  try {
+    if (id) await api(`/screens/groups/${id}`, { method: 'PUT', body: JSON.stringify(body) });
+    else await api('/screens/groups', { method: 'POST', body: JSON.stringify(body) });
+    closeModal('group-modal');
+    showToast(id ? 'Group updated' : 'Group created', 'success');
+    loadScreenGroups();
+  } catch(e) { showToast('Error: ' + e.message, 'error'); }
+  finally { btn.disabled = false; btn.textContent = 'Save Group'; }
+}
+
+async function deleteGroup(id, name) {
+  if (!confirm(`Delete group "${name}"? Screens will not be deleted.`)) return;
+  try {
+    await api(`/screens/groups/${id}`, { method: 'DELETE' });
+    showToast('Group deleted', 'success');
+    loadScreenGroups();
+  } catch(e) { showToast('Error: ' + e.message, 'error'); }
+}
+
 async function deleteScreen(id, code) {
   if(!confirm(`Delete screen ${code}? This cannot be undone.`)) return;
   try {
@@ -1229,28 +2195,112 @@ async function deleteScreen(id, code) {
   } catch(e) { showToast('Error: ' + e.message, 'error'); }
 }
 
+async function registerDevice(screenId, screenCode) {
+  const modal = document.getElementById('device-register-modal');
+  const body = document.getElementById('device-register-body');
+  document.getElementById('device-register-title').textContent = `Connect Device — ${screenCode}`;
+  body.innerHTML = '<p style="text-align:center;padding:32px;color:var(--text3);">Generating token…</p>';
+  modal.classList.remove('hidden');
+  try {
+    // Call register endpoint to generate fresh player JWT
+    const BASE = window.location.origin;
+    const resp = await fetch(`${BASE}/api/player/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ screen_code: screenCode })
+    });
+    if (!resp.ok) throw new Error((await resp.json()).error || 'Registration failed');
+    const data = await resp.json();
+    const serverUrl = BASE;
+    const setupJson = JSON.stringify({ server_url: serverUrl, screen_code: screenCode, token: data.token });
+
+    body.innerHTML = `
+      <div style="background:var(--surface2);border-radius:10px;padding:16px;margin-bottom:16px;">
+        <div style="font-size:12px;color:var(--text3);margin-bottom:4px;">Screen</div>
+        <div style="font-weight:600;font-size:15px;">${data.screen.name} (${screenCode})</div>
+        <div style="font-size:12px;color:var(--text3);">${data.screen.width_px}×${data.screen.height_px}</div>
+      </div>
+
+      <div style="margin-bottom:16px;">
+        <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px;">Step 1 — Server URL</div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <code style="flex:1;background:var(--surface2);padding:8px 12px;border-radius:6px;font-size:13px;word-break:break-all;">${serverUrl}</code>
+          <button class="btn btn-ghost" style="white-space:nowrap;font-size:12px;" onclick="navigator.clipboard.writeText('${serverUrl}').then(()=>showToast('Copied','success'))">Copy</button>
+        </div>
+      </div>
+
+      <div style="margin-bottom:16px;">
+        <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px;">Step 2 — Screen Code</div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <code style="flex:1;background:var(--surface2);padding:8px 12px;border-radius:6px;font-size:18px;font-weight:700;letter-spacing:2px;">${screenCode}</code>
+          <button class="btn btn-ghost" style="white-space:nowrap;font-size:12px;" onclick="navigator.clipboard.writeText('${screenCode}').then(()=>showToast('Copied','success'))">Copy</button>
+        </div>
+      </div>
+
+      <div style="margin-bottom:16px;">
+        <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px;">Step 3 — Player Token (valid 365 days)</div>
+        <div style="display:flex;gap:8px;align-items:flex-start;">
+          <code id="player-token-box" style="flex:1;background:var(--surface2);padding:8px 12px;border-radius:6px;font-size:10px;word-break:break-all;line-height:1.5;">${data.token}</code>
+          <button class="btn btn-ghost" style="white-space:nowrap;font-size:12px;" onclick="navigator.clipboard.writeText(document.getElementById('player-token-box').textContent.trim()).then(()=>showToast('Token copied!','success'))">Copy</button>
+        </div>
+      </div>
+
+      <div style="background:#e8f5e9;border:1px solid #a5d6a7;border-radius:8px;padding:12px;font-size:12px;">
+        <strong>APK mein kaise enter karein:</strong><br>
+        1. APK open karo → Settings icon dbaao<br>
+        2. "Server URL" mein upar wala URL daalo<br>
+        3. "Screen Code" mein <strong>${screenCode}</strong> daalo<br>
+        4. Save/Connect dabao — APK khud register ho jaayega<br><br>
+        <em>Token APK khud generate kar leta hai register ke waqt. Agar manual token entry ki zaroorat ho, upar wala copy karo.</em>
+      </div>`;
+
+    showToast('Token generated successfully', 'success');
+  } catch(e) {
+    body.innerHTML = `<p style="color:var(--danger);padding:16px;">Error: ${e.message}</p>`;
+  }
+}
+
 // ── CONTENT ───────────────────────────────────────────────────────────────
+let allContent = [];
+
 async function loadContent() {
   const tbody = document.getElementById('content-table');
   tbody.innerHTML = loadingRow(5);
   try {
     const data = await api('/content/all');
-    const arr = Array.isArray(data) ? data : [];
-    if(!arr.length) { tbody.innerHTML = emptyRow(5, 'No content uploaded yet'); return; }
-    tbody.innerHTML = arr.map(c => `
-      <tr>
-        <td style="width:72px;">
-          ${c.type==='image'
-            ? `<img src="${c.file_url}" style="width:64px;height:40px;object-fit:cover;border-radius:4px;background:var(--surface2);cursor:zoom-in;" onclick="openLightbox('${c.file_url}','${(c.original_name||'').replace(/'/g,"\\'")}','image')" onerror="this.style.display='none'" title="Click to preview">`
-            : `<div style="width:64px;height:40px;background:var(--surface2);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:20px;cursor:zoom-in;" onclick="openLightbox('${c.file_url}','${(c.original_name||'').replace(/'/g,"\\'")}','video')" title="Click to preview">🎬</div>`}
-        </td>
-        <td style="font-weight:500;font-size:13px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${c.original_name}">${c.original_name}</td>
-        <td><span class="badge ${c.type==='video'?'badge-blue':'badge-green'}">${c.type||'—'}</span></td>
-        <td style="font-size:12px;color:var(--text2);">${c.first_name||''} ${c.business_name ? '· '+c.business_name : ''}<br>${c.email||''}</td>
-        <td style="font-size:12px;">${c.file_size ? (c.file_size/1024/1024).toFixed(1)+' MB' : '—'}</td>
-        <td style="font-size:12px;color:var(--text3);">${fmtDate(c.created_at)}</td>
-      </tr>`).join('');
+    allContent = Array.isArray(data) ? data : [];
+    renderContent(allContent);
   } catch(e) { tbody.innerHTML = emptyRow(5, 'Error: ' + e.message); }
+}
+
+function filterContent() {
+  const q = (document.getElementById('content-adv-search')?.value || '').toLowerCase().trim();
+  const type = document.getElementById('content-type-filter')?.value || '';
+  const filtered = allContent.filter(c => {
+    const advText = `${c.first_name||''} ${c.last_name||''} ${c.business_name||''} ${c.email||''}`.toLowerCase();
+    const matchAdv = !q || advText.includes(q);
+    const matchType = !type || c.type === type;
+    return matchAdv && matchType;
+  });
+  renderContent(filtered);
+}
+
+function renderContent(arr) {
+  const tbody = document.getElementById('content-table');
+  if(!arr.length) { tbody.innerHTML = emptyRow(5, 'No content found'); return; }
+  tbody.innerHTML = arr.map(c => `
+    <tr>
+      <td style="width:72px;">
+        ${c.type==='image'
+          ? `<img src="${c.file_url}" style="width:64px;height:40px;object-fit:cover;border-radius:4px;background:var(--surface2);cursor:zoom-in;" onclick="openLightbox('${c.file_url}','${(c.original_name||'').replace(/'/g,"\\'")}','image')" onerror="this.style.display='none'" title="Click to preview">`
+          : `<div style="width:64px;height:40px;background:var(--surface2);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:20px;cursor:zoom-in;" onclick="openLightbox('${c.file_url}','${(c.original_name||'').replace(/'/g,"\\'")}','video')" title="Click to preview">🎬</div>`}
+      </td>
+      <td style="font-weight:500;font-size:13px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${c.original_name}">${c.original_name}</td>
+      <td><span class="badge ${c.type==='video'?'badge-blue':'badge-green'}">${c.type||'—'}</span></td>
+      <td style="font-size:12px;color:var(--text2);">${c.first_name||''} ${c.business_name ? '· '+c.business_name : ''}<br>${c.email||''}</td>
+      <td style="font-size:12px;">${c.file_size ? (c.file_size/1024/1024).toFixed(1)+' MB' : '—'}</td>
+      <td style="font-size:12px;color:var(--text3);">${fmtDate(c.created_at)}</td>
+    </tr>`).join('');
 }
 
 // ── ADVERTISERS ───────────────────────────────────────────────────────────
@@ -1496,38 +2546,106 @@ async function loadAnalytics() {
 }
 
 // ── PROOF OF PLAY ─────────────────────────────────────────────────────────
+let popLastParams = null;
+
 async function loadPop() {
   const tbody = document.getElementById('pop-table');
-  tbody.innerHTML = loadingRow(6);
-  // Populate filter dropdowns on first load
+  tbody.innerHTML = loadingRow(8);
   await populatePopFilters();
+
+  // Default: last 30 days if no dates set
+  const startEl = document.getElementById('pop-start');
+  const endEl   = document.getElementById('pop-end');
+  if (!startEl.value) {
+    startEl.value = new Date(Date.now() - 30*86400000).toISOString().slice(0,10);
+  }
+  if (!endEl.value) {
+    endEl.value = new Date().toISOString().slice(0,10);
+  }
+
+  const start      = startEl.value;
+  const end        = endEl.value;
+  const screenId   = document.getElementById('pop-screen').value;
+  const campaignId = document.getElementById('pop-campaign').value;
+  const userId     = document.getElementById('pop-user').value;
+  const params = new URLSearchParams();
+  if(start)      params.set('start', start);
+  if(end)        params.set('end', end);
+  if(screenId)   params.set('screen_id', screenId);
+  if(campaignId) params.set('campaign_id', campaignId);
+  if(userId)     params.set('user_id', userId);
+  popLastParams = params;
+
   try {
-    const start      = document.getElementById('pop-start').value;
-    const end        = document.getElementById('pop-end').value;
-    const screenId   = document.getElementById('pop-screen').value;
-    const campaignId = document.getElementById('pop-campaign').value;
-    const userId     = document.getElementById('pop-user').value;
-    const params = new URLSearchParams();
-    if(start)      params.set('start', start);
-    if(end)        params.set('end', end);
-    if(screenId)   params.set('screen_id', screenId);
-    if(campaignId) params.set('campaign_id', campaignId);
-    if(userId)     params.set('user_id', userId);
-    const qs = params.toString();
-    const data = await api('/reports/proof-of-play' + (qs ? '?' + qs : ''));
-    const arr = Array.isArray(data) ? data : [];
-    document.getElementById('pop-count').textContent = arr.length ? `${arr.length} record${arr.length>1?'s':''} found` : '';
-    if(!arr.length) { tbody.innerHTML = emptyRow(6, 'No play logs found for selected filters'); return; }
+    const data = await api('/reports/proof-of-play?' + params.toString());
+    const arr         = Array.isArray(data) ? data : (data.rows || []);
+    const totalInDb   = data.total_in_db ?? null;
+    const totalPlays  = data.total_plays ?? arr.reduce((s,r)=>s+(parseInt(r.play_count)||1),0);
+    const totalPlaysInDb = data.total_plays_in_db ?? null;
+
+    // Summary bar
+    const summaryEl = document.getElementById('pop-summary');
+    document.getElementById('pop-stat-records').textContent = fmtNum(arr.length);
+    document.getElementById('pop-stat-plays').textContent   = fmtNum(totalPlays);
+    document.getElementById('pop-stat-db').textContent      = totalPlaysInDb !== null ? fmtNum(totalPlaysInDb) + ' total plays' : (totalInDb !== null ? fmtNum(totalInDb) + ' log entries' : '—');
+    summaryEl.style.display = 'flex';
+
+    // Export button
+    document.getElementById('pop-export-btn').style.display = arr.length ? '' : 'none';
+
+    const countEl = document.getElementById('pop-count');
+    if (arr.length) {
+      countEl.textContent = `${fmtNum(arr.length)} log entr${arr.length>1?'ies':'y'} · ${fmtNum(totalPlays)} total plays`;
+      countEl.style.color = '';
+    } else {
+      countEl.innerHTML = `No play logs for selected filters.` +
+        (totalInDb === 0 ? ' <span style="color:var(--warning);">DB is empty — APK has not submitted proof of play yet.</span>'
+                         : totalInDb !== null ? ` <span style="color:var(--text3);">(${fmtNum(totalInDb)} log entries exist in DB — try widening the date range.)</span>` : '');
+      countEl.style.color = 'var(--text2)';
+    }
+
+    if(!arr.length) {
+      tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:32px;color:var(--text3);">
+        ${totalInDb === 0
+          ? 'Play logs table is empty — APK has not submitted proof of play yet.'
+          : 'No records match these filters. Try clearing the date range or removing other filters.'}
+      </td></tr>`;
+      return;
+    }
+
+    const tierColors = { paid:'var(--primary)', venue_own:'#ca8a04', venue_cross:'#2563EB', filler:'var(--text3)' };
     tbody.innerHTML = arr.map(p => `
       <tr>
-        <td><code style="font-size:11px;background:var(--surface2);padding:2px 6px;border-radius:4px;">${p.screen_code||'—'}</code> <span style="font-size:12px;">${p.screen_name||''}</span></td>
+        <td><code style="font-size:11px;background:var(--surface2);padding:2px 6px;border-radius:4px;">${p.screen_code||'—'}</code><br><span style="font-size:11px;color:var(--text3);">${p.screen_name||''}</span></td>
         <td style="font-size:12px;color:var(--text2);">${p.advertiser_name||p.user_email||'—'}</td>
-        <td style="font-size:12px;">${p.campaign_title||'—'}<br><span style="font-size:10px;color:var(--text3);">${p.campaign_code||''}</span></td>
-        <td style="font-size:12px;">${fmtDateTime(p.played_at)}</td>
+        <td style="font-size:12px;">${p.campaign_title||'<span style="color:var(--text3);">—</span>'}<br><span style="font-size:10px;color:var(--text3);">${p.campaign_code||''}</span></td>
+        <td style="font-size:12px;white-space:nowrap;">${fmtDateTime(p.played_at)}</td>
+        <td style="font-size:12px;white-space:nowrap;color:var(--text2);">${p.played_until ? fmtDateTime(p.played_until) : '—'}</td>
         <td style="font-variant-numeric:tabular-nums;">${p.duration_sec||'—'}</td>
-        <td style="font-variant-numeric:tabular-nums;">${p.play_count||1}</td>
+        <td style="font-variant-numeric:tabular-nums;font-weight:600;">${p.play_count||1}</td>
+        <td><span style="font-size:10px;font-weight:700;color:${tierColors[p.content_tier]||'var(--text2)'};">${(p.content_tier||'paid').replace('_',' ')}</span></td>
       </tr>`).join('');
-  } catch(e) { tbody.innerHTML = emptyRow(6, 'Error: ' + e.message); }
+  } catch(e) { tbody.innerHTML = emptyRow(8, 'Error: ' + e.message); }
+}
+
+function exportPopCsv() {
+  if (!popLastParams) return;
+  const params = new URLSearchParams(popLastParams);
+  params.set('format', 'csv');
+  const a = document.createElement('a');
+  a.href = '/api/reports/proof-of-play?' + params.toString();
+  a.setAttribute('download', '');
+  // Pass auth via URL workaround — use fetch+blob for auth header
+  fetch('/api/reports/proof-of-play?' + params.toString(), {
+    headers: { Authorization: 'Bearer ' + token }
+  }).then(r => r.blob()).then(blob => {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'proof-of-play-' + new Date().toISOString().slice(0,10) + '.csv';
+    document.body.appendChild(a); a.click();
+    document.body.removeChild(a); URL.revokeObjectURL(url);
+  }).catch(() => toast('Export failed', 'error'));
 }
 
 let popFiltersLoaded = false;

@@ -55,6 +55,20 @@ router.get('/all', authenticate, async (req, res, next) => {
   } catch (err) { next(err); }
 });
 
+// GET /api/content/storage — user's storage usage
+router.get('/storage', authenticate, async (req, res, next) => {
+  try {
+    const result = await query(
+      `SELECT COALESCE(SUM(file_size),0) AS used_bytes, COUNT(*) AS file_count
+       FROM content WHERE user_id=$1 AND status='active'`,
+      [req.user.id]
+    );
+    const usedBytes = parseInt(result.rows[0].used_bytes);
+    const limitBytes = 500 * 1024 * 1024; // 500MB
+    res.json({ used_bytes: usedBytes, limit_bytes: limitBytes, file_count: parseInt(result.rows[0].file_count) });
+  } catch (err) { next(err); }
+});
+
 // GET /api/content — user's own library
 router.get('/', authenticate, async (req, res, next) => {
   try {

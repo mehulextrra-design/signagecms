@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>SignageCMS — Advertiser Portal</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
@@ -42,6 +44,20 @@
   .form-input:focus { outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(13,148,136,0.12); }
   .form-input::placeholder { color:var(--text3); }
   .form-row { display:grid;grid-template-columns:1fr 1fr;gap:12px; }
+  /* Campaign action icons */
+  .camp-actions{display:flex;flex-wrap:wrap;gap:4px;align-items:center;}
+  .ca-btn{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:7px;cursor:pointer;border:none;background:transparent;transition:background 0.15s,color 0.15s;color:var(--text2);position:relative;}
+  .ca-btn:hover{background:var(--surface2);}
+  .ca-btn[title]:hover::after{content:attr(title);position:absolute;bottom:calc(100% + 5px);left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.78);color:#fff;font-size:11px;white-space:nowrap;padding:3px 7px;border-radius:5px;pointer-events:none;z-index:99;font-family:inherit;}
+  .ca-primary{color:#0d9488;} .ca-primary:hover{background:rgba(13,148,136,0.12);}
+  .ca-purple{color:#7c3aed;}  .ca-purple:hover{background:rgba(139,92,246,0.12);}
+  .ca-teal{color:#0891b2;}    .ca-teal:hover{background:rgba(6,182,212,0.12);}
+  .ca-teal.ca-active{color:#0891b2;background:rgba(6,182,212,0.15);}
+  .ca-danger{color:#dc2626;}  .ca-danger:hover{background:rgba(239,68,68,0.1);}
+  .ca-pulse{animation:ca-pulse 1.8s ease-in-out infinite;}
+  @keyframes ca-pulse{0%,100%{opacity:1}50%{opacity:0.45}}
+  @keyframes modal-in{from{opacity:0;transform:scale(0.95) translateY(6px)}to{opacity:1;transform:scale(1) translateY(0)}}
+
   .btn { display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 18px;border-radius:var(--radius-sm);font-size:14px;font-weight:500;cursor:pointer;border:none;transition:all 0.15s;font-family:inherit;text-decoration:none; }
   .btn-primary { background:var(--primary);color:#fff; }
   .btn-primary:hover { background:var(--primary-hover); }
@@ -167,6 +183,48 @@
   .screen-card:hover { border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-light); }
   .screen-card.selected { border-color:var(--primary);background:var(--primary-light); }
   .screen-card.selected::after { content:'✓';position:absolute;top:8px;right:8px;width:18px;height:18px;background:var(--primary);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700; }
+  /* Group chip */
+  .group-chip{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:20px;border:1.5px solid var(--primary);background:var(--primary-light);color:var(--primary);font-size:12.5px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.15s;}
+  .group-chip:hover{background:var(--primary);color:#fff;}
+  /* View toggle */
+  .view-toggle-btn{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:7px;border:1.5px solid var(--border);background:var(--surface);color:var(--text2);cursor:pointer;transition:all 0.15s;}
+  .view-toggle-btn.active{background:var(--primary);border-color:var(--primary);color:#fff;}
+  .view-toggle-btn:not(.active):hover{background:var(--surface2);}
+  /* Browse Screens card */
+  .screen-browse-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;cursor:pointer;transition:border-color 0.15s,box-shadow 0.15s,transform 0.15s;}
+  .screen-browse-card:hover{border-color:var(--primary);box-shadow:0 4px 20px rgba(0,0,0,0.1);transform:translateY(-2px);}
+  .sbc-visual{position:relative;height:80px;background:linear-gradient(135deg,#1a1f2e 0%,#0f1420 100%);display:flex;align-items:center;justify-content:center;}
+  .sbc-monitor{display:flex;align-items:center;justify-content:center;width:50px;height:34px;border:2px solid rgba(255,255,255,0.12);border-radius:5px;background:rgba(255,255,255,0.04);}
+  .sbc-status-dot{position:absolute;top:8px;right:8px;width:7px;height:7px;border-radius:50%;border:1.5px solid rgba(255,255,255,0.2);}
+  .sbc-online{background:#22c55e;} .sbc-offline{background:#f59e0b;}
+  .sbc-type-tag{position:absolute;bottom:6px;left:6px;font-size:9px;font-weight:600;padding:1px 5px;border-radius:3px;background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.7);text-transform:uppercase;letter-spacing:0.04em;}
+  .sbc-body{padding:9px 11px 11px;}
+  .sbc-name{font-size:13px;font-weight:700;color:var(--text);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .sbc-location{display:flex;align-items:center;gap:3px;font-size:11px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .sbc-divider{height:1px;background:var(--border);margin:8px 0;}
+  .sbc-stats{display:flex;align-items:center;gap:0;margin-bottom:9px;}
+  .sbc-stat{flex:1;text-align:center;}
+  .sbc-stat-val{font-size:13px;font-weight:700;color:var(--text);}
+  .sbc-stat-lbl{font-size:10px;color:var(--text3);margin-top:1px;}
+  .sbc-stat-sep{width:1px;height:24px;background:var(--border);}
+  .sbc-book-btn{width:100%;padding:6px;border-radius:7px;border:none;background:var(--primary);color:#fff;font-size:11.5px;font-weight:600;cursor:pointer;font-family:inherit;transition:opacity 0.15s;}
+  .sbc-book-btn:hover{opacity:0.88;}
+  .screen-browse-card.sbc-selected{border-color:var(--primary);box-shadow:0 0 0 2px var(--primary);}
+  .sbc-cb{position:absolute;top:7px;left:7px;width:17px;height:17px;border-radius:4px;border:2px solid rgba(255,255,255,0.5);background:rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.15s;}
+  .sbc-cb.checked{background:var(--primary);border-color:var(--primary);}
+  .sbc-group-header{cursor:pointer;user-select:none;}
+  .sbc-group-header:hover{background:var(--surface2);}
+  .sbc-grp-cb{width:16px;height:16px;border-radius:4px;border:2px solid var(--border);background:var(--bg);display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.15s;}
+  .sbc-grp-cb.checked{background:var(--primary);border-color:var(--primary);}
+  .sbc-grp-cb.partial{background:var(--primary-light);border-color:var(--primary);}
+  .sbc-chevron{transition:transform 0.2s;color:var(--text3);}
+  .sbc-chevron.open{transform:rotate(90deg);}
+  /* Group sections on browse page */
+  .sbc-group-section{margin-bottom:20px;}
+  .sbc-group-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:4px;margin-bottom:8px;padding:6px 10px;background:var(--surface);border:1.5px solid var(--border);border-radius:8px;}
+  .sbc-group-name{display:flex;align-items:center;gap:5px;font-size:12.5px;font-weight:700;color:var(--primary);}
+  .sbc-group-desc{font-size:11px;color:var(--text2);margin-left:4px;}
+  .sbc-group-meta{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--text2);flex-shrink:0;}
   .screen-name { font-size:13px;font-weight:600;margin-bottom:2px; }
   .screen-loc { font-size:11px;color:var(--text2);margin-bottom:8px; }
   .screen-price { font-size:12px;font-weight:700;color:var(--primary); }
@@ -184,11 +242,13 @@
   .creative-tab { padding:7px 16px;border-radius:var(--radius-sm);font-size:13px;font-weight:500;cursor:pointer;border:1.5px solid var(--border);background:transparent;color:var(--text2);transition:all 0.15s; }
   .creative-tab.active { background:var(--primary);color:#fff;border-color:var(--primary); }
   .library-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:10px;max-height:260px;overflow-y:auto;padding:4px 2px; }
-  .lib-item { border:2px solid var(--border);border-radius:var(--radius-sm);padding:8px;cursor:pointer;transition:all 0.15s;text-align:center; }
+  .lib-item { position:relative;border:2px solid var(--border);border-radius:var(--radius-sm);padding:8px;cursor:pointer;transition:all 0.15s;text-align:center; }
   .lib-item:hover,.lib-item.selected { border-color:var(--primary);background:var(--primary-light); }
   .lib-thumb { width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:4px;background:var(--surface2);margin-bottom:5px;display:block; }
-  .lib-thumb-vid { width:100%;aspect-ratio:16/9;border-radius:4px;background:var(--surface2);margin-bottom:5px;display:flex;align-items:center;justify-content:center;font-size:22px; }
+  .lib-thumb-vid { width:100%;aspect-ratio:16/9;border-radius:4px;background:#1a1f2e;margin-bottom:5px;display:flex;align-items:center;justify-content:center; }
   .lib-name { font-size:11px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+  .lib-del-btn { position:absolute;top:4px;right:4px;width:20px;height:20px;border-radius:4px;border:none;background:rgba(220,38,38,0.85);color:#fff;cursor:pointer;display:none;align-items:center;justify-content:center;padding:0; }
+  .lib-item:hover .lib-del-btn { display:flex; }
   .lib-type { font-size:10px;color:var(--text3);margin-top:2px; }
   /* REJECTION REASON */
   .rejection-reason { font-size:11px;color:#991B1B;background:var(--danger-light);border-radius:4px;padding:3px 7px;margin-top:4px;display:inline-block;max-width:260px;word-break:break-word; }
@@ -415,6 +475,10 @@
         <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
         Invoices
       </div>
+      <div class="nav-item" onclick="navigate('wallet')">
+        <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+        Wallet <span id="sidebar-wallet-bal" style="margin-left:auto;font-size:11px;background:rgba(13,148,136,0.2);color:#0D9488;border-radius:4px;padding:1px 6px;font-weight:600;"></span>
+      </div>
     </div>
     <div class="sidebar-footer">
       <div class="sidebar-user" onclick="navigate('profile')" style="cursor:pointer;">
@@ -474,15 +538,31 @@
 
       <!-- ANALYTICS -->
       <div id="page-analytics" class="page">
-        <div class="stat-grid">
-          <div class="stat-card"><div class="stat-label">Total Impressions</div><div class="stat-value" id="an-impr">—</div><div class="stat-change">This month</div></div>
-          <div class="stat-card"><div class="stat-label">Screens Used</div><div class="stat-value" id="an-screens">—</div><div class="stat-change">All campaigns</div></div>
-          <div class="stat-card"><div class="stat-label">Total Plays</div><div class="stat-value" id="an-plays">—</div><div class="stat-change">Confirmed</div></div>
-          <div class="stat-card"><div class="stat-label">Daily Reach</div><div class="stat-value" id="an-reach">—</div><div class="stat-change">Est.</div></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
+          <div class="filter-tabs" id="analytics-tabs">
+            <div class="filter-tab" onclick="setAnPeriod('day',this)">Today</div>
+            <div class="filter-tab active" onclick="setAnPeriod('week',this)">7 Days</div>
+            <div class="filter-tab" onclick="setAnPeriod('month',this)">This Month</div>
+            <div class="filter-tab" onclick="setAnPeriod('quarter',this)">Quarter</div>
+            <div class="filter-tab" onclick="setAnPeriod('year',this)">This Year</div>
+            <div class="filter-tab" onclick="setAnPeriod('custom',this)">Custom</div>
+          </div>
+          <div id="an-custom-range" style="display:none;align-items:center;gap:8px;">
+            <input type="date" id="an-start" style="padding:5px 8px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;background:var(--surface);color:var(--text);">
+            <span style="font-size:12px;color:var(--text-secondary);">to</span>
+            <input type="date" id="an-end" style="padding:5px 8px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;background:var(--surface);color:var(--text);">
+            <button class="btn btn-primary" style="padding:5px 12px;font-size:12px;" onclick="loadAnalytics()">Apply</button>
+          </div>
         </div>
-        <div class="section-header"><div class="section-title">Impressions — Last 7 Days</div></div>
+        <div class="stat-grid">
+          <div class="stat-card"><div class="stat-icon" style="float:right;width:28px;height:28px;border-radius:6px;background:#e0f2fe;display:flex;align-items:center;justify-content:center;"><svg width="14" height="14" fill="none" stroke="#0ea5e9" stroke-width="2" viewBox="0 0 24 24"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg></div><div class="stat-label">Total Plays</div><div class="stat-value" id="an-plays">—</div><div class="stat-change" id="an-plays-sub">Selected period</div></div>
+          <div class="stat-card"><div class="stat-icon" style="float:right;width:28px;height:28px;border-radius:6px;background:#f0fdf4;display:flex;align-items:center;justify-content:center;"><svg width="14" height="14" fill="none" stroke="#22c55e" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div><div class="stat-label">Screens Used</div><div class="stat-value" id="an-screens">—</div><div class="stat-change">Unique screens</div></div>
+          <div class="stat-card"><div class="stat-icon" style="float:right;width:28px;height:28px;border-radius:6px;background:#fef3c7;display:flex;align-items:center;justify-content:center;"><svg width="14" height="14" fill="none" stroke="#f59e0b" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg></div><div class="stat-label">Active Campaigns</div><div class="stat-value" id="an-campaigns">—</div><div class="stat-change">With plays</div></div>
+          <div class="stat-card"><div class="stat-icon" style="float:right;width:28px;height:28px;border-radius:6px;background:#fce7f3;display:flex;align-items:center;justify-content:center;"><svg width="14" height="14" fill="none" stroke="#ec4899" stroke-width="2" viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0"/></svg></div><div class="stat-label">Est. Impressions</div><div class="stat-value" id="an-impr">—</div><div class="stat-change">Plays × 150</div></div>
+        </div>
+        <div class="section-header"><div class="section-title" id="an-chart-title">Plays — Last 7 Days</div></div>
         <div class="card card-body" style="margin-bottom:20px;">
-          <div style="padding:8px 0;"><div class="bar-chart" id="bar-chart"></div></div>
+          <div style="padding:8px 0;min-height:80px;"><div class="bar-chart" id="bar-chart"><div class="empty-state" style="padding:20px;"><div class="empty-title">No play data</div></div></div></div>
         </div>
         <div class="section-header"><div class="section-title">Campaign Performance</div></div>
         <div class="card"><div id="analytics-table"><div class="empty-state"><div class="empty-icon"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg></div><div class="empty-title">No analytics yet</div><div class="empty-sub">Launch a campaign to see performance data.</div></div></div></div>
@@ -503,8 +583,27 @@
 
       <!-- SCREENS -->
       <div id="page-screens" class="page">
-        <div class="section-header" style="margin-bottom:16px;"><div class="section-title">Available Screens</div></div>
+        <div class="section-header" style="margin-bottom:16px;">
+          <div class="section-title">Available Screens</div>
+          <div style="display:flex;gap:6px;">
+            <button id="screens-view-grid" onclick="setScreensView('grid')" class="view-toggle-btn active" title="Grid View">
+              <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+            </button>
+            <button id="screens-view-map" onclick="setScreensView('map')" class="view-toggle-btn" title="Map View">
+              <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 16l4.553 2.276A1 1 0 0021 24.382V8.618a1 1 0 00-.553-.894L15 5m0 18V5m0 0L9 7"/></svg>
+            </button>
+          </div>
+        </div>
         <div id="screens-grid" class="screens-grid"><div style="grid-column:1/-1;" class="empty-state"><div class="empty-title">Loading screens…</div></div></div>
+        <div id="screens-map-wrap" style="display:none;border-radius:var(--radius-lg);overflow:hidden;border:1.5px solid var(--border);height:520px;">
+          <div id="screens-map" style="height:100%;width:100%;"></div>
+        </div>
+        <!-- Floating selection bar -->
+        <div id="sbc-sel-bar" style="display:none;position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--primary);color:#fff;border-radius:12px;padding:10px 18px;display:none;align-items:center;gap:14px;box-shadow:0 8px 32px rgba(0,0,0,0.22);z-index:200;white-space:nowrap;">
+          <span id="sbc-sel-count" style="font-size:13px;font-weight:600;"></span>
+          <button onclick="_sbcBookSelected()" style="background:#fff;color:var(--primary);border:none;border-radius:8px;padding:6px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Book Selected →</button>
+          <button onclick="_sbcClearSelection()" style="background:rgba(255,255,255,0.18);color:#fff;border:none;border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer;font-family:inherit;">✕ Clear</button>
+        </div>
       </div>
 
       <!-- BOOK CAMPAIGN WIZARD -->
@@ -523,8 +622,15 @@
           <!-- Step 1 -->
           <div class="wizard-panel active" id="wp1">
             <div class="section-header">
-              <div><div class="section-title">Choose Screens</div><div style="font-size:13px;color:var(--text2);margin-top:2px;">Select screens for your ad to run on.</div></div>
+              <div></div>
               <div id="selected-count" style="font-size:13px;font-weight:600;color:var(--primary);"></div>
+            </div>
+            <!-- Groups -->
+            <div id="wizard-groups-wrap" style="display:none;margin-bottom:14px;">
+              <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.05em;">Screen Groups</div>
+              <div id="wizard-groups-list" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
+              <div style="height:1px;background:var(--border);margin:14px 0;"></div>
+              <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.05em;">Individual Screens</div>
             </div>
             <div id="wizard-screens-grid" class="screens-grid" style="margin-bottom:16px;"><div style="grid-column:1/-1;text-align:center;padding:24px;color:var(--text2);">Loading screens…</div></div>
             <div class="wizard-nav"><div></div><button class="btn btn-primary" onclick="wizardNext(1)" id="btn-next-1" disabled>Continue →</button></div>
@@ -532,18 +638,32 @@
 
           <!-- Step 2 -->
           <div class="wizard-panel" id="wp2">
-            <div class="section-title" style="margin-bottom:6px;">Your Creative</div>
-            <div style="font-size:13px;color:var(--text2);margin-bottom:14px;">Upload a new file or choose from your media library.</div>
-            <div class="form-group"><label class="form-label">Campaign Name</label><input type="text" id="cmp-name" class="form-input" placeholder="e.g. Domino's Weekend Offer — July"></div>
-            <div class="creative-tabs">
+            <!-- Campaign Name + Storage inline -->
+            <div style="display:flex;align-items:flex-end;gap:12px;margin-bottom:12px;flex-wrap:wrap;">
+              <div style="flex:1;min-width:180px;">
+                <label class="form-label" style="margin-bottom:4px;">Campaign Name</label>
+                <input type="text" id="cmp-name" class="form-input" placeholder="e.g. Domino's Weekend Offer — July">
+              </div>
+              <div id="storage-bar-wrap" style="flex-shrink:0;min-width:190px;background:var(--surface);border:1.5px solid var(--border);border-radius:8px;padding:6px 10px;margin-bottom:2px;">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px;">
+                  <span style="font-size:10.5px;font-weight:600;color:var(--text2);letter-spacing:0.03em;">STORAGE</span>
+                  <span id="storage-bar-label" style="font-size:10.5px;color:var(--text3);">Loading…</span>
+                </div>
+                <div style="height:4px;background:var(--border);border-radius:3px;overflow:hidden;">
+                  <div id="storage-bar-fill" style="height:100%;background:var(--primary);border-radius:3px;width:0%;transition:width 0.4s;"></div>
+                </div>
+              </div>
+            </div>
+            <!-- Tabs row -->
+            <div class="creative-tabs" style="margin-bottom:10px;">
               <button class="creative-tab active" id="tab-upload" onclick="switchCreativeTab('upload')">Upload New</button>
               <button class="creative-tab" id="tab-library" onclick="switchCreativeTab('library')">My Library</button>
             </div>
             <!-- Upload tab -->
             <div id="creative-upload-section">
-              <div class="upload-zone" id="upload-zone" onclick="document.getElementById('file-input').click()" ondragover="handleDragOver(event)" ondrop="handleDrop(event)">
-                <div class="upload-icon"><svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="#0D9488"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg></div>
-                <div class="upload-title">Drag &amp; drop or click to browse</div>
+              <div class="upload-zone" id="upload-zone" onclick="document.getElementById('file-input').click()" ondragover="handleDragOver(event)" ondrop="handleDrop(event)" style="padding:22px 24px;">
+                <div class="upload-icon" style="width:40px;height:40px;margin:0 auto 8px;"><svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="#0D9488"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg></div>
+                <div class="upload-title" style="font-size:14px;">Drag &amp; drop or click to browse</div>
                 <div class="upload-sub">MP4 · MOV · JPG · PNG · max 200 MB</div>
               </div>
               <input type="file" id="file-input" accept="video/*,image/*" style="display:none" onchange="handleFileSelect(event)">
@@ -613,6 +733,48 @@
           </div>
         </div>
         <div class="card"><div id="invoices-table-wrap"><div class="empty-state"><div class="empty-icon"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg></div><div class="empty-title">No invoices yet</div><div class="empty-sub">Invoices are generated after campaigns are paid.</div></div></div></div>
+      </div>
+
+      <!-- WALLET -->
+      <div id="page-wallet" class="page">
+        <div class="stat-grid" style="margin-bottom:20px;">
+          <div class="stat-card" style="grid-column:span 2;">
+            <div class="stat-label">Wallet Balance</div>
+            <div class="stat-value" id="wallet-balance-display">—</div>
+            <div class="stat-sub">Available for campaign booking or refund</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Total Credited</div>
+            <div class="stat-value" id="wallet-total-in">—</div>
+            <div class="stat-sub">Pause / cancel refunds</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Total Used</div>
+            <div class="stat-value" id="wallet-total-out">—</div>
+            <div class="stat-sub">Resume / new campaigns</div>
+          </div>
+        </div>
+
+        <!-- Refund Request -->
+        <div class="card card-body" style="margin-bottom:20px;" id="wallet-refund-section" style="display:none;">
+          <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:12px;">Request Bank Refund</div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;">
+            <div>
+              <label style="font-size:12px;font-weight:600;color:var(--text2);display:block;margin-bottom:4px;">Amount (₹)</label>
+              <input type="number" id="refund-amount" placeholder="0.00" style="padding:8px 10px;border:1.5px solid var(--border);border-radius:6px;font-size:14px;background:var(--surface);color:var(--text);width:120px;">
+            </div>
+            <div style="flex:1;min-width:180px;">
+              <label style="font-size:12px;font-weight:600;color:var(--text2);display:block;margin-bottom:4px;">UPI ID / Bank Details</label>
+              <input type="text" id="refund-upi" placeholder="yourname@upi or account details" style="width:100%;box-sizing:border-box;padding:8px 10px;border:1.5px solid var(--border);border-radius:6px;font-size:14px;background:var(--surface);color:var(--text);">
+            </div>
+            <button class="btn btn-primary" onclick="requestWalletRefund()">Request Refund</button>
+          </div>
+          <div style="font-size:11px;color:var(--text2);margin-top:8px;">Refunds are processed within 5-7 business days by admin.</div>
+        </div>
+
+        <!-- Transaction History -->
+        <div class="section-header"><div class="section-title">Transaction History</div></div>
+        <div class="card"><div id="wallet-txn-table"><div class="empty-state"><div class="empty-title">No transactions yet</div></div></div></div>
       </div>
 
       <!-- PROFILE -->
@@ -762,10 +924,9 @@ window.addEventListener('DOMContentLoaded',()=>{
   else showAuthScreen();
   const d=s=>s.toISOString().slice(0,10);
   const now=new Date();
-  const s2=new Date(now);s2.setDate(now.getDate()+2);
-  const e2=new Date(now);e2.setDate(now.getDate()+9);
+  const e2=new Date(now);e2.setDate(now.getDate()+7);
   const sd=document.getElementById('sch-start');const ed=document.getElementById('sch-end');
-  if(sd)sd.value=d(s2);if(ed)ed.value=d(e2);
+  if(sd)sd.value=d(now);if(ed)ed.value=d(e2);
   ['login-email','login-password'].forEach(id=>{
     const el=document.getElementById(id);
     if(el)el.addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
@@ -814,9 +975,13 @@ async function loadUserInfo(){
 }
 
 function showApp(){
+  if(currentUser&&(currentUser.role==='admin'||currentUser.role==='superadmin')){
+    window.location.href='/admin';return;
+  }
   document.getElementById('auth-overlay').classList.add('hidden');
   document.getElementById('app').classList.remove('hidden');
   updateSidebarUser();navigate('dashboard');loadScreens();loadNotifications();
+  loadWallet().catch(()=>{});
 }
 
 function updateSidebarUser(){
@@ -840,7 +1005,7 @@ function toggleMoreSheet(){
 }
 function moreNav(page){toggleMoreSheet();navigate(page);}
 
-const PAGE_TITLES={dashboard:'Dashboard',analytics:'Analytics',campaigns:'My Campaigns','new-campaign':'Book Campaign',screens:'Browse Screens',invoices:'Invoices',profile:'Profile & Settings'};
+const PAGE_TITLES={dashboard:'Dashboard',analytics:'Analytics',campaigns:'My Campaigns','new-campaign':'Book Campaign',screens:'Browse Screens',invoices:'Invoices',wallet:'My Wallet',profile:'Profile & Settings'};
 
 function navigate(page, fromPopstate){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
@@ -877,8 +1042,9 @@ function navigate(page, fromPopstate){
   if(page==='invoices')loadInvoices();
   if(page==='analytics')loadAnalytics();
   if(page==='profile')loadProfile();
-  if(page==='screens')renderScreensList();
+  if(page==='screens'){ loadScreens().then(()=>{ renderScreensList(); if(_screensView==='map') renderScreensMap(); }); }
   if(page==='new-campaign')initWizard();
+  if(page==='wallet')loadWallet();
 }
 
 // Android / browser back button — navigate within SPA, don't exit the app
@@ -900,27 +1066,243 @@ async function loadScreens(){
   try{const data=await api('/screens?limit=50');allScreens=Array.isArray(data)?data:(data.screens||data.data||[]);}catch(e){allScreens=[];}
 }
 
-function renderScreensList(){
-  const grid=document.getElementById('screens-grid');
-  if(!allScreens.length){
-    grid.innerHTML=`<div style="grid-column:1/-1;" class="empty-state"><div class="empty-icon"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg></div><div class="empty-title">No screens available</div></div>`;
+let _screensView = 'grid';
+let _leafletMap = null;
+
+function setScreensView(view){
+  _screensView = view;
+  document.getElementById('screens-view-grid').classList.toggle('active', view==='grid');
+  document.getElementById('screens-view-map').classList.toggle('active', view==='map');
+  const gridEl = document.getElementById('screens-grid');
+  const mapEl = document.getElementById('screens-map-wrap');
+  if(view==='map'){
+    gridEl.style.display='none';
+    mapEl.style.display='';
+    renderScreensMap();
+  } else {
+    mapEl.style.display='none';
+    gridEl.style.display='block';
+    renderScreensList();
+  }
+}
+
+function renderScreensMap(){
+  const screensWithCoords = allScreens.filter(s=>s.latitude && s.longitude);
+  if(!screensWithCoords.length){
+    document.getElementById('screens-map').innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--text2);font-size:14px;">No screen coordinates available</div>';
     return;
   }
-  grid.innerHTML=allScreens.map(s=>`
-    <div class="card" style="display:flex;gap:10px;align-items:flex-start;padding:10px 12px;">
-      <div style="width:48px;height:30px;background:var(--sidebar-bg);border-radius:5px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="rgba(255,255,255,0.4)"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+  if(_leafletMap){ _leafletMap.remove(); _leafletMap=null; }
+  _leafletMap = L.map('screens-map',{zoomControl:true});
+  L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/streets-v12/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWVodWxkZSIsImEiOiJjbXVvYmhmbXAwNDIzMnpzN2xvdmFnbWZlIn0.YI1oX9vYenukXy-c0-bNLw',{
+    attribution:'© <a href="https://www.mapbox.com/">Mapbox</a>',
+    tileSize:512,
+    zoomOffset:-1,
+    maxZoom:19
+  }).addTo(_leafletMap);
+
+  const bounds=[];
+  screensWithCoords.forEach(s=>{
+    const lat=parseFloat(s.latitude), lng=parseFloat(s.longitude);
+    if(isNaN(lat)||isNaN(lng)) return;
+    bounds.push([lat,lng]);
+    const isOnline = s.status==='online';
+    const markerHtml=`<div style="width:36px;height:36px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:${isOnline?'#10b981':'#f59e0b'};border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,0.25);display:flex;align-items:center;justify-content:center;">
+      <svg style="transform:rotate(45deg)" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#fff" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+    </div>`;
+    const icon=L.divIcon({html:markerHtml,className:'',iconSize:[36,36],iconAnchor:[18,36],popupAnchor:[0,-38]});
+    const impr=s.daily_impressions>=1000?((s.daily_impressions/1000).toFixed(1)+'K'):(s.daily_impressions||0);
+    const popup=`<div style="font-family:Inter,sans-serif;min-width:180px;">
+      <div style="font-size:14px;font-weight:700;margin-bottom:2px;">${s.name}</div>
+      <div style="font-size:12px;color:#6b7280;margin-bottom:8px;">${s.location||s.city||''}</div>
+      <div style="display:flex;gap:12px;margin-bottom:10px;">
+        <div><div style="font-size:13px;font-weight:700;">₹${(s.price_per_day||0).toLocaleString('en-IN')}</div><div style="font-size:10px;color:#9ca3af;">per day</div></div>
+        <div><div style="font-size:13px;font-weight:700;">${impr}</div><div style="font-size:10px;color:#9ca3af;">imp/day</div></div>
       </div>
-      <div style="flex:1;min-width:0;">
-        <div style="font-size:13px;font-weight:600;margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${s.name}</div>
-        <div style="font-size:11px;color:var(--text2);margin-bottom:6px;">${s.location||s.city||'—'}</div>
-        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-          <span style="font-size:12px;font-weight:700;color:var(--primary);">₹${(s.price_per_day||0).toLocaleString('en-IN')}/day</span>
-          <span class="badge ${s.status==='online'?'badge-live':'badge-pending'}">${s.status||'unknown'}</span>
-          <span style="font-size:11px;color:var(--text2);">${(s.daily_impressions||0).toLocaleString('en-IN')} imp/day</span>
+      <button onclick="navigate('new-campaign')" style="width:100%;padding:7px;background:#10b981;color:#fff;border:none;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">Book Campaign →</button>
+    </div>`;
+    L.marker([lat,lng],{icon}).addTo(_leafletMap).bindPopup(popup,{maxWidth:220});
+  });
+  if(bounds.length===1) _leafletMap.setView(bounds[0],14);
+  else if(bounds.length>1) _leafletMap.fitBounds(bounds,{padding:[40,40]});
+  setTimeout(()=>_leafletMap.invalidateSize(),250);
+}
+
+let _sbcSelected = new Set(); // selected screen ids
+
+function _sbcCard(s){
+  const impr=s.daily_impressions>=1000?((s.daily_impressions/1000).toFixed(1)+'K'):(s.daily_impressions||0);
+  const sel=_sbcSelected.has(s.id);
+  return `<div class="screen-browse-card${sel?' sbc-selected':''}" id="sbc-card-${s.id}" onclick="_sbcToggle('${s.id}',event)">
+    <div class="sbc-visual">
+      <div class="sbc-monitor">
+        <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="rgba(255,255,255,0.35)" stroke-width="1.2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+      </div>
+      <div class="sbc-status-dot ${s.status==='online'?'sbc-online':'sbc-offline'}"></div>
+      <div class="sbc-cb${sel?' checked':''}" onclick="_sbcToggle('${s.id}',event)">
+        ${sel?`<svg width="10" height="10" fill="none" viewBox="0 0 24 24" stroke="#fff" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>`:''}
+      </div>
+      ${s.screen_type?`<div class="sbc-type-tag">${s.screen_type}</div>`:''}
+    </div>
+    <div class="sbc-body">
+      <div class="sbc-name">${s.name}</div>
+      <div class="sbc-location">
+        <svg width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        ${s.location||s.city||'—'}
+      </div>
+      <div class="sbc-divider"></div>
+      <div class="sbc-stats">
+        <div class="sbc-stat"><div class="sbc-stat-val">₹${(s.price_per_day||0).toLocaleString('en-IN')}</div><div class="sbc-stat-lbl">per day</div></div>
+        <div class="sbc-stat-sep"></div>
+        <div class="sbc-stat"><div class="sbc-stat-val">${impr}</div><div class="sbc-stat-lbl">imp/day</div></div>
+      </div>
+      <button class="sbc-book-btn" onclick="_sbcBookOne('${s.id}',event)">Book Campaign →</button>
+    </div>
+  </div>`;
+}
+
+function _sbcToggle(id, e){
+  if(e) e.stopPropagation();
+  if(_sbcSelected.has(id)) _sbcSelected.delete(id);
+  else _sbcSelected.add(id);
+  _sbcRefreshCard(id);
+  _sbcUpdateBar();
+}
+
+function _sbcRefreshCard(id){
+  const card=document.getElementById('sbc-card-'+id);
+  if(!card) return;
+  const sel=_sbcSelected.has(id);
+  card.classList.toggle('sbc-selected',sel);
+  const cb=card.querySelector('.sbc-cb');
+  if(cb){
+    cb.className='sbc-cb'+(sel?' checked':'');
+    cb.innerHTML=sel?`<svg width="10" height="10" fill="none" viewBox="0 0 24 24" stroke="#fff" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>`:'';
+  }
+}
+
+function _sbcGroupToggle(groupId, screenIds, e){
+  if(e){ e.stopPropagation(); }
+  const allSel=screenIds.every(id=>_sbcSelected.has(id));
+  screenIds.forEach(id=>{ if(allSel) _sbcSelected.delete(id); else _sbcSelected.add(id); });
+  screenIds.forEach(id=>_sbcRefreshCard(id));
+  _sbcUpdateGroupCb(groupId, screenIds);
+  _sbcUpdateBar();
+}
+
+function _sbcUpdateGroupCb(groupId, screenIds){
+  const cb=document.getElementById('sbc-gcb-'+groupId);
+  if(!cb) return;
+  const selCount=screenIds.filter(id=>_sbcSelected.has(id)).length;
+  if(selCount===0){ cb.className='sbc-grp-cb'; cb.innerHTML=''; }
+  else if(selCount===screenIds.length){ cb.className='sbc-grp-cb checked'; cb.innerHTML=`<svg width="10" height="10" fill="none" viewBox="0 0 24 24" stroke="#fff" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>`; }
+  else{ cb.className='sbc-grp-cb partial'; cb.innerHTML=`<svg width="8" height="8" fill="none" viewBox="0 0 24 24" stroke="var(--primary)" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14"/></svg>`; }
+}
+
+function _sbcUpdateBar(){
+  const bar=document.getElementById('sbc-sel-bar');
+  const cnt=document.getElementById('sbc-sel-count');
+  if(!bar) return;
+  if(_sbcSelected.size===0){ bar.style.display='none'; return; }
+  bar.style.display='flex';
+  const total=[..._sbcSelected].reduce((s,id)=>{ const sc=allScreens.find(x=>x.id===id); return s+parseFloat(sc?.price_per_day||0); },0);
+  cnt.textContent=`${_sbcSelected.size} screen${_sbcSelected.size>1?'s':''} selected · ₹${total.toLocaleString('en-IN')}/day`;
+}
+
+function _sbcClearSelection(){
+  _sbcSelected.forEach(id=>_sbcRefreshCard(id));
+  _sbcSelected.clear();
+  _sbcUpdateBar();
+  document.querySelectorAll('.sbc-grp-cb').forEach(cb=>{ cb.className='sbc-grp-cb'; cb.innerHTML=''; });
+}
+
+function _sbcBookOne(id, e){
+  if(e) e.stopPropagation();
+  _sbcSelected.clear();
+  _sbcSelected.add(id);
+  _sbcBookSelected();
+}
+
+function _sbcBookSelected(){
+  if(!_sbcSelected.size) return;
+  // Store selected screen ids and navigate to wizard
+  window._preselectedScreenIds=[..._sbcSelected];
+  _sbcSelected.clear();
+  _sbcUpdateBar();
+  navigate('new-campaign');
+}
+
+function _sbcAccordion(sectionId, e){
+  if(e) e.stopPropagation();
+  const body=document.getElementById('sbc-body-'+sectionId);
+  const chev=document.getElementById('sbc-chev-'+sectionId);
+  if(!body) return;
+  const open=body.style.display!=='none';
+  body.style.display=open?'none':'';
+  if(chev) chev.className='sbc-chevron'+(open?'':' open');
+}
+
+async function renderScreensList(){
+  const wrap=document.getElementById('screens-grid');
+  if(!allScreens.length){
+    wrap.innerHTML=`<div style="grid-column:1/-1;" class="empty-state"><div class="empty-icon"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg></div><div class="empty-title">No screens available</div></div>`;
+    return;
+  }
+
+  let groups=[];
+  try{ groups=await api('/screens/groups'); }catch(e){}
+
+  const groupedIds=new Set();
+  let html='';
+
+  function groupSection(id, name, desc, screenIds, totalPPD, onlineCount, cards){
+    return `<div class="sbc-group-section">
+      <div class="sbc-group-header" onclick="_sbcAccordion('${id}',event)">
+        <div style="display:flex;align-items:center;gap:8px;min-width:0;">
+          <div id="sbc-gcb-${id}" class="sbc-grp-cb" onclick="_sbcGroupToggle('${id}',[${screenIds.map(x=>`'${x}'`).join(',')}],event)"></div>
+          <div class="sbc-group-name">
+            <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+            ${name}${desc?`<span class="sbc-group-desc">· ${desc}</span>`:''}
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+          <div class="sbc-group-meta">
+            <span>${screenIds.length} screen${screenIds.length!==1?'s':''}</span>
+            <span style="color:var(--text3);">·</span>
+            <span style="color:#22c55e;">${onlineCount} online</span>
+            <span style="color:var(--text3);">·</span>
+            <span style="font-weight:700;">₹${totalPPD.toLocaleString('en-IN')}/day</span>
+          </div>
+          <svg id="sbc-chev-${id}" class="sbc-chevron open" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
         </div>
       </div>
-    </div>`).join('');
+      <div id="sbc-body-${id}" class="screens-grid" style="margin-top:8px;">${cards}</div>
+    </div>`;
+  }
+
+  groups.forEach(g=>{
+    if(!g.screens.length) return;
+    const screenIds=g.screens.map(gs=>(allScreens.find(x=>x.id===gs.id)||gs).id);
+    const totalPPD=g.screens.reduce((s,sc)=>s+parseFloat(sc.price_per_day||0),0);
+    const onlineCount=g.screens.filter(sc=>sc.status==='online').length;
+    const cards=g.screens.map(gs=>{ const s=allScreens.find(x=>x.id===gs.id)||gs; groupedIds.add(s.id); return _sbcCard(s); }).join('');
+    html+=groupSection(g.id, g.name, g.description||'', screenIds, totalPPD, onlineCount, cards);
+  });
+
+  const ungrouped=allScreens.filter(s=>!groupedIds.has(s.id));
+  if(ungrouped.length){
+    if(groups.length){
+      const uIds=ungrouped.map(s=>s.id);
+      const uPPD=ungrouped.reduce((s,sc)=>s+parseFloat(sc.price_per_day||0),0);
+      const uOnline=ungrouped.filter(s=>s.status==='online').length;
+      html+=groupSection('__ungrouped','Other Screens','',uIds,uPPD,uOnline,ungrouped.map(_sbcCard).join(''));
+    } else {
+      html=`<div class="screens-grid">${ungrouped.map(_sbcCard).join('')}</div>`;
+    }
+  }
+
+  wrap.innerHTML=html;
+  wrap.style.display='block';
 }
 
 async function loadDashboard(){
@@ -991,9 +1373,16 @@ function renderCampaignsTable(campaigns){
       <td style="font-weight:600;">₹${parseFloat(c.amount_total||0).toLocaleString('en-IN')}</td>
       <td>${payBadge(c.payment_status)}</td>
       <td>
-        ${c.status==='pending_payment'?`<button class="btn btn-primary btn-sm" onclick="submitForApproval('${c.id}',this)">Submit for Approval</button>`:''}
-        ${c.status==='rejected'?`<button class="btn btn-ghost btn-sm" onclick="navigate('new-campaign')" title="Book a new campaign with corrected content">Book Again</button>`:''}
-        ${!['pending_payment','rejected'].includes(c.status)?'-':''}
+        <div class="camp-actions">
+        ${c.status==='pending_payment'?`<button class="ca-btn ca-primary" onclick="submitForApproval('${c.id}',this)" title="Submit for Approval"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>Submit</button>`:''}
+        ${c.status==='rejected'?`<button class="ca-btn ca-primary" onclick="navigate('new-campaign')" title="Book Again"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"/></svg></button>`:''}
+        ${c.status==='live'?`<button class="ca-btn ca-default" onclick="campaignPause('${c.id}',this)" title="Pause Campaign"><svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg></button>`:''}
+        ${c.status==='paused'?`<button class="ca-btn ca-primary" onclick="campaignResume('${c.id}',this)" title="Resume Campaign"><svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></button>`:''}
+        ${['live','paused','approved'].includes(c.status)?`<button class="ca-btn ca-purple${c.creative_change_status==='pending'?' ca-pulse':''}" onclick="openCreativeModal('${c.id}','${(c.title||'').replace(/'/g,"\\'")}','${c.creative_change_status||''}')" title="${c.creative_change_status==='pending'?'Creative review pending':'Change Creative'}"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>`:''}
+        ${['live','approved','paused'].includes(c.status)&&c.creative_type==='image'?`<button class="ca-btn ca-teal${c.qr_enabled?' ca-active':''}" onclick="openQRModal('${c.id}','${(c.campaign_code||'').replace(/'/g,"\\'")}','${(c.title||'').replace(/'/g,"\\'")}',${c.qr_enabled?'true':'false'},'${c.qr_placement||'bot-right'}','${c.qr_phone||''}',${c.qr_content_url?`'${c.qr_content_url}'`:'null'})" title="${c.qr_enabled?'QR Active':'Enable QR Overlay'}"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="3" height="3"/><rect x="18" y="18" width="3" height="3"/><rect x="14" y="18" width="3" height="3"/><rect x="18" y="14" width="3" height="3"/></svg></button>`:''}
+        ${['live','paused','approved'].includes(c.status)?`<button class="ca-btn ca-danger" onclick="campaignCancel('${c.id}','${(c.title||c.campaign_code).replace(/'/g,"\\'")}')` + `" title="Cancel Campaign"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></button>`:''}
+        ${!['pending_payment','rejected','live','approved','paused'].includes(c.status)?'<span style="color:var(--text3);font-size:12px;">—</span>':''}
+        </div>
       </td>
     </tr>`).join('')}</tbody></table></div>`;
 }
@@ -1015,19 +1404,75 @@ function renderInvoicesTable(invoices){
     <tr><td class="td-bold">${i.invoice_number}</td><td style="font-size:13px;">${i.campaign_code||'—'}</td><td style="font-size:13px;">${fmtDate(i.issued_at)}</td><td>₹${parseFloat(i.amount_base||0).toLocaleString('en-IN')}</td><td>₹${parseFloat(i.amount_gst||0).toLocaleString('en-IN')}</td><td style="font-weight:600;">₹${parseFloat(i.amount_total||0).toLocaleString('en-IN')}</td><td>${payBadge(i.status)}</td></tr>`).join('')}</tbody></table></div>`;
 }
 
+let anPeriod='week';
+
+function setAnPeriod(period,el){
+  anPeriod=period;
+  document.querySelectorAll('#analytics-tabs .filter-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  const custom=document.getElementById('an-custom-range');
+  if(period==='custom'){custom.style.display='flex';}
+  else{custom.style.display='none';loadAnalytics();}
+}
+
+function fmtNum(n){
+  if(n==null||n===''||isNaN(n))return'—';
+  n=parseInt(n);
+  if(n>=10000000)return`${(n/10000000).toFixed(1)}Cr`;
+  if(n>=100000)return`${(n/100000).toFixed(1)}L`;
+  if(n>=1000)return`${(n/1000).toFixed(1)}K`;
+  return n.toLocaleString('en-IN');
+}
+
+function fmtChartLabel(bucket,period){
+  const d=new Date(bucket);
+  if(period==='day')return d.getHours().toString().padStart(2,'0')+':00';
+  if(period==='year')return d.toLocaleString('default',{month:'short'});
+  if(period==='quarter')return'W'+Math.ceil((d.getDate()+new Date(d.getFullYear(),d.getMonth(),1).getDay())/7);
+  return d.toLocaleDateString('en-IN',{day:'2-digit',month:'short'});
+}
+
 async function loadAnalytics(){
   try{
-    const camps=allCampaigns.length?allCampaigns:(await api('/campaigns?limit=100').then(d=>d.campaigns||d.data||[]));
-    const impr=camps.reduce((s,c)=>s+(c.impressions||0),0);
-    document.getElementById('an-impr').textContent=impr>1000?`${(impr/1000).toFixed(1)}K`:impr||'—';
-    document.getElementById('an-screens').textContent=allScreens.length||'—';
-    document.getElementById('an-plays').textContent=camps.reduce((s,c)=>s+(c.play_count||0),0)||'—';
-    document.getElementById('an-reach').textContent=allScreens.reduce((s,sc)=>s+(sc.daily_impressions||0),0).toLocaleString('en-IN')||'—';
-    const days=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
-    const vals=[420,380,510,640,590,780,450];
-    const max=Math.max(...vals);
-    document.getElementById('bar-chart').innerHTML=days.map((d,i)=>`<div class="bar-item"><div class="bar-val">${vals[i]}</div><div class="bar" style="height:${Math.round((vals[i]/max)*120)}px;" title="${d}: ${vals[i]}"></div><div class="bar-label">${d}</div></div>`).join('');
-  }catch(e){}
+    let url='/reports/analytics?period='+anPeriod;
+    if(anPeriod==='custom'){
+      const s=document.getElementById('an-start').value;
+      const e=document.getElementById('an-end').value;
+      if(!s||!e){toast('Please select date range','error');return;}
+      url+=`&start=${s}&end=${e}`;
+    }
+    const data=await api(url);
+    const st=data.stats||{};
+    const plays=parseInt(st.total_plays)||0;
+    document.getElementById('an-plays').textContent=fmtNum(plays);
+    document.getElementById('an-screens').textContent=fmtNum(st.screens_used);
+    document.getElementById('an-campaigns').textContent=fmtNum(st.campaigns_active);
+    document.getElementById('an-impr').textContent=fmtNum(plays*150);
+    const labels={day:'Today',week:'Last 7 Days',month:'This Month',quarter:'This Quarter',year:'This Year',custom:'Custom Range'};
+    document.getElementById('an-chart-title').textContent='Plays — '+(labels[anPeriod]||'Selected Period');
+    const chart=data.chart||[];
+    const chartEl=document.getElementById('bar-chart');
+    if(!chart.length){
+      chartEl.innerHTML='<div class="empty-state" style="padding:20px;"><div class="empty-title">No plays in this period</div></div>';
+    }else{
+      const max=Math.max(...chart.map(r=>parseInt(r.plays)));
+      chartEl.innerHTML=chart.map(r=>{
+        const v=parseInt(r.plays);
+        const lbl=fmtChartLabel(r.bucket,anPeriod);
+        const h=max>0?Math.max(4,Math.round((v/max)*120)):4;
+        return`<div class="bar-item"><div class="bar-val">${fmtNum(v)}</div><div class="bar" style="height:${h}px;" title="${lbl}: ${v}"></div><div class="bar-label">${lbl}</div></div>`;
+      }).join('');
+    }
+    const camps=data.campaigns||[];
+    const tbl=document.getElementById('analytics-table');
+    if(!camps.length){
+      tbl.innerHTML='<div class="empty-state"><div class="empty-title">No campaign data</div><div class="empty-sub">No plays recorded in this period.</div></div>';
+    }else{
+      tbl.innerHTML=`<table class="data-table"><thead><tr><th>Campaign</th><th>Code</th><th>Plays</th><th>Screens</th><th>QR Scans</th><th>Status</th></tr></thead><tbody>${
+        camps.map(c=>`<tr><td>${c.title||'—'}</td><td><code>${c.campaign_code||'—'}</code></td><td>${fmtNum(c.plays)}</td><td>${fmtNum(c.screens)}</td><td>${c.qr_enabled?`<span style="color:var(--primary);font-weight:600;">${fmtNum(c.qr_scans)}</span>`:'<span style="color:var(--text3);font-size:11px;">—</span>'}</td><td><span class="badge badge-${c.status==='live'?'success':c.status==='paused'?'warning':'default'}">${c.status||'—'}</span></td></tr>`).join('')
+      }</tbody></table>`;
+    }
+  }catch(e){console.error('Analytics error',e);}
 }
 
 async function loadProfile(){
@@ -1069,7 +1514,10 @@ async function changePassword(){
 }
 
 function initWizard(){
-  wizardStep=1;selectedScreenIds=[];uploadedFile=null;uploadedContentId=null;
+  wizardStep=1;
+  selectedScreenIds=window._preselectedScreenIds||[];
+  window._preselectedScreenIds=null;
+  uploadedFile=null;uploadedContentId=null;
   campaignCost={base:0,gst:0,total:0,discount:0};
   updateWizardUI(1);renderWizardScreens();
   document.getElementById('cmp-name').value='';
@@ -1087,10 +1535,49 @@ function initWizard(){
   document.getElementById('selected-count').textContent='';
 }
 
-function renderWizardScreens(){
+let allScreenGroups=[];
+
+async function renderWizardScreens(){
   const grid=document.getElementById('wizard-screens-grid');
-  if(!allScreens.length){grid.innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:32px;color:var(--text2);">Loading screens…</div>`;loadScreens().then(renderWizardScreens);return;}
-  grid.innerHTML=allScreens.map(s=>`<div class="screen-card ${selectedScreenIds.includes(s.id)?'selected':''}" onclick="toggleScreen('${s.id}',this)"><div class="screen-name">${s.name}</div><div class="screen-loc">${s.location||s.city||'—'}</div><div style="display:flex;align-items:center;justify-content:space-between;"><div class="screen-price">₹${(s.price_per_day||0).toLocaleString('en-IN')}/day</div><div style="width:7px;height:7px;border-radius:50%;background:${s.status==='online'?'var(--success)':'var(--warning)'};"></div></div><div style="font-size:11px;color:var(--text2);margin-top:6px;">${(s.daily_impressions||0).toLocaleString('en-IN')} imp/day · ${s.zone||'A'} zone</div></div>`).join('');
+  if(!allScreens.length){
+    grid.innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:32px;color:var(--text2);">Loading screens…</div>`;
+    await loadScreens();
+  }
+  // Load groups
+  try{
+    allScreenGroups = await api('/screens/groups');
+  }catch(e){ allScreenGroups=[]; }
+
+  const groupsWrap=document.getElementById('wizard-groups-wrap');
+  const groupsList=document.getElementById('wizard-groups-list');
+  if(allScreenGroups.length){
+    groupsWrap.style.display='block';
+    groupsList.innerHTML=allScreenGroups.map(g=>`
+      <button class="group-chip" onclick="selectGroup('${g.id}')" title="Select all ${g.screens.length} screens in this group">
+        <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        ${g.name} <span style="opacity:0.65;font-weight:400;">(${g.screens.length})</span>
+      </button>`).join('');
+  } else {
+    groupsWrap.style.display='none';
+  }
+
+  grid.innerHTML=allScreens.map(s=>`<div class="screen-card ${selectedScreenIds.includes(s.id)?'selected':''}" id="sc-card-${s.id}" onclick="toggleScreen('${s.id}',this)"><div class="screen-name">${s.name}</div><div class="screen-loc">${s.location||s.city||'—'}</div><div style="display:flex;align-items:center;justify-content:space-between;"><div class="screen-price">₹${(s.price_per_day||0).toLocaleString('en-IN')}/day</div><div style="width:7px;height:7px;border-radius:50%;background:${s.status==='online'?'var(--success)':'var(--warning)'};"></div></div><div style="font-size:11px;color:var(--text2);margin-top:6px;">${(s.daily_impressions||0).toLocaleString('en-IN')} imp/day · ${s.zone||'A'} zone</div></div>`).join('');
+}
+
+function selectGroup(groupId){
+  const group=allScreenGroups.find(g=>g.id===groupId);
+  if(!group) return;
+  group.screens.forEach(s=>{
+    if(!selectedScreenIds.includes(s.id)){
+      selectedScreenIds.push(s.id);
+      const card=document.getElementById('sc-card-'+s.id);
+      if(card) card.classList.add('selected');
+    }
+  });
+  const cnt=selectedScreenIds.length;
+  document.getElementById('selected-count').textContent=cnt?`${cnt} screen${cnt>1?'s':''} selected`:'';
+  document.getElementById('btn-next-1').disabled=!cnt;
+  toast(`${group.name} — ${group.screens.length} screen${group.screens.length!==1?'s':''} selected`,'success');
 }
 
 function toggleScreen(id,el){
@@ -1120,6 +1607,7 @@ async function wizardNext(step){
   if(step===1){
     if(!selectedScreenIds.length){toast('Select at least one screen','error');return;}
     updateWizardUI(2);
+    loadStorageBar();
   }else if(step===2){
     const name=document.getElementById('cmp-name').value.trim();
     if(!name){toast('Enter a campaign name','error');return;}
@@ -1210,24 +1698,52 @@ function switchCreativeTab(tab){
   document.getElementById('tab-library').classList.toggle('active',tab==='library');
   document.getElementById('creative-upload-section').style.display=tab==='upload'?'':'none';
   document.getElementById('creative-library-section').style.display=tab==='library'?'':'none';
-  if(tab==='library')loadLibraryGrid();
+  if(tab==='library') loadLibraryGrid();
+  else loadStorageBar();
 }
 
 let userLibrary=[];
+async function loadStorageBar(){
+  try{
+    const s=await api('/content/storage');
+    const usedMB=(s.used_bytes/1048576).toFixed(1);
+    const limitMB=500;
+    const pct=Math.min(100,(s.used_bytes/(s.limit_bytes))*100).toFixed(1);
+    const fill=document.getElementById('storage-bar-fill');
+    const label=document.getElementById('storage-bar-label');
+    if(fill) fill.style.width=pct+'%';
+    if(fill) fill.style.background=pct>85?'#dc2626':pct>65?'#f59e0b':'var(--primary)';
+    if(label) label.textContent=`${usedMB} MB of ${limitMB} MB used (${s.file_count} file${s.file_count!==1?'s':''})`;
+  }catch(e){}
+}
+
 async function loadLibraryGrid(){
   const grid=document.getElementById('library-grid');
   grid.innerHTML='<div style="color:var(--text2);font-size:13px;padding:20px;text-align:center;">Loading…</div>';
+  loadStorageBar();
   try{
     const data=await api('/content');
     userLibrary=Array.isArray(data)?data:[];
-    if(!userLibrary.length){grid.innerHTML='<div style="color:var(--text2);font-size:13px;padding:20px;text-align:center;">No uploads yet — use "Upload New".</div>';return;}
+    if(!userLibrary.length){grid.innerHTML='<div style="color:var(--text2);font-size:13px;padding:20px;text-align:center;">No uploads yet — use "Upload New" tab.</div>';return;}
     grid.innerHTML=userLibrary.map(c=>`
-      <div class="lib-item${uploadedContentId===c.id?' selected':''}" onclick="selectFromLibrary('${c.id}','${c.original_name.replace(/'/g,"\\'")}','${c.type}','${(c.file_url||'').replace(/'/g,"%27")}')">
-        ${c.type==='image'?`<img class="lib-thumb" src="${c.file_url}" onerror="this.parentNode.querySelector('.lib-thumb').style.display='none'">`:`<div class="lib-thumb-vid">🎬</div>`}
+      <div class="lib-item${uploadedContentId===c.id?' selected':''}" id="lib-item-${c.id}" onclick="selectFromLibrary('${c.id}','${c.original_name.replace(/'/g,"\\'")}','${c.type}','${(c.file_url||'').replace(/'/g,"%27")}')">
+        ${c.type==='image'?`<img class="lib-thumb" src="${c.file_url}" onerror="this.style.display='none'">`:`<div class="lib-thumb-vid"><svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="rgba(255,255,255,0.5)" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>`}
         <div class="lib-name" title="${c.original_name}">${c.original_name}</div>
-        <div class="lib-type">${c.type}${c.file_size?' · '+(c.file_size/1048576).toFixed(1)+'MB':''}</div>
+        <div class="lib-type">${c.type}${c.file_size?' · '+(c.file_size/1048576).toFixed(1)+' MB':''}</div>
+        <button class="lib-del-btn" title="Delete from library" onclick="deleteLibraryItem('${c.id}',event)"><svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
       </div>`).join('');
   }catch(e){grid.innerHTML=`<div style="color:var(--danger);font-size:13px;padding:20px;">${e.message}</div>`;}
+}
+
+async function deleteLibraryItem(id, e){
+  e.stopPropagation();
+  try{
+    await api('/content/'+id,{method:'DELETE'});
+    document.getElementById('lib-item-'+id)?.remove();
+    userLibrary=userLibrary.filter(c=>c.id!==id);
+    if(uploadedContentId===id){uploadedContentId=null;document.getElementById('upload-preview').style.display='none';document.getElementById('btn-next-2').disabled=true;}
+    loadStorageBar();
+  }catch(err){alert(err.message);}
 }
 
 function selectFromLibrary(id,name,type,url){
@@ -1392,6 +1908,356 @@ function timeAgo(dateStr){
   if(hr<24)return `${hr}h ago`;
   const d=Math.floor(hr/24);
   return d===1?'Yesterday':`${d} days ago`;
+}
+
+// ── WALLET ───────────────────────────────────────────────────────────────────
+let walletBalance = 0;
+
+async function loadWallet(){
+  try{
+    const data = await api('/wallet');
+    walletBalance = parseFloat(data.balance || 0);
+    document.getElementById('wallet-balance-display').textContent = '₹' + walletBalance.toLocaleString('en-IN', {minimumFractionDigits:2});
+    document.getElementById('sidebar-wallet-bal').textContent = '₹' + fmtNum(walletBalance);
+    document.getElementById('refund-amount').max = walletBalance;
+
+    const txns = data.transactions || [];
+    const totalIn  = txns.filter(t=>parseFloat(t.amount)>0).reduce((s,t)=>s+parseFloat(t.amount),0);
+    const totalOut = txns.filter(t=>parseFloat(t.amount)<0).reduce((s,t)=>s+Math.abs(parseFloat(t.amount)),0);
+    document.getElementById('wallet-total-in').textContent  = '₹' + totalIn.toLocaleString('en-IN',{minimumFractionDigits:2});
+    document.getElementById('wallet-total-out').textContent = '₹' + totalOut.toLocaleString('en-IN',{minimumFractionDigits:2});
+
+    const refundSec = document.getElementById('wallet-refund-section');
+    if(refundSec) refundSec.style.display = walletBalance > 0 ? 'block' : 'none';
+
+    const tbl = document.getElementById('wallet-txn-table');
+    if(!txns.length){
+      tbl.innerHTML='<div class="empty-state"><div class="empty-title">No transactions yet</div><div class="empty-sub">Transactions appear here when you pause, cancel, or resume campaigns.</div></div>';
+    } else {
+      const typeLabel = {
+        credit_pause:'Pause Refund', credit_cancel:'Cancel Refund', admin_credit:'Admin Credit',
+        debit_resume:'Resume Charge', debit_campaign:'Campaign Charge', refund_requested:'Bank Refund Requested'
+      };
+      const typeColor = {
+        credit_pause:'var(--success)', credit_cancel:'var(--success)', admin_credit:'var(--success)',
+        debit_resume:'var(--error)', debit_campaign:'var(--error)', refund_requested:'var(--warning)'
+      };
+      tbl.innerHTML=`<div class="table-wrap"><table><thead><tr><th>Date</th><th>Type</th><th>Campaign</th><th>Amount</th></tr></thead><tbody>${
+        txns.map(t=>{
+          const amt = parseFloat(t.amount);
+          const isCredit = amt > 0;
+          return `<tr>
+            <td style="font-size:12px;">${fmtDate(t.created_at)}</td>
+            <td><span style="font-size:12px;font-weight:500;color:${typeColor[t.type]||'var(--text)'};">${typeLabel[t.type]||t.type}</span></td>
+            <td style="font-size:12px;color:var(--text2);">${t.campaign_code||'—'}</td>
+            <td style="font-weight:700;color:${isCredit?'var(--success)':'var(--error)'};">${isCredit?'+':''}₹${Math.abs(amt).toLocaleString('en-IN',{minimumFractionDigits:2})}</td>
+          </tr>`;
+        }).join('')
+      }</tbody></table></div>`;
+    }
+  }catch(e){toast('Could not load wallet','error');}
+}
+
+async function requestWalletRefund(){
+  const amount = parseFloat(document.getElementById('refund-amount').value);
+  const upi    = document.getElementById('refund-upi').value.trim();
+  if(!amount||amount<=0){toast('Enter valid amount','error');return;}
+  if(!upi){toast('Enter UPI ID or bank details','error');return;}
+  if(amount > walletBalance){toast('Amount exceeds wallet balance','error');return;}
+  try{
+    await api('/wallet/refund-request',{method:'POST',body:JSON.stringify({amount,upi_id:upi})});
+    toast('Refund request submitted! Admin will process in 5-7 days.','success');
+    loadWallet();
+  }catch(e){toast(e.message||'Error','error');}
+}
+
+// ── CAMPAIGN ACTIONS ──────────────────────────────────────────────────────────
+// ── CONFIRM MODAL ────────────────────────────────────────────────────────────
+let _confirmResolve=null;
+function showConfirm({title,body,okLabel='Confirm',danger=false}){
+  return new Promise(resolve=>{
+    _confirmResolve=resolve;
+    document.getElementById('confirm-modal-title').textContent=title;
+    document.getElementById('confirm-modal-body').textContent=body;
+    const icon=document.getElementById('confirm-modal-icon');
+    const ok=document.getElementById('confirm-modal-ok');
+    if(danger){
+      icon.style.background='rgba(239,68,68,0.12)';
+      icon.innerHTML='<svg width="20" height="20" fill="none" stroke="#dc2626" stroke-width="2.5" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>';
+      ok.style.background='#dc2626';
+    }else{
+      icon.style.background='rgba(13,148,136,0.12)';
+      icon.innerHTML='<svg width="20" height="20" fill="none" stroke="#0d9488" stroke-width="2.5" viewBox="0 0 24 24"><path d="M10 9v6m4-6v6M9 3h6l1 3H8L9 3zM3 6h18M5 6l1 14a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2L19 6"/></svg>';
+      ok.style.background='var(--primary)';
+    }
+    ok.textContent=okLabel;
+    document.getElementById('confirm-modal-overlay').style.display='flex';
+  });
+}
+function _confirmOk(){document.getElementById('confirm-modal-overlay').style.display='none';if(_confirmResolve)_confirmResolve(true);_confirmResolve=null;}
+function _confirmCancel(){document.getElementById('confirm-modal-overlay').style.display='none';if(_confirmResolve)_confirmResolve(false);_confirmResolve=null;}
+
+async function campaignPause(id, btn){
+  const ok = await showConfirm({title:'Pause Campaign',body:'Unspent days will be credited to your wallet. You can resume anytime.',okLabel:'Pause',danger:false});
+  if(!ok) return;
+  btn.disabled=true;
+  try{
+    const data = await api(`/campaigns/${id}/pause`,{method:'POST',body:JSON.stringify({})});
+    const credited = parseFloat(data.wallet_credited||0);
+    toast(credited>0?`Campaign paused. ₹${credited.toLocaleString('en-IN',{minimumFractionDigits:2})} credited to wallet.`:'Campaign paused.','success');
+    document.getElementById('sidebar-wallet-bal').textContent='₹'+fmtNum(walletBalance+credited);
+    walletBalance+=credited;
+    await loadCampaigns();
+  }catch(e){toast(e.message||'Could not pause','error');btn.disabled=false;}
+}
+
+async function campaignResume(id, btn){
+  btn.disabled=true; btn.textContent='…';
+  try{
+    const data = await api(`/campaigns/${id}/resume`,{method:'POST',body:JSON.stringify({})});
+    const debited = parseFloat(data.wallet_debited||0);
+    toast(debited>0?`Campaign resumed. ₹${debited.toLocaleString('en-IN',{minimumFractionDigits:2})} deducted from wallet.`:'Campaign resumed.','success');
+    walletBalance = Math.max(0, walletBalance - debited);
+    document.getElementById('sidebar-wallet-bal').textContent='₹'+fmtNum(walletBalance);
+    await loadCampaigns();
+  }catch(e){toast(e.message||'Could not resume — check wallet balance','error');btn.disabled=false;btn.textContent='▶ Resume';}
+}
+
+async function campaignCancel(id, title){
+  const ok = await showConfirm({title:`Cancel "${title}"?`,body:'Unspent days will be refunded to your wallet. This cannot be undone.',okLabel:'Yes, Cancel',danger:true});
+  if(!ok) return;
+  try{
+    const data = await api(`/campaigns/${id}`,{method:'DELETE',body:JSON.stringify({reason:'Cancelled by advertiser'})});
+    const credited = parseFloat(data.wallet_credited||0);
+    toast(credited>0?`Campaign cancelled. ₹${credited.toLocaleString('en-IN',{minimumFractionDigits:2})} credited to wallet.`:'Campaign cancelled.','success');
+    walletBalance+=credited;
+    document.getElementById('sidebar-wallet-bal').textContent='₹'+fmtNum(walletBalance);
+    await loadCampaigns();
+  }catch(e){toast(e.message||'Could not cancel','error');}
+}
+
+// ── CREATIVE CHANGE MODAL ─────────────────────────────────────────────────────
+let creativeCampaignId = null;
+
+function openCreativeModal(id, title, changeStatus){
+  creativeCampaignId = id;
+  document.getElementById('creative-modal-title').textContent = title;
+  document.getElementById('creative-status-note').style.display = changeStatus==='pending' ? 'block' : 'none';
+  document.getElementById('creative-file-input').value = '';
+  document.getElementById('creative-upload-status').textContent = '';
+  document.getElementById('creative-modal-overlay').style.display = 'flex';
+}
+
+function closeCreativeModal(){
+  document.getElementById('creative-modal-overlay').style.display = 'none';
+  creativeCampaignId = null;
+}
+
+async function submitCreativeChange(){
+  const fileInput = document.getElementById('creative-file-input');
+  if(!fileInput.files.length){toast('Select a file first','error');return;}
+  const file = fileInput.files[0];
+  const statusEl = document.getElementById('creative-upload-status');
+  statusEl.textContent = 'Uploading…';
+  try{
+    // Upload file first
+    const formData = new FormData();
+    formData.append('file', file);
+    const headers = {};
+    if(token) headers['Authorization'] = `Bearer ${token}`;
+    const uploadRes = await fetch(`${API}/content/upload`, {method:'POST', headers, body:formData});
+    const uploadData = await uploadRes.json();
+    if(!uploadRes.ok) throw new Error(uploadData.error||'Upload failed');
+    const contentId = uploadData.id || uploadData.content?.id;
+    // Submit creative change
+    statusEl.textContent = 'Submitting for review…';
+    await api(`/campaigns/${creativeCampaignId}/creative`,{method:'PUT',body:JSON.stringify({content_id:contentId})});
+    toast('Creative change submitted for admin review. Current creative continues until approved.','success');
+    closeCreativeModal();
+    await loadCampaigns();
+  }catch(e){
+    statusEl.textContent = '';
+    toast(e.message||'Failed to change creative','error');
+  }
+}
+
+// ── QR OVERLAY MODAL ─────────────────────────────────────────────────────────
+let qrModalCampaignId=null;
+
+function openQRModal(id,code,title,enabled,placement,phone,previewUrl){
+  qrModalCampaignId=id;
+  document.getElementById('qr-modal-title').textContent=title||code;
+  document.getElementById('qr-modal-code').textContent=code;
+  const toggleEl=document.getElementById('qr-toggle');
+  toggleEl.checked=!!enabled;
+  document.getElementById('qr-toggle-wrap').classList.toggle('qr-toggle-on',!!enabled);
+  document.getElementById('qr-phone').value=phone||(currentUser&&currentUser.mobile?currentUser.mobile:'');
+  document.getElementById('qr-preview-wrap').style.display=previewUrl&&enabled?'block':'none';
+  if(previewUrl&&enabled)document.getElementById('qr-preview-img').src=previewUrl;
+  // Set placement selection
+  document.querySelectorAll('.qr-pos-btn').forEach(b=>{
+    b.classList.toggle('active',b.dataset.pos===(placement||'bot-right'));
+  });
+  toggleQRFields(!!enabled);
+  document.getElementById('qr-modal-overlay').style.display='flex';
+}
+
+function closeQRModal(){
+  document.getElementById('qr-modal-overlay').style.display='none';
+  qrModalCampaignId=null;
+}
+
+function toggleQRFields(on){
+  document.getElementById('qr-fields').style.display=on?'block':'none';
+}
+
+async function saveQRSettings(){
+  if(!qrModalCampaignId)return;
+  const enabled=document.getElementById('qr-toggle').checked;
+  const phone=document.getElementById('qr-phone').value.trim();
+  const placement=document.querySelector('.qr-pos-btn.active')?.dataset.pos||'bot-right';
+  if(enabled&&!phone){toast('WhatsApp number required','error');return;}
+  const btn=document.getElementById('qr-save-btn');
+  btn.disabled=true;btn.textContent='Saving…';
+  try{
+    const data=await api(`/campaigns/${qrModalCampaignId}/qr`,{method:'PUT',body:JSON.stringify({qr_enabled:enabled,qr_placement:placement,qr_phone:phone})});
+    toast(enabled?'QR overlay enabled!':'QR overlay disabled','success');
+    if(data.qr_content_url&&enabled){
+      document.getElementById('qr-preview-img').src=data.qr_content_url;
+      document.getElementById('qr-preview-wrap').style.display='block';
+    }else{
+      document.getElementById('qr-preview-wrap').style.display='none';
+    }
+    await loadCampaigns();
+  }catch(e){toast('Could not save QR settings','error');}
+  btn.disabled=false;btn.textContent='Save QR Settings';
+}
+</script>
+
+<!-- QR OVERLAY MODAL -->
+<!-- Confirm Modal -->
+<div id="confirm-modal-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:2000;align-items:center;justify-content:center;padding:16px;" onclick="if(event.target===this)_confirmCancel()">
+  <div style="background:var(--surface);border-radius:var(--radius-lg);width:100%;max-width:380px;box-shadow:0 20px 60px rgba(0,0,0,0.25);overflow:hidden;animation:modal-in 0.18s ease;">
+    <div style="padding:22px 22px 0;">
+      <div id="confirm-modal-icon" style="width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:14px;"></div>
+      <div id="confirm-modal-title" style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:6px;"></div>
+      <div id="confirm-modal-body" style="font-size:13.5px;color:var(--text2);line-height:1.5;"></div>
+    </div>
+    <div style="display:flex;gap:10px;padding:20px 22px 22px;justify-content:flex-end;">
+      <button onclick="_confirmCancel()" style="padding:8px 18px;border-radius:8px;border:1.5px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">Cancel</button>
+      <button id="confirm-modal-ok" style="padding:8px 18px;border-radius:8px;border:none;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;color:#fff;" onclick="_confirmOk()">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<div id="qr-modal-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;align-items:center;justify-content:center;padding:16px;">
+  <div style="background:var(--surface);border-radius:var(--radius-lg);width:100%;max-width:480px;box-shadow:0 20px 60px rgba(0,0,0,0.3);overflow:hidden;">
+    <div style="padding:18px 20px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+      <div>
+        <div style="font-size:15px;font-weight:700;color:var(--text);" id="qr-modal-title">Campaign</div>
+        <div style="font-size:12px;color:var(--text2);" id="qr-modal-code"></div>
+      </div>
+      <button onclick="closeQRModal()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text2);line-height:1;">×</button>
+    </div>
+    <div style="padding:18px 20px;">
+      <!-- Toggle -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <div>
+          <div style="font-size:14px;font-weight:600;color:var(--text);">Enable WhatsApp QR Overlay</div>
+          <div style="font-size:12px;color:var(--text2);margin-top:2px;">QR will be overlaid on your image creative</div>
+        </div>
+        <label class="qr-toggle-wrap" id="qr-toggle-wrap">
+          <input type="checkbox" id="qr-toggle" style="opacity:0;width:0;height:0;position:absolute;" onchange="onQRToggleChange(this)">
+          <span class="qr-toggle-track"></span>
+          <span class="qr-toggle-knob"></span>
+        </label>
+      </div>
+
+      <div id="qr-fields">
+        <!-- WhatsApp Number -->
+        <div style="margin-bottom:16px;">
+          <label style="font-size:12px;font-weight:600;color:var(--text2);display:block;margin-bottom:6px;">WhatsApp Number</label>
+          <input type="tel" id="qr-phone" placeholder="+91 9876543210" style="width:100%;box-sizing:border-box;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;background:var(--surface);color:var(--text);">
+          <div style="font-size:11px;color:var(--text2);margin-top:4px;">Include country code, e.g. 919876543210</div>
+        </div>
+
+        <!-- Placement Grid -->
+        <div style="margin-bottom:16px;">
+          <label style="font-size:12px;font-weight:600;color:var(--text2);display:block;margin-bottom:8px;">QR Position</label>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;max-width:260px;">
+            <button class="qr-pos-btn" data-pos="top-left" onclick="selectQRPos(this)" style="padding:8px 12px;border:1.5px solid var(--border);border-radius:6px;background:var(--surface);cursor:pointer;font-size:12px;color:var(--text);text-align:left;">↖ Top Left</button>
+            <button class="qr-pos-btn" data-pos="top-right" onclick="selectQRPos(this)" style="padding:8px 12px;border:1.5px solid var(--border);border-radius:6px;background:var(--surface);cursor:pointer;font-size:12px;color:var(--text);text-align:right;">Top Right ↗</button>
+            <button class="qr-pos-btn" data-pos="mid-left" onclick="selectQRPos(this)" style="padding:8px 12px;border:1.5px solid var(--border);border-radius:6px;background:var(--surface);cursor:pointer;font-size:12px;color:var(--text);text-align:left;">← Mid Left</button>
+            <button class="qr-pos-btn" data-pos="mid-right" onclick="selectQRPos(this)" style="padding:8px 12px;border:1.5px solid var(--border);border-radius:6px;background:var(--surface);cursor:pointer;font-size:12px;color:var(--text);text-align:right;">Mid Right →</button>
+            <button class="qr-pos-btn" data-pos="bot-left" onclick="selectQRPos(this)" style="padding:8px 12px;border:1.5px solid var(--border);border-radius:6px;background:var(--surface);cursor:pointer;font-size:12px;color:var(--text);text-align:left;">↙ Bot Left</button>
+            <button class="qr-pos-btn active" data-pos="bot-right" onclick="selectQRPos(this)" style="padding:8px 12px;border:1.5px solid var(--border);border-radius:6px;background:var(--surface);cursor:pointer;font-size:12px;color:var(--text);text-align:right;">Bot Right ↘</button>
+          </div>
+        </div>
+
+        <!-- Preview -->
+        <div id="qr-preview-wrap" style="display:none;margin-bottom:16px;">
+          <label style="font-size:12px;font-weight:600;color:var(--text2);display:block;margin-bottom:6px;">Preview (with QR overlay)</label>
+          <img id="qr-preview-img" src="" alt="preview" style="max-width:100%;border-radius:8px;border:1px solid var(--border);">
+        </div>
+      </div>
+
+      <div style="display:flex;gap:10px;justify-content:flex-end;">
+        <button onclick="closeQRModal()" style="padding:9px 18px;border:1.5px solid var(--border);border-radius:8px;background:none;cursor:pointer;font-size:14px;color:var(--text);">Cancel</button>
+        <button id="qr-save-btn" onclick="saveQRSettings()" class="btn btn-primary" style="padding:9px 20px;font-size:14px;">Save QR Settings</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.qr-toggle-wrap { position:relative; display:inline-block; width:44px; height:24px; cursor:pointer; }
+.qr-toggle-track { position:absolute; inset:0; background:var(--border); border-radius:12px; transition:0.2s; pointer-events:none; }
+.qr-toggle-knob { position:absolute; top:3px; left:3px; width:18px; height:18px; background:#fff; border-radius:50%; transition:0.2s; box-shadow:0 1px 3px rgba(0,0,0,0.3); pointer-events:none; }
+.qr-toggle-on .qr-toggle-track { background:var(--primary); }
+.qr-toggle-on .qr-toggle-knob { transform:translateX(20px); }
+.qr-pos-btn.active { border-color: var(--primary) !important; background: rgba(13,148,136,0.1) !important; color: var(--primary) !important; font-weight: 600; }
+</style>
+
+<!-- CREATIVE CHANGE MODAL -->
+<div id="creative-modal-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;align-items:center;justify-content:center;padding:16px;">
+  <div style="background:var(--surface);border-radius:var(--radius-lg);width:100%;max-width:440px;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+    <div style="padding:18px 20px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+      <div>
+        <div style="font-size:15px;font-weight:700;color:var(--text);">Change Creative</div>
+        <div style="font-size:12px;color:var(--text2);" id="creative-modal-title"></div>
+      </div>
+      <button onclick="closeCreativeModal()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text2);">×</button>
+    </div>
+    <div style="padding:18px 20px;">
+      <div id="creative-status-note" style="display:none;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:8px;padding:10px 12px;font-size:13px;color:var(--warning);margin-bottom:14px;">
+        ⏳ A creative change is already pending admin review.
+      </div>
+      <div style="margin-bottom:14px;">
+        <label style="font-size:12px;font-weight:600;color:var(--text2);display:block;margin-bottom:6px;">Upload New Creative (Image only)</label>
+        <input type="file" id="creative-file-input" accept="image/jpeg,image/png,image/webp,image/gif"
+          style="width:100%;box-sizing:border-box;padding:8px;border:1.5px dashed var(--border);border-radius:8px;font-size:13px;background:var(--surface);color:var(--text);cursor:pointer;">
+      </div>
+      <div style="font-size:12px;color:var(--text2);margin-bottom:16px;background:var(--surface2);border-radius:6px;padding:10px;">
+        ℹ Your current creative will keep running until admin approves the change. No billing interruption.
+      </div>
+      <div id="creative-upload-status" style="font-size:13px;color:var(--primary);margin-bottom:10px;"></div>
+      <div style="display:flex;gap:10px;justify-content:flex-end;">
+        <button onclick="closeCreativeModal()" style="padding:9px 18px;border:1.5px solid var(--border);border-radius:8px;background:none;cursor:pointer;font-size:14px;color:var(--text);">Cancel</button>
+        <button onclick="submitCreativeChange()" class="btn btn-primary" style="padding:9px 20px;font-size:14px;">Submit for Review</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function selectQRPos(el){
+  document.querySelectorAll('.qr-pos-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+}
+function onQRToggleChange(cb){
+  const wrap=cb.closest('.qr-toggle-wrap');
+  if(wrap)wrap.classList.toggle('qr-toggle-on',cb.checked);
+  toggleQRFields(cb.checked);
 }
 </script>
 </body>

@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Venue Partner Portal — SignageCMS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary:#0D9488; --primary-light:rgba(13,148,136,0.1); --primary-dark:#0a7a70;
+  --bg:#f8fafc; --surface:#fff; --surface2:#f1f5f9;
+  --border:#e2e8f0; --text:#0f172a; --text2:#475569; --text3:#94a3b8;
+  --radius:8px; --danger:#ef4444; --warning:#f59e0b; --success:#16a34a;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg:#0d1117; --surface:#161b22; --surface2:#21262d;
+    --border:#30363d; --text:#e6edf3; --text2:#8b949e; --text3:#6e7681;
+  }
+}
+:root[data-theme="dark"] {
+  --bg:#0d1117; --surface:#161b22; --surface2:#21262d;
+  --border:#30363d; --text:#e6edf3; --text2:#8b949e; --text3:#6e7681;
+}
+* { box-sizing:border-box; margin:0; padding:0; }
+body { font-family:'Inter',system-ui,sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
+
+/* LOGIN */
+#login-screen { display:flex; align-items:center; justify-content:center; min-height:100vh; padding:24px; }
+.login-card { background:var(--surface); border:1.5px solid var(--border); border-radius:16px; padding:36px 32px; width:100%; max-width:380px; }
+.login-logo { display:flex; align-items:center; gap:10px; margin-bottom:28px; }
+.login-logo-mark { width:38px; height:38px; background:var(--primary); border-radius:10px; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:800; font-size:14px; }
+.login-logo-name { font-size:16px; font-weight:800; }
+.login-logo-sub { font-size:10px; color:var(--primary); font-weight:700; background:var(--primary-light); border-radius:4px; padding:1px 6px; }
+.login-title { font-size:20px; font-weight:800; margin-bottom:6px; }
+.login-sub { font-size:13px; color:var(--text2); margin-bottom:24px; }
+.form-group { margin-bottom:14px; }
+.form-label { display:block; font-size:12px; font-weight:600; color:var(--text2); margin-bottom:5px; text-transform:uppercase; letter-spacing:0.04em; }
+.form-input { width:100%; padding:10px 12px; border:1.5px solid var(--border); border-radius:var(--radius); font-size:14px; background:var(--surface); color:var(--text); outline:none; transition:border-color 0.15s; }
+.form-input:focus { border-color:var(--primary); }
+.btn { padding:10px 20px; border-radius:var(--radius); font-size:14px; font-weight:600; cursor:pointer; border:none; transition:all 0.15s; }
+.btn-primary { background:var(--primary); color:#fff; width:100%; }
+.btn-primary:hover { background:var(--primary-dark); }
+.btn-ghost { background:transparent; color:var(--text2); border:1.5px solid var(--border); }
+.btn-ghost:hover { background:var(--surface2); color:var(--text); }
+.btn-sm { padding:6px 14px; font-size:12px; }
+.login-error { color:var(--danger); font-size:12px; margin-top:10px; text-align:center; }
+
+/* MAIN APP */
+#app { display:none; flex-direction:column; min-height:100vh; }
+.topbar { background:var(--surface); border-bottom:1px solid var(--border); padding:0 24px; height:56px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:100; }
+.topbar-logo { display:flex; align-items:center; gap:10px; }
+.topbar-logo-mark { width:30px; height:30px; background:var(--primary); border-radius:8px; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:800; font-size:12px; }
+.topbar-name { font-size:14px; font-weight:800; }
+.topbar-tag { font-size:9.5px; color:var(--primary); font-weight:700; background:var(--primary-light); border-radius:4px; padding:1px 6px; }
+.topbar-user { display:flex; align-items:center; gap:10px; }
+.topbar-biz { font-size:13px; font-weight:600; }
+.topbar-role { font-size:10px; color:var(--text3); }
+
+.main-content { flex:1; padding:24px; max-width:960px; width:100%; margin:0 auto; }
+
+/* TABS */
+.page-tabs { display:flex; gap:4px; margin-bottom:20px; border-bottom:1px solid var(--border); }
+.page-tab { padding:8px 16px; font-size:13px; font-weight:600; cursor:pointer; color:var(--text2); border:none; background:none; border-bottom:2.5px solid transparent; margin-bottom:-1px; transition:all 0.15s; }
+.page-tab.active { color:var(--primary); border-bottom-color:var(--primary); }
+
+.tab-panel { display:none; }
+.tab-panel.active { display:block; }
+
+/* CARDS */
+.card { background:var(--surface); border:1.5px solid var(--border); border-radius:12px; padding:20px; margin-bottom:16px; }
+.card-title { font-size:12px; font-weight:700; color:var(--text2); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:14px; }
+.stat-row { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:12px; margin-bottom:20px; }
+.stat-box { background:var(--surface); border:1.5px solid var(--border); border-radius:10px; padding:14px; }
+.stat-label { font-size:10.5px; font-weight:700; color:var(--text2); text-transform:uppercase; letter-spacing:0.04em; margin-bottom:4px; }
+.stat-val { font-size:22px; font-weight:800; color:var(--text); }
+.stat-val.primary { color:var(--primary); }
+.stat-sub { font-size:11px; color:var(--text3); margin-top:2px; }
+
+/* SCREEN STATUS */
+.screen-card { background:var(--surface); border:1.5px solid var(--border); border-radius:10px; padding:16px; margin-bottom:10px; display:flex; align-items:center; gap:14px; }
+.screen-status-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+.online { background:#22c55e; box-shadow:0 0 0 3px rgba(34,197,94,0.2); }
+.offline { background:#ef4444; }
+.maintenance { background:#f59e0b; }
+.screen-info { flex:1; }
+.screen-name { font-size:14px; font-weight:700; }
+.screen-loc { font-size:12px; color:var(--text2); margin-top:2px; }
+.screen-meta { font-size:11px; color:var(--text3); margin-top:3px; }
+.screen-airtime { text-align:right; }
+.airtime-bar { width:100px; height:6px; background:var(--border); border-radius:3px; overflow:hidden; margin-bottom:4px; }
+.airtime-fill { height:100%; background:var(--primary); border-radius:3px; }
+.airtime-label { font-size:10px; color:var(--text3); }
+
+/* CONTENT UPLOAD */
+.upload-zone { border:2px dashed var(--border); border-radius:10px; padding:32px 20px; text-align:center; cursor:pointer; transition:all 0.2s; }
+.upload-zone:hover,.upload-zone.dragover { border-color:var(--primary); background:var(--primary-light); }
+.upload-icon { width:44px; height:44px; margin:0 auto 10px; background:var(--primary-light); border-radius:10px; display:flex; align-items:center; justify-content:center; }
+.upload-title { font-size:14px; font-weight:600; margin-bottom:4px; }
+.upload-sub { font-size:12px; color:var(--text3); }
+
+/* Content grid */
+.content-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(130px,1fr)); gap:12px; margin-top:14px; }
+.content-item { border:1.5px solid var(--border); border-radius:8px; overflow:hidden; cursor:pointer; transition:border-color 0.15s; }
+.content-item:hover { border-color:var(--primary); }
+.content-thumb { width:100%; height:80px; object-fit:cover; background:var(--surface2); display:block; }
+.content-thumb-video { width:100%; height:80px; background:var(--surface2); display:flex; align-items:center; justify-content:center; font-size:26px; }
+.content-meta { padding:8px; }
+.content-name { font-size:11px; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.content-tier { display:inline-block; font-size:9.5px; font-weight:700; padding:1px 6px; border-radius:4px; margin-top:3px; }
+.tier-venue-own { background:rgba(202,138,4,0.15); color:#92400e; }
+.tier-venue-cross { background:rgba(37,99,235,0.12); color:#1d4ed8; }
+
+/* Revenue table */
+.rev-table { width:100%; border-collapse:collapse; font-size:13px; }
+.rev-table th { font-size:10.5px; font-weight:700; color:var(--text2); text-transform:uppercase; letter-spacing:0.04em; padding:8px 12px; border-bottom:1px solid var(--border); text-align:left; }
+.rev-table td { padding:10px 12px; border-bottom:1px solid var(--border); }
+.rev-table tr:last-child td { border-bottom:none; }
+
+.empty { text-align:center; padding:40px 20px; color:var(--text3); font-size:13px; }
+.badge { display:inline-block; font-size:10.5px; font-weight:700; padding:2px 8px; border-radius:4px; }
+.badge-green { background:#dcfce7; color:#166534; }
+.badge-red { background:#fee2e2; color:#991b1b; }
+.badge-yellow { background:#fef9c3; color:#854d0e; }
+.badge-blue { background:#dbeafe; color:#1e40af; }
+
+@media (max-width:600px) {
+  .main-content { padding:16px; }
+  .stat-row { grid-template-columns:1fr 1fr; }
+  .topbar { padding:0 16px; }
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="login-logo-mark">SC</div>
+      <div>
+        <div class="login-logo-name">SignageCMS</div>
+      </div>
+      <div class="login-logo-sub">VENUE</div>
+    </div>
+    <div class="login-title">Venue Partner Portal</div>
+    <div class="login-sub">Sign in to manage your screen and content</div>
+    <div class="form-group">
+      <label class="form-label">Email</label>
+      <input type="email" id="login-email" class="form-input" placeholder="you@yourvenue.in" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Password</label>
+      <input type="password" id="login-pass" class="form-input" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <button class="btn btn-primary" onclick="doLogin()">Sign In</button>
+    <div class="login-error" id="login-err"></div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app">
+  <div class="topbar">
+    <div class="topbar-logo">
+      <div class="topbar-logo-mark">SC</div>
+      <span class="topbar-name">SignageCMS</span>
+      <span class="topbar-tag">VENUE</span>
+    </div>
+    <div class="topbar-user">
+      <div>
+        <div class="topbar-biz" id="tb-biz">—</div>
+        <div class="topbar-role">Venue Partner</div>
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="logout()">Sign Out</button>
+    </div>
+  </div>
+
+  <div class="main-content">
+    <div class="page-tabs">
+      <button class="page-tab active" onclick="switchTab('overview')">Overview</button>
+      <button class="page-tab" onclick="switchTab('content')">My Content</button>
+      <button class="page-tab" onclick="switchTab('revenue')">Revenue</button>
+    </div>
+
+    <!-- OVERVIEW TAB -->
+    <div class="tab-panel active" id="tab-overview">
+      <div class="stat-row" id="overview-stats">
+        <div class="stat-box"><div class="stat-label">My Screens</div><div class="stat-val primary" id="ov-screens">—</div></div>
+        <div class="stat-box"><div class="stat-label">Revenue Earned</div><div class="stat-val primary" id="ov-revenue">—</div></div>
+        <div class="stat-box"><div class="stat-label">Pending Settlement</div><div class="stat-val" id="ov-pending">—</div></div>
+        <div class="stat-box"><div class="stat-label">My Content Files</div><div class="stat-val" id="ov-content">—</div></div>
+      </div>
+
+      <div class="card-title" style="margin-bottom:10px;">My Screens</div>
+      <div id="screens-list"><div class="empty">Loading screens…</div></div>
+
+      <!-- Airtime split info -->
+      <div class="card" style="margin-top:16px;">
+        <div class="card-title">How Your Screen's Airtime is Split</div>
+        <div id="airtime-split-info">
+          <div style="font-size:13px;color:var(--text2);">Loading…</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTENT TAB -->
+    <div class="tab-panel" id="tab-content">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;" class="content-type-row">
+        <!-- Venue Own Content -->
+        <div class="card" style="margin-bottom:0;">
+          <div class="card-title" style="color:#ca8a04;">
+            Your Screen Content
+            <span style="font-size:10px;font-weight:500;color:var(--text3);display:block;margin-top:2px;">Plays on your screen only (menu, offers, promos)</span>
+          </div>
+          <div class="upload-zone" onclick="triggerUpload('venue_own')">
+            <div class="upload-icon"><svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="#ca8a04"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg></div>
+            <div class="upload-title" style="font-size:13px;">Upload Your Content</div>
+            <div class="upload-sub">JPG · PNG · MP4 · max 200 MB</div>
+          </div>
+        </div>
+
+        <!-- Cross-Network Ad -->
+        <div class="card" style="margin-bottom:0;">
+          <div class="card-title" style="color:#2563EB;">
+            Network Ad (Free)
+            <span style="font-size:10px;font-weight:500;color:var(--text3);display:block;margin-top:2px;">Plays on other screens in your city</span>
+          </div>
+          <div class="upload-zone" onclick="triggerUpload('venue_cross')">
+            <div class="upload-icon"><svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="#2563EB"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064"/></svg></div>
+            <div class="upload-title" style="font-size:13px;">Upload Your Ad</div>
+            <div class="upload-sub">Runs city-wide on partner screens</div>
+          </div>
+        </div>
+      </div>
+
+      <input type="file" id="file-input-venue" accept="video/*,image/*" style="display:none" onchange="handleFileUpload(event)">
+      <input type="hidden" id="upload-tier">
+
+      <div id="upload-progress" style="display:none;margin-bottom:14px;">
+        <div style="height:4px;background:var(--border);border-radius:3px;overflow:hidden;">
+          <div id="upload-prog-fill" style="height:100%;background:var(--primary);width:0%;transition:width 0.3s;"></div>
+        </div>
+        <div style="font-size:11px;color:var(--text2);margin-top:4px;" id="upload-prog-text">Uploading…</div>
+      </div>
+
+      <div class="card-title" style="margin-top:4px;margin-bottom:10px;">All My Content</div>
+      <div id="content-grid" class="content-grid"><div class="empty">Loading content…</div></div>
+    </div>
+
+    <!-- REVENUE TAB -->
+    <div class="tab-panel" id="tab-revenue">
+      <div class="stat-row" style="margin-bottom:20px;">
+        <div class="stat-box"><div class="stat-label">Total Earned</div><div class="stat-val primary" id="rv-total">—</div><div class="stat-sub">From paid campaigns on your screen</div></div>
+        <div class="stat-box"><div class="stat-label">Settled</div><div class="stat-val" style="color:var(--success);" id="rv-settled">—</div></div>
+        <div class="stat-box"><div class="stat-label">Pending</div><div class="stat-val" style="color:var(--warning);" id="rv-pending-amt">—</div><div class="stat-sub">Next settlement upcoming</div></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Monthly Revenue</div>
+        <div id="rev-monthly-wrap">
+          <div class="empty">Loading…</div>
+        </div>
+        <div style="font-size:11px;color:var(--text3);margin-top:12px;">Revenue is credited monthly via bank transfer / UPI. Contact your account manager for settlement queries.</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const BASE = '';
+let _token = localStorage.getItem('vp_token') || '';
+let _vpData = null;
+
+function api(path, opts={}) {
+  return fetch(BASE + '/api' + path, {
+    headers: { 'Content-Type':'application/json', 'Authorization': 'Bearer ' + _token },
+    ...opts
+  }).then(async r => {
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || r.statusText);
+    return d;
+  });
+}
+
+async function doLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const pass = document.getElementById('login-pass').value;
+  const err = document.getElementById('login-err');
+  err.textContent = '';
+  try {
+    const res = await fetch('/api/auth/login', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ email, password: pass })
+    }).then(async r => { const d=await r.json(); if(!r.ok) throw new Error(d.error||'Login failed'); return d; });
+
+    if (res.user.role !== 'venue_partner') {
+      err.textContent = 'This portal is for venue partners only.';
+      return;
+    }
+    _token = res.token;
+    localStorage.setItem('vp_token', _token);
+    initApp(res.user);
+  } catch(e) { err.textContent = e.message; }
+}
+
+function logout() {
+  localStorage.removeItem('vp_token');
+  _token = '';
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('app').style.display = 'none';
+}
+
+async function initApp(user) {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'flex';
+  document.getElementById('tb-biz').textContent = user.business_name || user.first_name || user.email;
+  // Load venue partner data
+  if (user.venue_partner_id) {
+    try {
+      _vpData = await api('/venue-partners/' + user.venue_partner_id);
+      loadOverview();
+      loadContent();
+      loadRevenue();
+    } catch(e) { console.error(e); }
+  }
+}
+
+function switchTab(name) {
+  document.querySelectorAll('.page-tab').forEach((t,i) => {
+    const names = ['overview','content','revenue'];
+    t.classList.toggle('active', names[i]===name);
+  });
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+}
+
+function loadOverview() {
+  if (!_vpData) return;
+  const screens = _vpData.screens || [];
+  document.getElementById('ov-screens').textContent = screens.length;
+
+  // Render screens
+  const container = document.getElementById('screens-list');
+  if (!screens.length) { container.innerHTML = '<div class="empty">No screens linked yet — contact your account manager.</div>'; return; }
+  container.innerHTML = screens.map(s => {
+    const dotClass = s.status==='online' ? 'online' : s.status==='maintenance' ? 'maintenance' : 'offline';
+    const paid = s.paid_pct||75, own=s.venue_own_pct||15, cross=s.cross_pct||8;
+    return `<div class="screen-card">
+      <div class="screen-status-dot ${dotClass}"></div>
+      <div class="screen-info">
+        <div class="screen-name">${s.name}</div>
+        <div class="screen-loc">${s.location||''} ${s.city?'· '+s.city:''}</div>
+        <div class="screen-meta">${s.screen_code}</div>
+      </div>
+      <div class="screen-airtime">
+        <div class="airtime-label" style="margin-bottom:4px;font-size:10px;color:var(--text3);">Your airtime</div>
+        <div style="display:flex;height:8px;border-radius:4px;overflow:hidden;width:120px;margin-bottom:4px;">
+          <div style="width:${paid}%;background:var(--primary);"></div>
+          <div style="width:${own}%;background:#ca8a04;"></div>
+          <div style="width:${cross}%;background:#2563EB;"></div>
+        </div>
+        <div style="font-size:9.5px;color:var(--text3);">${own}% your content · ${cross}% your ad</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Airtime info
+  const s0 = screens[0] || {};
+  document.getElementById('airtime-split-info').innerHTML = `
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <div style="display:flex;align-items:center;gap:6px;font-size:12px;"><div style="width:12px;height:12px;border-radius:3px;background:var(--primary);flex-shrink:0;"></div><span><strong>${s0.paid_pct||75}%</strong> Paid advertiser campaigns (generates revenue for you)</span></div>
+      <div style="display:flex;align-items:center;gap:6px;font-size:12px;"><div style="width:12px;height:12px;border-radius:3px;background:#ca8a04;flex-shrink:0;"></div><span><strong>${s0.venue_own_pct||15}%</strong> Your screen content (menu, offers)</span></div>
+      <div style="display:flex;align-items:center;gap:6px;font-size:12px;"><div style="width:12px;height:12px;border-radius:3px;background:#2563EB;flex-shrink:0;"></div><span><strong>${s0.cross_pct||8}%</strong> Your city-wide ad (on other screens, free)</span></div>
+    </div>`;
+}
+
+async function loadContent() {
+  const grid = document.getElementById('content-grid');
+  grid.innerHTML = '<div class="empty">Loading…</div>';
+  try {
+    const items = await api('/venue-partners/' + _vpData.id + '/content');
+    document.getElementById('ov-content').textContent = items.length;
+    if (!items.length) { grid.innerHTML = '<div class="empty">No content yet — upload your first file above.</div>'; return; }
+    grid.innerHTML = items.map(c => {
+      const isVideo = c.type === 'video';
+      const tierLabel = c.content_tier === 'venue_cross' ? '<span class="content-tier tier-venue-cross">City-wide ad</span>' : '<span class="content-tier tier-venue-own">Screen content</span>';
+      return `<div class="content-item">
+        ${isVideo
+          ? `<div class="content-thumb-video">🎬</div>`
+          : `<img class="content-thumb" src="${c.file_url}" onerror="this.style.background='var(--surface2)'" alt="">`}
+        <div class="content-meta">
+          <div class="content-name" title="${c.original_name}">${c.original_name}</div>
+          ${tierLabel}
+        </div>
+      </div>`;
+    }).join('');
+  } catch(e) { grid.innerHTML = '<div class="empty" style="color:var(--danger);">'+e.message+'</div>'; }
+}
+
+async function loadRevenue() {
+  try {
+    const r = await api('/venue-partners/' + _vpData.id + '/revenue');
+    const s = r.summary;
+    const fmt = n => Number(n||0).toLocaleString('en-IN',{minimumFractionDigits:0});
+    document.getElementById('ov-revenue').textContent = '₹'+fmt(s.total_earned);
+    document.getElementById('ov-pending').textContent = '₹'+fmt(s.pending_settlement);
+    document.getElementById('rv-total').textContent = '₹'+fmt(s.total_earned);
+    document.getElementById('rv-settled').textContent = '₹'+fmt(s.total_settled);
+    document.getElementById('rv-pending-amt').textContent = '₹'+fmt(s.pending_settlement);
+
+    const wrap = document.getElementById('rev-monthly-wrap');
+    if (!r.monthly.length) { wrap.innerHTML = '<div class="empty">No revenue yet — revenue is generated when paid campaigns run on your screen.</div>'; return; }
+    wrap.innerHTML = `<table class="rev-table"><thead><tr><th>Month</th><th>Plays Served</th><th>Revenue Earned</th><th>Status</th></tr></thead><tbody>
+      ${r.monthly.map(m=>`<tr>
+        <td style="font-weight:600;">${m.month}</td>
+        <td>${Number(m.plays||0).toLocaleString()}</td>
+        <td style="font-weight:700;color:var(--primary);">₹${Number(m.earned||0).toLocaleString('en-IN',{minimumFractionDigits:2})}</td>
+        <td><span class="badge badge-yellow">Pending</span></td>
+      </tr>`).join('')}
+    </tbody></table>`;
+  } catch(e) { console.error(e); }
+}
+
+function triggerUpload(tier) {
+  document.getElementById('upload-tier').value = tier;
+  document.getElementById('file-input-venue').click();
+}
+
+async function handleFileUpload(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const tier = document.getElementById('upload-tier').value;
+  const prog = document.getElementById('upload-progress');
+  const fill = document.getElementById('upload-prog-fill');
+  const text = document.getElementById('upload-prog-text');
+  prog.style.display = 'block';
+  fill.style.width = '10%';
+  text.textContent = 'Uploading ' + file.name + '…';
+
+  const fd = new FormData();
+  fd.append('file', file);
+
+  try {
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', '/api/content/upload');
+    xhr.setRequestHeader('Authorization', 'Bearer ' + _token);
+    xhr.upload.onprogress = ev => {
+      if (ev.lengthComputable) { fill.style.width = Math.round(ev.loaded/ev.total*85) + '%'; }
+    };
+    xhr.onload = async () => {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        const res = JSON.parse(xhr.responseText);
+        // Update content_tier
+        await fetch('/api/content/' + res.id, {
+          method:'PATCH',
+          headers:{'Content-Type':'application/json','Authorization':'Bearer '+_token},
+          body: JSON.stringify({ content_tier: tier })
+        });
+        fill.style.width = '100%';
+        text.textContent = '✓ Uploaded successfully';
+        setTimeout(()=>{ prog.style.display='none'; fill.style.width='0%'; }, 2000);
+        loadContent();
+      } else {
+        const err = JSON.parse(xhr.responseText);
+        text.textContent = 'Error: ' + (err.error||'Upload failed');
+        setTimeout(()=>prog.style.display='none',3000);
+      }
+    };
+    xhr.onerror = () => { text.textContent = 'Upload failed'; };
+    xhr.send(fd);
+  } catch(e) { text.textContent = 'Error: '+e.message; }
+  e.target.value = '';
+}
+
+// Auto-login if token exists
+(async () => {
+  if (_token) {
+    try {
+      const me = await api('/auth/me');
+      if (me.role === 'venue_partner') { initApp(me); return; }
+    } catch(e) { localStorage.removeItem('vp_token'); _token=''; }
+  }
+})();
+</script>
+</body>
+</html>

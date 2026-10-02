@@ -17,6 +17,9 @@ const userRoutes = require('./routes/users');
 const billingRoutes = require('./routes/billing');
 const couponRoutes = require('./routes/coupons');
 const notificationRoutes = require('./routes/notifications');
+const walletRoutes = require('./routes/wallet');
+const venuePartnerRoutes = require('./routes/venuePartners');
+const fillerRoutes = require('./routes/filler');
 
 const { startScheduler } = require('./services/scheduler');
 
@@ -70,6 +73,16 @@ app.use('/api/users', userRoutes);
 app.use('/api/billing', billingRoutes);
 app.use('/api/coupons', couponRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/wallet', walletRoutes);
+app.use('/api/venue-partners', venuePartnerRoutes);
+app.use('/api/filler', fillerRoutes);
+
+// Venue portal shortcut — no-cache
+app.get('/venue', (req, res) => {
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.sendFile(path.join(__dirname, '../public/venue.html'));
+});
 
 // Admin panel shortcut — no-cache
 app.get('/admin', (req, res) => {
