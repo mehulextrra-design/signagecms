@@ -17,6 +17,10 @@ const userRoutes = require('./routes/users');
 const billingRoutes = require('./routes/billing');
 const couponRoutes = require('./routes/coupons');
 const notificationRoutes = require('./routes/notifications');
+const qrRoutes = require('./routes/qr');
+const walletRoutes = require('./routes/wallet');
+const venuePartnerRoutes = require('./routes/venuePartners');
+const fillerRoutes = require('./routes/filler');
 
 const { startScheduler } = require('./services/scheduler');
 
@@ -31,7 +35,7 @@ app.use(helmet({
       defaultSrc: ["'self'"],
       scriptSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net"],
       scriptSrcAttr: ["'unsafe-inline'"],
-      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://cdnjs.cloudflare.com"],
       fontSrc: ["'self'", "https://fonts.gstatic.com"],
       imgSrc: ["'self'", "data:", "blob:", "*"],
       connectSrc: ["'self'", "*"],
@@ -70,6 +74,17 @@ app.use('/api/users', userRoutes);
 app.use('/api/billing', billingRoutes);
 app.use('/api/coupons', couponRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/qr', qrRoutes);
+app.use('/api/wallet', walletRoutes);
+app.use('/api/venue-partners', venuePartnerRoutes);
+app.use('/api/filler', fillerRoutes);
+
+// Venue portal shortcut — no-cache
+app.get('/venue', (req, res) => {
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.sendFile(path.join(__dirname, '../public/venue.html'));
+});
 
 // Admin panel shortcut — no-cache
 app.get('/admin', (req, res) => {
@@ -99,9 +114,16 @@ async function runMigrations() {
     ssl: process.env.DATABASE_URL ? { rejectUnauthorized: false } : false,
   });
   try {
-    const sql = fs.readFileSync(path.join(__dirname, '../migrations/001_initial_schema.sql'), 'utf8');
-    await pool.query(sql);
-    console.log('[DB] Migrations applied successfully');
+    const migrationsDir = path.join(__dirname, '../migrations');
+    const files = fs.readdirSync(migrationsDir)
+      .filter(f => f.endsWith('.sql'))
+      .sort();
+    for (const file of files) {
+      const sql = fs.readFileSync(path.join(migrationsDir, file), 'utf8');
+      await pool.query(sql);
+      console.log(`[DB] Migration applied: ${file}`);
+    }
+    console.log('[DB] All migrations applied successfully');
   } catch (err) {
     console.error('[DB] Migration error:', err.message);
   } finally {

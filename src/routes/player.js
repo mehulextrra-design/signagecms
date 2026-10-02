@@ -282,36 +282,51 @@ router.post('/proof-of-play', authenticatePlayer, async (req, res, next) => {
   const { plays } = req.body;
   if (!Array.isArray(plays) || !plays.length) return res.status(400).json({ error: 'plays array required' });
   console.log(`[PoP] screen=${screenId} count=${plays.length} first_dur=${plays[0]?.duration_sec}`);
+
+  // Only accept real UUIDs as campaign_id (filler/venue items use synthetic IDs)
+  const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
   try {
     let inserted = 0;
     let skipped = 0;
+    let errored = 0;
     for (const play of plays) {
-      // Normalize duration: if APK sends milliseconds (>3600), convert to seconds
-      let durSec = parseFloat(play.duration_sec) || 0;
-      if (durSec > 3600) durSec = parseFloat((durSec / 1000).toFixed(3));
+      try {
+        // Normalize duration: if APK sends milliseconds (>3600), convert to seconds
+        let durSec = parseFloat(play.duration_sec) || 0;
+        if (durSec > 3600) durSec = parseFloat((durSec / 1000).toFixed(3));
 
-      // Dedup: skip if identical play already recorded in last 5 minutes
-      // (guards against APK retry storm sending same record multiple times)
-      const dup = await query(
-        `SELECT 1 FROM play_logs
-         WHERE screen_id=$1 AND content_id=$2
-           AND played_at BETWEEN ($3::timestamptz - interval '5 minutes') AND ($3::timestamptz + interval '5 minutes')
-           AND duration_sec BETWEEN ($4 - 1) AND ($4 + 1)
-         LIMIT 1`,
-        [screenId, play.content_id, play.played_at, durSec]
-      );
-      if (dup.rows.length) { skipped++; continue; }
+        // Resolve campaign_id: must be a valid UUID referencing campaigns table
+        const campaignId = (play.campaign_id && UUID_RE.test(play.campaign_id))
+          ? play.campaign_id
+          : null;
 
-      await query(
-        `INSERT INTO play_logs (screen_id, campaign_id, content_id, played_at, duration_sec, play_count, content_tier)
-         VALUES ($1,$2,$3,$4,$5,$6,$7)`,
-        [screenId, play.campaign_id || null, play.content_id, play.played_at,
-         durSec, play.play_count || 1, play.content_tier || 'paid']
-      );
-      inserted++;
+        // Dedup: skip if identical play already recorded in last 5 minutes
+        const dup = await query(
+          `SELECT 1 FROM play_logs
+           WHERE screen_id=$1 AND content_id=$2
+             AND played_at BETWEEN ($3::timestamptz - interval '5 minutes') AND ($3::timestamptz + interval '5 minutes')
+             AND duration_sec BETWEEN ($4 - 1) AND ($4 + 1)
+           LIMIT 1`,
+          [screenId, play.content_id, play.played_at, durSec]
+        );
+        if (dup.rows.length) { skipped++; continue; }
+
+        await query(
+          `INSERT INTO play_logs (screen_id, campaign_id, content_id, played_at, duration_sec, play_count, content_tier)
+           VALUES ($1,$2,$3,$4,$5,$6,$7)`,
+          [screenId, campaignId, play.content_id, play.played_at,
+           durSec, play.play_count || 1, play.content_tier || 'paid']
+        );
+        inserted++;
+      } catch (rowErr) {
+        // One bad row should not drop the whole batch
+        errored++;
+        console.error(`[PoP] row error screen=${screenId} cid=${play.campaign_id} err=${rowErr.message}`);
+      }
     }
-    if (skipped) console.log(`[PoP] screen=${screenId} skipped ${skipped} duplicates`);
-    res.json({ ok: true, inserted, skipped });
+    if (skipped) console.log(`[PoP] screen=${screenId} skipped=${skipped} errored=${errored}`);
+    res.json({ ok: true, inserted, skipped, errored });
   } catch (err) { next(err); }
 });
 
