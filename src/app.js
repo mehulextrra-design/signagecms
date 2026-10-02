@@ -116,14 +116,21 @@ async function runMigrations() {
     const files = fs.readdirSync(migrationsDir)
       .filter(f => f.endsWith('.sql'))
       .sort();
+
+    let applied = 0, failed = 0;
     for (const file of files) {
-      const sql = fs.readFileSync(path.join(migrationsDir, file), 'utf8');
-      await pool.query(sql);
-      console.log(`[DB] Migration applied: ${file}`);
+      try {
+        const sql = fs.readFileSync(path.join(migrationsDir, file), 'utf8');
+        await pool.query(sql);
+        console.log(`[DB] Migration OK: ${file}`);
+        applied++;
+      } catch (err) {
+        // Expected for already-applied CREATE TABLE migrations — log and continue
+        console.warn(`[DB] Migration skip/warn (${file}): ${err.message}`);
+        failed++;
+      }
     }
-    console.log('[DB] All migrations applied successfully');
-  } catch (err) {
-    console.error('[DB] Migration error:', err.message);
+    console.log(`[DB] Migrations done — applied: ${applied}, skipped/warned: ${failed}`);
   } finally {
     await pool.end();
   }
