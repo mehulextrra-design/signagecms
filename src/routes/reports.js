@@ -28,13 +28,8 @@ router.get('/proof-of-play', authenticate, async (req, res, next) => {
     `;
     const params = [];
     if (!isAdmin) {
-      // Show logs where campaign belongs to this user, OR where screen is assigned to their campaign
       params.push(req.user.id);
-      sql += ` AND (c.user_id = $${params.length} OR pl.screen_id IN (
-        SELECT DISTINCT cs.screen_id FROM campaign_screens cs
-        JOIN campaigns cc ON cc.id = cs.campaign_id
-        WHERE cc.user_id = $${params.length}
-      ))`;
+      sql += ` AND c.user_id = $${params.length}`;
     }
     if (campaign_id) { params.push(campaign_id); sql += ` AND pl.campaign_id = $${params.length}`; }
     if (screen_id)   { params.push(screen_id);   sql += ` AND pl.screen_id = $${params.length}`; }
