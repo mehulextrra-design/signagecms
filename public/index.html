@@ -160,8 +160,7 @@
   .filter-tab:hover:not(.active) { background:var(--surface2);color:var(--text); }
 
   /* PACKAGE SELECTOR */
-  .pkg-selector { display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:6px; }
-  @media(max-width:600px){.pkg-selector{grid-template-columns:repeat(2,1fr);}}
+  .pkg-selector { display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:6px; }
   .pkg-opt { border:2px solid var(--border);border-radius:10px;padding:14px 10px;cursor:pointer;text-align:center;transition:all 0.15s;background:var(--surface); }
   .pkg-opt:hover { border-color:var(--primary);background:var(--surface2); }
   .pkg-opt.selected { border-color:var(--primary);background:rgba(13,148,136,0.08); }
@@ -172,6 +171,16 @@
   .pkg-opt .pkg-desc { font-size:11px;color:var(--text2);margin-top:6px;line-height:1.4; }
   .pkg-opt .pkg-imp { font-size:11px;color:var(--success,#16a34a);font-weight:600;margin-top:4px; }
   .pkg-trial-badge { font-size:10px;background:#fef3c7;color:#92400e;border-radius:4px;padding:1px 5px;font-weight:700;display:inline-block;margin-left:4px; }
+  @media(max-width:600px){
+    .pkg-selector { grid-template-columns:1fr !important; gap:8px; }
+    .pkg-opt { display:grid;grid-template-columns:1fr 1fr;gap:0 12px;text-align:left;padding:12px 14px; }
+    .pkg-opt .pkg-name { grid-column:1;grid-row:1;margin-bottom:2px;font-size:13px; }
+    .pkg-opt .pkg-slot { grid-column:1;grid-row:2;margin-bottom:0; }
+    .pkg-opt .pkg-price { grid-column:2;grid-row:1;font-size:14px;text-align:right;margin-bottom:0; }
+    .pkg-opt .pkg-ppd  { grid-column:2;grid-row:2;text-align:right; }
+    .pkg-opt .pkg-imp  { grid-column:2;grid-row:3;text-align:right;margin-top:2px; }
+    .pkg-opt .pkg-desc { grid-column:1;grid-row:3;font-size:10px;margin-top:2px; }
+  }
 
   /* WIZARD */
   .wizard-container { max-width:780px;margin:0 auto; }
@@ -189,7 +198,10 @@
   .ws-connector.done { background:var(--success); }
   .wizard-panel { display:none; }
   .wizard-panel.active { display:block; }
-  .wizard-nav { display:flex;align-items:center;justify-content:space-between;margin-top:24px;padding-top:20px;border-top:1px solid var(--border); }
+  .wizard-nav { display:flex;align-items:center;justify-content:space-between;margin-top:24px;padding-top:16px;border-top:1px solid var(--border); }
+  @media(max-width:640px){
+    .wizard-nav { position:sticky;bottom:0;background:var(--bg);padding:12px 0 6px;margin-top:16px;z-index:20; }
+  }
 
   /* SCREEN CARDS */
   .screens-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px; }
@@ -754,7 +766,7 @@
 
             <div class="form-group" style="margin-top:4px;">
               <label class="form-label">Select Package <span style="color:var(--text3);font-weight:400;">(entire network · all screens)</span></label>
-              <div class="pkg-selector" id="pkg-selector" style="grid-template-columns:repeat(5,1fr);">
+              <div class="pkg-selector" id="pkg-selector">
                 <div class="pkg-opt" data-pkg="trial" onclick="selectPkg('trial')" style="border-color:#f59e0b;">
                   <div class="pkg-name">Trial <span class="pkg-trial-badge">7 DAYS</span></div>
                   <div class="pkg-slot">10 sec</div>
