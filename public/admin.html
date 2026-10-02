@@ -1205,15 +1205,16 @@ function navigate(page) {
 
   // Move first section-head's controls into topbar-actions, hide the section-head
   const actionsEl = document.getElementById('topbar-actions');
-  actionsEl.innerHTML = '';
-  const pageEl = document.getElementById('page-' + page);
-  if (pageEl) {
-    const sh = pageEl.querySelector('.section-head');
-    if (sh) {
-      [...sh.children].forEach(child => {
-        if (child.tagName !== 'H2') actionsEl.innerHTML += child.outerHTML;
-      });
-      sh.style.display = 'none';
+  if (actionsEl) {
+    actionsEl.innerHTML = '';
+    if (pageEl) {
+      const sh = pageEl.querySelector('.section-head');
+      if (sh) {
+        [...sh.children].forEach(child => {
+          if (child.tagName !== 'H2') actionsEl.innerHTML += child.outerHTML;
+        });
+        sh.style.display = 'none';
+      }
     }
   }
 
