@@ -99,16 +99,26 @@ router.get('/analytics', authenticate, async (req, res, next) => {
     const trunc = period === 'day' ? 'hour' : period === 'year' ? 'month' : period === 'quarter' ? 'week' : 'day';
     const base = `FROM play_logs pl JOIN campaigns c ON c.id = pl.campaign_id ${where}`;
 
-    const [chartRes, statsRes, campRes] = await Promise.all([
+    const projParams = isAdmin ? [] : [req.user.id];
+    const projWhere = isAdmin ? '' : 'AND c.user_id = $1';
+
+    const [chartRes, statsRes, campRes, projRes] = await Promise.all([
       query(`SELECT DATE_TRUNC('${trunc}', pl.played_at) AS bucket, COUNT(*) AS plays ${base} GROUP BY bucket ORDER BY bucket`, params),
       query(`SELECT COUNT(*) AS total_plays, COUNT(DISTINCT pl.screen_id) AS screens_used, COUNT(DISTINCT pl.campaign_id) AS campaigns_active ${base}`, params),
       query(`SELECT c.id, c.title, c.campaign_code, c.status, c.qr_enabled,
               COUNT(pl.id) AS plays, COUNT(DISTINCT pl.screen_id) AS screens,
               0 AS qr_scans
               ${base} GROUP BY c.id ORDER BY plays DESC LIMIT 10`, params),
+      query(`SELECT c.id, c.title, c.campaign_code, c.status, c.start_date, c.end_date,
+              c.slot_duration_sec, c.package_name, c.amount_total,
+              COUNT(DISTINCT cs.screen_id) AS screen_count
+             FROM campaigns c
+             JOIN campaign_screens cs ON cs.campaign_id = c.id
+             WHERE c.status IN ('approved','live','completed','pending_approval') ${projWhere}
+             GROUP BY c.id ORDER BY c.start_date DESC LIMIT 30`, projParams),
     ]);
 
-    res.json({ stats: statsRes.rows[0], chart: chartRes.rows, campaigns: campRes.rows });
+    res.json({ stats: statsRes.rows[0], chart: chartRes.rows, campaigns: campRes.rows, projected: projRes.rows });
   } catch (err) { next(err); }
 });
 

@@ -594,6 +594,10 @@
           <div class="stat-card"><div class="stat-icon" style="float:right;width:28px;height:28px;border-radius:6px;background:#fef3c7;display:flex;align-items:center;justify-content:center;"><svg width="14" height="14" fill="none" stroke="#f59e0b" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg></div><div class="stat-label">Active Campaigns</div><div class="stat-value" id="an-campaigns">—</div><div class="stat-change">With plays</div></div>
           <div class="stat-card"><div class="stat-icon" style="float:right;width:28px;height:28px;border-radius:6px;background:#fce7f3;display:flex;align-items:center;justify-content:center;"><svg width="14" height="14" fill="none" stroke="#ec4899" stroke-width="2" viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0"/></svg></div><div class="stat-label">Est. Impressions</div><div class="stat-value" id="an-impr">—</div><div class="stat-change">Plays × 150</div></div>
         </div>
+        <div id="an-projected-banner" style="display:none;background:linear-gradient(135deg,#eff6ff,#f0fdf4);border:1px solid #bfdbfe;border-radius:10px;padding:10px 14px;margin-bottom:14px;display:none;align-items:center;gap:10px;">
+          <svg width="16" height="16" fill="none" stroke="#3b82f6" stroke-width="2" viewBox="0 0 24 24" style="flex-shrink:0;"><path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <span style="font-size:12px;color:#1e40af;line-height:1.4;">Estimated plays based on booked campaigns. Actual play logs will appear once screens go live.</span>
+        </div>
         <div class="section-header"><div class="section-title" id="an-chart-title">Plays — Last 7 Days</div></div>
         <div class="card card-body" style="margin-bottom:20px;">
           <div style="padding:8px 0;min-height:80px;"><div class="bar-chart" id="bar-chart"><div class="empty-state" style="padding:20px;"><div class="empty-title">No play data</div></div></div></div>
@@ -1549,45 +1553,122 @@ function fmtChartLabel(bucket,period){
   return d.toLocaleDateString('en-IN',{day:'2-digit',month:'short'});
 }
 
+// Projected plays per screen per day by slot duration
+function _projPlaysPerScreen(slotSec){return Math.floor(40500/(slotSec||15));}
+
+// Generate day buckets between two date strings (inclusive), return array of {date, plays}
+function _projChartData(campaigns, periodStart, periodEnd){
+  const buckets={};
+  const d=new Date(periodStart); d.setHours(0,0,0,0);
+  const end=new Date(periodEnd); end.setHours(23,59,59,999);
+  while(d<=end){
+    buckets[d.toISOString().slice(0,10)]=0;
+    d.setDate(d.getDate()+1);
+  }
+  campaigns.forEach(c=>{
+    const cs=new Date(c.start_date); cs.setHours(0,0,0,0);
+    const ce=new Date(c.end_date); ce.setHours(23,59,59,999);
+    const ppd=_projPlaysPerScreen(c.slot_duration_sec)*parseInt(c.screen_count||1);
+    Object.keys(buckets).forEach(dt=>{
+      const day=new Date(dt);
+      if(day>=cs&&day<=ce) buckets[dt]+=ppd;
+    });
+  });
+  return Object.entries(buckets).map(([dt,plays])=>({bucket:dt,plays}));
+}
+
+function _getPeriodRange(period,customStart,customEnd){
+  const today=new Date(); today.setHours(0,0,0,0);
+  const fmt=d=>d.toISOString().slice(0,10);
+  if(period==='custom') return{start:customStart,end:customEnd};
+  const end=fmt(today);
+  if(period==='day') return{start:end,end};
+  if(period==='week'){const s=new Date(today);s.setDate(s.getDate()-6);return{start:fmt(s),end};}
+  if(period==='month'){const s=new Date(today.getFullYear(),today.getMonth(),1);return{start:fmt(s),end};}
+  if(period==='quarter'){const m=today.getMonth(),qm=m-m%3;const s=new Date(today.getFullYear(),qm,1);return{start:fmt(s),end};}
+  if(period==='year'){return{start:today.getFullYear()+'-01-01',end};}
+  return{start:end,end};
+}
+
 async function loadAnalytics(){
   try{
     let url='/reports/analytics?period='+anPeriod;
+    let customStart,customEnd;
     if(anPeriod==='custom'){
-      const s=document.getElementById('an-start').value;
-      const e=document.getElementById('an-end').value;
-      if(!s||!e){toast('Please select date range','error');return;}
-      url+=`&start=${s}&end=${e}`;
+      customStart=document.getElementById('an-start').value;
+      customEnd=document.getElementById('an-end').value;
+      if(!customStart||!customEnd){toast('Please select date range','error');return;}
+      url+=`&start=${customStart}&end=${customEnd}`;
     }
     const data=await api(url);
     const st=data.stats||{};
     const plays=parseInt(st.total_plays)||0;
-    document.getElementById('an-plays').textContent=fmtNum(plays);
-    document.getElementById('an-screens').textContent=fmtNum(st.screens_used);
-    document.getElementById('an-campaigns').textContent=fmtNum(st.campaigns_active);
-    document.getElementById('an-impr').textContent=fmtNum(plays*150);
+    const projected=data.projected||[];
+    const isProjected=plays===0&&projected.length>0;
+    const banner=document.getElementById('an-projected-banner');
+
     const labels={day:'Today',week:'Last 7 Days',month:'This Month',quarter:'This Quarter',year:'This Year',custom:'Custom Range'};
-    document.getElementById('an-chart-title').textContent='Plays — '+(labels[anPeriod]||'Selected Period');
-    const chart=data.chart||[];
     const chartEl=document.getElementById('bar-chart');
-    if(!chart.length){
-      chartEl.innerHTML='<div class="empty-state" style="padding:20px;"><div class="empty-title">No plays in this period</div></div>';
-    }else{
-      const max=Math.max(...chart.map(r=>parseInt(r.plays)));
-      chartEl.innerHTML=chart.map(r=>{
-        const v=parseInt(r.plays);
-        const lbl=fmtChartLabel(r.bucket,anPeriod);
-        const h=max>0?Math.max(4,Math.round((v/max)*120)):4;
-        return`<div class="bar-item"><div class="bar-val">${fmtNum(v)}</div><div class="bar" style="height:${h}px;" title="${lbl}: ${v}"></div><div class="bar-label">${lbl}</div></div>`;
-      }).join('');
-    }
-    const camps=data.campaigns||[];
     const tbl=document.getElementById('analytics-table');
-    if(!camps.length){
-      tbl.innerHTML='<div class="empty-state"><div class="empty-title">No campaign data</div><div class="empty-sub">No plays recorded in this period.</div></div>';
-    }else{
-      tbl.innerHTML=`<table class="data-table"><thead><tr><th>Campaign</th><th>Code</th><th>Plays</th><th>Screens</th><th>QR Scans</th><th>Status</th></tr></thead><tbody>${
-        camps.map(c=>`<tr><td>${c.title||'—'}</td><td><code>${c.campaign_code||'—'}</code></td><td>${fmtNum(c.plays)}</td><td>${fmtNum(c.screens)}</td><td>${c.qr_enabled?`<span style="color:var(--primary);font-weight:600;">${fmtNum(c.qr_scans)}</span>`:'<span style="color:var(--text3);font-size:11px;">—</span>'}</td><td><span class="badge badge-${c.status==='live'?'success':c.status==='paused'?'warning':'default'}">${c.status||'—'}</span></td></tr>`).join('')
+
+    if(isProjected){
+      // Calculate projected stats for the period
+      const range=_getPeriodRange(anPeriod,customStart,customEnd);
+      const projChart=_projChartData(projected,range.start,range.end);
+      const totalProjPlays=projChart.reduce((s,r)=>s+r.plays,0);
+      const uniqueScreens=projected.reduce((s,c)=>s+parseInt(c.screen_count||0),0);
+      const uniqueCamps=projected.length;
+
+      document.getElementById('an-plays').textContent='~'+fmtNum(totalProjPlays);
+      document.getElementById('an-screens').textContent=fmtNum(uniqueScreens);
+      document.getElementById('an-campaigns').textContent=fmtNum(uniqueCamps);
+      document.getElementById('an-impr').textContent='~'+fmtNum(totalProjPlays*150);
+      document.getElementById('an-chart-title').textContent='Est. Plays — '+(labels[anPeriod]||'Selected Period');
+      if(banner) banner.style.display='flex';
+
+      const max=Math.max(...projChart.map(r=>r.plays),1);
+      chartEl.innerHTML=projChart.map(r=>{
+        const v=r.plays;
+        const lbl=fmtChartLabel(r.bucket,'week');
+        const h=Math.max(4,Math.round((v/max)*120));
+        return`<div class="bar-item"><div class="bar-val" style="color:var(--primary);opacity:.7;">${v>0?fmtNum(v):''}</div><div class="bar" style="height:${h}px;background:var(--primary);opacity:.4;" title="${lbl}: ~${fmtNum(v)}"></div><div class="bar-label">${lbl}</div></div>`;
+      }).join('');
+
+      tbl.innerHTML=`<table class="data-table"><thead><tr><th>Campaign</th><th>Code</th><th>Est. Plays/Day</th><th>Screens</th><th>Package</th><th>Status</th></tr></thead><tbody>${
+        projected.map(c=>{
+          const ppd=_projPlaysPerScreen(c.slot_duration_sec)*parseInt(c.screen_count||1);
+          return`<tr><td>${c.title||'—'}</td><td><code>${c.campaign_code||'—'}</code></td><td style="color:var(--primary);font-weight:600;">~${fmtNum(ppd)}</td><td>${fmtNum(c.screen_count)}</td><td><span style="text-transform:capitalize;">${c.package_name||'—'}</span></td><td><span class="badge badge-${c.status==='live'?'success':c.status==='approved'?'info':c.status==='completed'?'default':'warning'}">${c.status||'—'}</span></td></tr>`;
+        }).join('')
       }</tbody></table>`;
+    }else{
+      if(banner) banner.style.display='none';
+      document.getElementById('an-plays').textContent=fmtNum(plays);
+      document.getElementById('an-screens').textContent=fmtNum(st.screens_used);
+      document.getElementById('an-campaigns').textContent=fmtNum(st.campaigns_active);
+      document.getElementById('an-impr').textContent=fmtNum(plays*150);
+      document.getElementById('an-chart-title').textContent='Plays — '+(labels[anPeriod]||'Selected Period');
+
+      const chart=data.chart||[];
+      if(!chart.length){
+        chartEl.innerHTML='<div class="empty-state" style="padding:20px;"><div class="empty-title">No plays in this period</div></div>';
+      }else{
+        const max=Math.max(...chart.map(r=>parseInt(r.plays)));
+        chartEl.innerHTML=chart.map(r=>{
+          const v=parseInt(r.plays);
+          const lbl=fmtChartLabel(r.bucket,anPeriod);
+          const h=max>0?Math.max(4,Math.round((v/max)*120)):4;
+          return`<div class="bar-item"><div class="bar-val">${fmtNum(v)}</div><div class="bar" style="height:${h}px;" title="${lbl}: ${v}"></div><div class="bar-label">${lbl}</div></div>`;
+        }).join('');
+      }
+
+      const camps=data.campaigns||[];
+      if(!camps.length){
+        tbl.innerHTML='<div class="empty-state"><div class="empty-title">No campaign data</div><div class="empty-sub">No plays recorded in this period.</div></div>';
+      }else{
+        tbl.innerHTML=`<table class="data-table"><thead><tr><th>Campaign</th><th>Code</th><th>Plays</th><th>Screens</th><th>QR Scans</th><th>Status</th></tr></thead><tbody>${
+          camps.map(c=>`<tr><td>${c.title||'—'}</td><td><code>${c.campaign_code||'—'}</code></td><td>${fmtNum(c.plays)}</td><td>${fmtNum(c.screens)}</td><td>${c.qr_enabled?`<span style="color:var(--primary);font-weight:600;">${fmtNum(c.qr_scans)}</span>`:'<span style="color:var(--text3);font-size:11px;">—</span>'}</td><td><span class="badge badge-${c.status==='live'?'success':c.status==='paused'?'warning':'default'}">${c.status||'—'}</span></td></tr>`).join('')
+        }</tbody></table>`;
+      }
     }
   }catch(e){console.error('Analytics error',e);}
 }
