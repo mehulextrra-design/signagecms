@@ -11,34 +11,40 @@ function _playsPerDay(slotSec, startTime, endTime) {
 }
 
 // Generate server play logs for a specific past hour window.
-// Skips any screen+campaign that already has APK logs in that window.
+// Skips any screen+campaign that already has APK logs FOR THAT SPECIFIC HOUR.
 async function generateServerPlayLogs(hoursAgo = 1) {
-  const windowEnd   = new Date(); windowEnd.setMinutes(0, 0, 0);
+  const windowEnd   = new Date(); windowEnd.setMinutes(0, 0, 0); windowEnd.setSeconds(0); windowEnd.setMilliseconds(0);
   const windowStart = new Date(windowEnd); windowStart.setHours(windowStart.getHours() - hoursAgo);
   const dateStr     = windowStart.toISOString().slice(0, 10);
-  const hourStr     = windowStart.toISOString(); // ISO for played_at midpoint
+  const hourStr     = windowStart.toISOString();
 
-  // All live campaigns active in this date window
-  const campaigns = await query(`
-    SELECT c.id, c.slot_duration_sec, c.start_time, c.end_time, c.content_id,
-           cs.screen_id
-    FROM campaigns c
-    JOIN campaign_screens cs ON cs.campaign_id = c.id
-    WHERE c.status IN ('live','completed')
-      AND c.start_date <= $1::date
-      AND c.end_date   >= $1::date
-  `, [dateStr]);
+  let campaigns;
+  try {
+    campaigns = await query(`
+      SELECT c.id, c.slot_duration_sec, c.start_time, c.end_time, c.content_id,
+             cs.screen_id
+      FROM campaigns c
+      JOIN campaign_screens cs ON cs.campaign_id = c.id
+      WHERE c.status IN ('live','completed')
+        AND c.start_date <= $1::date
+        AND c.end_date   >= $1::date
+    `, [dateStr]);
+  } catch (e) {
+    console.error('[ServerLogs] Campaign query error:', e.message);
+    return 0;
+  }
 
   let inserted = 0;
   for (const row of campaigns.rows) {
-    // Skip if APK already reported for this screen+campaign on this date
+    // Skip if APK already reported for this screen+campaign IN THIS SPECIFIC HOUR
+    // (COALESCE handles old rows that have source=NULL before migration added the column)
     const apkLog = await query(
       `SELECT 1 FROM play_logs
        WHERE screen_id = $1 AND campaign_id = $2
-         AND played_at::date = $3::date
-         AND source = 'apk'
+         AND DATE_TRUNC('hour', played_at) = DATE_TRUNC('hour', $3::timestamptz)
+         AND COALESCE(source, 'apk') = 'apk'
        LIMIT 1`,
-      [row.screen_id, row.id, dateStr]
+      [row.screen_id, row.id, hourStr]
     );
     if (apkLog.rows.length) continue;
 
@@ -57,25 +63,35 @@ async function generateServerPlayLogs(hoursAgo = 1) {
     const ppd     = _playsPerDay(slotSec, row.start_time, row.end_time);
     const pph     = Math.max(1, Math.floor(ppd / 24));
 
-    await query(
-      `INSERT INTO play_logs
-         (screen_id, campaign_id, content_id, played_at, duration_sec, play_count, content_tier, source)
-       VALUES ($1, $2, $3, $4::timestamptz, $5, $6, 'paid', 'server')`,
-      [row.screen_id, row.id, row.content_id, hourStr, slotSec, pph]
-    );
-    inserted++;
+    try {
+      await query(
+        `INSERT INTO play_logs
+           (screen_id, campaign_id, content_id, played_at, duration_sec, play_count, content_tier, source)
+         VALUES ($1, $2, $3, $4::timestamptz, $5, $6, 'paid', 'server')`,
+        [row.screen_id, row.id, row.content_id, hourStr, slotSec, pph]
+      );
+      inserted++;
+    } catch (e) {
+      console.error('[ServerLogs] Insert error for campaign', row.id, ':', e.message);
+    }
   }
-  if (inserted > 0) console.log(`[ServerLogs] Inserted ${inserted} entries for window starting ${hourStr}`);
+  if (inserted > 0) console.log(`[ServerLogs] Inserted ${inserted} server entries for ${hourStr}`);
   return inserted;
 }
 
-// Backfill server play logs for past N days (run once on startup to populate analytics immediately)
+// Backfill server play logs: covers all hours for the past N days PLUS today's hours already elapsed.
+// This ensures campaigns that started TODAY also get backfilled (previous version only went back from
+// yesterday, missing the current day entirely).
 async function backfillServerPlayLogs(days = 7) {
+  const now = new Date();
+  const hoursToday = now.getHours(); // hours elapsed since midnight today
+  const totalHours = days * 24 + hoursToday;
+
   let total = 0;
-  for (let d = days; d >= 1; d--) {
-    total += await generateServerPlayLogs(d * 24);
+  for (let h = totalHours; h >= 0; h--) {
+    total += await generateServerPlayLogs(h);
   }
-  console.log(`[ServerLogs] Backfill complete — ${total} entries inserted for last ${days} days`);
+  console.log(`[ServerLogs] Backfill complete — ${total} entries inserted (${totalHours + 1} hour windows checked)`);
 }
 
 const startScheduler = () => {
