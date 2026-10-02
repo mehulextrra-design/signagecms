@@ -109,31 +109,29 @@ app.use((err, req, res, next) => {
 // Critical column fixes — run before file-based migrations, every startup.
 // These are hardcoded here so they ALWAYS execute regardless of migration file state.
 async function applyCriticalFixes(pool) {
-  const fixes = [
-    // play_logs.duration_sec must be NUMERIC(10,3) — APK sends decimal seconds (e.g. 10.005)
-    // OID 23=int4, 21=int2, 20=int8 — convert any integer variant to NUMERIC
-    `DO $$ BEGIN
-       IF EXISTS (
-         SELECT 1 FROM pg_attribute
-         WHERE attrelid = 'play_logs'::regclass
-           AND attname = 'duration_sec'
-           AND atttypid IN (23, 21, 20)
-           AND NOT attisdropped
-       ) THEN
-         ALTER TABLE play_logs ALTER COLUMN duration_sec TYPE NUMERIC(10,3)
-           USING duration_sec::NUMERIC(10,3);
-         RAISE NOTICE '[Fix] play_logs.duration_sec converted INTEGER -> NUMERIC(10,3)';
-       END IF;
-     END $$`,
-  ];
-  for (const sql of fixes) {
-    try {
-      await pool.query(sql);
-    } catch (err) {
-      console.warn('[DB] Critical fix warn:', err.message);
+  // Fix play_logs.duration_sec: must be NUMERIC(10,3) — APK sends decimal seconds like 10.005
+  // Use direct JS queries (no DO $$ block) for maximum reliability
+  try {
+    const colRes = await pool.query(
+      `SELECT atttypid FROM pg_attribute
+       WHERE attrelid = 'play_logs'::regclass
+         AND attname   = 'duration_sec'
+         AND NOT attisdropped`
+    );
+    const typid = colRes.rows.length ? Number(colRes.rows[0].atttypid) : null;
+    // OID 23=int4 (INTEGER), 21=int2 (SMALLINT), 20=int8 (BIGINT)
+    if (typid !== null && [23, 21, 20].includes(typid)) {
+      await pool.query(
+        `ALTER TABLE play_logs ALTER COLUMN duration_sec TYPE NUMERIC(10,3) USING duration_sec::NUMERIC(10,3)`
+      );
+      console.log(`[DB] Fixed: play_logs.duration_sec OID=${typid} -> NUMERIC(10,3)`);
+    } else {
+      console.log(`[DB] play_logs.duration_sec OK (OID=${typid}), no fix needed`);
     }
+  } catch (err) {
+    console.warn('[DB] Critical fix warn:', err.message);
   }
-  console.log('[DB] Critical column fixes applied');
+  console.log('[DB] Critical column fixes done');
 }
 
 async function runMigrations() {

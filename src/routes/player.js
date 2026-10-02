@@ -308,6 +308,12 @@ router.post('/proof-of-play', authenticatePlayer, async (req, res, next) => {
           ? play.campaign_id
           : null;
 
+        // Resolve content_id: APK may prefix filler/venue IDs with "filler_" or "venue_"
+        // Strip synthetic prefix and validate as UUID before any DB query
+        const rawContent = (play.content_id || '').replace(/^(filler_|venue_|cross_)/i, '');
+        const contentId = UUID_RE.test(rawContent) ? rawContent : null;
+        if (!contentId) { skipped++; continue; }
+
         // Dedup: skip if identical play already recorded in last 5 minutes
         const dup = await query(
           `SELECT 1 FROM play_logs
@@ -315,14 +321,14 @@ router.post('/proof-of-play', authenticatePlayer, async (req, res, next) => {
              AND played_at BETWEEN ($3::timestamptz - interval '5 minutes') AND ($3::timestamptz + interval '5 minutes')
              AND duration_sec BETWEEN ($4 - 1) AND ($4 + 1)
            LIMIT 1`,
-          [screenId, play.content_id, play.played_at, durSec]
+          [screenId, contentId, play.played_at, durSec]
         );
         if (dup.rows.length) { skipped++; continue; }
 
         await query(
           `INSERT INTO play_logs (screen_id, campaign_id, content_id, played_at, duration_sec, play_count, content_tier)
            VALUES ($1,$2,$3,$4,$5,$6,$7)`,
-          [screenId, campaignId, play.content_id, play.played_at,
+          [screenId, campaignId, contentId, play.played_at,
            durSec, parseInt(play.play_count, 10) || 1, play.content_tier || 'paid']
         );
         inserted++;
