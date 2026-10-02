@@ -297,21 +297,17 @@ router.post('/proof-of-play', authenticatePlayer, async (req, res, next) => {
     let skipped = 0;
     let errored = 0;
     for (const play of plays) {
+      // Declare outside try so catch block can access them
+      let durSec = parseFloat(play.duration_sec) || 0;
+      if (durSec > 3600) durSec = parseFloat((durSec / 1000).toFixed(3));
+      durSec = parseFloat(durSec.toFixed(3));
+
+      const campaignId = (play.campaign_id && UUID_RE.test(play.campaign_id))
+        ? play.campaign_id : null;
+      const rawContent = (play.content_id || '').replace(/^(filler_|venue_|cross_)/i, '');
+      const contentId = UUID_RE.test(rawContent) ? rawContent : null;
+
       try {
-        // Normalize duration: if APK sends milliseconds (>3600), convert to seconds
-        let durSec = parseFloat(play.duration_sec) || 0;
-        if (durSec > 3600) durSec = parseFloat((durSec / 1000).toFixed(3));
-        durSec = parseFloat(durSec.toFixed(3)); // ensure always decimal, never integer-like
-
-        // Resolve campaign_id: must be a valid UUID referencing campaigns table
-        const campaignId = (play.campaign_id && UUID_RE.test(play.campaign_id))
-          ? play.campaign_id
-          : null;
-
-        // Resolve content_id: APK may prefix filler/venue IDs with "filler_" or "venue_"
-        // Strip synthetic prefix and validate as UUID — store null if not a UUID (don't skip)
-        const rawContent = (play.content_id || '').replace(/^(filler_|venue_|cross_)/i, '');
-        const contentId = UUID_RE.test(rawContent) ? rawContent : null;
 
         // Dedup: skip if identical play already recorded in last 5 minutes
         const dup = await query(
