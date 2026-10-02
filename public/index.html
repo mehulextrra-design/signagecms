@@ -1832,7 +1832,7 @@ function updateNetworkSummary(){
   const impMo=impDay*30;
   const dur=parseInt(document.getElementById('sch-duration')?.value)||30;
   const cost=rate.fixedDays?rate.flat:rate.ppd*dur;
-  const pkgRateLabel=rate.fixedDays?`₹${rate.flat.toLocaleString('en-IN')} flat`:`₹${rate.monthly.toLocaleString('en-IN')}/mo`;
+  const pkgRateLabel=rate.fixedDays?`₹${rate.flat.toLocaleString('en-IN')}/week`:`₹${rate.monthly.toLocaleString('en-IN')}/mo`;
   document.getElementById('sum-screens').textContent=n+' screens';
   document.getElementById('sum-impressions').textContent='~'+impDay.toLocaleString('en-IN');
   document.getElementById('sum-impressions-mo').textContent='~'+impMo.toLocaleString('en-IN');
