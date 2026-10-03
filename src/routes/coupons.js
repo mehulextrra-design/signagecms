@@ -14,7 +14,8 @@ router.get('/', authenticate, requireAdmin, async (req, res, next) => {
 
 // POST /api/coupons/validate — check if coupon is valid for given amount
 router.post('/validate', authenticate, async (req, res, next) => {
-  const { code, order_amount } = req.body;
+  const { code, order_amount, amount } = req.body;
+  const orderAmt = order_amount || amount;
   if (!code) return res.status(400).json({ error: 'Coupon code required' });
   try {
     const result = await query(
@@ -25,14 +26,14 @@ router.post('/validate', authenticate, async (req, res, next) => {
     );
     if (!result.rows.length) return res.status(404).json({ error: 'Invalid or expired coupon' });
     const c = result.rows[0];
-    if (order_amount && parseFloat(order_amount) < parseFloat(c.min_order)) {
+    if (orderAmt && parseFloat(orderAmt) < parseFloat(c.min_order)) {
       return res.status(400).json({ error: `Minimum order amount ₹${c.min_order} required` });
     }
     let discount = c.type === 'percent'
-      ? (parseFloat(order_amount || 0) * parseFloat(c.value) / 100)
+      ? (parseFloat(orderAmt || 0) * parseFloat(c.value) / 100)
       : parseFloat(c.value);
     if (c.max_discount) discount = Math.min(discount, parseFloat(c.max_discount));
-    res.json({ valid: true, coupon: c, discount: parseFloat(discount.toFixed(2)) });
+    res.json({ valid: true, coupon: c, discount: parseFloat(discount.toFixed(2)), discount_amount: parseFloat(discount.toFixed(2)) });
   } catch (err) { next(err); }
 });
 
