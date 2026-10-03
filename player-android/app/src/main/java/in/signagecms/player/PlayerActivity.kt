@@ -26,6 +26,7 @@ import `in`.signagecms.player.databinding.ActivityPlayerBinding
 import `in`.signagecms.player.db.AppDatabase
 import `in`.signagecms.player.db.entities.CampaignEntity
 import `in`.signagecms.player.db.entities.PlayLogEntity
+import `in`.signagecms.player.admin.KioskManager
 import `in`.signagecms.player.utils.ContentDownloader
 import `in`.signagecms.player.utils.Prefs
 import kotlinx.coroutines.Dispatchers
@@ -99,6 +100,10 @@ class PlayerActivity : AppCompatActivity() {
 
         binding = ActivityPlayerBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        // Start Lock Task Mode (true kiosk) if this app is Device Owner.
+        // Back / Home / Recents are blocked by the OS — no user can exit.
+        KioskManager.startLockTask(this)
 
         // ── Kiosk / display-override flags ────────────────────────────────
         // Show over lock screen and force-turn the display on.
@@ -493,8 +498,13 @@ class PlayerActivity : AppCompatActivity() {
                 syncSchedule()
             }
             "reboot" -> {
-                finish()
-                startActivity(Intent(this, PlayerActivity::class.java))
+                // Use Device Owner API for real system reboot; fallback to app restart
+                if (KioskManager.isDeviceOwner(this)) {
+                    KioskManager.reboot(this)
+                } else {
+                    finish()
+                    startActivity(Intent(this, PlayerActivity::class.java))
+                }
             }
             "clear_cache" -> {
                 ContentDownloader.clearAll(this)
