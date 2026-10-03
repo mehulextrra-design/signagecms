@@ -28,7 +28,8 @@ router.get('/', authenticate, async (req, res, next) => {
       SELECT c.*, u.first_name, u.last_name, u.business_name, u.email,
         ARRAY_AGG(DISTINCT s.screen_code) FILTER (WHERE s.id IS NOT NULL) AS screens,
         c.rejection_reason, c.ai_review_status, c.ai_review_notes,
-        ct.file_url AS creative_url, ct.type AS creative_type, ct.original_name AS creative_name
+        ct.file_url AS creative_url, ct.type AS creative_type, ct.original_name AS creative_name,
+        COALESCE((SELECT SUM(pl.play_count) FROM play_logs pl WHERE pl.campaign_id = c.id), 0) AS play_count
       FROM campaigns c
       JOIN users u ON u.id = c.user_id
       LEFT JOIN campaign_screens cs ON cs.campaign_id = c.id
@@ -74,6 +75,27 @@ router.get('/:id/qr', authenticate, async (req, res, next) => {
       status: campaign.status,
       upi_string: upiString,
     });
+  } catch (err) { next(err); }
+});
+
+// PUT /api/campaigns/:id/qr — save WhatsApp QR overlay settings
+router.put('/:id/qr', authenticate, async (req, res, next) => {
+  try {
+    const { qr_enabled, qr_placement, qr_phone } = req.body;
+    const check = await query('SELECT id, user_id FROM campaigns WHERE id = $1', [req.params.id]);
+    if (!check.rows.length) return res.status(404).json({ error: 'Campaign not found' });
+    if (!['admin', 'superadmin'].includes(req.user.role) && check.rows[0].user_id !== req.user.id) {
+      return res.status(403).json({ error: 'Access denied' });
+    }
+    const qrContentUrl = qr_enabled && qr_phone
+      ? `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(`https://wa.me/${qr_phone.replace(/\D/g, '')}`)}&size=250x250`
+      : null;
+    const result = await query(
+      `UPDATE campaigns SET qr_enabled=$1, qr_placement=$2, qr_content_url=$3, updated_at=NOW()
+       WHERE id=$4 RETURNING id, qr_enabled, qr_placement, qr_content_url`,
+      [!!qr_enabled, qr_placement || 'bot-right', qrContentUrl, req.params.id]
+    );
+    res.json(result.rows[0]);
   } catch (err) { next(err); }
 });
 

@@ -1487,10 +1487,10 @@ async function loadDashboard(){
     const live=allCampaigns.filter(c=>c.status==='live').length;
     const pending=allCampaigns.filter(c=>['pending_payment','pending_approval'].includes(c.status)).length;
     const spent=allInvoices.filter(i=>i.status==='paid').reduce((s,i)=>s+parseFloat(i.amount_total||0),0);
-    const impr=allCampaigns.reduce((s,c)=>s+(c.impressions||0),0);
+    const impr=allCampaigns.reduce((s,c)=>s+(parseInt(c.play_count)||0),0);
     document.getElementById('stat-active').textContent=live;
     document.getElementById('stat-active-sub').textContent=`${allCampaigns.length} total`;
-    document.getElementById('stat-impr').textContent=impr>1000?`${(impr/1000).toFixed(1)}K`:impr||'0';
+    document.getElementById('stat-impr').textContent=impr>999999?`${(impr/1000000).toFixed(1)}M`:impr>999?`${(impr/1000).toFixed(1)}K`:impr||'0';
     document.getElementById('stat-impr-sub').textContent='All campaigns';
     document.getElementById('stat-spent').textContent=`₹${spent.toLocaleString('en-IN')}`;
     document.getElementById('stat-spent-sub').textContent=`${allInvoices.filter(i=>i.status==='paid').length} invoices`;

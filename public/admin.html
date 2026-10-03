@@ -500,7 +500,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
           <button class="btn btn-primary" onclick="openScreenModal()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add Screen</button>
         </div>
         <div class="table-card">
-          <div class="table-wrap"><table><thead><tr><th>Code</th><th>Name</th><th>Location</th><th>Zone</th><th>Resolution</th><th>₹/Day</th><th>Status</th><th>Last Heartbeat</th><th>Actions</th></tr></thead><tbody id="screens-table"></tbody></table></div>
+          <div class="table-wrap"><table><thead><tr><th>Code</th><th>Name</th><th>Location</th><th>Zone</th><th>Resolution</th><th>Est. Impr/Day</th><th>Status</th><th>Last Heartbeat</th><th>Actions</th></tr></thead><tbody id="screens-table"></tbody></table></div>
         </div>
 
         <!-- Screen Groups -->
@@ -1937,7 +1937,7 @@ async function loadScreens() {
         <td style="font-size:12px;color:var(--text2);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${s.location||'—'}<br>${s.city||''}</td>
         <td><span class="zone-tag zone-${s.zone||'A'}">${s.zone||'A'}</span></td>
         <td style="font-size:12px;font-variant-numeric:tabular-nums;">${s.width_px}×${s.height_px}</td>
-        <td style="font-variant-numeric:tabular-nums;font-weight:600;">₹${fmt(s.price_per_day)}</td>
+        <td style="font-variant-numeric:tabular-nums;font-weight:600;">${(s.daily_impressions||5000).toLocaleString('en-IN')}</td>
         <td>
           <span style="display:inline-flex;align-items:center;gap:5px;">
             <span class="status-dot dot-${s.status||'offline'}"></span>

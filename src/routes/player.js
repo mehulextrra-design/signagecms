@@ -216,6 +216,9 @@ router.get('/schedule', authenticatePlayer, async (req, res, next) => {
       file_size: item.file_size || null,
       weight: item.weight,
       content_tier: item.content_tier,
+      qr_enabled: item.qr_enabled || false,
+      qr_placement: item.qr_placement || null,
+      qr_content_url: item.qr_content_url || null,
     }));
 
     res.json({
