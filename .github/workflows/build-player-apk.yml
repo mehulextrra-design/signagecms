@@ -21,16 +21,11 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      # signagecms.keystore is committed to the repo (PKCS12 format).
-      # Same file → same signature → adb install -r works for all future updates.
-      - name: Verify keystore exists
+      - name: Restore keystore from KEYSTORE_B64 secret
+        working-directory: player-android/app
         run: |
-          if [ -f "player-android/app/signagecms.keystore" ]; then
-            echo "✅ Keystore found ($(wc -c < player-android/app/signagecms.keystore) bytes)"
-          else
-            echo "❌ Keystore missing from repo!"
-            exit 1
-          fi
+          echo "${{ secrets.KEYSTORE_B64 }}" | base64 -d > signagecms.keystore
+          echo "✅ Keystore restored ($(wc -c < signagecms.keystore) bytes)"
 
       - name: Make gradlew executable
         working-directory: player-android
