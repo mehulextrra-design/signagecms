@@ -37,6 +37,11 @@ import java.util.*
 
 class PlayerActivity : AppCompatActivity() {
 
+    companion object {
+        // Checked by PlayerService / WatchdogWorker to know if activity is alive.
+        @Volatile var isVisible = false
+    }
+
     private lateinit var binding: ActivityPlayerBinding
     private lateinit var prefs: Prefs
     private lateinit var db: AppDatabase
@@ -95,6 +100,19 @@ class PlayerActivity : AppCompatActivity() {
         binding = ActivityPlayerBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // ── Kiosk / display-override flags ────────────────────────────────
+        // Show over lock screen and force-turn the display on.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+            setShowWhenLocked(true)
+            setTurnScreenOn(true)
+        } else {
+            @Suppress("DEPRECATION")
+            window.addFlags(
+                WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
+                or WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
+                or WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD
+            )
+        }
         acquireWakeLock()
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         setFullscreen()
@@ -113,8 +131,21 @@ class PlayerActivity : AppCompatActivity() {
         registerReceiver(networkReceiver, IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION))
     }
 
+    override fun onResume() {
+        super.onResume()
+        isVisible = true
+        // Re-apply fullscreen in case status bar was revealed
+        setFullscreen()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        isVisible = false
+    }
+
     override fun onDestroy() {
         super.onDestroy()
+        isVisible = false
         handler.removeCallbacksAndMessages(null)
         cancelImageTimer()
         releasePlayer()
@@ -126,6 +157,10 @@ class PlayerActivity : AppCompatActivity() {
         super.onWindowFocusChanged(hasFocus)
         if (hasFocus) setFullscreen()
     }
+
+    // Block back button — kiosk mode: user cannot exit the player
+    @Suppress("DEPRECATION")
+    override fun onBackPressed() { /* intentionally empty */ }
 
     // ── FULLSCREEN ────────────────────────────────────────────────────────
 

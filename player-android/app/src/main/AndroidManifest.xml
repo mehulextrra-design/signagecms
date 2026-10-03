@@ -15,6 +15,12 @@
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     <!-- Keep screen on -->
     <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
+    <!-- Required for AlarmManager.setExactAndAllowWhileIdle (crash/task-removed restart) -->
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <!-- Needed on Android 13+ for exact alarms without user prompt -->
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+    <!-- Keep the app alive: prevent OS from batching our watchdog WorkManager job -->
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
 
     <!-- TV / Android TV box compatibility — without this, boxes without
          a touchscreen report "Parse Error" because Android assumes the

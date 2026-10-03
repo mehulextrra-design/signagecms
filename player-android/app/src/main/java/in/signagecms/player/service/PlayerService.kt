@@ -1,7 +1,6 @@
 package `in`.signagecms.player.service
 
 import android.app.Notification
-import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
@@ -10,15 +9,35 @@ import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import `in`.signagecms.player.PlayerActivity
 import `in`.signagecms.player.R
+import `in`.signagecms.player.SetupActivity
+import `in`.signagecms.player.utils.scheduleRestart
 
-// Foreground service so OS doesn't kill the player on China boards
 class PlayerService : Service() {
 
     override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         startForeground(NOTIF_ID, buildNotification())
+
+        // If the player was killed by the OS (memory pressure) and the service
+        // is being restarted via START_STICKY, bring the activity back to front.
+        if (!PlayerActivity.isVisible) {
+            val launch = Intent(this, SetupActivity::class.java).apply {
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            }
+            try { startActivity(launch) } catch (e: Exception) { /* ignore */ }
+        }
+
         return START_STICKY
+    }
+
+    /**
+     * Fired when the user swipes the app away from the Recents screen.
+     * We schedule a restart so the player comes back automatically.
+     */
+    override fun onTaskRemoved(rootIntent: Intent?) {
+        super.onTaskRemoved(rootIntent)
+        scheduleRestart(this, delayMs = 1_500L)
     }
 
     private fun buildNotification(): Notification {
