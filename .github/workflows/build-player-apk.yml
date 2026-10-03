@@ -90,8 +90,24 @@ jobs:
           echo "$BUILD_OUTPUT"
           if [ $EXIT_CODE -ne 0 ]; then
             echo "## ❌ Build Failed" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### Kotlin Errors" >> $GITHUB_STEP_SUMMARY
             echo '```' >> $GITHUB_STEP_SUMMARY
-            echo "$BUILD_OUTPUT" | grep -E "^e: |error:|FAILURE:|Caused by:|> " | head -60 >> $GITHUB_STEP_SUMMARY
+            # Print each Kotlin error line split into path + message parts
+            echo "$BUILD_OUTPUT" | grep "^e: " | while IFS= read -r line; do
+              # Strip "e: file://" prefix and split into components
+              clean="${line#e: file://}"
+              filepath="${clean%%: (*}"
+              rest="${clean#*: }"
+              echo "FILE: $filepath"
+              echo "  $rest"
+              echo ""
+            done >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### Build Failure" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            echo "$BUILD_OUTPUT" | grep -E "FAILURE:|Caused by:|> Task" | head -20 >> $GITHUB_STEP_SUMMARY
             echo '```' >> $GITHUB_STEP_SUMMARY
             exit $EXIT_CODE
           fi
