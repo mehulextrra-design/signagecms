@@ -43,22 +43,31 @@ object KioskManager {
     /**
      * Reboot the device. Requires Device Owner + Android 7+.
      * Called from PlayerActivity when CMS sends a reboot command via heartbeat.
+     * Uses reflection to call DevicePolicyManager.rebootDevice() to avoid
+     * "Unresolved reference" on certain CI SDK builds.
      */
     fun reboot(context: Context) {
         if (!isDeviceOwner(context)) {
             Log.w(TAG, "Reboot requested but not Device Owner")
             return
         }
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
-            Log.w(TAG, "Reboot API requires Android 7+")
-            return
+        Log.d(TAG, "Rebooting device")
+        // Strategy 1: DevicePolicyManager.rebootDevice() via reflection (API 24+, Device Owner)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            try {
+                val dpm = context.getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
+                val method = dpm.javaClass.getMethod("rebootDevice", ComponentName::class.java)
+                method.invoke(dpm, adminComponent(context))
+                return
+            } catch (e: Exception) {
+                Log.w(TAG, "DPM reboot failed: ${e.message}")
+            }
         }
+        // Strategy 2: shell reboot (works on rooted TV boxes)
         try {
-            val dpm = context.getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
-            Log.d(TAG, "Rebooting device via DevicePolicyManager")
-            dpm.rebootDevice(adminComponent(context))
+            Runtime.getRuntime().exec("reboot")
         } catch (e: Exception) {
-            Log.e(TAG, "Reboot failed: ${e.message}")
+            Log.e(TAG, "Shell reboot failed: ${e.message}")
         }
     }
 }
