@@ -21,16 +21,35 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      # Generate a consistent keystore using a fixed seed stored as a secret.
-      # If KEYSTORE_B64 secret is set, use it; otherwise generate a new one
-      # (first run only — copy the base64 output and add it as KEYSTORE_B64 secret).
+      # ── Keystore strategy (priority order) ──────────────────────────────
+      # 1. If KEYSTORE_B64 secret is set → always use it (most reliable)
+      # 2. Else restore from Actions cache (persists across runs on same branch)
+      # 3. Else generate new keystore + save to cache for future runs
+      #
+      # Result: same signature every build once keystore is established.
+      # To reset: delete the cache key "signagecms-keystore" in GitHub Actions UI.
+      - name: Restore keystore from cache
+        if: ${{ secrets.KEYSTORE_B64 == '' }}
+        id: cache-keystore
+        uses: actions/cache@v4
+        with:
+          path: player-android/app/signagecms.keystore
+          key: signagecms-keystore-v1
+
       - name: Set up signing keystore
         working-directory: player-android
+        env:
+          KEYSTORE_B64: ${{ secrets.KEYSTORE_B64 }}
         run: |
-          if [ -n "${{ secrets.KEYSTORE_B64 }}" ]; then
-            echo "${{ secrets.KEYSTORE_B64 }}" | base64 -d > app/signagecms.keystore
-            echo "Using existing keystore from secret"
+          if [ -n "$KEYSTORE_B64" ]; then
+            echo "$KEYSTORE_B64" | base64 -d > app/signagecms.keystore
+            echo "✅ Using keystore from KEYSTORE_B64 secret"
+
+          elif [ -f "app/signagecms.keystore" ]; then
+            echo "✅ Using cached keystore (same signature as previous builds)"
+
           else
+            echo "⚠️  Generating new keystore (first time on this branch)"
             keytool -genkey -v \
               -keystore app/signagecms.keystore \
               -alias signagecms \
@@ -38,9 +57,15 @@ jobs:
               -storepass "signagecms2026" \
               -keypass  "signagecms2026" \
               -dname "CN=SignageCMS Player,OU=Android,O=SignageCMS,L=India,ST=India,C=IN"
-            echo "Generated new keystore. Add KEYSTORE_B64 secret to reuse across builds:"
+
+            echo ""
+            echo "──────────────────────────────────────────────────────────────"
+            echo "📋 IMPORTANT — to keep this keystore forever, add this as a"
+            echo "   GitHub secret named KEYSTORE_B64 (Settings → Secrets → Actions):"
+            echo "──────────────────────────────────────────────────────────────"
             base64 -w 0 app/signagecms.keystore
             echo ""
+            echo "──────────────────────────────────────────────────────────────"
           fi
 
       - name: Make gradlew executable
@@ -51,9 +76,9 @@ jobs:
         working-directory: player-android
         env:
           BUILD_NUMBER: ${{ github.run_number }}
-          KEYSTORE_PASS: ${{ secrets.KEYSTORE_PASS || 'signagecms2026' }}
+          KEYSTORE_PASS: signagecms2026
           KEY_ALIAS: signagecms
-          KEY_PASS: ${{ secrets.KEYSTORE_PASS || 'signagecms2026' }}
+          KEY_PASS: signagecms2026
         run: |
           set +e
           BUILD_OUTPUT=$(./gradlew assembleRelease --no-daemon --stacktrace 2>&1)
@@ -83,4 +108,4 @@ jobs:
           echo "- **APK:** SignageCMS-Player-v1.${{ github.run_number }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Size:** $APK_SIZE" >> $GITHUB_STEP_SUMMARY
           echo "- **Version:** 1.${{ github.run_number }} (versionCode ${{ github.run_number }})" >> $GITHUB_STEP_SUMMARY
-          echo "- **Type:** Release (TV compatible)" >> $GITHUB_STEP_SUMMARY
+          echo "- **Type:** Release (TV compatible, kiosk mode)" >> $GITHUB_STEP_SUMMARY
