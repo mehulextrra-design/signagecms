@@ -1,10 +1,7 @@
 package `in`.signagecms.player.admin
 
-import android.app.admin.DeviceAdminReceiver
-import android.content.Context
-import android.content.Intent
+import android.app.admin.DeviceAdminReceiver as BaseDeviceAdminReceiver
 
-class DeviceAdminReceiver : DeviceAdminReceiver() {
+class DeviceAdminReceiver : BaseDeviceAdminReceiver() {
     // Device Owner callbacks — no custom logic needed.
-    // The OS calls this receiver when Device Owner status changes.
 }

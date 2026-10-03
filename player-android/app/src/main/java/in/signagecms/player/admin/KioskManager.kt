@@ -6,6 +6,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.os.Build
 import android.util.Log
+import `in`.signagecms.player.admin.DeviceAdminReceiver
 
 object KioskManager {
 
