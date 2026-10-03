@@ -7,6 +7,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
@@ -2108,17 +2109,49 @@ async function submitCampaign(){
   try{
     const body={title:document.getElementById('cmp-name').value.trim(),screen_ids:selectedScreenIds,content_id:uploadedContentId,start_date:document.getElementById('sch-start').value,end_date:document.getElementById('sch-end').value,start_time:document.getElementById('sch-time-start').value+':00',end_time:document.getElementById('sch-time-end').value+':00',package_name:selectedPkg,coupon_code:document.getElementById('coupon-input').value.trim()||undefined};
     const campaign=await api('/campaigns',{method:'POST',body:JSON.stringify(body)});
-    await api(`/campaigns/${campaign.id}/confirm-payment`,{method:'POST',body:JSON.stringify({payment_id:'PAY-'+Date.now(),payment_method:'online'})});
-    toast('Campaign submitted for approval!','success');setTimeout(()=>navigate('campaigns'),1500);
+    await openRazorpay(campaign,btn,'Confirm & Pay →',()=>{setTimeout(()=>navigate('campaigns'),1500);});
   }catch(e){toast(e.message,'error');btn.innerHTML='Confirm & Pay →';btn.disabled=false;}
+}
+
+function openRazorpay(campaign,btn,btnLabel,onSuccess){
+  return new Promise(async(resolve,reject)=>{
+    try{
+      const order=await api(`/campaigns/${campaign.id}/create-order`,{method:'POST'});
+      const options={
+        key:order.key_id,
+        amount:order.amount,
+        currency:order.currency,
+        order_id:order.order_id,
+        name:'SignageCMS',
+        description:campaign.title||campaign.campaign_code,
+        prefill:{name:currentUser?.first_name||'',email:currentUser?.email||''},
+        theme:{color:'#0D9488'},
+        handler:async function(response){
+          try{
+            await api(`/campaigns/${campaign.id}/confirm-payment`,{method:'POST',body:JSON.stringify({
+              payment_id:response.razorpay_payment_id,
+              order_id:response.razorpay_order_id,
+              signature:response.razorpay_signature,
+              payment_method:'razorpay'
+            })});
+            toast('Payment successful! Campaign submitted for approval.','success');
+            if(btn){btn.innerHTML=btnLabel;btn.disabled=false;}
+            onSuccess&&onSuccess();
+            resolve();
+          }catch(e){toast(e.message,'error');if(btn){btn.innerHTML=btnLabel;btn.disabled=false;}reject(e);}
+        },
+        modal:{ondismiss:function(){if(btn){btn.innerHTML=btnLabel;btn.disabled=false;}resolve();}}
+      };
+      new Razorpay(options).open();
+    }catch(e){reject(e);}
+  });
 }
 
 async function submitForApproval(id,btn){
   const orig=btn.innerHTML;btn.innerHTML='…';btn.disabled=true;
   try{
-    await api(`/campaigns/${id}/confirm-payment`,{method:'POST',body:JSON.stringify({payment_id:'PAY-'+Date.now(),payment_method:'online'})});
-    toast('Campaign submitted for approval! AI review running…','success');
-    await loadCampaigns();
+    const campaign={id};
+    await openRazorpay(campaign,btn,orig,async()=>{ toast('Payment successful! AI review running…','success'); await loadCampaigns(); });
   }catch(e){toast(e.message,'error');btn.innerHTML=orig;btn.disabled=false;}
 }
 

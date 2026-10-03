@@ -1,7 +1,14 @@
 const express = require('express');
+const crypto = require('crypto');
+const Razorpay = require('razorpay');
 const { query, getClient } = require('../db');
 const { authenticate, requireAdmin } = require('../middleware/auth');
 const { reviewCampaign } = require('../services/aiReview');
+
+const rzp = new Razorpay({
+  key_id: process.env.RAZORPAY_KEY_ID,
+  key_secret: process.env.RAZORPAY_KEY_SECRET,
+});
 
 const router = express.Router();
 
@@ -226,9 +233,40 @@ router.post('/', authenticate, async (req, res, next) => {
   } finally { client.release(); }
 });
 
-// POST /api/campaigns/:id/confirm-payment — mark paid + submit for approval
+// POST /api/campaigns/:id/create-order — create Razorpay order
+router.post('/:id/create-order', authenticate, async (req, res, next) => {
+  try {
+    const result = await query(
+      'SELECT id, amount_total, campaign_code, title, user_id, status FROM campaigns WHERE id = $1',
+      [req.params.id]
+    );
+    if (!result.rows.length) return res.status(404).json({ error: 'Campaign not found' });
+    const campaign = result.rows[0];
+    if (campaign.user_id !== req.user.id && !['admin', 'superadmin'].includes(req.user.role)) {
+      return res.status(403).json({ error: 'Access denied' });
+    }
+    if (campaign.status !== 'pending_payment') {
+      return res.status(400).json({ error: 'Campaign is not awaiting payment' });
+    }
+    const order = await rzp.orders.create({
+      amount: Math.round(parseFloat(campaign.amount_total) * 100),
+      currency: 'INR',
+      receipt: campaign.campaign_code,
+      notes: { campaign_id: campaign.id, title: campaign.title },
+    });
+    res.json({ order_id: order.id, amount: order.amount, currency: order.currency, key_id: process.env.RAZORPAY_KEY_ID });
+  } catch (err) { next(err); }
+});
+
+// POST /api/campaigns/:id/confirm-payment — verify Razorpay signature + mark paid
 router.post('/:id/confirm-payment', authenticate, async (req, res, next) => {
-  const { payment_id, payment_method } = req.body;
+  const { payment_id, order_id, signature, payment_method } = req.body;
+  // Verify Razorpay signature when present
+  if (order_id && signature) {
+    const expected = crypto.createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
+      .update(`${order_id}|${payment_id}`).digest('hex');
+    if (expected !== signature) return res.status(400).json({ error: 'Payment verification failed' });
+  }
   const client = await getClient();
   try {
     await client.query('BEGIN');
