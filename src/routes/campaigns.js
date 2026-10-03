@@ -50,6 +50,33 @@ router.get('/', authenticate, async (req, res, next) => {
   } catch (err) { next(err); }
 });
 
+// GET /api/campaigns/:id/qr — UPI payment details for pending_payment campaigns
+router.get('/:id/qr', authenticate, async (req, res, next) => {
+  try {
+    const result = await query(
+      'SELECT id, amount_total, campaign_code, title, user_id, status FROM campaigns WHERE id = $1',
+      [req.params.id]
+    );
+    if (!result.rows.length) return res.status(404).json({ error: 'Campaign not found' });
+    const campaign = result.rows[0];
+    if (!['admin', 'superadmin'].includes(req.user.role) && campaign.user_id !== req.user.id) {
+      return res.status(403).json({ error: 'Access denied' });
+    }
+    const upiId = process.env.UPI_ID || 'signagecms@upi';
+    const amount = parseFloat(campaign.amount_total).toFixed(2);
+    const ref = campaign.campaign_code;
+    const upiString = `upi://pay?pa=${upiId}&am=${amount}&tn=${encodeURIComponent(ref)}&cu=INR`;
+    res.json({
+      upi_id: upiId,
+      amount: parseFloat(amount),
+      reference: ref,
+      campaign_id: campaign.id,
+      status: campaign.status,
+      upi_string: upiString,
+    });
+  } catch (err) { next(err); }
+});
+
 // GET /api/campaigns/:id
 router.get('/:id', authenticate, async (req, res, next) => {
   try {
