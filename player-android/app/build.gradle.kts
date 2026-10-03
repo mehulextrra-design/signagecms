@@ -23,7 +23,6 @@ android {
             storePassword = System.getenv("KEYSTORE_PASS") ?: "signagecms2026"
             keyAlias = System.getenv("KEY_ALIAS") ?: "signagecms"
             keyPassword = System.getenv("KEY_PASS") ?: "signagecms2026"
-            storeType = "PKCS12"
         }
     }
 

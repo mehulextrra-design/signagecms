@@ -21,11 +21,57 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Restore keystore from KEYSTORE_B64 secret
+      # Generate a fresh JKS keystore using keytool (JDK is available above).
+      # If KEYSTORE_B64 secret is set, use it instead (consistent signature).
+      - name: Set up signing keystore
         working-directory: player-android/app
         run: |
-          echo "${{ secrets.KEYSTORE_B64 }}" | base64 -d > signagecms.keystore
-          echo "✅ Keystore restored ($(wc -c < signagecms.keystore) bytes)"
+          if [ -n "${{ secrets.KEYSTORE_B64 }}" ]; then
+            echo "${{ secrets.KEYSTORE_B64 }}" | base64 -d > signagecms.keystore
+            echo "Using keystore from KEYSTORE_B64 secret"
+            # Detect actual alias (handles both JKS and PKCS12 formats)
+            ALIAS=$(keytool -list \
+              -keystore signagecms.keystore \
+              -storepass "signagecms2026" \
+              -J-Dfile.encoding=UTF8 2>/dev/null \
+              | grep "PrivateKeyEntry\|trustedCertEntry\|SecretKeyEntry" \
+              | head -1 | cut -d',' -f1 | tr -d ' ')
+            if [ -z "$ALIAS" ]; then
+              # PKCS12 alias detection (different format)
+              ALIAS=$(keytool -list \
+                -keystore signagecms.keystore \
+                -storepass "signagecms2026" \
+                -storetype PKCS12 \
+                -J-Dfile.encoding=UTF8 2>/dev/null \
+                | grep "PrivateKeyEntry" \
+                | head -1 | cut -d',' -f1 | tr -d ' ')
+            fi
+            if [ -z "$ALIAS" ]; then
+              echo "⚠️  Could not detect alias from secret keystore — regenerating with keytool"
+              rm -f signagecms.keystore
+            else
+              echo "KEY_ALIAS=$ALIAS" >> $GITHUB_ENV
+              echo "✅ Alias detected: $ALIAS"
+            fi
+          fi
+
+          if [ ! -f signagecms.keystore ]; then
+            echo "Generating fresh JKS keystore with keytool"
+            keytool -genkey -v \
+              -keystore signagecms.keystore \
+              -storetype JKS \
+              -alias signagecms \
+              -keyalg RSA -keysize 2048 -validity 36500 \
+              -storepass "signagecms2026" \
+              -keypass  "signagecms2026" \
+              -dname "CN=SignageCMS Player,OU=Android,O=SignageCMS,L=India,ST=India,C=IN"
+            echo "KEY_ALIAS=signagecms" >> $GITHUB_ENV
+            echo ""
+            echo "====== COPY THIS AS KEYSTORE_B64 SECRET ======"
+            base64 -w 0 signagecms.keystore
+            echo ""
+            echo "=============================================="
+          fi
 
       - name: Make gradlew executable
         working-directory: player-android
@@ -36,7 +82,6 @@ jobs:
         env:
           BUILD_NUMBER: ${{ github.run_number }}
           KEYSTORE_PASS: signagecms2026
-          KEY_ALIAS: signagecms
           KEY_PASS: signagecms2026
         run: |
           set +e
@@ -67,4 +112,4 @@ jobs:
           echo "- **APK:** SignageCMS-Player-v1.${{ github.run_number }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Size:** $APK_SIZE" >> $GITHUB_STEP_SUMMARY
           echo "- **Version:** 1.${{ github.run_number }} (versionCode ${{ github.run_number }})" >> $GITHUB_STEP_SUMMARY
-          echo "- **Type:** Release — PKCS12 signed, TV kiosk mode" >> $GITHUB_STEP_SUMMARY
+          echo "- **Type:** Release — signed, TV kiosk mode" >> $GITHUB_STEP_SUMMARY
