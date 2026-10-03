@@ -16,6 +16,13 @@
     <!-- Keep screen on -->
     <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
 
+    <!-- TV / Android TV box compatibility — without this, boxes without
+         a touchscreen report "Parse Error" because Android assumes the
+         app requires touchscreen by default -->
+    <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
+    <uses-feature android:name="android.hardware.touchscreen.multitouch" android:required="false" />
+    <uses-feature android:name="android.software.leanback" android:required="false" />
+
     <application
         android:name=".PlayerApp"
         android:allowBackup="false"
@@ -35,6 +42,7 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
             </intent-filter>
         </activity>
 

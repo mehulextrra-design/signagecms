@@ -17,10 +17,19 @@ android {
         buildConfigField("String", "API_BASE_URL", "\"https://signagecrm-production.up.railway.app/api/\"")
     }
 
+    signingConfigs {
+        create("release") {
+            storeFile = file("signagecms.keystore")
+            storePassword = System.getenv("KEYSTORE_PASS") ?: "signagecms2026"
+            keyAlias = System.getenv("KEY_ALIAS") ?: "signagecms"
+            keyPassword = System.getenv("KEY_PASS") ?: "signagecms2026"
+        }
+    }
+
     buildTypes {
         release {
-            isMinifyEnabled = true
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            isMinifyEnabled = false  // disabled — proguard can break TV compatibility
+            signingConfig = signingConfigs.getByName("release")
         }
         debug {
             applicationIdSuffix = ".debug"

@@ -7,8 +7,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-debug:
-    name: Build Debug APK
+  build:
+    name: Build Release APK
     runs-on: ubuntu-latest
 
     steps:
@@ -21,17 +21,42 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
+      # Generate a consistent keystore using a fixed seed stored as a secret.
+      # If KEYSTORE_B64 secret is set, use it; otherwise generate a new one
+      # (first run only — copy the base64 output and add it as KEYSTORE_B64 secret).
+      - name: Set up signing keystore
+        working-directory: player-android
+        run: |
+          if [ -n "${{ secrets.KEYSTORE_B64 }}" ]; then
+            echo "${{ secrets.KEYSTORE_B64 }}" | base64 -d > app/signagecms.keystore
+            echo "Using existing keystore from secret"
+          else
+            keytool -genkey -v \
+              -keystore app/signagecms.keystore \
+              -alias signagecms \
+              -keyalg RSA -keysize 2048 -validity 36500 \
+              -storepass "signagecms2026" \
+              -keypass  "signagecms2026" \
+              -dname "CN=SignageCMS Player,OU=Android,O=SignageCMS,L=India,ST=India,C=IN"
+            echo "Generated new keystore. Add KEYSTORE_B64 secret to reuse across builds:"
+            base64 -w 0 app/signagecms.keystore
+            echo ""
+          fi
+
       - name: Make gradlew executable
         working-directory: player-android
         run: chmod +x gradlew
 
-      - name: Build Debug APK
+      - name: Build Release APK
         working-directory: player-android
         env:
           BUILD_NUMBER: ${{ github.run_number }}
+          KEYSTORE_PASS: ${{ secrets.KEYSTORE_PASS || 'signagecms2026' }}
+          KEY_ALIAS: signagecms
+          KEY_PASS: ${{ secrets.KEYSTORE_PASS || 'signagecms2026' }}
         run: |
           set +e
-          BUILD_OUTPUT=$(./gradlew assembleDebug --no-daemon --stacktrace 2>&1)
+          BUILD_OUTPUT=$(./gradlew assembleRelease --no-daemon --stacktrace 2>&1)
           EXIT_CODE=$?
           echo "$BUILD_OUTPUT"
           if [ $EXIT_CODE -ne 0 ]; then
@@ -42,18 +67,20 @@ jobs:
             exit $EXIT_CODE
           fi
 
-      - name: Upload Debug APK
+      - name: Upload Release APK
         uses: actions/upload-artifact@v4
         with:
-          name: SignageCMS-Player-Debug-${{ github.run_number }}
-          path: player-android/app/build/outputs/apk/debug/app-debug.apk
+          name: SignageCMS-Player-v1.${{ github.run_number }}
+          path: player-android/app/build/outputs/apk/release/app-release.apk
           retention-days: 90
 
       - name: APK Info
         working-directory: player-android
         run: |
-          APK_PATH="app/build/outputs/apk/debug/app-debug.apk"
+          APK_PATH="app/build/outputs/apk/release/app-release.apk"
           APK_SIZE=$(du -sh "$APK_PATH" | cut -f1)
           echo "## ✅ APK Build Success" >> $GITHUB_STEP_SUMMARY
+          echo "- **APK:** SignageCMS-Player-v1.${{ github.run_number }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Size:** $APK_SIZE" >> $GITHUB_STEP_SUMMARY
-          echo "- **Build:** #${{ github.run_number }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Version:** 1.${{ github.run_number }} (versionCode ${{ github.run_number }})" >> $GITHUB_STEP_SUMMARY
+          echo "- **Type:** Release (TV compatible)" >> $GITHUB_STEP_SUMMARY
