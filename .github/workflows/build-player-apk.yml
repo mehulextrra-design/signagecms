@@ -21,51 +21,15 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      # ── Keystore strategy (priority order) ──────────────────────────────
-      # 1. If KEYSTORE_B64 secret is set → always use it (most reliable)
-      # 2. Else restore from Actions cache (persists across runs on same branch)
-      # 3. Else generate new keystore + save to cache for future runs
-      #
-      # Result: same signature every build once keystore is established.
-      # To reset: delete the cache key "signagecms-keystore" in GitHub Actions UI.
-      - name: Restore keystore from cache
-        if: ${{ secrets.KEYSTORE_B64 == '' }}
-        id: cache-keystore
-        uses: actions/cache@v4
-        with:
-          path: player-android/app/signagecms.keystore
-          key: signagecms-keystore-v1
-
-      - name: Set up signing keystore
-        working-directory: player-android
-        env:
-          KEYSTORE_B64: ${{ secrets.KEYSTORE_B64 }}
+      # signagecms.keystore is committed to the repo (PKCS12 format).
+      # Same file → same signature → adb install -r works for all future updates.
+      - name: Verify keystore exists
         run: |
-          if [ -n "$KEYSTORE_B64" ]; then
-            echo "$KEYSTORE_B64" | base64 -d > app/signagecms.keystore
-            echo "✅ Using keystore from KEYSTORE_B64 secret"
-
-          elif [ -f "app/signagecms.keystore" ]; then
-            echo "✅ Using cached keystore (same signature as previous builds)"
-
+          if [ -f "player-android/app/signagecms.keystore" ]; then
+            echo "✅ Keystore found ($(wc -c < player-android/app/signagecms.keystore) bytes)"
           else
-            echo "⚠️  Generating new keystore (first time on this branch)"
-            keytool -genkey -v \
-              -keystore app/signagecms.keystore \
-              -alias signagecms \
-              -keyalg RSA -keysize 2048 -validity 36500 \
-              -storepass "signagecms2026" \
-              -keypass  "signagecms2026" \
-              -dname "CN=SignageCMS Player,OU=Android,O=SignageCMS,L=India,ST=India,C=IN"
-
-            echo ""
-            echo "──────────────────────────────────────────────────────────────"
-            echo "📋 IMPORTANT — to keep this keystore forever, add this as a"
-            echo "   GitHub secret named KEYSTORE_B64 (Settings → Secrets → Actions):"
-            echo "──────────────────────────────────────────────────────────────"
-            base64 -w 0 app/signagecms.keystore
-            echo ""
-            echo "──────────────────────────────────────────────────────────────"
+            echo "❌ Keystore missing from repo!"
+            exit 1
           fi
 
       - name: Make gradlew executable
@@ -108,4 +72,4 @@ jobs:
           echo "- **APK:** SignageCMS-Player-v1.${{ github.run_number }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Size:** $APK_SIZE" >> $GITHUB_STEP_SUMMARY
           echo "- **Version:** 1.${{ github.run_number }} (versionCode ${{ github.run_number }})" >> $GITHUB_STEP_SUMMARY
-          echo "- **Type:** Release (TV compatible, kiosk mode)" >> $GITHUB_STEP_SUMMARY
+          echo "- **Type:** Release — PKCS12 signed, TV kiosk mode" >> $GITHUB_STEP_SUMMARY
