@@ -5,7 +5,7 @@ const { query, getClient } = require('../db');
 const { authenticate, requireAdmin } = require('../middleware/auth');
 const { reviewCampaign } = require('../services/aiReview');
 
-const rzp = new Razorpay({
+const getRzp = () => new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
   key_secret: process.env.RAZORPAY_KEY_SECRET,
 });
@@ -248,7 +248,7 @@ router.post('/:id/create-order', authenticate, async (req, res, next) => {
     if (campaign.status !== 'pending_payment') {
       return res.status(400).json({ error: 'Campaign is not awaiting payment' });
     }
-    const order = await rzp.orders.create({
+    const order = await getRzp().orders.create({
       amount: Math.round(parseFloat(campaign.amount_total) * 100),
       currency: 'INR',
       receipt: campaign.campaign_code,
