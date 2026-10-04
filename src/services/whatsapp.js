@@ -208,4 +208,179 @@ async function sendReportForUser(userId) {
   return sendWhatsApp(report.phone, report.message, report.templateParams);
 }
 
-module.exports = { sendWeeklyReports, sendReportForUser, buildWeeklyReport };
+// ── Helpers ───────────────────────────────────────────────────────────────────
+function fmtDate(d) { return d ? String(d).slice(0, 10) : '—'; }
+
+async function _campaignUser(campaignId) {
+  const r = await query(
+    `SELECT c.title, c.campaign_code, c.start_date, c.end_date,
+            c.amount_total, c.slot_duration_sec,
+            u.first_name, u.business_name, u.mobile
+     FROM campaigns c JOIN users u ON u.id = c.user_id WHERE c.id = $1`,
+    [campaignId]
+  );
+  return r.rows[0] || null;
+}
+
+// ── Campaign approved ─────────────────────────────────────────────────────────
+async function sendCampaignApprovedWA(campaignId) {
+  const d = await _campaignUser(campaignId);
+  if (!d || !d.mobile) return;
+  const name = d.business_name || d.first_name || 'Advertiser';
+  const msg =
+`✅ *Campaign Approved!*
+
+Hi ${name}, your campaign is now LIVE on our screens.
+
+*Campaign:* ${d.title}
+*Code:* ${d.campaign_code}
+*Period:* ${fmtDate(d.start_date)} to ${fmtDate(d.end_date)}
+
+Track real-time Proof of Play on your dashboard:
+🔗 signagecrm-production.up.railway.app
+
+— Team SignageCMS`;
+  return sendWhatsApp(d.mobile, msg, [name, d.campaign_code, fmtDate(d.start_date), fmtDate(d.end_date)]);
+}
+
+// ── Invoice confirmed ─────────────────────────────────────────────────────────
+async function sendInvoiceConfirmedWA(campaignId, invoiceNumber) {
+  const d = await _campaignUser(campaignId);
+  if (!d || !d.mobile) return;
+  const name = d.business_name || d.first_name || 'Advertiser';
+  const msg =
+`🧾 *Payment Received — Invoice Ready*
+
+Hi ${name}, we've received your payment and your invoice is ready.
+
+*Invoice No:* ${invoiceNumber}
+*Campaign:* ${d.campaign_code}
+*Amount:* ₹${parseFloat(d.amount_total || 0).toFixed(2)}
+
+Your campaign is now under review. You'll receive another message once it goes live.
+🔗 signagecrm-production.up.railway.app
+
+— Team SignageCMS`;
+  return sendWhatsApp(d.mobile, msg, [name, invoiceNumber, d.campaign_code, String(parseFloat(d.amount_total || 0).toFixed(2))]);
+}
+
+// ── Expiry reminder (daysLeft = 1 or 2) ──────────────────────────────────────
+async function sendExpiryReminderWA(campaignId, daysLeft) {
+  const d = await _campaignUser(campaignId);
+  if (!d || !d.mobile) return;
+  const name = d.business_name || d.first_name || 'Advertiser';
+  const dayWord = daysLeft === 1 ? 'tomorrow' : 'in 2 days';
+  const msg =
+`⏰ *Campaign Ending ${daysLeft === 1 ? 'Tomorrow' : 'in 2 Days'}*
+
+Hi ${name}, your campaign is expiring ${dayWord}.
+
+*Campaign:* ${d.title}
+*Code:* ${d.campaign_code}
+*End Date:* ${fmtDate(d.end_date)}
+
+Want to extend? Contact us or book a new campaign from your dashboard.
+🔗 signagecrm-production.up.railway.app
+
+— Team SignageCMS`;
+  return sendWhatsApp(d.mobile, msg, [name, d.campaign_code, fmtDate(d.end_date), String(daysLeft)]);
+}
+
+// ── Campaign completed ────────────────────────────────────────────────────────
+async function sendCampaignCompletedWA(campaignId) {
+  const d = await _campaignUser(campaignId);
+  if (!d || !d.mobile) return;
+  const name = d.business_name || d.first_name || 'Advertiser';
+
+  // Get total plays for this campaign
+  const pr = await query('SELECT COALESCE(SUM(play_count),0) AS plays FROM play_logs WHERE campaign_id=$1', [campaignId]);
+  const totalPlays = parseInt(pr.rows[0]?.plays || 0);
+
+  const msg =
+`🏁 *Campaign Completed*
+
+Hi ${name}, your campaign has successfully completed.
+
+*Campaign:* ${d.title}
+*Code:* ${d.campaign_code}
+*Period:* ${fmtDate(d.start_date)} to ${fmtDate(d.end_date)}
+*Total Plays:* ${totalPlays.toLocaleString('en-IN')}
+
+View your full Proof of Play report on your dashboard.
+🔗 signagecrm-production.up.railway.app
+
+Thank you for advertising with SignageCMS! 🙏
+
+— Team SignageCMS`;
+  return sendWhatsApp(d.mobile, msg, [name, d.campaign_code, String(totalPlays)]);
+}
+
+// ── Daily PoP to individual advertiser ───────────────────────────────────────
+async function sendDailyPoPWA(userId, dateStr) {
+  const today = dateStr || new Date().toISOString().slice(0, 10);
+  const r = await query(
+    `SELECT u.first_name, u.business_name, u.mobile,
+            c.title, c.campaign_code,
+            COALESCE(SUM(pl.play_count), 0) AS plays,
+            COUNT(DISTINCT pl.screen_id) AS screens
+     FROM users u
+     JOIN campaigns c ON c.user_id = u.id
+     LEFT JOIN play_logs pl ON pl.campaign_id = c.id AND pl.play_date = $2
+     WHERE u.id = $1 AND c.status IN ('live','completed')
+       AND c.start_date <= $2::date AND c.end_date >= $2::date
+     GROUP BY u.first_name, u.business_name, u.mobile, c.title, c.campaign_code
+     ORDER BY plays DESC`,
+    [userId, today]
+  );
+  if (!r.rows.length || !r.rows[0].mobile) return;
+  const { first_name, business_name, mobile } = r.rows[0];
+  const name = business_name || first_name || 'Advertiser';
+  const totalPlays = r.rows.reduce((s, x) => s + parseInt(x.plays), 0);
+  const lines = r.rows.map(x => `  • ${x.campaign_code}: ${x.plays} plays on ${x.screens} screen(s)`).join('\n');
+
+  const msg =
+`📊 *Daily Proof of Play — ${today}*
+
+Hi ${name}! Here's today's ad performance:
+
+*Total Plays Today:* ${totalPlays.toLocaleString('en-IN')}
+
+${lines}
+
+Full analytics available on your dashboard.
+🔗 signagecrm-production.up.railway.app
+
+— Team SignageCMS`;
+  return sendWhatsApp(mobile, msg, [name, today, String(totalPlays)]);
+}
+
+// ── Send daily PoP WA to ALL advertisers with live campaigns ──────────────────
+async function sendDailyPoPAllWA() {
+  const today = new Date().toISOString().slice(0, 10);
+  const users = await query(
+    `SELECT DISTINCT u.id FROM users u
+     JOIN campaigns c ON c.user_id = u.id
+     WHERE c.status = 'live' AND c.start_date <= $1::date AND c.end_date >= $1::date
+       AND u.mobile IS NOT NULL AND u.mobile != ''`,
+    [today]
+  );
+  let sent = 0;
+  for (const { id } of users.rows) {
+    try {
+      await sendDailyPoPWA(id, today);
+      sent++;
+      await new Promise(r => setTimeout(r, 400));
+    } catch (e) {
+      console.error(`[WhatsApp] Daily PoP WA error for user ${id}:`, e.message);
+    }
+  }
+  console.log(`[WhatsApp] Daily PoP WA sent to ${sent} advertisers`);
+  return sent;
+}
+
+module.exports = {
+  sendWeeklyReports, sendReportForUser, buildWeeklyReport,
+  sendCampaignApprovedWA, sendInvoiceConfirmedWA,
+  sendExpiryReminderWA, sendCampaignCompletedWA,
+  sendDailyPoPWA, sendDailyPoPAllWA,
+};

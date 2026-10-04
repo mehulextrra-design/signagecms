@@ -1,6 +1,6 @@
 const cron = require('node-cron');
 const { query } = require('../db');
-const { sendWeeklyReports } = require('./whatsapp');
+const { sendWeeklyReports, sendExpiryReminderWA, sendCampaignCompletedWA, sendDailyPoPAllWA } = require('./whatsapp');
 const { sendDailyPoPReport } = require('./email');
 
 // Plays per screen per day based on package slot duration (WLRP model: 15h × 75% utilisation)
@@ -112,7 +112,7 @@ const startScheduler = () => {
     }
   });
 
-  // Every minute: auto-complete campaigns that have passed end_date
+  // Every minute: auto-complete campaigns that have passed end_date + send WA
   cron.schedule('* * * * *', async () => {
     try {
       const completed = await query(
@@ -122,6 +122,9 @@ const startScheduler = () => {
       );
       if (completed.rows.length) {
         console.log(`[Scheduler] Completed ${completed.rows.length} campaign(s):`, completed.rows.map(r => r.campaign_code));
+        for (const row of completed.rows) {
+          sendCampaignCompletedWA(row.id).catch(e => console.error('[Scheduler] CompletedWA error:', e.message));
+        }
       }
     } catch (err) {
       console.error('[Scheduler] Complete error:', err.message);
@@ -162,6 +165,39 @@ const startScheduler = () => {
       await sendDailyPoPReport();
     } catch (err) {
       console.error('[Scheduler] Daily PoP email error:', err.message);
+    }
+  });
+
+  // Daily at 9:00 PM IST (15:30 UTC): send daily PoP WhatsApp to each active advertiser
+  cron.schedule('35 15 * * *', async () => {
+    try {
+      await sendDailyPoPAllWA();
+    } catch (err) {
+      console.error('[Scheduler] Daily PoP WA error:', err.message);
+    }
+  });
+
+  // Daily at 10:00 AM IST (04:30 UTC): send expiry reminders for campaigns ending in 1 or 2 days
+  cron.schedule('30 4 * * *', async () => {
+    try {
+      for (const daysLeft of [2, 1]) {
+        const expiring = await query(
+          `SELECT id, campaign_code FROM campaigns
+           WHERE status = 'live'
+             AND end_date = CURRENT_DATE + $1::int`,
+          [daysLeft]
+        );
+        if (expiring.rows.length) {
+          console.log(`[Scheduler] Expiry reminder (${daysLeft}d): ${expiring.rows.length} campaign(s)`);
+          for (const row of expiring.rows) {
+            sendExpiryReminderWA(row.id, daysLeft).catch(e =>
+              console.error(`[Scheduler] ExpiryWA error for ${row.campaign_code}:`, e.message)
+            );
+          }
+        }
+      }
+    } catch (err) {
+      console.error('[Scheduler] Expiry reminder error:', err.message);
     }
   });
 

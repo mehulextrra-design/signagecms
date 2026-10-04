@@ -1,4 +1,9 @@
 const PDFDocument = require('pdfkit');
+const path = require('path');
+const fs = require('fs');
+
+const LOGO_PATH = process.env.COMPANY_LOGO_PATH
+  || path.join(__dirname, '../../public/assets/logo.png');
 
 const CO = {
   name:    process.env.COMPANY_NAME    || 'KARV ADTECH LLP',
@@ -38,10 +43,23 @@ function generateInvoicePDF(campaign, user, invoiceNo) {
 
       // ── Header bar ────────────────────────────────────────────────────────
       doc.rect(50, 50, W, 56).fill(DARK);
-      doc.circle(66, 78, 14).fill(ORANGE);
-      doc.fontSize(9).fillColor('#ffffff').text('▶', 61, 73);
-      doc.fontSize(16).font('Helvetica-Bold').fillColor('#ffffff').text('SignageCMS', 88, 62);
-      doc.fontSize(9).font('Helvetica').fillColor('#aaaaaa').text('Digital Out-of-Home Platform', 88, 82);
+
+      const logoExists = fs.existsSync(LOGO_PATH);
+      if (logoExists) {
+        // Fit logo inside a 44×44 box at the left of the header
+        try {
+          doc.image(LOGO_PATH, 58, 58, { fit: [44, 44], align: 'center', valign: 'center' });
+        } catch (_) { /* logo load failed — fall through to text */ }
+      }
+
+      const textX = logoExists ? 112 : 68;
+      doc.fontSize(16).font('Helvetica-Bold').fillColor('#ffffff').text(CO.name, textX, 62);
+      doc.fontSize(9).font('Helvetica').fillColor('#aaaaaa').text('Digital Out-of-Home Platform', textX, 82);
+
+      if (!logoExists) {
+        // Fallback dot indicator
+        doc.circle(58, 78, 10).fill(ORANGE);
+      }
 
       // ── Invoice label + number ────────────────────────────────────────────
       doc.moveDown(0.5);

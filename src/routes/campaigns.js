@@ -5,6 +5,7 @@ const { query, getClient } = require('../db');
 const { authenticate, requireAdmin } = require('../middleware/auth');
 const { reviewCampaign } = require('../services/aiReview');
 const { sendInvoiceEmail, sendApprovedEmail, sendRejectedEmail } = require('../services/email');
+const { sendCampaignApprovedWA, sendInvoiceConfirmedWA } = require('../services/whatsapp');
 
 const getRzp = () => new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
@@ -295,6 +296,7 @@ router.post('/:id/confirm-payment', authenticate, async (req, res, next) => {
       console.error('[AI Review] Background review failed:', err.message)
     );
     sendInvoiceEmail(campaign.id, invNum).catch(() => {});
+    sendInvoiceConfirmedWA(campaign.id, invNum).catch(() => {});
   } catch (err) { await client.query('ROLLBACK'); next(err); }
   finally { client.release(); }
 });
@@ -310,6 +312,7 @@ router.post('/:id/approve', authenticate, requireAdmin, async (req, res, next) =
     if (!result.rows.length) return res.status(404).json({ error: 'Campaign not found or not pending approval' });
     res.json(result.rows[0]);
     sendApprovedEmail(result.rows[0].id).catch(() => {});
+    sendCampaignApprovedWA(result.rows[0].id).catch(() => {});
   } catch (err) { next(err); }
 });
 
