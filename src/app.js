@@ -92,6 +92,16 @@ app.get('/admin', (req, res) => {
   res.sendFile(path.join(__dirname, '../public/admin.html'));
 });
 
+// Serve generated invoice PDFs for WhatsApp delivery (bypasses Cloudinary)
+const { getPDF } = require('./services/pdf-store');
+app.get('/pdfs/:invoiceNo', (req, res) => {
+  const buf = getPDF(req.params.invoiceNo);
+  if (!buf) return res.status(404).json({ error: 'PDF not found or expired' });
+  res.set('Content-Type', 'application/pdf');
+  res.set('Content-Disposition', `inline; filename="${req.params.invoiceNo}.pdf"`);
+  res.send(buf);
+});
+
 // Health check
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', time: new Date().toISOString(), version: '1.0.0' });

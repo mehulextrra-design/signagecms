@@ -1,9 +1,9 @@
 const https = require('https');
 const http = require('http');
-const { Readable } = require('stream');
 const { v2: cloudinary } = require('cloudinary');
 const { query } = require('../db');
 const { generateInvoicePDF, generatePoPPDF } = require('./invoice-pdf');
+const { storePDF } = require('./pdf-store');
 
 // ── Config ────────────────────────────────────────────────────────────────────
 // Set these in Railway environment variables:
@@ -324,9 +324,13 @@ Aapki campaign abhi review mein hai. Approve hone pe aapko turant WhatsApp aayeg
       { first_name: d.first_name, business_name: d.business_name, email: d.email, mobile: d.mobile },
       invoiceNumber
     );
-    pdfUrl = await uploadPDFToCloudinary(pdfBuffer, invoiceNumber);
+    // Serve PDF directly from Railway — Cloudinary raw delivery is blocked
+    storePDF(invoiceNumber, pdfBuffer);
+    const baseUrl = process.env.APP_URL || 'https://signagecrm-production.up.railway.app';
+    pdfUrl = `${baseUrl}/pdfs/${invoiceNumber}`;
+    console.log(`[WhatsApp] PDF stored, URL: ${pdfUrl}`);
   } catch (e) {
-    console.warn('[WhatsApp] PDF generation/upload failed, sending WA without attachment:', e.message);
+    console.warn('[WhatsApp] PDF generation failed, sending WA without attachment:', e.message);
   }
 
   return sendWhatsApp(d.mobile, msg, params, TPL_INVOICE, pdfUrl);
