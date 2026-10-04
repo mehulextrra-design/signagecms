@@ -21,7 +21,8 @@ const TEMPLATE   = process.env.WHATSAPP_TEMPLATE || 'weekly_pop_report';
 // Per-event template names (set in Railway to match your Aisensy template names)
 const TPL_INVOICE   = process.env.WA_TPL_INVOICE   || 'invoice_confirmed';
 const TPL_APPROVED  = process.env.WA_TPL_APPROVED  || 'campaign_approved';
-const TPL_EXPIRY    = process.env.WA_TPL_EXPIRY    || 'expiry_reminder';
+const TPL_EXPIRY_2  = process.env.WA_TPL_EXPIRY_2  || 'expiry_reminder_2day';
+const TPL_EXPIRY_1  = process.env.WA_TPL_EXPIRY_1  || 'expiry_reminder_1day';
 const TPL_COMPLETED = process.env.WA_TPL_COMPLETED || 'campaign_completed';
 const TPL_POP       = process.env.WA_TPL_POP       || 'daily_pop_summary';
 
@@ -337,7 +338,8 @@ Agar aap apna ad continue rakhna chahte hain toh abhi renew kar lo — gap nahi 
 🔗 signagecrm-production.up.railway.app
 
 — Team SignageCMS`;
-  return sendWhatsApp(d.mobile, msg, [name, d.campaign_code, fmtDate(d.end_date), String(daysLeft)], TPL_EXPIRY);
+  const tpl = daysLeft === 1 ? TPL_EXPIRY_1 : TPL_EXPIRY_2;
+  return sendWhatsApp(d.mobile, msg, [name, d.campaign_code, fmtDate(d.end_date), String(daysLeft)], tpl);
 }
 
 // ── Campaign completed ────────────────────────────────────────────────────────
