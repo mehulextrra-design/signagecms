@@ -20,8 +20,15 @@ const MUTED  = '#787068';
 const LIGHT  = '#f7f4ef';
 const LINE   = '#e0dbd3';
 
-function rupee(n) { return `Rs. ${parseFloat(n || 0).toFixed(2)}`; }
-function fmt(d)   { return d ? String(d).slice(0, 10) : '—'; }
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function rupee(n) { return `Rs.${parseFloat(n||0).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2})}`; }
+function fmt(d) {
+  if (!d) return '—';
+  // pg DATE columns arrive as Date objects; convert safely to ISO first
+  const iso = (d instanceof Date) ? d.toISOString().slice(0,10) : String(d).slice(0,10);
+  const [y, m, day] = iso.split('-');
+  return `${day} ${MONTHS[parseInt(m,10)-1]} ${y}`;
+}
 
 /**
  * Generate an invoice PDF buffer for a campaign.
@@ -62,18 +69,17 @@ function generateInvoicePDF(campaign, user, invoiceNo) {
       }
 
       // ── Invoice label + number ────────────────────────────────────────────
-      doc.moveDown(0.5);
       const topY = 124;
-      doc.fontSize(22).font('Helvetica-Bold').fillColor(DARK).text('INVOICE', 50, topY);
-      doc.fontSize(10).font('Helvetica').fillColor(MUTED).text(invoiceNo, 50, topY + 28);
+      doc.fontSize(26).font('Helvetica-Bold').fillColor(DARK).text('INVOICE', 50, topY);
+      doc.fontSize(10).font('Helvetica').fillColor(MUTED).text(invoiceNo, 50, topY + 32);
 
       // right side: date + status
       const issueDate = fmt(new Date());
-      doc.fontSize(9).fillColor(MUTED).text('Issue Date', 380, topY, { width: 165, align: 'right' });
-      doc.fontSize(11).font('Helvetica-Bold').fillColor(DARK).text(issueDate, 380, topY + 14, { width: 165, align: 'right' });
-      doc.fontSize(9).font('Helvetica').fillColor(MUTED).text('Status', 380, topY + 34, { width: 165, align: 'right' });
-      doc.rect(doc.page.width - 50 - 60, topY + 48, 60, 18).fill('#dcfce7');
-      doc.fontSize(8).font('Helvetica-Bold').fillColor('#16a34a').text('PAID', doc.page.width - 50 - 60, topY + 52, { width: 60, align: 'center' });
+      doc.fontSize(8).font('Helvetica').fillColor(MUTED).text('Issue Date', 380, topY, { width: 165, align: 'right' });
+      doc.fontSize(12).font('Helvetica-Bold').fillColor(DARK).text(issueDate, 380, topY + 13, { width: 165, align: 'right' });
+      doc.fontSize(8).font('Helvetica').fillColor(MUTED).text('Status', 380, topY + 34, { width: 165, align: 'right' });
+      doc.rect(doc.page.width - 50 - 50, topY + 47, 50, 16).fill('#dcfce7');
+      doc.fontSize(8).font('Helvetica-Bold').fillColor('#16a34a').text('PAID', doc.page.width - 50 - 50, topY + 51, { width: 50, align: 'center' });
 
       // ── Divider ───────────────────────────────────────────────────────────
       const divY = topY + 74;
@@ -98,24 +104,27 @@ function generateInvoicePDF(campaign, user, invoiceNo) {
 
       // ── Campaign details table ─────────────────────────────────────────────
       const tblY = Math.max(fromY, toY) + 24;
-      doc.rect(50, tblY, W, 28).fill(DARK);
-      ['Description', 'Campaign Code', 'Period', 'Amount'].forEach((h, i) => {
-        const xs = [60, 210, 330, 480]; const ws = [140, 110, 140, 65];
-        doc.fontSize(8).font('Helvetica-Bold').fillColor('#ffffff').text(h, xs[i], tblY + 9, { width: ws[i] });
-      });
+      doc.rect(50, tblY, W, 24).fill(DARK);
+      const hdrs = [['#', 36, 20], ['Description', 88, 260], ['Period', 350, 110], ['Amount', 462, 83]];
+      hdrs.forEach(([h, x, w]) => doc.fontSize(8).font('Helvetica-Bold').fillColor('#ffffff').text(h, x, tblY + 7, { width: w }));
 
-      // row
-      const rowY = tblY + 28;
+      // row — description includes campaign code as sub-line
+      const rowY = tblY + 24;
       const period = `${fmt(campaign.start_date)} – ${fmt(campaign.end_date)}`;
-      doc.rect(50, rowY, W, 26).fill(LIGHT);
-      doc.fontSize(9).font('Helvetica').fillColor(DARK)
-        .text(campaign.title || campaign.campaign_code, 60, rowY + 7, { width: 140 })
-        .text(campaign.campaign_code || '—', 210, rowY + 7, { width: 110 })
-        .text(period, 330, rowY + 7, { width: 140 })
-        .text(rupee(campaign.amount_base), 480, rowY + 7, { width: 65 });
+      const rowH = 40;
+      doc.rect(50, rowY, W, rowH).fill(LIGHT);
+      // #
+      doc.fontSize(9).font('Helvetica').fillColor(MUTED).text('01', 60, rowY + 8, { width: 20 });
+      // description + code
+      doc.fontSize(9).font('Helvetica-Bold').fillColor(DARK).text(campaign.title || campaign.campaign_code, 88, rowY + 7, { width: 255 });
+      doc.fontSize(8).font('Helvetica').fillColor(MUTED).text(campaign.campaign_code || '', 88, rowY + 22, { width: 255 });
+      // period
+      doc.fontSize(9).font('Helvetica').fillColor(DARK).text(period, 350, rowY + 14, { width: 106 });
+      // amount
+      doc.fontSize(9).font('Helvetica-Bold').fillColor(DARK).text(rupee(campaign.amount_base), 462, rowY + 14, { width: 83, align: 'right' });
 
       // ── Totals block ──────────────────────────────────────────────────────
-      let sumY = rowY + 40;
+      let sumY = rowY + rowH + 12;
       const sumX = 370;
       const sumW = W - (sumX - 50);
 
@@ -137,13 +146,20 @@ function generateInvoicePDF(campaign, user, invoiceNo) {
       sumRow('Total Paid', rupee(campaign.amount_total), true, ORANGE);
 
       // ── Footer ────────────────────────────────────────────────────────────
-      const ftY = doc.page.height - 80;
-      doc.rect(50, ftY, W, 1).fill(LINE);
-      doc.fontSize(8).font('Helvetica').fillColor(MUTED)
-        .text(`${CO.name} · This is a computer-generated invoice and does not require a signature.`, 50, ftY + 10, { width: W, align: 'center' });
+      const ftY = doc.page.height - 72;
+      doc.rect(50, ftY, W, 0.5).fill(LINE);
+      // left side
+      doc.fontSize(8).font('Helvetica-Bold').fillColor(DARK)
+        .text(CO.name, 50, ftY + 10, { width: W / 2 });
+      doc.fontSize(7.5).font('Helvetica').fillColor(MUTED)
+        .text('This is a computer-generated invoice and does not require a signature.', 50, ftY + 22, { width: W / 2 });
       if (CO.gst) {
-        doc.text(`GSTIN: ${CO.gst}`, 50, ftY + 24, { width: W, align: 'center' });
+        doc.fontSize(7.5).fillColor(MUTED)
+          .text(`GSTIN: ${CO.gst}`, 50, ftY + 34, { width: W / 2 });
       }
+      // right side
+      doc.fontSize(7.5).font('Helvetica').fillColor(MUTED)
+        .text('signagecrm-production.up.railway.app', 50 + W / 2, ftY + 22, { width: W / 2, align: 'right' });
 
       doc.end();
     } catch (err) {
