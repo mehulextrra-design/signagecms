@@ -1,9 +1,9 @@
 const { query } = require('../db');
 const { generateInvoicePDF } = require('./invoice-pdf');
 
-const FROM_NAME = 'SignageCMS';
-const FROM_EMAIL = process.env.FROM_EMAIL || process.env.GMAIL_USER || 'noreply@extrravenue.com';
-const FROM = `${FROM_NAME} <${FROM_EMAIL}>`;
+const FROM_EMAIL = process.env.FROM_EMAIL || 'onboarding@resend.dev';
+const REPLY_TO  = process.env.GMAIL_USER || undefined;
+const FROM = `SignageCMS <${FROM_EMAIL}>`;
 
 async function sendMail({ to, subject, html, attachments = [] }) {
   const apiKey = process.env.RESEND_API_KEY;
@@ -12,6 +12,7 @@ async function sendMail({ to, subject, html, attachments = [] }) {
     return;
   }
   const payload = { from: FROM, to: [to], subject, html };
+  if (REPLY_TO) payload.reply_to = REPLY_TO;
   if (attachments.length) {
     payload.attachments = attachments.map(a => ({
       filename: a.filename,
