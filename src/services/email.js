@@ -1,5 +1,6 @@
 const nodemailer = require('nodemailer');
 const { query } = require('../db');
+const { generateInvoicePDF } = require('./invoice-pdf');
 
 const transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -52,7 +53,7 @@ async function sendInvoiceEmail(campaignId, invoiceNumber) {
     const { rows } = await query(
       `SELECT c.title, c.campaign_code, c.start_date, c.end_date,
               c.amount_base, c.amount_gst, c.amount_total, c.coupon_code, c.discount_amount,
-              u.email, u.first_name, u.last_name, u.business_name
+              u.email, u.first_name, u.last_name, u.business_name, u.gst_number, u.mobile, u.city
        FROM campaigns c JOIN users u ON u.id = c.user_id WHERE c.id = $1`,
       [campaignId]
     );
@@ -77,13 +78,20 @@ async function sendInvoiceEmail(campaignId, invoiceNumber) {
       <p>Your campaign is now under review. You will receive another email once it is approved and goes live.</p>
       <a class="btn" href="${process.env.APP_URL || 'https://signagecrm-production.up.railway.app'}">View Campaign</a>`;
 
-    await transporter.sendMail({
+    let pdfBuffer = null;
+    try { pdfBuffer = await generateInvoicePDF(c, { email: c.email, first_name: c.first_name, last_name: c.last_name, business_name: c.business_name, gst_number: c.gst_number, mobile: c.mobile, city: c.city }, invoiceNumber); } catch (e) { console.error('[Email] PDF gen error:', e.message); }
+
+    const mailOpts = {
       from: FROM,
       to: c.email,
       subject: `Invoice ${invoiceNumber} – ${c.campaign_code} | SignageCMS`,
       html: wrap('Invoice', body),
-    });
-    console.log(`[Email] Invoice sent to ${c.email} — ${invoiceNumber}`);
+    };
+    if (pdfBuffer) {
+      mailOpts.attachments = [{ filename: `${invoiceNumber}.pdf`, content: pdfBuffer, contentType: 'application/pdf' }];
+    }
+    await transporter.sendMail(mailOpts);
+    console.log(`[Email] Invoice sent to ${c.email} — ${invoiceNumber}${pdfBuffer ? ' (with PDF)' : ''}`);
   } catch (err) {
     console.error('[Email] sendInvoiceEmail error:', err.message);
   }

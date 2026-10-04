@@ -4,10 +4,10 @@ const { query } = require('../db');
 
 // ── Config ────────────────────────────────────────────────────────────────────
 // Set these in Railway environment variables:
-//   WHATSAPP_PROVIDER  = interakt | generic (default: generic/log-only)
-//   WHATSAPP_API_KEY   = your API key / Bearer token
-//   WHATSAPP_API_URL   = API endpoint (for generic provider)
-//   WHATSAPP_TEMPLATE  = template name (for Interakt, default: weekly_pop_report)
+//   WHATSAPP_PROVIDER  = aisensy | interakt | generic (default: log-only)
+//   WHATSAPP_API_KEY   = your API key
+//   WHATSAPP_API_URL   = API endpoint (generic provider only)
+//   WHATSAPP_TEMPLATE  = template name (default: weekly_pop_report)
 // ─────────────────────────────────────────────────────────────────────────────
 
 const PROVIDER   = (process.env.WHATSAPP_PROVIDER || 'log').toLowerCase();
@@ -45,6 +45,31 @@ async function sendWhatsApp(phone, message, templateParams = null) {
   if (normalized.length !== 10) {
     console.warn(`[WhatsApp] Invalid phone skipped: ${phone}`);
     return { skipped: true };
+  }
+
+  if (PROVIDER === 'aisensy') {
+    // Aisensy campaign API
+    const payload = {
+      apiKey: API_KEY,
+      campaignName: TEMPLATE,
+      destination: `91${normalized}`,
+      userName: templateParams ? templateParams[0] : 'Advertiser',
+      templateParams: templateParams || [message],
+      source: 'signagecms-backend',
+      media: {},
+      buttons: [],
+      carouselCards: [],
+      location: {},
+      paramsFallbackValue: { FirstName: templateParams ? templateParams[0] : 'Advertiser' },
+    };
+    try {
+      const r = await httpPost('https://backend.aisensy.com/campaign/t1/api/v2', payload);
+      console.log(`[WhatsApp] Aisensy sent to ${normalized}: HTTP ${r.status}`);
+      return r;
+    } catch (err) {
+      console.error(`[WhatsApp] Aisensy error for ${normalized}:`, err.message);
+      return { error: err.message };
+    }
   }
 
   if (PROVIDER === 'interakt') {
