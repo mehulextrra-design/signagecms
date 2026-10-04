@@ -1,22 +1,34 @@
-const nodemailer = require('nodemailer');
 const { query } = require('../db');
 const { generateInvoicePDF } = require('./invoice-pdf');
 
-const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  port: 587,
-  secure: false,
-  requireTLS: true,
-  auth: {
-    user: process.env.GMAIL_USER,
-    pass: process.env.GMAIL_PASS,
-  },
-  tls: { rejectUnauthorized: false },
-  connectionTimeout: 15000,
-  greetingTimeout: 10000,
-});
+const FROM_NAME = 'SignageCMS';
+const FROM_EMAIL = process.env.FROM_EMAIL || process.env.GMAIL_USER || 'noreply@extrravenue.com';
+const FROM = `${FROM_NAME} <${FROM_EMAIL}>`;
 
-const FROM = `"SignageCMS" <${process.env.GMAIL_USER}>`;
+async function sendMail({ to, subject, html, attachments = [] }) {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    console.error('[Email] RESEND_API_KEY not set');
+    return;
+  }
+  const payload = { from: FROM, to: [to], subject, html };
+  if (attachments.length) {
+    payload.attachments = attachments.map(a => ({
+      filename: a.filename,
+      content: Buffer.isBuffer(a.content) ? a.content.toString('base64') : a.content,
+    }));
+  }
+  const res = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`Resend API ${res.status}: ${body}`);
+  }
+  return res.json();
+}
 
 // ── HTML wrapper ──────────────────────────────────────────────────────────
 function wrap(title, body) {
@@ -55,10 +67,6 @@ function wrap(title, body) {
 
 // ── Invoice email (after payment confirmed) ───────────────────────────────
 async function sendInvoiceEmail(campaignId, invoiceNumber) {
-  if (!process.env.GMAIL_USER || !process.env.GMAIL_PASS) {
-    console.error('[Email] GMAIL_USER or GMAIL_PASS not set in environment variables');
-    return;
-  }
   try {
     const { rows } = await query(
       `SELECT c.title, c.campaign_code, c.start_date, c.end_date,
@@ -91,16 +99,12 @@ async function sendInvoiceEmail(campaignId, invoiceNumber) {
     let pdfBuffer = null;
     try { pdfBuffer = await generateInvoicePDF(c, { email: c.email, first_name: c.first_name, last_name: c.last_name, business_name: c.business_name, gst_number: c.gst_number, mobile: c.mobile, city: c.city }, invoiceNumber); } catch (e) { console.error('[Email] PDF gen error:', e.message); }
 
-    const mailOpts = {
-      from: FROM,
+    await sendMail({
       to: c.email,
       subject: `Invoice ${invoiceNumber} – ${c.campaign_code} | SignageCMS`,
       html: wrap('Invoice', body),
-    };
-    if (pdfBuffer) {
-      mailOpts.attachments = [{ filename: `${invoiceNumber}.pdf`, content: pdfBuffer, contentType: 'application/pdf' }];
-    }
-    await transporter.sendMail(mailOpts);
+      attachments: pdfBuffer ? [{ filename: `${invoiceNumber}.pdf`, content: pdfBuffer }] : [],
+    });
     console.log(`[Email] Invoice sent to ${c.email} — ${invoiceNumber}${pdfBuffer ? ' (with PDF)' : ''}`);
   } catch (err) {
     console.error('[Email] sendInvoiceEmail error:', err.message);
@@ -133,8 +137,7 @@ async function sendApprovedEmail(campaignId) {
       <p>You can track real-time impressions and play counts from your dashboard.</p>
       <a class="btn" href="${process.env.APP_URL || 'https://signagecrm-production.up.railway.app'}">View Live Campaign</a>`;
 
-    await transporter.sendMail({
-      from: FROM,
+    await sendMail({
       to: c.email,
       subject: `Campaign Approved – ${c.campaign_code} is now live | SignageCMS`,
       html: wrap('Campaign Approved', body),
@@ -170,8 +173,7 @@ async function sendRejectedEmail(campaignId, reason) {
       <p>Please update your creative or contact us to resubmit your campaign.</p>
       <a class="btn" href="${process.env.APP_URL || 'https://signagecrm-production.up.railway.app'}">Update Campaign</a>`;
 
-    await transporter.sendMail({
-      from: FROM,
+    await sendMail({
       to: c.email,
       subject: `Campaign Update Required – ${c.campaign_code} | SignageCMS`,
       html: wrap('Campaign Rejected', body),
@@ -224,8 +226,7 @@ async function sendDailyPoPReport() {
       <div class="card">${rows}</div>
       <a class="btn" href="${process.env.APP_URL || 'https://signagecrm-production.up.railway.app'}/admin">View Admin Dashboard</a>`;
 
-    await transporter.sendMail({
-      from: FROM,
+    await sendMail({
       to: adminEmail,
       subject: `Daily PoP Report – ${today} · ${totalPlays} plays | SignageCMS`,
       html: wrap('Daily PoP Report', body),
