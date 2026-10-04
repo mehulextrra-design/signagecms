@@ -286,7 +286,9 @@ Dashboard pe jaake real-time Proof of Play dekh sakte hain:
 🔗 signagecrm-production.up.railway.app
 
 — Team SignageCMS`;
-  return sendWhatsApp(d.mobile, msg, [name, d.campaign_code, fmtDate(d.start_date), fmtDate(d.end_date)], TPL_APPROVED);
+  // campaign_approved template has IMAGE header — send banner image
+  const bannerUrl = process.env.WA_APPROVED_BANNER || null;
+  return sendWhatsApp(d.mobile, msg, [name, d.campaign_code, fmtDate(d.start_date), fmtDate(d.end_date)], TPL_APPROVED, bannerUrl);
 }
 
 // ── Invoice confirmed (document template — attaches PDF) ─────────────────────
@@ -354,7 +356,8 @@ Agar aap apna ad continue rakhna chahte hain toh abhi renew kar lo — gap nahi 
 
 — Team SignageCMS`;
   const tpl = daysLeft === 1 ? TPL_EXPIRY_1 : TPL_EXPIRY_2;
-  return sendWhatsApp(d.mobile, msg, [name, d.campaign_code, fmtDate(d.end_date), String(daysLeft)], tpl);
+  // Templates have 3 vars: name, campaign_code, end_date
+  return sendWhatsApp(d.mobile, msg, [name, d.campaign_code, fmtDate(d.end_date)], tpl);
 }
 
 // ── Campaign completed ────────────────────────────────────────────────────────
