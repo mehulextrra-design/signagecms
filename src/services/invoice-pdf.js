@@ -1,6 +1,6 @@
 const PDFDocument = require('pdfkit');
 const path = require('path');
-const fs = require('fs');
+const fs   = require('fs');
 
 const LOGO_PATH = process.env.COMPANY_LOGO_PATH
   || path.join(__dirname, '../../public/assets/logo.png');
@@ -14,152 +14,335 @@ const CO = {
   phone:   process.env.COMPANY_PHONE   || '',
 };
 
-const ORANGE = '#ff5c00';
-const DARK   = '#1e1e1e';
-const MUTED  = '#787068';
-const LIGHT  = '#f7f4ef';
-const LINE   = '#e0dbd3';
+const ORANGE    = '#ff5c00';
+const DARK      = '#111827';
+const MUTED     = '#6b7280';
+const LINE      = '#e5e7eb';
+const FAINT     = '#f3f4f6';
+const GREEN_FG  = '#16a34a';
+const GREEN_BG  = '#dcfce7';
+const BLUE_FG   = '#1d4ed8';
+const BLUE_BG   = '#eff6ff';
+const BODY_BG   = '#edecea';
+const CARD_BG   = '#ffffff';
 
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-function rupee(n) { return `Rs.${parseFloat(n||0).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2})}`; }
+
+function rupee(n) {
+  return `Rs.${parseFloat(n || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+}
 function fmt(d) {
   if (!d) return '—';
-  // pg DATE columns arrive as Date objects; convert safely to ISO first
   const iso = (d instanceof Date) ? d.toISOString().slice(0,10) : String(d).slice(0,10);
-  const [y, m, day] = iso.split('-');
-  return `${day} ${MONTHS[parseInt(m,10)-1]} ${y}`;
+  const [yr, m, day] = iso.split('-');
+  return `${day} ${MONTHS[parseInt(m,10)-1]} ${yr}`;
 }
 
 /**
- * Generate an invoice PDF buffer for a campaign.
- * @param {object} campaign  — row from DB (all columns needed)
- * @param {object} user      — row from DB
- * @param {string} invoiceNo — e.g. "INV-2024-00042"
- * @returns {Promise<Buffer>}
+ * @param {object} campaign
+ * @param {object} user
+ * @param {string} invoiceNo
+ * @param {object} [payment]  { razorpay_payment_id, method }
  */
-function generateInvoicePDF(campaign, user, invoiceNo) {
+function generateInvoicePDF(campaign, user, invoiceNo, payment = {}) {
   return new Promise((resolve, reject) => {
     try {
-      const doc = new PDFDocument({ size: 'A4', margin: 50 });
+      const doc = new PDFDocument({ size: 'A4', margin: 0 });
       const chunks = [];
       doc.on('data', c => chunks.push(c));
-      doc.on('end', () => resolve(Buffer.concat(chunks)));
+      doc.on('end',  () => resolve(Buffer.concat(chunks)));
       doc.on('error', reject);
 
-      const W = doc.page.width - 100; // usable width (50 margin each side)
+      const PW = doc.page.width;   // 595.28
+      const PH = doc.page.height;  // 841.89
 
-      // ── Header bar ────────────────────────────────────────────────────────
-      doc.rect(50, 50, W, 56).fill(DARK);
+      // Card insets
+      const CX = 28, CY = 28;
+      const CW = PW - CX * 2;   // card width
+      const IL = CX + 32;        // inner left  (padding inside card)
+      const IR = CX + CW - 32;   // inner right
+      const IW = IR - IL;        // inner width
 
-      const logoExists = fs.existsSync(LOGO_PATH);
-      if (logoExists) {
-        // Fit logo inside a 44×44 box at the left of the header
-        try {
-          doc.image(LOGO_PATH, 58, 58, { fit: [44, 44], align: 'center', valign: 'center' });
-        } catch (_) { /* logo load failed — fall through to text */ }
-      }
+      // ── BODY BACKGROUND ──────────────────────────────────────────────────
+      doc.rect(0, 0, PW, PH).fill(BODY_BG);
 
-      const textX = logoExists ? 112 : 68;
-      doc.fontSize(16).font('Helvetica-Bold').fillColor('#ffffff').text(CO.name, textX, 62);
-      doc.fontSize(9).font('Helvetica').fillColor('#aaaaaa').text('Digital Out-of-Home Platform', textX, 82);
+      // ── WHITE CARD (draw outline now; we'll know final height after content) ─
+      // We draw card background first (full estimated height), content on top
+      const CARD_H_EST = PH - CY * 2;
+      doc.roundedRect(CX, CY, CW, CARD_H_EST, 10).fill(CARD_BG);
+      // card border
+      doc.roundedRect(CX, CY, CW, CARD_H_EST, 10)
+        .strokeColor('#d1d5db').lineWidth(0.5).stroke();
 
-      if (!logoExists) {
-        // Fallback dot indicator
-        doc.circle(58, 78, 10).fill(ORANGE);
-      }
+      let y = CY; // running Y inside card
 
-      // ── Invoice label + number ────────────────────────────────────────────
-      const topY = 124;
-      doc.fontSize(26).font('Helvetica-Bold').fillColor(DARK).text('INVOICE', 50, topY);
-      doc.fontSize(10).font('Helvetica').fillColor(MUTED).text(invoiceNo, 50, topY + 32);
+      // ── 1. HEADER ─────────────────────────────────────────────────────────
+      // white bg (already drawn by card), just draw content
+      const HDR_PAD = 26;
+      const hdrContentY = y + HDR_PAD;
 
-      // right side: date + status
+      // Logo icon box (orange screen icon)
+      const iconX = IL, iconY = hdrContentY;
+      doc.rect(iconX, iconY, 40, 40).fill('#fff3ed').stroke('#e5e7eb');
+      // screen icon lines inside
+      doc.rect(iconX + 7, iconY + 9, 26, 17).strokeColor(ORANGE).lineWidth(1.5).stroke();
+      doc.moveTo(iconX + 14, iconY + 26).lineTo(iconX + 14, iconY + 31).stroke();
+      doc.moveTo(iconX + 26, iconY + 26).lineTo(iconX + 26, iconY + 31).stroke();
+      doc.moveTo(iconX + 11, iconY + 31).lineTo(iconX + 29, iconY + 31).stroke();
+      doc.rect(iconX + 12, iconY + 13, 8, 7).fill(ORANGE).opacity(0.7);
+      doc.opacity(1);
+
+      // Company name + subtitle
+      const brandX = iconX + 52;
+      doc.fontSize(16).font('Helvetica-Bold').fillColor(DARK)
+        .text(CO.name, brandX, hdrContentY + 3, { width: 200, lineBreak: false });
+      doc.fontSize(9).font('Helvetica').fillColor(MUTED)
+        .text('EXTRRAVENUE · DIGITAL OOH PLATFORM', brandX, hdrContentY + 24, { width: 200, lineBreak: false });
+
+      // INVOICE + number (right side)
+      doc.fontSize(30).font('Helvetica-Bold').fillColor(DARK)
+        .text('INVOICE', IL, hdrContentY, { width: IW, align: 'right', lineBreak: false });
+      doc.fontSize(11).font('Helvetica').fillColor(MUTED)
+        .text(invoiceNo, IL, hdrContentY + 36, { width: IW, align: 'right', lineBreak: false });
+
+      y = hdrContentY + 46 + HDR_PAD;
+
+      // bottom border of header
+      doc.moveTo(CX, y).lineTo(CX + CW, y).strokeColor(LINE).lineWidth(0.5).stroke();
+
+      // ── 2. META BAR ──────────────────────────────────────────────────────
+      const META_H  = 64;
+      const cellW   = CW / 4;
+      const period  = `${fmt(campaign.start_date)} – ${fmt(campaign.end_date)}`;
       const issueDate = fmt(new Date());
-      doc.fontSize(8).font('Helvetica').fillColor(MUTED).text('Issue Date', 380, topY, { width: 165, align: 'right' });
-      doc.fontSize(12).font('Helvetica-Bold').fillColor(DARK).text(issueDate, 380, topY + 13, { width: 165, align: 'right' });
-      doc.fontSize(8).font('Helvetica').fillColor(MUTED).text('Status', 380, topY + 34, { width: 165, align: 'right' });
-      doc.rect(doc.page.width - 50 - 50, topY + 47, 50, 16).fill('#dcfce7');
-      doc.fontSize(8).font('Helvetica-Bold').fillColor('#16a34a').text('PAID', doc.page.width - 50 - 50, topY + 51, { width: 50, align: 'center' });
 
-      // ── Divider ───────────────────────────────────────────────────────────
-      const divY = topY + 74;
-      doc.moveTo(50, divY).lineTo(50 + W, divY).strokeColor(LINE).lineWidth(1).stroke();
+      // Compact period: "01 Oct – 31 Oct 2026" (drop start year if same year)
+      const sISO = fmt(campaign.start_date), eISO = fmt(campaign.end_date);
+      const sYear = sISO.slice(-4), eYear = eISO.slice(-4);
+      const compactPeriod = sYear === eYear
+        ? `${sISO.slice(0, -5)} – ${eISO}`   // "01 Oct – 31 Oct 2026"
+        : period;
 
-      // ── From / To columns ─────────────────────────────────────────────────
-      const colY = divY + 16;
-      const col2 = 300;
+      const metaItems = [
+        { label: 'ISSUE DATE',      value: issueDate,      badge: null },
+        { label: 'DUE DATE',        value: 'Immediate',    badge: null },
+        { label: 'STATUS',          value: null,           badge: { text: 'PAID', bg: GREEN_BG, fg: GREEN_FG } },
+        { label: 'CAMPAIGN PERIOD', value: null,           badge: { text: compactPeriod, bg: BLUE_BG, fg: BLUE_FG } },
+      ];
 
-      doc.fontSize(8).font('Helvetica-Bold').fillColor(ORANGE).text('FROM', 50, colY);
-      doc.fontSize(11).font('Helvetica-Bold').fillColor(DARK).text(CO.name, 50, colY + 14);
-      let fromY = colY + 30;
-      const fromLines = [CO.address, CO.phone, CO.email, CO.gst ? `GST: ${CO.gst}` : null, CO.pan ? `PAN: ${CO.pan}` : null].filter(Boolean);
-      fromLines.forEach(l => { doc.fontSize(9).font('Helvetica').fillColor(MUTED).text(l, 50, fromY); fromY += 14; });
+      metaItems.forEach(({ label, value, badge }, i) => {
+        const cx = CX + i * cellW;
+        const lx = cx + 20;
 
-      doc.fontSize(8).font('Helvetica-Bold').fillColor(ORANGE).text('BILLED TO', col2, colY);
-      const clientName = user.business_name || `${user.first_name || ''} ${user.last_name || ''}`.trim() || user.email;
-      doc.fontSize(11).font('Helvetica-Bold').fillColor(DARK).text(clientName, col2, colY + 14);
-      let toY = colY + 30;
-      const toLines = [user.email, user.mobile, user.city, user.gst_number ? `GST: ${user.gst_number}` : null].filter(Boolean);
-      toLines.forEach(l => { doc.fontSize(9).font('Helvetica').fillColor(MUTED).text(l, col2, toY); toY += 14; });
+        // vertical divider
+        if (i > 0) {
+          doc.moveTo(cx, y).lineTo(cx, y + META_H).strokeColor(LINE).lineWidth(0.5).stroke();
+        }
 
-      // ── Campaign details table ─────────────────────────────────────────────
-      const tblY = Math.max(fromY, toY) + 24;
-      doc.rect(50, tblY, W, 24).fill(DARK);
-      const hdrs = [['#', 36, 20], ['Description', 88, 260], ['Period', 350, 110], ['Amount', 462, 83]];
-      hdrs.forEach(([h, x, w]) => doc.fontSize(8).font('Helvetica-Bold').fillColor('#ffffff').text(h, x, tblY + 7, { width: w }));
+        // label
+        doc.fontSize(8).font('Helvetica-Bold').fillColor(MUTED)
+          .text(label, lx, y + 14, { width: cellW - 24, lineBreak: false });
 
-      // row — description includes campaign code as sub-line
-      const rowY = tblY + 24;
-      const period = `${fmt(campaign.start_date)} – ${fmt(campaign.end_date)}`;
-      const rowH = 40;
-      doc.rect(50, rowY, W, rowH).fill(LIGHT);
-      // #
-      doc.fontSize(9).font('Helvetica').fillColor(MUTED).text('01', 60, rowY + 8, { width: 20 });
-      // description + code
-      doc.fontSize(9).font('Helvetica-Bold').fillColor(DARK).text(campaign.title || campaign.campaign_code, 88, rowY + 7, { width: 255 });
-      doc.fontSize(8).font('Helvetica').fillColor(MUTED).text(campaign.campaign_code || '', 88, rowY + 22, { width: 255 });
-      // period
-      doc.fontSize(9).font('Helvetica').fillColor(DARK).text(period, 350, rowY + 14, { width: 106 });
-      // amount
-      doc.fontSize(9).font('Helvetica-Bold').fillColor(DARK).text(rupee(campaign.amount_base), 462, rowY + 14, { width: 83, align: 'right' });
+        if (badge) {
+          const maxBw = cellW - 24;
+          doc.fontSize(8).font('Helvetica-Bold');
+          const textW = Math.min(doc.widthOfString(badge.text), maxBw - 14);
+          const bw    = Math.min(textW + 16, maxBw);
+          doc.rect(lx, y + 29, bw, 18).fill(badge.bg);
+          doc.fillColor(badge.fg)
+            .text(badge.text, lx + 7, y + 33, { width: bw - 10, lineBreak: false });
+        } else {
+          doc.fontSize(13).font('Helvetica-Bold').fillColor(DARK)
+            .text(value, lx, y + 30, { width: cellW - 24, lineBreak: false });
+        }
+      });
 
-      // ── Totals block ──────────────────────────────────────────────────────
-      let sumY = rowY + rowH + 12;
-      const sumX = 370;
-      const sumW = W - (sumX - 50);
+      y += META_H;
+      doc.moveTo(CX, y).lineTo(CX + CW, y).strokeColor(LINE).lineWidth(0.5).stroke();
 
-      function sumRow(label, value, bold = false, color = DARK) {
-        doc.moveTo(sumX, sumY).lineTo(50 + W, sumY).strokeColor(LINE).lineWidth(0.5).stroke();
-        doc.fontSize(9)
-          .font(bold ? 'Helvetica-Bold' : 'Helvetica')
-          .fillColor(MUTED).text(label, sumX, sumY + 6, { width: sumW * 0.55 })
-          .fillColor(color).text(value, sumX + sumW * 0.55, sumY + 6, { width: sumW * 0.45, align: 'right' });
-        sumY += 22;
+      // ── 3. ADDRESSES ────────────────────────────────────────────────────
+      const addrW  = IW / 2 - 16;
+      const col2X  = IL + IW / 2 + 8;
+      let ay = y + 26;
+
+      // FROM
+      doc.fontSize(8).font('Helvetica-Bold').fillColor(ORANGE)
+        .text('FROM', IL, ay, { lineBreak: false });
+      doc.fontSize(14).font('Helvetica-Bold').fillColor(DARK)
+        .text(CO.name, IL, ay + 14, { width: addrW, lineBreak: false });
+      let fromY = ay + 34;
+      const fromLines = [
+        CO.address,
+        [CO.email, CO.phone].filter(Boolean).join('  ·  '),
+        CO.gst ? `GST:  ${CO.gst}` : null,
+        CO.pan ? `PAN:  ${CO.pan}` : null,
+      ].filter(Boolean);
+      fromLines.forEach(l => {
+        doc.fontSize(10).font('Helvetica').fillColor(MUTED)
+          .text(l, IL, fromY, { width: addrW, lineBreak: false });
+        fromY += 15;
+      });
+
+      // BILLED TO
+      const clientName = user.business_name
+        || `${user.first_name || ''} ${user.last_name || ''}`.trim()
+        || user.email;
+      doc.fontSize(8).font('Helvetica-Bold').fillColor(ORANGE)
+        .text('BILLED TO', col2X, ay, { lineBreak: false });
+      doc.fontSize(14).font('Helvetica-Bold').fillColor(DARK)
+        .text(clientName, col2X, ay + 14, { width: addrW, lineBreak: false });
+      let toY = ay + 34;
+      const toLines = [
+        [user.email, user.mobile].filter(Boolean).join('  ·  '),
+        user.city,
+        user.gst_number ? `GST:  ${user.gst_number}` : null,
+      ].filter(Boolean);
+      toLines.forEach(l => {
+        doc.fontSize(10).font('Helvetica').fillColor(MUTED)
+          .text(l, col2X, toY, { width: addrW, lineBreak: false });
+        toY += 15;
+      });
+
+      y = Math.max(fromY, toY) + 22;
+      doc.moveTo(CX, y).lineTo(CX + CW, y).strokeColor(LINE).lineWidth(0.5).stroke();
+      y += 16;
+
+      // ── 4. TABLE ─────────────────────────────────────────────────────────
+      const COL_NUM  = { x: IL,          w: 26 };
+      const COL_DESC = { x: IL + 28,     w: IW - 28 - 110 - 100 };
+      const COL_SCR  = { x: IR - 206,    w: 100 };
+      const COL_AMT  = { x: IR - 100,    w: 100 };
+
+      // Table header row
+      doc.fontSize(8.5).font('Helvetica-Bold').fillColor(MUTED)
+        .text('#',           COL_NUM.x,  y, { width: COL_NUM.w,  lineBreak: false })
+        .text('DESCRIPTION', COL_DESC.x, y, { width: COL_DESC.w, lineBreak: false })
+        .text('SCREENS',     COL_SCR.x,  y, { width: COL_SCR.w,  align: 'right', lineBreak: false })
+        .text('AMOUNT',      COL_AMT.x,  y, { width: COL_AMT.w,  align: 'right', lineBreak: false });
+      y += 14;
+      // thick underline
+      doc.moveTo(IL, y).lineTo(IR, y).strokeColor(DARK).lineWidth(1.8).stroke();
+      y += 14;
+
+      // Row — draw # / screens / amount first (same y), then description block
+      const slotSec   = campaign.slot_duration_sec || 15;
+      const startD    = campaign.start_date instanceof Date ? campaign.start_date : new Date(campaign.start_date);
+      const endD      = campaign.end_date   instanceof Date ? campaign.end_date   : new Date(campaign.end_date);
+      const durationDays = Math.round((endD - startD) / (1000 * 60 * 60 * 24)) + 1;
+      const metaLine  = `${slotSec}-sec slot · Standard package · ${durationDays} days`;
+      const codeLine  = `${campaign.campaign_code || ''}  ·  ${fmt(campaign.start_date)} – ${fmt(campaign.end_date)}`;
+
+      const rowStartY = y;
+      // # column
+      doc.fontSize(11).font('Helvetica').fillColor(MUTED)
+        .text('01', COL_NUM.x, rowStartY, { width: COL_NUM.w, lineBreak: false });
+      // screens column
+      doc.fontSize(11).font('Helvetica').fillColor(MUTED)
+        .text('--', COL_SCR.x, rowStartY, { width: COL_SCR.w, align: 'right', lineBreak: false });
+      // amount column
+      doc.fontSize(12).font('Helvetica-Bold').fillColor(DARK)
+        .text(rupee(campaign.amount_base), COL_AMT.x, rowStartY, { width: COL_AMT.w, align: 'right', lineBreak: false });
+
+      // description block — allow wrapping, track cursor after
+      doc.fontSize(12).font('Helvetica-Bold').fillColor(DARK)
+        .text(campaign.title || campaign.campaign_code, COL_DESC.x, rowStartY, { width: COL_DESC.w, lineBreak: true });
+      const afterTitle = doc.y;
+      doc.fontSize(9.5).font('Helvetica').fillColor(MUTED)
+        .text(metaLine, COL_DESC.x, afterTitle + 2, { width: COL_DESC.w, lineBreak: false });
+      doc.fontSize(9).font('Helvetica').fillColor(MUTED)
+        .text(codeLine, COL_DESC.x, afterTitle + 16, { width: COL_DESC.w, lineBreak: false });
+
+      y = afterTitle + 32;
+      doc.moveTo(IL, y).lineTo(IR, y).strokeColor(LINE).lineWidth(0.5).stroke();
+      y += 12;
+
+      // ── 5. TOTALS ────────────────────────────────────────────────────────
+      const TOT_W = 290;
+      const TOT_X = IR - TOT_W;
+
+      const ROW_H = 30;
+
+      function totLine(label, value, valColor = DARK, bold = false) {
+        const font = bold ? 'Helvetica-Bold' : 'Helvetica';
+        const textY = y + 9;
+        doc.fontSize(11).font('Helvetica').fillColor(MUTED)
+          .text(label, TOT_X, textY, { width: TOT_W * 0.6, lineBreak: false });
+        doc.font(font).fillColor(valColor)
+          .text(value, TOT_X, textY, { width: TOT_W, align: 'right', lineBreak: false });
+        y += ROW_H;
+        doc.moveTo(TOT_X, y).lineTo(IR, y).strokeColor(LINE).lineWidth(0.5).stroke();
       }
 
       if (campaign.coupon_code && parseFloat(campaign.discount_amount) > 0) {
-        sumRow(`Subtotal`, rupee(parseFloat(campaign.amount_base) + parseFloat(campaign.discount_amount)));
-        sumRow(`Coupon (${campaign.coupon_code})`, `−${rupee(campaign.discount_amount)}`);
+        totLine('Subtotal (before discount)',
+          rupee(parseFloat(campaign.amount_base) + parseFloat(campaign.discount_amount)));
+        totLine(`Coupon ${campaign.coupon_code} (-${Math.round(parseFloat(campaign.discount_amount) / (parseFloat(campaign.amount_base) + parseFloat(campaign.discount_amount)) * 100)}%)`,
+          `-${rupee(campaign.discount_amount)}`, GREEN_FG);
       }
-      sumRow('Base Amount', rupee(campaign.amount_base));
-      sumRow('GST (18%)', rupee(campaign.amount_gst));
-      sumRow('Total Paid', rupee(campaign.amount_total), true, ORANGE);
+      totLine('Base Amount', rupee(campaign.amount_base));
+      totLine('GST @ 18%',   rupee(campaign.amount_gst));
 
-      // ── Footer ────────────────────────────────────────────────────────────
-      const ftY = doc.page.height - 72;
-      doc.rect(50, ftY, W, 0.5).fill(LINE);
-      // left side
-      doc.fontSize(8).font('Helvetica-Bold').fillColor(DARK)
-        .text(CO.name, 50, ftY + 10, { width: W / 2 });
-      doc.fontSize(7.5).font('Helvetica').fillColor(MUTED)
-        .text('This is a computer-generated invoice and does not require a signature.', 50, ftY + 22, { width: W / 2 });
+      // Grand total — inline (no box), large orange amount
+      y += 10;
+      doc.fontSize(13).font('Helvetica-Bold').fillColor(DARK)
+        .text('Total Paid', TOT_X, y + 6, { width: TOT_W * 0.5, lineBreak: false });
+      doc.fontSize(22).font('Helvetica-Bold').fillColor(ORANGE)
+        .text(rupee(campaign.amount_total), TOT_X, y, { width: TOT_W, align: 'right', lineBreak: false });
+      y += 38;
+
+      // ── 6. NOTE BOX ──────────────────────────────────────────────────────
+      y += 10;
+      const noteText = 'Your campaign is now under review. Once approved, it will go live automatically on the scheduled start date. You will receive a confirmation email and WhatsApp message when it is approved.';
+      const noteH = 54;
+      const noteInnerW = IW - 28;
+      doc.rect(IL, y, IW, noteH).fill(FAINT);
+      doc.rect(IL, y, 3, noteH).fill(ORANGE);
+      // measure bold prefix width to continue inline
+      doc.fontSize(9.5).font('Helvetica-Bold');
+      const boldPfxW = doc.widthOfString('Campaign Status: ');
+      doc.fillColor(DARK)
+        .text('Campaign Status: ', IL + 14, y + 11, { lineBreak: false });
+      doc.font('Helvetica').fillColor(MUTED)
+        .text(noteText, IL + 14 + boldPfxW, y + 11, { width: noteInnerW - boldPfxW, lineBreak: true });
+      y += noteH + 20;
+
+      // ── 7. FOOTER ────────────────────────────────────────────────────────
+      doc.moveTo(CX, y).lineTo(CX + CW, y).strokeColor(LINE).lineWidth(0.5).stroke();
+      y += 14;
+
+      // Left side
+      doc.fontSize(9.5).font('Helvetica-Bold').fillColor(DARK)
+        .text(`${CO.name}`, IL, y, { lineBreak: false });
+      doc.fontSize(9.5).font('Helvetica').fillColor(MUTED)
+        .text(' · SignageCMS', IL + doc.widthOfString(CO.name, { fontSize: 9.5 }) + 2, y, { lineBreak: false });
+
+      doc.fontSize(9).font('Helvetica').fillColor(MUTED)
+        .text('This is a computer-generated invoice and does not require a signature.', IL, y + 14, { lineBreak: false });
+
+      // GSTIN chip
       if (CO.gst) {
-        doc.fontSize(7.5).fillColor(MUTED)
-          .text(`GSTIN: ${CO.gst}`, 50, ftY + 34, { width: W / 2 });
+        const chipText = `GSTIN:  ${CO.gst}`;
+        const chipW = doc.widthOfString(chipText, { fontSize: 8.5 }) + 16;
+        doc.rect(IL, y + 30, chipW, 16).fill(FAINT);
+        doc.fontSize(8.5).font('Helvetica').fillColor(DARK)
+          .text(chipText, IL + 8, y + 33, { lineBreak: false });
       }
-      // right side
-      doc.fontSize(7.5).font('Helvetica').fillColor(MUTED)
-        .text('signagecrm-production.up.railway.app', 50 + W / 2, ftY + 22, { width: W / 2, align: 'right' });
+
+      // Right side
+      const payRef = payment.razorpay_payment_id || '';
+      const payMethod = payment.method || 'Razorpay';
+      const rightLines = [
+        payRef ? `Payment Reference: ${payRef}` : null,
+        payRef ? `Method: ${payMethod}` : null,
+        'https://extrravenue.com',
+      ].filter(Boolean);
+
+      let ry = y;
+      rightLines.forEach(l => {
+        doc.fontSize(9).font('Helvetica').fillColor(MUTED)
+          .text(l, IL, ry, { width: IW, align: 'right', lineBreak: false });
+        ry += 14;
+      });
 
       doc.end();
     } catch (err) {
@@ -168,73 +351,56 @@ function generateInvoicePDF(campaign, user, invoiceNo) {
   });
 }
 
-/**
- * Generate a daily Proof-of-Play report PDF.
- * @param {string} userName
- * @param {string} dateStr  e.g. "2024-01-15"
- * @param {Array}  rows     [{campaign_code, title, plays, screens}]
- * @returns {Promise<Buffer>}
- */
 function generatePoPPDF(userName, dateStr, rows) {
   return new Promise((resolve, reject) => {
     try {
-      const doc = new PDFDocument({ size: 'A4', margin: 50 });
+      const doc = new PDFDocument({ size: 'A4', margin: 40 });
       const chunks = [];
       doc.on('data', c => chunks.push(c));
-      doc.on('end', () => resolve(Buffer.concat(chunks)));
+      doc.on('end',  () => resolve(Buffer.concat(chunks)));
       doc.on('error', reject);
 
-      const W = doc.page.width - 100;
+      const W = doc.page.width - 80;
 
-      // Header
-      doc.rect(50, 50, W, 56).fill(DARK);
+      doc.rect(40, 40, W, 56).fill(DARK);
       const logoExists = fs.existsSync(LOGO_PATH);
       if (logoExists) {
-        try { doc.image(LOGO_PATH, 58, 58, { fit: [44, 44] }); } catch (_) {}
+        try { doc.image(LOGO_PATH, 48, 48, { fit: [44, 44] }); } catch (_) {}
       }
-      const tX = logoExists ? 112 : 68;
-      doc.fontSize(16).font('Helvetica-Bold').fillColor('#ffffff').text(CO.name, tX, 62);
-      doc.fontSize(9).font('Helvetica').fillColor('#aaaaaa').text('Proof of Play Report', tX, 82);
+      const tX = logoExists ? 102 : 58;
+      doc.fontSize(16).font('Helvetica-Bold').fillColor('#ffffff').text(CO.name, tX, 52);
+      doc.fontSize(9).font('Helvetica').fillColor('#aaaaaa').text('Proof of Play Report', tX, 72);
 
-      // Title
-      doc.fontSize(20).font('Helvetica-Bold').fillColor(DARK).text('Daily PoP Report', 50, 124);
-      doc.fontSize(10).font('Helvetica').fillColor(MUTED).text(`Date: ${dateStr}   •   Advertiser: ${userName}`, 50, 150);
+      doc.fontSize(20).font('Helvetica-Bold').fillColor(DARK).text('Daily PoP Report', 40, 114);
+      doc.fontSize(10).font('Helvetica').fillColor(MUTED).text(`Date: ${dateStr}   •   Advertiser: ${userName}`, 40, 140);
 
-      const divY = 172;
-      doc.moveTo(50, divY).lineTo(50 + W, divY).strokeColor(LINE).lineWidth(1).stroke();
+      const divY = 162;
+      doc.moveTo(40, divY).lineTo(40 + W, divY).strokeColor(LINE).lineWidth(1).stroke();
 
-      // Table header
       const tblY = divY + 12;
-      doc.rect(50, tblY, W, 26).fill(DARK);
+      doc.rect(40, tblY, W, 26).fill(DARK);
       ['Campaign', 'Code', 'Plays Today', 'Screens'].forEach((h, i) => {
-        const xs = [60, 220, 340, 460];
+        const xs = [50, 210, 330, 450];
         doc.fontSize(8).font('Helvetica-Bold').fillColor('#ffffff').text(h, xs[i], tblY + 9);
       });
 
       let rowY = tblY + 26;
       const totalPlays = rows.reduce((s, r) => s + parseInt(r.plays || 0), 0);
       rows.forEach((r, idx) => {
-        doc.rect(50, rowY, W, 24).fill(idx % 2 === 0 ? LIGHT : '#ffffff');
+        doc.rect(40, rowY, W, 24).fill(idx % 2 === 0 ? FAINT : '#ffffff');
         doc.fontSize(9).font('Helvetica').fillColor(DARK)
-          .text(r.title || r.campaign_code, 60, rowY + 7, { width: 155 })
-          .text(r.campaign_code, 220, rowY + 7, { width: 110 })
-          .text(String(r.plays || 0), 340, rowY + 7, { width: 110 })
-          .text(String(r.screens || 0), 460, rowY + 7, { width: 80 });
+          .text(r.title || r.campaign_code, 50, rowY + 7, { width: 155 })
+          .text(r.campaign_code, 210, rowY + 7, { width: 110 })
+          .text(String(r.plays || 0), 330, rowY + 7, { width: 110 })
+          .text(String(r.screens || 0), 450, rowY + 7, { width: 80 });
         rowY += 24;
       });
 
-      // Total row
       rowY += 4;
-      doc.moveTo(50, rowY).lineTo(50 + W, rowY).strokeColor(LINE).lineWidth(1).stroke();
+      doc.moveTo(40, rowY).lineTo(40 + W, rowY).strokeColor(LINE).lineWidth(1).stroke();
       rowY += 6;
-      doc.fontSize(10).font('Helvetica-Bold').fillColor(DARK).text('Total Plays Today', 60, rowY);
-      doc.fillColor(ORANGE).text(String(totalPlays), 340, rowY);
-
-      // Footer
-      const ftY = doc.page.height - 80;
-      doc.rect(50, ftY, W, 1).fill(LINE);
-      doc.fontSize(8).font('Helvetica').fillColor(MUTED)
-        .text(`${CO.name} · Automated Proof of Play · ${dateStr}`, 50, ftY + 10, { width: W, align: 'center' });
+      doc.fontSize(10).font('Helvetica-Bold').fillColor(DARK).text('Total Plays Today', 50, rowY);
+      doc.fillColor(ORANGE).text(String(totalPlays), 330, rowY);
 
       doc.end();
     } catch (err) { reject(err); }
