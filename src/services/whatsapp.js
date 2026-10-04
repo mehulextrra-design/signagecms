@@ -41,13 +41,12 @@ async function uploadPDFToCloudinary(buffer, publicId) {
         folder: 'signagecms/pdfs',
         public_id: publicId,
         format: 'pdf',
+        access_mode: 'public',
       },
       (err, result) => {
         if (err) return reject(err);
-        // Strip version segment — matching the format of other working Cloudinary URLs
-        const url = result.secure_url.replace(/\/v\d+\//, '/');
-        console.log(`[WhatsApp] PDF uploaded to Cloudinary: ${url}`);
-        resolve(url);
+        console.log(`[WhatsApp] PDF uploaded to Cloudinary: ${result.secure_url}`);
+        resolve(result.secure_url);
       }
     );
     // Write buffer directly — avoids Readable.from() iterating byte-by-byte
