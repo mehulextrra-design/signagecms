@@ -2152,9 +2152,8 @@ function openRazorpay(campaign,btn,btnLabel,onSuccess){
             toast('Payment successful! Campaign submitted for approval.','success');
             if(btn){btn.innerHTML=btnLabel;btn.disabled=false;}
             onSuccess&&onSuccess();
-            resolve();
+            resolve({paid:true});
           }catch(e){toast(e.message,'error');if(btn){btn.innerHTML=btnLabel;btn.disabled=false;}reject(e);}
-          resolve({paid:true});
         },
         modal:{ondismiss:function(){if(btn){btn.innerHTML=btnLabel;btn.disabled=false;}resolve({dismissed:true});}}
       };
