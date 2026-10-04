@@ -38,13 +38,31 @@ function fmt(d) {
   return `${day} ${MONTHS[parseInt(m,10)-1]} ${yr}`;
 }
 
+// Fetch logo buffer from URL or local file
+async function fetchLogoBuffer() {
+  const logoUrl = process.env.COMPANY_LOGO_URL;
+  if (logoUrl) {
+    try {
+      const res = await fetch(logoUrl);
+      if (res.ok) return Buffer.from(await res.arrayBuffer());
+    } catch {}
+  }
+  const logoPath = process.env.COMPANY_LOGO_PATH
+    || path.join(__dirname, '../../public/assets/logo.png');
+  if (fs.existsSync(logoPath)) {
+    try { return fs.readFileSync(logoPath); } catch {}
+  }
+  return null;
+}
+
 /**
  * @param {object} campaign
  * @param {object} user
  * @param {string} invoiceNo
  * @param {object} [payment]  { razorpay_payment_id, method }
  */
-function generateInvoicePDF(campaign, user, invoiceNo, payment = {}) {
+async function generateInvoicePDF(campaign, user, invoiceNo, payment = {}) {
+  const logoBuffer = await fetchLogoBuffer();
   return new Promise((resolve, reject) => {
     try {
       const doc = new PDFDocument({ size: 'A4', margin: 0 });
@@ -81,16 +99,19 @@ function generateInvoicePDF(campaign, user, invoiceNo, payment = {}) {
       const HDR_PAD = 26;
       const hdrContentY = y + HDR_PAD;
 
-      // Logo icon box (orange screen icon)
+      // Logo icon box
       const iconX = IL, iconY = hdrContentY;
-      doc.rect(iconX, iconY, 40, 40).fill('#fff3ed').stroke('#e5e7eb');
-      // screen icon lines inside
-      doc.rect(iconX + 7, iconY + 9, 26, 17).strokeColor(ORANGE).lineWidth(1.5).stroke();
-      doc.moveTo(iconX + 14, iconY + 26).lineTo(iconX + 14, iconY + 31).stroke();
-      doc.moveTo(iconX + 26, iconY + 26).lineTo(iconX + 26, iconY + 31).stroke();
-      doc.moveTo(iconX + 11, iconY + 31).lineTo(iconX + 29, iconY + 31).stroke();
-      doc.rect(iconX + 12, iconY + 13, 8, 7).fill(ORANGE).opacity(0.7);
-      doc.opacity(1);
+      doc.rect(iconX, iconY, 40, 40).fillAndStroke('#fff3ed', '#e5e7eb');
+      if (logoBuffer) {
+        try { doc.image(logoBuffer, iconX + 4, iconY + 4, { fit: [32, 32] }); } catch {}
+      } else {
+        // fallback: drawn screen icon
+        doc.rect(iconX + 7, iconY + 9, 26, 17).strokeColor(ORANGE).lineWidth(1.5).stroke();
+        doc.moveTo(iconX + 14, iconY + 26).lineTo(iconX + 14, iconY + 31).stroke();
+        doc.moveTo(iconX + 26, iconY + 26).lineTo(iconX + 26, iconY + 31).stroke();
+        doc.moveTo(iconX + 11, iconY + 31).lineTo(iconX + 29, iconY + 31).stroke();
+        doc.save().opacity(0.7).rect(iconX + 12, iconY + 13, 8, 7).fill(ORANGE).restore();
+      }
 
       // Company name + subtitle
       const brandX = iconX + 52;
@@ -179,8 +200,8 @@ function generateInvoicePDF(campaign, user, invoiceNo, payment = {}) {
       ].filter(Boolean);
       fromLines.forEach(l => {
         doc.fontSize(10).font('Helvetica').fillColor(MUTED)
-          .text(l, IL, fromY, { width: addrW, lineBreak: false });
-        fromY += 15;
+          .text(l, IL, fromY, { width: addrW, lineBreak: true });
+        fromY = doc.y + 2;
       });
 
       // BILLED TO
@@ -199,8 +220,8 @@ function generateInvoicePDF(campaign, user, invoiceNo, payment = {}) {
       ].filter(Boolean);
       toLines.forEach(l => {
         doc.fontSize(10).font('Helvetica').fillColor(MUTED)
-          .text(l, col2X, toY, { width: addrW, lineBreak: false });
-        toY += 15;
+          .text(l, col2X, toY, { width: addrW, lineBreak: true });
+        toY = doc.y + 2;
       });
 
       y = Math.max(fromY, toY) + 22;
