@@ -300,8 +300,8 @@ router.post('/:id/confirm-payment', authenticate, async (req, res, next) => {
     reviewCampaign(campaign.id).catch(err =>
       console.error('[AI Review] Background review failed:', err.message)
     );
-    sendInvoiceEmail(campaign.id, invNum).catch(() => {});
-    sendInvoiceConfirmedWA(campaign.id, invNum).catch(() => {});
+    sendInvoiceEmail(campaign.id, invNum).catch(e => console.error('[Email] Invoice failed:', e.message));
+    sendInvoiceConfirmedWA(campaign.id, invNum).catch(e => console.error('[WA] Invoice WA failed:', e.message));
   } catch (err) { await client.query('ROLLBACK'); next(err); }
   finally { client.release(); }
 });
@@ -316,8 +316,8 @@ router.post('/:id/approve', authenticate, requireAdmin, async (req, res, next) =
     );
     if (!result.rows.length) return res.status(404).json({ error: 'Campaign not found or not pending approval' });
     res.json(result.rows[0]);
-    sendApprovedEmail(result.rows[0].id).catch(() => {});
-    sendCampaignApprovedWA(result.rows[0].id).catch(() => {});
+    sendApprovedEmail(result.rows[0].id).catch(e => console.error('[Email] Approved email failed:', e.message));
+    sendCampaignApprovedWA(result.rows[0].id).catch(e => console.error('[WA] Approved WA failed:', e.message));
   } catch (err) { next(err); }
 });
 
