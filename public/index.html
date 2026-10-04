@@ -1840,7 +1840,13 @@ async function saveProfile(){
   try{
     const body={email:document.getElementById('prof-email').value.trim(),first_name:document.getElementById('prof-first').value,last_name:document.getElementById('prof-last').value,mobile:document.getElementById('prof-mobile').value,business_name:document.getElementById('prof-biz').value,business_type:document.getElementById('prof-biz-type').value,gst_number:document.getElementById('prof-gst').value,city:document.getElementById('prof-city').value};
     await api(`/users/${currentUser.id}`,{method:'PUT',body:JSON.stringify(body)});
-    currentUser={...currentUser,...body};updateSidebarUser();toast('Profile saved!','success');
+    currentUser={...currentUser,...body};updateSidebarUser();
+    const hName=[body.first_name,body.last_name].filter(Boolean).join(' ')||body.email||currentUser.email;
+    document.getElementById('profile-fullname').textContent=hName;
+    document.getElementById('profile-email-disp').textContent=body.email||currentUser.email;
+    const hInit=hName===body.email?body.email.slice(0,2).toUpperCase():hName.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    document.getElementById('profile-avatar').textContent=hInit;
+    toast('Profile saved!','success');
   }catch(e){toast(e.message,'error');}
 }
 
