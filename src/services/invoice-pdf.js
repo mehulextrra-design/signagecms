@@ -152,4 +152,77 @@ function generateInvoicePDF(campaign, user, invoiceNo) {
   });
 }
 
-module.exports = { generateInvoicePDF };
+/**
+ * Generate a daily Proof-of-Play report PDF.
+ * @param {string} userName
+ * @param {string} dateStr  e.g. "2024-01-15"
+ * @param {Array}  rows     [{campaign_code, title, plays, screens}]
+ * @returns {Promise<Buffer>}
+ */
+function generatePoPPDF(userName, dateStr, rows) {
+  return new Promise((resolve, reject) => {
+    try {
+      const doc = new PDFDocument({ size: 'A4', margin: 50 });
+      const chunks = [];
+      doc.on('data', c => chunks.push(c));
+      doc.on('end', () => resolve(Buffer.concat(chunks)));
+      doc.on('error', reject);
+
+      const W = doc.page.width - 100;
+
+      // Header
+      doc.rect(50, 50, W, 56).fill(DARK);
+      const logoExists = fs.existsSync(LOGO_PATH);
+      if (logoExists) {
+        try { doc.image(LOGO_PATH, 58, 58, { fit: [44, 44] }); } catch (_) {}
+      }
+      const tX = logoExists ? 112 : 68;
+      doc.fontSize(16).font('Helvetica-Bold').fillColor('#ffffff').text(CO.name, tX, 62);
+      doc.fontSize(9).font('Helvetica').fillColor('#aaaaaa').text('Proof of Play Report', tX, 82);
+
+      // Title
+      doc.fontSize(20).font('Helvetica-Bold').fillColor(DARK).text('Daily PoP Report', 50, 124);
+      doc.fontSize(10).font('Helvetica').fillColor(MUTED).text(`Date: ${dateStr}   •   Advertiser: ${userName}`, 50, 150);
+
+      const divY = 172;
+      doc.moveTo(50, divY).lineTo(50 + W, divY).strokeColor(LINE).lineWidth(1).stroke();
+
+      // Table header
+      const tblY = divY + 12;
+      doc.rect(50, tblY, W, 26).fill(DARK);
+      ['Campaign', 'Code', 'Plays Today', 'Screens'].forEach((h, i) => {
+        const xs = [60, 220, 340, 460];
+        doc.fontSize(8).font('Helvetica-Bold').fillColor('#ffffff').text(h, xs[i], tblY + 9);
+      });
+
+      let rowY = tblY + 26;
+      const totalPlays = rows.reduce((s, r) => s + parseInt(r.plays || 0), 0);
+      rows.forEach((r, idx) => {
+        doc.rect(50, rowY, W, 24).fill(idx % 2 === 0 ? LIGHT : '#ffffff');
+        doc.fontSize(9).font('Helvetica').fillColor(DARK)
+          .text(r.title || r.campaign_code, 60, rowY + 7, { width: 155 })
+          .text(r.campaign_code, 220, rowY + 7, { width: 110 })
+          .text(String(r.plays || 0), 340, rowY + 7, { width: 110 })
+          .text(String(r.screens || 0), 460, rowY + 7, { width: 80 });
+        rowY += 24;
+      });
+
+      // Total row
+      rowY += 4;
+      doc.moveTo(50, rowY).lineTo(50 + W, rowY).strokeColor(LINE).lineWidth(1).stroke();
+      rowY += 6;
+      doc.fontSize(10).font('Helvetica-Bold').fillColor(DARK).text('Total Plays Today', 60, rowY);
+      doc.fillColor(ORANGE).text(String(totalPlays), 340, rowY);
+
+      // Footer
+      const ftY = doc.page.height - 80;
+      doc.rect(50, ftY, W, 1).fill(LINE);
+      doc.fontSize(8).font('Helvetica').fillColor(MUTED)
+        .text(`${CO.name} · Automated Proof of Play · ${dateStr}`, 50, ftY + 10, { width: W, align: 'center' });
+
+      doc.end();
+    } catch (err) { reject(err); }
+  });
+}
+
+module.exports = { generateInvoicePDF, generatePoPPDF };

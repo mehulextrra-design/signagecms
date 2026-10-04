@@ -1,6 +1,9 @@
 const https = require('https');
 const http = require('http');
+const { Readable } = require('stream');
+const { v2: cloudinary } = require('cloudinary');
 const { query } = require('../db');
+const { generateInvoicePDF, generatePoPPDF } = require('./invoice-pdf');
 
 // ── Config ────────────────────────────────────────────────────────────────────
 // Set these in Railway environment variables:
@@ -14,6 +17,30 @@ const PROVIDER   = (process.env.WHATSAPP_PROVIDER || 'log').toLowerCase();
 const API_KEY    = process.env.WHATSAPP_API_KEY || '';
 const API_URL    = process.env.WHATSAPP_API_URL || '';
 const TEMPLATE   = process.env.WHATSAPP_TEMPLATE || 'weekly_pop_report';
+
+// Per-event template names (set in Railway to match your Aisensy template names)
+const TPL_INVOICE   = process.env.WA_TPL_INVOICE   || 'invoice_confirmed';
+const TPL_APPROVED  = process.env.WA_TPL_APPROVED  || 'campaign_approved';
+const TPL_EXPIRY    = process.env.WA_TPL_EXPIRY    || 'expiry_reminder';
+const TPL_COMPLETED = process.env.WA_TPL_COMPLETED || 'campaign_completed';
+const TPL_POP       = process.env.WA_TPL_POP       || 'daily_pop_summary';
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key:    process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+// Upload a PDF buffer to Cloudinary and return the public URL
+async function uploadPDFToCloudinary(buffer, publicId) {
+  return new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(
+      { resource_type: 'raw', folder: 'signagecms/pdfs', public_id: publicId, format: 'pdf' },
+      (err, result) => err ? reject(err) : resolve(result.secure_url)
+    );
+    Readable.from(buffer).pipe(stream);
+  });
+}
 
 // ── HTTP helper ───────────────────────────────────────────────────────────────
 function httpPost(url, payload, headers = {}) {
@@ -39,7 +66,9 @@ function httpPost(url, payload, headers = {}) {
 }
 
 // ── Send single WhatsApp message ──────────────────────────────────────────────
-async function sendWhatsApp(phone, message, templateParams = null) {
+// templateName: Aisensy campaign/template name (defaults to global TEMPLATE)
+// mediaUrl:     For Aisensy document-type templates — public URL of the PDF
+async function sendWhatsApp(phone, message, templateParams = null, templateName = null, mediaUrl = null) {
   // Normalize phone: strip +91, spaces, dashes → 10-digit
   const normalized = phone.replace(/\D/g, '').replace(/^91/, '').slice(-10);
   if (normalized.length !== 10) {
@@ -49,22 +78,23 @@ async function sendWhatsApp(phone, message, templateParams = null) {
 
   if (PROVIDER === 'aisensy') {
     // Aisensy campaign API
+    const firstName = templateParams ? templateParams[0] : 'Advertiser';
     const payload = {
       apiKey: API_KEY,
-      campaignName: TEMPLATE,
+      campaignName: templateName || TEMPLATE,
       destination: `91${normalized}`,
-      userName: templateParams ? templateParams[0] : 'Advertiser',
+      userName: firstName,
       templateParams: templateParams || [message],
       source: 'signagecms-backend',
-      media: {},
+      media: mediaUrl ? { url: mediaUrl, filename: mediaUrl.split('/').pop() } : {},
       buttons: [],
       carouselCards: [],
       location: {},
-      paramsFallbackValue: { FirstName: templateParams ? templateParams[0] : 'Advertiser' },
+      paramsFallbackValue: { FirstName: firstName },
     };
     try {
       const r = await httpPost('https://backend.aisensy.com/campaign/t1/api/v2', payload);
-      console.log(`[WhatsApp] Aisensy sent to ${normalized}: HTTP ${r.status}`);
+      console.log(`[WhatsApp] Aisensy sent to ${normalized} (${templateName || TEMPLATE}): HTTP ${r.status}`);
       return r;
     } catch (err) {
       console.error(`[WhatsApp] Aisensy error for ${normalized}:`, err.message);
@@ -214,8 +244,8 @@ function fmtDate(d) { return d ? String(d).slice(0, 10) : '—'; }
 async function _campaignUser(campaignId) {
   const r = await query(
     `SELECT c.title, c.campaign_code, c.start_date, c.end_date,
-            c.amount_total, c.slot_duration_sec,
-            u.first_name, u.business_name, u.mobile
+            c.amount_total, c.amount_base, c.amount_gst, c.slot_duration_sec,
+            u.first_name, u.business_name, u.mobile, u.email
      FROM campaigns c JOIN users u ON u.id = c.user_id WHERE c.id = $1`,
     [campaignId]
   );
@@ -240,10 +270,10 @@ Dashboard pe jaake real-time Proof of Play dekh sakte hain:
 🔗 signagecrm-production.up.railway.app
 
 — Team SignageCMS`;
-  return sendWhatsApp(d.mobile, msg, [name, d.campaign_code, fmtDate(d.start_date), fmtDate(d.end_date)]);
+  return sendWhatsApp(d.mobile, msg, [name, d.campaign_code, fmtDate(d.start_date), fmtDate(d.end_date)], TPL_APPROVED);
 }
 
-// ── Invoice confirmed ─────────────────────────────────────────────────────────
+// ── Invoice confirmed (document template — attaches PDF) ─────────────────────
 async function sendInvoiceConfirmedWA(campaignId, invoiceNumber) {
   const d = await _campaignUser(campaignId);
   if (!d || !d.mobile) return;
@@ -261,7 +291,22 @@ Aapki campaign abhi review mein hai. Approve hone pe aapko turant WhatsApp aayeg
 🔗 signagecrm-production.up.railway.app
 
 — Team SignageCMS`;
-  return sendWhatsApp(d.mobile, msg, [name, invoiceNumber, d.campaign_code, String(parseFloat(d.amount_total || 0).toFixed(2))]);
+  const params = [name, invoiceNumber, d.campaign_code, String(parseFloat(d.amount_total || 0).toFixed(2))];
+
+  let pdfUrl = null;
+  try {
+    const pdfBuffer = await generateInvoicePDF(
+      { title: d.title, campaign_code: d.campaign_code, start_date: d.start_date, end_date: d.end_date,
+        amount_base: d.amount_base, amount_gst: d.amount_gst, amount_total: d.amount_total },
+      { first_name: d.first_name, business_name: d.business_name, email: d.email, mobile: d.mobile },
+      invoiceNumber
+    );
+    pdfUrl = await uploadPDFToCloudinary(pdfBuffer, invoiceNumber);
+  } catch (e) {
+    console.warn('[WhatsApp] PDF generation/upload failed for invoice WA, sending without attachment:', e.message);
+  }
+
+  return sendWhatsApp(d.mobile, msg, params, TPL_INVOICE, pdfUrl);
 }
 
 // ── Expiry reminder (daysLeft = 1 or 2) ──────────────────────────────────────
@@ -292,7 +337,7 @@ Agar aap apna ad continue rakhna chahte hain toh abhi renew kar lo — gap nahi 
 🔗 signagecrm-production.up.railway.app
 
 — Team SignageCMS`;
-  return sendWhatsApp(d.mobile, msg, [name, d.campaign_code, fmtDate(d.end_date), String(daysLeft)]);
+  return sendWhatsApp(d.mobile, msg, [name, d.campaign_code, fmtDate(d.end_date), String(daysLeft)], TPL_EXPIRY);
 }
 
 // ── Campaign completed ────────────────────────────────────────────────────────
@@ -319,7 +364,7 @@ Agle campaign ke liye ready hain? 🚀
 🔗 signagecrm-production.up.railway.app
 
 — Team SignageCMS`;
-  return sendWhatsApp(d.mobile, msg, [name, d.campaign_code, String(totalPlays)]);
+  return sendWhatsApp(d.mobile, msg, [name, d.campaign_code, String(totalPlays)], TPL_COMPLETED);
 }
 
 // ── Daily PoP to individual advertiser ───────────────────────────────────────
@@ -358,7 +403,20 @@ Aapke ads hamare poore network mein customers tak pahunch rahe hain. Detailed an
 🔗 signagecrm-production.up.railway.app
 
 — Team SignageCMS`;
-  return sendWhatsApp(mobile, msg, [name, today, String(totalPlays)]);
+
+  let pdfUrl = null;
+  try {
+    const pdfBuffer = await generatePoPPDF(name, today, r.rows.map(x => ({
+      campaign_code: x.campaign_code, title: x.title,
+      plays: x.plays, screens: x.screens,
+    })));
+    const publicId = `pop-${userId}-${today}`;
+    pdfUrl = await uploadPDFToCloudinary(pdfBuffer, publicId);
+  } catch (e) {
+    console.warn('[WhatsApp] PoP PDF upload failed, sending without attachment:', e.message);
+  }
+
+  return sendWhatsApp(mobile, msg, [name, today, String(totalPlays)], TPL_POP, pdfUrl);
 }
 
 // ── Send daily PoP WA to ALL advertisers with live campaigns ──────────────────

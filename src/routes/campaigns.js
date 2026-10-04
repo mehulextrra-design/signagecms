@@ -7,10 +7,15 @@ const { reviewCampaign } = require('../services/aiReview');
 const { sendInvoiceEmail, sendApprovedEmail, sendRejectedEmail } = require('../services/email');
 const { sendCampaignApprovedWA, sendInvoiceConfirmedWA } = require('../services/whatsapp');
 
-const getRzp = () => new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID,
-  key_secret: process.env.RAZORPAY_KEY_SECRET,
-});
+const getRzp = () => {
+  if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
+    throw { status: 503, message: 'Payment gateway not configured. Please contact support.' };
+  }
+  return new Razorpay({
+    key_id: process.env.RAZORPAY_KEY_ID,
+    key_secret: process.env.RAZORPAY_KEY_SECRET,
+  });
+};
 
 const router = express.Router();
 

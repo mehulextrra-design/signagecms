@@ -1553,7 +1553,7 @@ function renderCampaignsTable(campaigns){
       <td>${payBadge(c.payment_status)}</td>
       <td>
         <div class="camp-actions">
-        ${c.status==='pending_payment'?`<button class="ca-btn ca-primary" onclick="submitForApproval('${c.id}',this)" title="Submit for Approval"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>Submit</button>`:''}
+        ${c.status==='pending_payment'?`<button class="ca-btn ca-primary" onclick="submitForApproval('${c.id}',this)" title="Complete Payment"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>Pay Now</button>`:''}
         ${c.status==='rejected'?`<button class="ca-btn ca-primary" onclick="navigate('new-campaign')" title="Book Again"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"/></svg></button>`:''}
         ${c.status==='live'?`<button class="ca-btn ca-default" onclick="campaignPause('${c.id}',this)" title="Pause Campaign"><svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg></button>`:''}
         ${c.status==='paused'?`<button class="ca-btn ca-primary" onclick="campaignResume('${c.id}',this)" title="Resume Campaign"><svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></button>`:''}
@@ -2120,7 +2120,11 @@ async function submitCampaign(){
   try{
     const body={title:document.getElementById('cmp-name').value.trim(),screen_ids:selectedScreenIds,content_id:uploadedContentId,start_date:document.getElementById('sch-start').value,end_date:document.getElementById('sch-end').value,start_time:document.getElementById('sch-time-start').value+':00',end_time:document.getElementById('sch-time-end').value+':00',package_name:selectedPkg,coupon_code:document.getElementById('coupon-input').value.trim()||undefined};
     const campaign=await api('/campaigns',{method:'POST',body:JSON.stringify(body)});
-    await openRazorpay(campaign,btn,'Confirm & Pay →',()=>{setTimeout(()=>navigate('campaigns'),1500);});
+    const result=await openRazorpay(campaign,btn,'Confirm & Pay →',()=>{setTimeout(()=>navigate('campaigns'),1500);});
+    if(result&&result.dismissed){
+      toast('Campaign saved! Complete payment from My Campaigns.','info');
+      setTimeout(()=>navigate('campaigns'),1200);
+    }
   }catch(e){toast(e.message,'error');btn.innerHTML='Confirm & Pay →';btn.disabled=false;}
 }
 
@@ -2150,8 +2154,9 @@ function openRazorpay(campaign,btn,btnLabel,onSuccess){
             onSuccess&&onSuccess();
             resolve();
           }catch(e){toast(e.message,'error');if(btn){btn.innerHTML=btnLabel;btn.disabled=false;}reject(e);}
+          resolve({paid:true});
         },
-        modal:{ondismiss:function(){if(btn){btn.innerHTML=btnLabel;btn.disabled=false;}resolve();}}
+        modal:{ondismiss:function(){if(btn){btn.innerHTML=btnLabel;btn.disabled=false;}resolve({dismissed:true});}}
       };
       new Razorpay(options).open();
     }catch(e){reject(e);}
