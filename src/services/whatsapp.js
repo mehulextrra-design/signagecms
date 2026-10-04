@@ -95,7 +95,11 @@ async function sendWhatsApp(phone, message, templateParams = null, templateName 
     };
     try {
       const r = await httpPost('https://backend.aisensy.com/campaign/t1/api/v2', payload);
-      console.log(`[WhatsApp] Aisensy sent to ${normalized} (${templateName || TEMPLATE}): HTTP ${r.status}`);
+      if (r.status !== 200) {
+        console.error(`[WhatsApp] Aisensy HTTP ${r.status} for ${normalized} (${payload.campaignName}): ${r.body}`);
+      } else {
+        console.log(`[WhatsApp] Aisensy sent to ${normalized} (${payload.campaignName}): OK`);
+      }
       return r;
     } catch (err) {
       console.error(`[WhatsApp] Aisensy error for ${normalized}:`, err.message);
