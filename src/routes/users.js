@@ -18,7 +18,7 @@ router.get('/', authenticate, requireAdmin, async (req, res, next) => {
 
 // GET /api/users/:id
 router.get('/:id', authenticate, async (req, res, next) => {
-  if (!['admin', 'superadmin'].includes(req.user.role) && req.user.id !== req.params.id) {
+  if (!['admin', 'superadmin'].includes(req.user.role) && String(req.user.id) !== String(req.params.id)) {
     return res.status(403).json({ error: 'Access denied' });
   }
   try {
@@ -33,7 +33,7 @@ router.get('/:id', authenticate, async (req, res, next) => {
 
 // PUT /api/users/:id — update own profile (or admin updates any)
 router.put('/:id', authenticate, async (req, res, next) => {
-  if (!['admin', 'superadmin'].includes(req.user.role) && req.user.id !== req.params.id) {
+  if (!['admin', 'superadmin'].includes(req.user.role) && String(req.user.id) !== String(req.params.id)) {
     return res.status(403).json({ error: 'Access denied' });
   }
   const { email, first_name, last_name, mobile, business_name, business_type, gst_number, pan_number, city } = req.body;

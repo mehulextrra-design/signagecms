@@ -962,7 +962,7 @@
             <div class="profile-section-title">Personal Info</div>
             <div class="prof-group" style="margin-bottom:10px;">
               <label class="prof-label">Email</label>
-              <input type="email" id="prof-email" class="prof-input" placeholder="you@example.com">
+              <input type="email" id="prof-email" class="prof-input" placeholder="you@example.com" autocomplete="off">
             </div>
             <div class="prof-row">
               <div class="prof-group"><label class="prof-label">First Name</label><input type="text" id="prof-first" class="prof-input"></div>
@@ -1839,7 +1839,7 @@ async function loadProfile(){
 async function saveProfile(){
   try{
     const body={email:document.getElementById('prof-email').value.trim(),first_name:document.getElementById('prof-first').value,last_name:document.getElementById('prof-last').value,mobile:document.getElementById('prof-mobile').value,business_name:document.getElementById('prof-biz').value,business_type:document.getElementById('prof-biz-type').value,gst_number:document.getElementById('prof-gst').value,city:document.getElementById('prof-city').value};
-    await api('/users/profile',{method:'PUT',body:JSON.stringify(body)});
+    await api(`/users/${currentUser.id}`,{method:'PUT',body:JSON.stringify(body)});
     currentUser={...currentUser,...body};updateSidebarUser();toast('Profile saved!','success');
   }catch(e){toast(e.message,'error');}
 }
