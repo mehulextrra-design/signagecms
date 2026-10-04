@@ -42,7 +42,6 @@ async function uploadPDFToCloudinary(buffer, publicId) {
         public_id: publicId,
         format: 'pdf',
         access_mode: 'public',
-        headers: 'Content-Type: application/pdf',
       },
       (err, result) => {
         if (err) return reject(err);
