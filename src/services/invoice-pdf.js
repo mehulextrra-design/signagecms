@@ -38,16 +38,19 @@ function fmt(d) {
   return `${day} ${MONTHS[parseInt(m,10)-1]} ${yr}`;
 }
 
-// Fetch logo buffer from COMPANY_LOGO_URL env var (HTTP/HTTPS URL only)
-async function fetchLogoBuffer() {
-  const logoUrl = process.env.COMPANY_LOGO_URL;
-  if (!logoUrl) return null;
+// Load logo once at startup — validated PNG only, no async/fetch risk
+let LOGO_BUFFER = null;
+(function loadLogo() {
   try {
-    const res = await fetch(logoUrl);
-    if (res.ok) return Buffer.from(await res.arrayBuffer());
+    const p = process.env.COMPANY_LOGO_PATH || path.join(__dirname, '../../public/assets/logo.png');
+    if (!fs.existsSync(p)) return;
+    const buf = fs.readFileSync(p);
+    if (buf[0] === 0x89 && buf[1] === 0x50 && buf[2] === 0x4E && buf[3] === 0x47) {
+      LOGO_BUFFER = buf;
+      console.log('[Invoice] Logo loaded:', p, buf.length, 'bytes');
+    }
   } catch {}
-  return null;
-}
+})();
 
 /**
  * @param {object} campaign
@@ -55,8 +58,7 @@ async function fetchLogoBuffer() {
  * @param {string} invoiceNo
  * @param {object} [payment]  { razorpay_payment_id, method }
  */
-async function generateInvoicePDF(campaign, user, invoiceNo, payment = {}) {
-  const logoBuffer = await fetchLogoBuffer();
+function generateInvoicePDF(campaign, user, invoiceNo, payment = {}) {
   return new Promise((resolve, reject) => {
     try {
       const doc = new PDFDocument({ size: 'A4', margin: 0 });
@@ -96,8 +98,8 @@ async function generateInvoicePDF(campaign, user, invoiceNo, payment = {}) {
       // Logo icon box
       const iconX = IL, iconY = hdrContentY;
       doc.rect(iconX, iconY, 40, 40).fillAndStroke('#fff3ed', '#e5e7eb');
-      if (logoBuffer) {
-        try { doc.image(logoBuffer, iconX + 4, iconY + 4, { fit: [32, 32] }); } catch {}
+      if (LOGO_BUFFER) {
+        doc.image(LOGO_BUFFER, iconX + 4, iconY + 4, { fit: [32, 32] });
       } else {
         // fallback: drawn screen icon
         doc.rect(iconX + 7, iconY + 9, 26, 17).strokeColor(ORANGE).lineWidth(1.5).stroke();
