@@ -44,8 +44,8 @@ async function uploadPDFToCloudinary(buffer, publicId) {
       },
       (err, result) => {
         if (err) return reject(err);
-        // Add fl_attachment so WhatsApp's media fetcher gets proper download headers
-        const url = result.secure_url.replace('/raw/upload/', '/raw/upload/fl_attachment/');
+        // Strip version segment — matching the format of other working Cloudinary URLs
+        const url = result.secure_url.replace(/\/v\d+\//, '/');
         console.log(`[WhatsApp] PDF uploaded to Cloudinary: ${url}`);
         resolve(url);
       }
