@@ -49,7 +49,8 @@ async function uploadPDFToCloudinary(buffer, publicId) {
         resolve(result.secure_url);
       }
     );
-    Readable.from(buffer).pipe(stream);
+    // Write buffer directly — avoids Readable.from() iterating byte-by-byte
+    stream.end(buffer);
   });
 }
 
