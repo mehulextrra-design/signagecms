@@ -104,6 +104,7 @@ async function sendWhatsApp(phone, message, templateParams = null, templateName 
       paramsFallbackValue: { FirstName: firstName },
     };
     try {
+      console.log(`[WhatsApp] Sending → campaign="${payload.campaignName}" destination="${payload.destination}" params=${JSON.stringify(payload.templateParams)} media=${payload.media ? payload.media.url : 'none'}`);
       const r = await httpPost('https://backend.aisensy.com/campaign/t1/api/v2', payload);
       if (r.status !== 200) {
         console.error(`[WhatsApp] Aisensy HTTP ${r.status} for ${normalized} (${payload.campaignName}): ${r.body}`);
