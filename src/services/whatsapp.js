@@ -98,7 +98,7 @@ async function sendWhatsApp(phone, message, templateParams = null, templateName 
       if (r.status !== 200) {
         console.error(`[WhatsApp] Aisensy HTTP ${r.status} for ${normalized} (${payload.campaignName}): ${r.body}`);
       } else {
-        console.log(`[WhatsApp] Aisensy sent to ${normalized} (${payload.campaignName}): OK`);
+        console.log(`[WhatsApp] Aisensy sent to ${normalized} (${payload.campaignName}): OK | ${r.body}`);
       }
       return r;
     } catch (err) {
