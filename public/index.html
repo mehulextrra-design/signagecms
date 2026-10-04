@@ -1554,6 +1554,7 @@ function renderCampaignsTable(campaigns){
       <td>
         <div class="camp-actions">
         ${c.status==='pending_payment'?`<button class="ca-btn ca-primary" onclick="submitForApproval('${c.id}',this)" title="Complete Payment"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>Pay Now</button>`:''}
+        ${c.status==='pending_payment'&&['admin','superadmin'].includes(currentUser?.role)?`<button class="ca-btn" style="background:var(--warning,#f59e0b);color:#fff;font-size:10px;" onclick="adminTestPay('${c.id}',this)" title="Mark Paid (Test — bypass Razorpay)">Test Pay</button>`:''}
         ${c.status==='rejected'?`<button class="ca-btn ca-primary" onclick="navigate('new-campaign')" title="Book Again"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"/></svg></button>`:''}
         ${c.status==='live'?`<button class="ca-btn ca-default" onclick="campaignPause('${c.id}',this)" title="Pause Campaign"><svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg></button>`:''}
         ${c.status==='paused'?`<button class="ca-btn ca-primary" onclick="campaignResume('${c.id}',this)" title="Resume Campaign"><svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></button>`:''}
@@ -2167,6 +2168,19 @@ async function submitForApproval(id,btn){
   try{
     const campaign={id};
     await openRazorpay(campaign,btn,orig,async()=>{ toast('Payment successful! AI review running…','success'); await loadCampaigns(); });
+  }catch(e){toast(e.message,'error');btn.innerHTML=orig;btn.disabled=false;}
+}
+
+async function adminTestPay(id,btn){
+  if(!confirm('Razorpay bypass karke campaign ko paid mark karo? (Sirf testing ke liye)'))return;
+  const orig=btn.innerHTML;btn.innerHTML='…';btn.disabled=true;
+  try{
+    const res=await api(`/campaigns/${id}/confirm-payment`,{method:'POST',body:JSON.stringify({
+      payment_id:`TEST-${Date.now()}`,
+      payment_method:'test_bypass'
+    })});
+    toast(`Test payment done! Invoice: ${res.invoice_number}`,'success');
+    await loadCampaigns();
   }catch(e){toast(e.message,'error');btn.innerHTML=orig;btn.disabled=false;}
 }
 
