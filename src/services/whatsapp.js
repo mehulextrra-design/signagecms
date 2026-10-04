@@ -439,10 +439,13 @@ Aapke ads hamare poore network mein customers tak pahunch rahe hain. Detailed an
       campaign_code: x.campaign_code, title: x.title,
       plays: x.plays, screens: x.screens,
     })));
-    const publicId = `pop-${userId}-${today}`;
-    pdfUrl = await uploadPDFToCloudinary(pdfBuffer, publicId);
+    const popId = `pop-${userId}-${today}`;
+    storePDF(popId, pdfBuffer);
+    const baseUrl = process.env.APP_URL || 'https://signagecrm-production.up.railway.app';
+    pdfUrl = `${baseUrl}/pdfs/${popId}`;
+    console.log(`[WhatsApp] PoP PDF stored, URL: ${pdfUrl}`);
   } catch (e) {
-    console.warn('[WhatsApp] PoP PDF upload failed, sending without attachment:', e.message);
+    console.warn('[WhatsApp] PoP PDF generation failed, sending without attachment:', e.message);
   }
 
   return sendWhatsApp(mobile, msg, [name, today, String(totalPlays)], TPL_POP, pdfUrl);
