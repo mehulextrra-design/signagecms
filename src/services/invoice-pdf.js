@@ -38,20 +38,14 @@ function fmt(d) {
   return `${day} ${MONTHS[parseInt(m,10)-1]} ${yr}`;
 }
 
-// Fetch logo buffer from URL or local file
+// Fetch logo buffer from COMPANY_LOGO_URL env var (HTTP/HTTPS URL only)
 async function fetchLogoBuffer() {
   const logoUrl = process.env.COMPANY_LOGO_URL;
-  if (logoUrl) {
-    try {
-      const res = await fetch(logoUrl);
-      if (res.ok) return Buffer.from(await res.arrayBuffer());
-    } catch {}
-  }
-  const logoPath = process.env.COMPANY_LOGO_PATH
-    || path.join(__dirname, '../../public/assets/logo.png');
-  if (fs.existsSync(logoPath)) {
-    try { return fs.readFileSync(logoPath); } catch {}
-  }
+  if (!logoUrl) return null;
+  try {
+    const res = await fetch(logoUrl);
+    if (res.ok) return Buffer.from(await res.arrayBuffer());
+  } catch {}
   return null;
 }
 
