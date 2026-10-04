@@ -262,8 +262,12 @@ async function _campaignUser(campaignId) {
   const r = await query(
     `SELECT c.title, c.campaign_code, c.start_date, c.end_date,
             c.amount_total, c.amount_base, c.amount_gst, c.slot_duration_sec,
-            u.first_name, u.business_name, u.mobile, u.email
-     FROM campaigns c JOIN users u ON u.id = c.user_id WHERE c.id = $1`,
+            u.first_name, u.business_name, u.mobile, u.email,
+            ct.file_url AS media_url, ct.mime_type
+     FROM campaigns c
+     JOIN users u ON u.id = c.user_id
+     LEFT JOIN content ct ON ct.id = c.content_id
+     WHERE c.id = $1`,
     [campaignId]
   );
   return r.rows[0] || null;
@@ -287,9 +291,9 @@ Dashboard pe jaake real-time Proof of Play dekh sakte hain:
 🔗 signagecrm-production.up.railway.app
 
 — Team SignageCMS`;
-  // campaign_approved template has IMAGE header — send banner image
-  const bannerUrl = process.env.WA_APPROVED_BANNER || null;
-  return sendWhatsApp(d.mobile, msg, [name, d.campaign_code, fmtDate(d.start_date), fmtDate(d.end_date)], TPL_APPROVED, bannerUrl);
+  // campaign_approved template has IMAGE header — attach campaign's own media
+  const mediaUrl = d.media_url || process.env.WA_APPROVED_BANNER || null;
+  return sendWhatsApp(d.mobile, msg, [name, d.campaign_code, fmtDate(d.start_date), fmtDate(d.end_date)], TPL_APPROVED, mediaUrl);
 }
 
 // ── Invoice confirmed (document template — attaches PDF) ─────────────────────
