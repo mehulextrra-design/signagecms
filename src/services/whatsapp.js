@@ -228,15 +228,15 @@ async function sendCampaignApprovedWA(campaignId) {
   if (!d || !d.mobile) return;
   const name = d.business_name || d.first_name || 'Advertiser';
   const msg =
-`✅ *Campaign Approved!*
+`✅ *Campaign Approved — Ab Live Hai!* 🚀
 
-Hi ${name}, your campaign is now LIVE on our screens.
+Hi ${name}, bahut badiya khabar hai — aapki campaign approve ho gayi aur abhi humari screens pe chal rahi hai!
 
-*Campaign:* ${d.title}
-*Code:* ${d.campaign_code}
-*Period:* ${fmtDate(d.start_date)} to ${fmtDate(d.end_date)}
+*Campaign:* ${d.campaign_code}
+*Start Date:* ${fmtDate(d.start_date)}
+*End Date:* ${fmtDate(d.end_date)}
 
-Track real-time Proof of Play on your dashboard:
+Dashboard pe jaake real-time Proof of Play dekh sakte hain:
 🔗 signagecrm-production.up.railway.app
 
 — Team SignageCMS`;
@@ -249,15 +249,15 @@ async function sendInvoiceConfirmedWA(campaignId, invoiceNumber) {
   if (!d || !d.mobile) return;
   const name = d.business_name || d.first_name || 'Advertiser';
   const msg =
-`🧾 *Payment Received — Invoice Ready*
+`🧾 *Payment Ho Gaya — Invoice Ready Hai!*
 
-Hi ${name}, we've received your payment and your invoice is ready.
+Hi ${name}, aapka payment humein mil gaya aur invoice ready hai. 🙌
 
 *Invoice No:* ${invoiceNumber}
 *Campaign:* ${d.campaign_code}
-*Amount:* ₹${parseFloat(d.amount_total || 0).toFixed(2)}
+*Paid Amount:* ₹${parseFloat(d.amount_total || 0).toFixed(2)}
 
-Your campaign is now under review. You'll receive another message once it goes live.
+Aapki campaign abhi review mein hai. Approve hone pe aapko turant WhatsApp aayega.
 🔗 signagecrm-production.up.railway.app
 
 — Team SignageCMS`;
@@ -269,17 +269,26 @@ async function sendExpiryReminderWA(campaignId, daysLeft) {
   const d = await _campaignUser(campaignId);
   if (!d || !d.mobile) return;
   const name = d.business_name || d.first_name || 'Advertiser';
-  const dayWord = daysLeft === 1 ? 'tomorrow' : 'in 2 days';
-  const msg =
-`⏰ *Campaign Ending ${daysLeft === 1 ? 'Tomorrow' : 'in 2 Days'}*
+  const msg = daysLeft === 1
+? `⚠️ *Kal Aakhri Din Hai — Abhi Extend Karo!*
 
-Hi ${name}, your campaign is expiring ${dayWord}.
+Hi ${name}, aapki campaign *kal* khatam ho rahi hai!
 
-*Campaign:* ${d.title}
-*Code:* ${d.campaign_code}
+*Campaign:* ${d.campaign_code}
 *End Date:* ${fmtDate(d.end_date)}
 
-Want to extend? Contact us or book a new campaign from your dashboard.
+Ye aakhri mauka hai extend karne ka. Abhi new campaign book karo aur screen presence bina gap ke jaari rakho. 🙏
+🔗 signagecrm-production.up.railway.app
+
+— Team SignageCMS`
+: `⏰ *Campaign 2 Din Mein Khatam Ho Rahi Hai!*
+
+Hi ${name}, aapki campaign sirf 2 din mein end hone wali hai!
+
+*Campaign:* ${d.campaign_code}
+*End Date:* ${fmtDate(d.end_date)}
+
+Agar aap apna ad continue rakhna chahte hain toh abhi renew kar lo — gap nahi aana chahiye screens pe! 💪
 🔗 signagecrm-production.up.railway.app
 
 — Team SignageCMS`;
@@ -297,19 +306,17 @@ async function sendCampaignCompletedWA(campaignId) {
   const totalPlays = parseInt(pr.rows[0]?.plays || 0);
 
   const msg =
-`🏁 *Campaign Completed*
+`🏁 *Campaign Successfully Complete Ho Gayi!*
 
-Hi ${name}, your campaign has successfully completed.
+Hi ${name}, aapki campaign successfully complete ho gayi hai! 🎉
 
-*Campaign:* ${d.title}
-*Code:* ${d.campaign_code}
-*Period:* ${fmtDate(d.start_date)} to ${fmtDate(d.end_date)}
+*Campaign:* ${d.campaign_code}
 *Total Plays:* ${totalPlays.toLocaleString('en-IN')}
 
-View your full Proof of Play report on your dashboard.
-🔗 signagecrm-production.up.railway.app
+SignageCMS pe advertise karne ke liye shukriya! Pura Proof of Play report aapke dashboard pe available hai.
 
-Thank you for advertising with SignageCMS! 🙏
+Agle campaign ke liye ready hain? 🚀
+🔗 signagecrm-production.up.railway.app
 
 — Team SignageCMS`;
   return sendWhatsApp(d.mobile, msg, [name, d.campaign_code, String(totalPlays)]);
@@ -339,15 +346,15 @@ async function sendDailyPoPWA(userId, dateStr) {
   const lines = r.rows.map(x => `  • ${x.campaign_code}: ${x.plays} plays on ${x.screens} screen(s)`).join('\n');
 
   const msg =
-`📊 *Daily Proof of Play — ${today}*
+`📊 *Aaj Ka Proof of Play Report*
 
-Hi ${name}! Here's today's ad performance:
+Hi ${name}! ${today} ki aapki ad performance ye rahi:
 
-*Total Plays Today:* ${totalPlays.toLocaleString('en-IN')}
+*Aaj Ke Total Plays:* ${totalPlays.toLocaleString('en-IN')}
 
 ${lines}
 
-Full analytics available on your dashboard.
+Aapke ads hamare poore network mein customers tak pahunch rahe hain. Detailed analytics ke liye dashboard check karo.
 🔗 signagecrm-production.up.railway.app
 
 — Team SignageCMS`;
