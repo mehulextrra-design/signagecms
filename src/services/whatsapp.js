@@ -36,8 +36,19 @@ cloudinary.config({
 async function uploadPDFToCloudinary(buffer, publicId) {
   return new Promise((resolve, reject) => {
     const stream = cloudinary.uploader.upload_stream(
-      { resource_type: 'raw', folder: 'signagecms/pdfs', public_id: publicId, format: 'pdf' },
-      (err, result) => err ? reject(err) : resolve(result.secure_url)
+      {
+        resource_type: 'raw',
+        folder: 'signagecms/pdfs',
+        public_id: publicId,
+        format: 'pdf',
+        access_mode: 'public',
+        headers: 'Content-Type: application/pdf',
+      },
+      (err, result) => {
+        if (err) return reject(err);
+        console.log(`[WhatsApp] PDF uploaded to Cloudinary: ${result.secure_url}`);
+        resolve(result.secure_url);
+      }
     );
     Readable.from(buffer).pipe(stream);
   });
@@ -297,8 +308,21 @@ Aapki campaign abhi review mein hai. Approve hone pe aapko turant WhatsApp aayeg
 
 — Team SignageCMS`;
   const params = [name, invoiceNumber, d.campaign_code, String(parseFloat(d.amount_total || 0).toFixed(2))];
-  // PDF is already sent via email; skip media attachment for WA to avoid Aisensy media upload errors
-  return sendWhatsApp(d.mobile, msg, params, TPL_INVOICE, null);
+
+  let pdfUrl = null;
+  try {
+    const pdfBuffer = await generateInvoicePDF(
+      { title: d.title, campaign_code: d.campaign_code, start_date: d.start_date, end_date: d.end_date,
+        amount_base: d.amount_base, amount_gst: d.amount_gst, amount_total: d.amount_total },
+      { first_name: d.first_name, business_name: d.business_name, email: d.email, mobile: d.mobile },
+      invoiceNumber
+    );
+    pdfUrl = await uploadPDFToCloudinary(pdfBuffer, invoiceNumber);
+  } catch (e) {
+    console.warn('[WhatsApp] PDF generation/upload failed, sending WA without attachment:', e.message);
+  }
+
+  return sendWhatsApp(d.mobile, msg, params, TPL_INVOICE, pdfUrl);
 }
 
 // ── Expiry reminder (daysLeft = 1 or 2) ──────────────────────────────────────
