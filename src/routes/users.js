@@ -36,12 +36,20 @@ router.put('/:id', authenticate, async (req, res, next) => {
   if (!['admin', 'superadmin'].includes(req.user.role) && req.user.id !== req.params.id) {
     return res.status(403).json({ error: 'Access denied' });
   }
-  const { first_name, last_name, mobile, business_name, business_type, gst_number, pan_number, city } = req.body;
+  const { email, first_name, last_name, mobile, business_name, business_type, gst_number, pan_number, city } = req.body;
   try {
+    // Check email uniqueness if being changed
+    if (email) {
+      const existing = await query('SELECT id FROM users WHERE email=$1 AND id!=$2', [email, req.params.id]);
+      if (existing.rows.length) return res.status(409).json({ error: 'Email already in use' });
+    }
     const result = await query(
-      `UPDATE users SET first_name=$1, last_name=$2, mobile=$3, business_name=$4, business_type=$5,
-       gst_number=$6, pan_number=$7, city=$8, updated_at=NOW() WHERE id=$9 RETURNING *`,
-      [first_name, last_name, mobile, business_name, business_type, gst_number, pan_number, city, req.params.id]
+      `UPDATE users SET
+         email=COALESCE(NULLIF($1,''), email),
+         first_name=$2, last_name=$3, mobile=$4, business_name=$5, business_type=$6,
+         gst_number=$7, pan_number=$8, city=$9, updated_at=NOW()
+       WHERE id=$10 RETURNING *`,
+      [email||null, first_name, last_name, mobile, business_name, business_type, gst_number, pan_number, city, req.params.id]
     );
     res.json(result.rows[0]);
   } catch (err) { next(err); }
