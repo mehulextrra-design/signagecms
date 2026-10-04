@@ -87,7 +87,7 @@ async function sendWhatsApp(phone, message, templateParams = null, templateName 
       userName: firstName,
       templateParams: templateParams || [message],
       source: 'signagecms-backend',
-      media: mediaUrl ? { url: mediaUrl, filename: mediaUrl.split('/').pop() } : {},
+      media: mediaUrl ? { url: mediaUrl, filename: mediaUrl.split('/').pop() } : undefined,
       buttons: [],
       carouselCards: [],
       location: {},

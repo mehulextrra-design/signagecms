@@ -6,11 +6,14 @@ const transporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',
   port: 587,
   secure: false,
+  requireTLS: true,
   auth: {
     user: process.env.GMAIL_USER,
     pass: process.env.GMAIL_PASS,
   },
   tls: { rejectUnauthorized: false },
+  connectionTimeout: 15000,
+  greetingTimeout: 10000,
 });
 
 const FROM = `"SignageCMS" <${process.env.GMAIL_USER}>`;
@@ -52,6 +55,10 @@ function wrap(title, body) {
 
 // ── Invoice email (after payment confirmed) ───────────────────────────────
 async function sendInvoiceEmail(campaignId, invoiceNumber) {
+  if (!process.env.GMAIL_USER || !process.env.GMAIL_PASS) {
+    console.error('[Email] GMAIL_USER or GMAIL_PASS not set in environment variables');
+    return;
+  }
   try {
     const { rows } = await query(
       `SELECT c.title, c.campaign_code, c.start_date, c.end_date,
