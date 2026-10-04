@@ -1,6 +1,7 @@
 const cron = require('node-cron');
 const { query } = require('../db');
 const { sendWeeklyReports } = require('./whatsapp');
+const { sendDailyPoPReport } = require('./email');
 
 // Plays per screen per day based on package slot duration (WLRP model: 15h × 75% utilisation)
 function _playsPerDay(slotSec, startTime, endTime) {
@@ -152,6 +153,15 @@ const startScheduler = () => {
       );
     } catch (err) {
       console.error('[Scheduler] Coupon expiry error:', err.message);
+    }
+  });
+
+  // Daily at 9:00 PM IST (15:30 UTC): send daily PoP summary email to admin
+  cron.schedule('30 15 * * *', async () => {
+    try {
+      await sendDailyPoPReport();
+    } catch (err) {
+      console.error('[Scheduler] Daily PoP email error:', err.message);
     }
   });
 
