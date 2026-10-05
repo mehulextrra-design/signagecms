@@ -6,6 +6,9 @@ import retrofit2.http.*
 
 interface ApiService {
 
+    @GET("player/app-version")
+    suspend fun getAppVersion(): Response<AppVersionResponse>
+
     @POST("player/register")
     suspend fun register(@Body request: RegisterRequest): Response<RegisterResponse>
 

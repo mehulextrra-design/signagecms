@@ -21,6 +21,8 @@
     <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
     <!-- Keep the app alive: prevent OS from batching our watchdog WorkManager job -->
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+    <!-- Silent/prompted APK self-update -->
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
     <!-- TV / Android TV box compatibility — without this, boxes without
          a touchscreen report "Parse Error" because Android assumes the

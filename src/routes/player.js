@@ -45,6 +45,17 @@ router.post('/register', async (req, res, next) => {
   } catch (err) { next(err); }
 });
 
+// GET /api/player/app-version — public, no auth; returns latest APK version info
+// Set APK_VERSION_CODE and APK_DOWNLOAD_URL env vars in Railway after each build
+router.get('/app-version', (req, res) => {
+  const versionCode = parseInt(process.env.APK_VERSION_CODE || '3', 10);
+  res.json({
+    version_code: versionCode,
+    version_name: process.env.APK_VERSION_NAME || `1.${versionCode}`,
+    apk_url: process.env.APK_DOWNLOAD_URL || null,
+  });
+});
+
 // GET /api/player/schedule — 4-tier content playlist with WLRP weights
 router.get('/schedule', authenticatePlayer, async (req, res, next) => {
   try {

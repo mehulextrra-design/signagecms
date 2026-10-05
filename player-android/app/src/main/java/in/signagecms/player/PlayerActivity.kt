@@ -28,6 +28,7 @@ import `in`.signagecms.player.db.AppDatabase
 import `in`.signagecms.player.db.entities.CampaignEntity
 import `in`.signagecms.player.db.entities.PlayLogEntity
 import `in`.signagecms.player.admin.KioskManager
+import `in`.signagecms.player.update.AppUpdater
 import `in`.signagecms.player.utils.ContentDownloader
 import `in`.signagecms.player.utils.Prefs
 import kotlinx.coroutines.Dispatchers
@@ -127,6 +128,9 @@ class PlayerActivity : AppCompatActivity() {
 
         // Load cached content first (offline-first)
         loadFromDatabase(forceRestart = true)
+
+        // Check for app update in background (downloads + installs if newer version available)
+        lifecycleScope.launch { AppUpdater.checkAndUpdate(this@PlayerActivity) }
 
         // Sync from server, then start heartbeat + periodic sync
         syncSchedule()

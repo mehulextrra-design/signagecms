@@ -2,6 +2,14 @@ package `in`.signagecms.player.api.models
 
 import com.google.gson.annotations.SerializedName
 
+// ── APP VERSION ───────────────────────────────────────────────────────────
+
+data class AppVersionResponse(
+    @SerializedName("version_code") val versionCode: Int,
+    @SerializedName("version_name") val versionName: String,
+    @SerializedName("apk_url") val apkUrl: String?
+)
+
 // ── REGISTER ──────────────────────────────────────────────────────────────
 
 data class RegisterRequest(
