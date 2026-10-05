@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - 'player-android/**'
+      - '.github/workflows/build-player-apk.yml'
   workflow_dispatch:
 
 jobs:
