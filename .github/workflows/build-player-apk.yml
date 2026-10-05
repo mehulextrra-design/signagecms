@@ -124,38 +124,37 @@ jobs:
       - name: Upload APK to Cloudinary
         id: cloudinary
         env:
-          CLOUDINARY_CLOUD_NAME: ${{ secrets.CLOUDINARY_CLOUD_NAME }}
-          CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
-          CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
+          CLD_CLOUD: ${{ secrets.CLOUDINARY_CLOUD_NAME }}
+          CLD_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
+          CLD_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
+          RUN_NUM: ${{ github.run_number }}
         run: |
-          APK_PATH="player-android/app/build/outputs/apk/release/app-release.apk"
-          PUBLIC_ID="signagecms-player-v1.${{ github.run_number }}"
-          TIMESTAMP=$(date +%s)
-          SIGNATURE=$(echo -n "public_id=${PUBLIC_ID}&timestamp=${TIMESTAMP}${CLOUDINARY_API_SECRET}" | openssl sha1 | awk '{print $2}')
-
-          RESPONSE=$(curl -s -X POST \
-            "https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/raw/upload" \
-            -F "file=@${APK_PATH}" \
-            -F "public_id=${PUBLIC_ID}" \
-            -F "api_key=${CLOUDINARY_API_KEY}" \
-            -F "timestamp=${TIMESTAMP}" \
-            -F "signature=${SIGNATURE}")
-
-          echo "Cloudinary response: $RESPONSE"
-          APK_URL=$(echo "$RESPONSE" | grep -o '"secure_url":"[^"]*"' | cut -d'"' -f4)
-
-          if [ -z "$APK_URL" ]; then
-            echo "❌ Cloudinary upload failed"
-            exit 1
-          fi
-
-          echo "apk_url=$APK_URL" >> $GITHUB_OUTPUT
-          echo "## ✅ APK Ready" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Railway pe update karo:**" >> $GITHUB_STEP_SUMMARY
-          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-          echo "APK_VERSION_CODE=${{ github.run_number }}" >> $GITHUB_STEP_SUMMARY
-          echo "APK_DOWNLOAD_URL=$APK_URL" >> $GITHUB_STEP_SUMMARY
-          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-          echo ""
-          echo "✅ APK URL: $APK_URL"
+          cat > /tmp/upload.py << 'PYEOF'
+          import hashlib, json, os, subprocess, time, sys
+          cloud  = os.environ['CLD_CLOUD']
+          key    = os.environ['CLD_KEY']
+          secret = os.environ['CLD_SECRET']
+          run    = os.environ['RUN_NUM']
+          pid    = f'signagecms-player-v1.{run}'
+          ts     = str(int(time.time()))
+          sig    = hashlib.sha1(f'public_id={pid}&timestamp={ts}{secret}'.encode()).hexdigest()
+          r = subprocess.run([
+            'curl','-s','-X','POST',
+            f'https://api.cloudinary.com/v1_1/{cloud}/raw/upload',
+            '-F', f'file=@player-android/app/build/outputs/apk/release/app-release.apk',
+            '-F', f'public_id={pid}',
+            '-F', f'api_key={key}',
+            '-F', f'timestamp={ts}',
+            '-F', f'signature={sig}'
+          ], capture_output=True, text=True)
+          print('Response:', r.stdout[:300])
+          d = json.loads(r.stdout)
+          url = d.get('secure_url', '')
+          if not url:
+            print('FAILED:', r.stdout); sys.exit(1)
+          print(f'SUCCESS: {url}')
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as f: f.write(f'apk_url={url}\n')
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as f:
+            f.write(f'## APK Ready\n```\nAPK_VERSION_CODE={run}\nAPK_DOWNLOAD_URL={url}\n```\n')
+          PYEOF
+          python3 /tmp/upload.py
