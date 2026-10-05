@@ -130,32 +130,34 @@ jobs:
           CLD_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
           RUN_NUM: ${{ github.run_number }}
         run: |
-          node << 'JSEOF'
-          const crypto = require('crypto');
-          const fs = require('fs');
-          const { spawnSync } = require('child_process');
-          const cloud  = process.env.CLD_CLOUD;
-          const key    = process.env.CLD_KEY;
-          const secret = process.env.CLD_SECRET;
-          const run    = process.env.RUN_NUM;
-          const pid    = `signagecms-player-v1.${run}`;
-          const ts     = String(Math.floor(Date.now() / 1000));
-          const sig    = crypto.createHash('sha1').update(`public_id=${pid}&timestamp=${ts}${secret}`).digest('hex');
-          const r = spawnSync('curl', [
-            '-s', '-X', 'POST',
-            `https://api.cloudinary.com/v1_1/${cloud}/raw/upload`,
-            '-F', `file=@player-android/app/build/outputs/apk/release/app-release.apk`,
-            '-F', `public_id=${pid}`,
-            '-F', `api_key=${key}`,
-            '-F', `timestamp=${ts}`,
-            '-F', `signature=${sig}`
-          ], { encoding: 'utf8' });
-          console.log('Response:', r.stdout.substring(0, 300));
-          const d = JSON.parse(r.stdout);
-          const url = d.secure_url;
-          if (!url) { console.error('FAILED:', r.stdout); process.exit(1); }
-          console.log('SUCCESS:', url);
-          fs.appendFileSync(process.env.GITHUB_OUTPUT, `apk_url=${url}\n`);
-          fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY,
-            `## APK Ready\n\`\`\`\nAPK_VERSION_CODE=${run}\nAPK_DOWNLOAD_URL=${url}\n\`\`\`\n`);
-          JSEOF
+          APK=player-android/app/build/outputs/apk/release/app-release.apk
+          echo "APK exists: $(ls -lh $APK 2>&1)"
+          echo "Secrets set: CLOUD=${CLD_CLOUD:+YES} KEY=${CLD_KEY:+YES} SECRET=${CLD_SECRET:+YES}"
+
+          TIMESTAMP=$(date +%s)
+          PUBLIC_ID="signagecms-player-v1.${RUN_NUM}"
+
+          # SHA1 signature: "public_id=<pid>&timestamp=<ts><secret>"
+          SIGNATURE=$(printf "public_id=%s&timestamp=%s%s" "$PUBLIC_ID" "$TIMESTAMP" "$CLD_SECRET" | openssl dgst -sha1 -binary | xxd -p | tr -d '\n')
+          echo "Signature computed (first 8): ${SIGNATURE:0:8}..."
+
+          RESPONSE=$(curl -s -X POST \
+            "https://api.cloudinary.com/v1_1/${CLD_CLOUD}/raw/upload" \
+            -F "file=@${APK}" \
+            -F "public_id=${PUBLIC_ID}" \
+            -F "api_key=${CLD_KEY}" \
+            -F "timestamp=${TIMESTAMP}" \
+            -F "signature=${SIGNATURE}")
+
+          echo "Cloudinary response: $RESPONSE"
+
+          APK_URL=$(echo "$RESPONSE" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('secure_url',''))" 2>/dev/null)
+
+          if [ -z "$APK_URL" ]; then
+            echo "ERROR: secure_url not found in response"
+            exit 1
+          fi
+
+          echo "SUCCESS: $APK_URL"
+          echo "apk_url=$APK_URL" >> "$GITHUB_OUTPUT"
+          printf '## APK Ready\n```\nAPK_VERSION_CODE=%s\nAPK_DOWNLOAD_URL=%s\n```\n' "$RUN_NUM" "$APK_URL" >> "$GITHUB_STEP_SUMMARY"
