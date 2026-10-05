@@ -21,7 +21,10 @@ data class CampaignEntity(
     val contentTier: String = "paid",
     val localFilePath: String? = null,
     val isDownloaded: Boolean = false,
-    val updatedAt: Long = System.currentTimeMillis()
+    val updatedAt: Long = System.currentTimeMillis(),
+    val qrEnabled: Boolean = false,
+    val qrPlacement: String? = null,
+    val qrContentUrl: String? = null
 )
 
 @Entity(tableName = "play_log_queue")

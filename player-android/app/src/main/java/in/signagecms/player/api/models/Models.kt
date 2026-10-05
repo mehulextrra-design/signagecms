@@ -53,7 +53,10 @@ data class CampaignItem(
     @SerializedName("height_px") val heightPx: Int?,
     @SerializedName("file_size") val fileSize: Long?,
     val weight: Double?,
-    @SerializedName("content_tier") val contentTier: String?
+    @SerializedName("content_tier") val contentTier: String?,
+    @SerializedName("qr_enabled") val qrEnabled: Boolean? = false,
+    @SerializedName("qr_placement") val qrPlacement: String? = null,
+    @SerializedName("qr_content_url") val qrContentUrl: String? = null
 )
 
 // ── HEARTBEAT ─────────────────────────────────────────────────────────────

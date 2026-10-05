@@ -198,7 +198,7 @@ async function sendDailyPoPReport() {
              COUNT(DISTINCT pl.screen_id) AS screens
       FROM campaigns c
       JOIN users u ON u.id = c.user_id
-      LEFT JOIN play_logs pl ON pl.campaign_id = c.id AND pl.play_date = $1
+      LEFT JOIN play_logs pl ON pl.campaign_id = c.id AND (pl.played_at AT TIME ZONE 'Asia/Kolkata')::date = $1::date
       WHERE c.status IN ('live','completed')
         AND c.start_date <= $1::date AND c.end_date >= $1::date
       GROUP BY c.campaign_code, c.title, u.business_name, u.email

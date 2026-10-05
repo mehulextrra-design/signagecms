@@ -12,6 +12,7 @@ import android.os.Looper
 import android.os.PowerManager
 import android.view.View
 import android.view.WindowManager
+import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.media3.common.MediaItem
@@ -228,7 +229,10 @@ class PlayerActivity : AppCompatActivity() {
                             storedName   = fileName,
                             contentType  = c.contentType,
                             durationSec  = c.durationSec ?: 10.0,
-                            contentTier  = c.contentTier ?: "paid"
+                            contentTier  = c.contentTier ?: "paid",
+                            qrEnabled    = c.qrEnabled ?: false,
+                            qrPlacement  = c.qrPlacement,
+                            qrContentUrl = c.qrContentUrl
                         )
                     }
 
@@ -323,6 +327,7 @@ class PlayerActivity : AppCompatActivity() {
         currentContentTier  = campaign.contentTier
         playStartTime       = System.currentTimeMillis()
         updateStatusBar(campaign.title)
+        updateQrOverlay(campaign)
 
         when (campaign.contentType) {
             "video" -> playVideo(campaign)
@@ -330,6 +335,36 @@ class PlayerActivity : AppCompatActivity() {
             else    -> showImage(campaign)
         }
     }
+
+    private fun updateQrOverlay(campaign: CampaignEntity) {
+        val qrView = binding.ivQrOverlay
+        if (!campaign.qrEnabled || campaign.qrContentUrl.isNullOrBlank()) {
+            qrView.visibility = View.GONE
+            return
+        }
+
+        // Position the QR view according to qr_placement
+        val params = qrView.layoutParams as FrameLayout.LayoutParams
+        val margin = resources.getDimensionPixelSize(
+            android.R.dimen.notification_large_icon_width
+        ).coerceAtLeast(20.dpToPx())
+        params.gravity = when (campaign.qrPlacement) {
+            "top-left"  -> android.view.Gravity.TOP or android.view.Gravity.START
+            "top-right" -> android.view.Gravity.TOP or android.view.Gravity.END
+            "mid-left"  -> android.view.Gravity.CENTER_VERTICAL or android.view.Gravity.START
+            "mid-right" -> android.view.Gravity.CENTER_VERTICAL or android.view.Gravity.END
+            "bot-left"  -> android.view.Gravity.BOTTOM or android.view.Gravity.START
+            else        -> android.view.Gravity.BOTTOM or android.view.Gravity.END  // bot-right default
+        }
+        params.setMargins(20.dpToPx(), 20.dpToPx(), 20.dpToPx(), 20.dpToPx())
+        qrView.layoutParams = params
+        qrView.visibility = View.VISIBLE
+
+        Glide.with(this).load(campaign.qrContentUrl).into(qrView)
+    }
+
+    private fun Int.dpToPx(): Int =
+        (this * resources.displayMetrics.density).toInt()
 
     private fun playVideo(campaign: CampaignEntity) {
         // Cancel any pending image timer before starting video

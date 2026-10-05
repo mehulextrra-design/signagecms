@@ -406,7 +406,7 @@ async function sendDailyPoPWA(userId, dateStr) {
             COUNT(DISTINCT pl.screen_id) AS screens
      FROM users u
      JOIN campaigns c ON c.user_id = u.id
-     LEFT JOIN play_logs pl ON pl.campaign_id = c.id AND pl.play_date = $2
+     LEFT JOIN play_logs pl ON pl.campaign_id = c.id AND (pl.played_at AT TIME ZONE 'Asia/Kolkata')::date = $2::date
      WHERE u.id = $1 AND c.status IN ('live','completed')
        AND c.start_date <= $2::date AND c.end_date >= $2::date
      GROUP BY u.first_name, u.business_name, u.mobile, c.title, c.campaign_code

@@ -75,6 +75,18 @@
             android:visibility="gone" />
     </LinearLayout>
 
+    <!-- QR code overlay — positioned dynamically by PlayerActivity based on qr_placement -->
+    <ImageView
+        android:id="@+id/ivQrOverlay"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="20dp"
+        android:visibility="gone"
+        android:background="#FFFFFFFF"
+        android:padding="6dp"
+        android:elevation="4dp" />
+
     <!-- Status overlay (bottom-left corner, small) — works in both landscape & portrait -->
     <LinearLayout
         android:id="@+id/layoutStatus"
