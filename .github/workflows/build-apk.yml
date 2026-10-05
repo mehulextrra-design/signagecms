@@ -1,0 +1,58 @@
+name: Build & Release APK
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'player-android/**'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x player-android/gradlew
+
+      - name: Get version code
+        id: version
+        run: |
+          CODE=$(grep -oP '(?<=\?: )\d+' player-android/app/build.gradle.kts | head -1)
+          echo "code=$CODE" >> $GITHUB_OUTPUT
+          echo "tag=v1.$CODE" >> $GITHUB_OUTPUT
+          echo "APK version: $CODE"
+
+      - name: Build Release APK
+        working-directory: player-android
+        run: ./gradlew assembleRelease --no-daemon
+        env:
+          BUILD_NUMBER: ${{ steps.version.outputs.code }}
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: signagecms-apk
+          path: player-android/app/build/outputs/apk/release/app-release.apk
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: SignageCMS Player ${{ steps.version.outputs.tag }}
+          files: player-android/app/build/outputs/apk/release/app-release.apk
+          asset_name: app-release.apk
+          make_latest: true
+          body: |
+            Auto-built from commit ${{ github.sha }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
