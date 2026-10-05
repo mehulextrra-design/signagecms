@@ -238,4 +238,78 @@ async function sendDailyPoPReport() {
   }
 }
 
-module.exports = { sendInvoiceEmail, sendApprovedEmail, sendRejectedEmail, sendDailyPoPReport };
+// ── Daily PoP email to individual advertiser ──────────────────────────────
+async function sendDailyPoPEmailToUser(userId, dateStr) {
+  try {
+    const today = dateStr || new Date().toISOString().slice(0, 10);
+    const { rows } = await query(`
+      SELECT u.first_name, u.last_name, u.business_name, u.email,
+             c.title, c.campaign_code,
+             COALESCE(SUM(pl.play_count), 0) AS plays,
+             COUNT(DISTINCT pl.screen_id) AS screens
+      FROM users u
+      JOIN campaigns c ON c.user_id = u.id
+      LEFT JOIN play_logs pl ON pl.campaign_id = c.id
+        AND (pl.played_at AT TIME ZONE 'Asia/Kolkata')::date = $2::date
+      WHERE u.id = $1 AND c.status IN ('live','completed')
+        AND c.start_date <= $2::date AND c.end_date >= $2::date
+      GROUP BY u.first_name, u.last_name, u.business_name, u.email,
+               c.title, c.campaign_code
+      ORDER BY plays DESC
+    `, [userId, today]);
+
+    if (!rows.length || !rows[0].email) return;
+    const { first_name, last_name, business_name, email } = rows[0];
+    const name = business_name || `${first_name} ${last_name}`.trim() || 'Advertiser';
+    const totalPlays = rows.reduce((s, r) => s + parseInt(r.plays), 0);
+
+    const campaignRows = rows.map(r => `
+      <div class="row">
+        <span class="rl">${r.campaign_code} · ${r.title}</span>
+        <span class="rv">${parseInt(r.plays).toLocaleString()} plays · ${r.screens} screen(s)</span>
+      </div>`).join('');
+
+    const body = `
+      <div class="tag">Daily Proof of Play</div>
+      <h2>Aaj Ka Report — ${today}</h2>
+      <p>Hi ${name}, yeh raha aapka aaj ka ad performance summary.</p>
+      <div class="card">
+        <div class="row"><span class="rl">Date</span><span class="rv">${today}</span></div>
+        <div class="row"><span class="rl">Active Campaigns</span><span class="rv">${rows.length}</span></div>
+        <div class="row"><span class="rl" style="font-weight:700;color:#1e1e1e">Total Plays Today</span><span class="rv" style="color:#ff5c00;font-size:16px">${totalPlays.toLocaleString('en-IN')}</span></div>
+      </div>
+      <div class="card">${campaignRows}</div>
+      <p style="font-size:13px;color:#aaa;">Detailed analytics aur screen-wise breakdown ke liye dashboard check karein.</p>
+      <a class="btn" href="${process.env.APP_URL || 'https://signagecrm-production.up.railway.app'}">Dashboard Dekhein</a>`;
+
+    await sendMail({
+      to: email,
+      subject: `Aaj Ka Proof of Play — ${today} · ${totalPlays.toLocaleString('en-IN')} plays | SignageCMS`,
+      html: wrap('Daily Proof of Play', body),
+    });
+    console.log(`[Email] Daily PoP sent to ${email} — ${today}, ${totalPlays} plays`);
+  } catch (err) {
+    console.error(`[Email] sendDailyPoPEmailToUser error (user ${userId}):`, err.message);
+  }
+}
+
+// ── Daily PoP email to ALL active advertisers ─────────────────────────────
+async function sendDailyPoPEmailAll() {
+  const today = new Date().toISOString().slice(0, 10);
+  const { rows: users } = await query(
+    `SELECT DISTINCT u.id FROM users u
+     JOIN campaigns c ON c.user_id = u.id
+     WHERE c.status = 'live' AND c.start_date <= $1::date AND c.end_date >= $1::date
+       AND u.email IS NOT NULL AND u.email != ''`,
+    [today]
+  );
+  let sent = 0;
+  for (const { id } of users) {
+    await sendDailyPoPEmailToUser(id, today);
+    sent++;
+  }
+  console.log(`[Email] Daily PoP email sent to ${sent} advertisers`);
+  return sent;
+}
+
+module.exports = { sendInvoiceEmail, sendApprovedEmail, sendRejectedEmail, sendDailyPoPReport, sendDailyPoPEmailAll };

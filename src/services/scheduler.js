@@ -1,7 +1,7 @@
 const cron = require('node-cron');
 const { query } = require('../db');
 const { sendWeeklyReports, sendExpiryReminderWA, sendCampaignCompletedWA, sendDailyPoPAllWA } = require('./whatsapp');
-const { sendDailyPoPReport } = require('./email');
+const { sendDailyPoPReport, sendDailyPoPEmailAll } = require('./email');
 
 // Plays per screen per day based on package slot duration (WLRP model: 15h × 75% utilisation)
 function _playsPerDay(slotSec, startTime, endTime) {
@@ -168,7 +168,16 @@ const startScheduler = () => {
     }
   });
 
-  // Daily at 9:00 PM IST (15:30 UTC): send daily PoP WhatsApp to each active advertiser
+  // Daily at 9:02 PM IST (15:32 UTC): send daily PoP email to each active advertiser
+  cron.schedule('32 15 * * *', async () => {
+    try {
+      await sendDailyPoPEmailAll();
+    } catch (err) {
+      console.error('[Scheduler] Daily PoP email-all error:', err.message);
+    }
+  });
+
+  // Daily at 9:05 PM IST (15:35 UTC): send daily PoP WhatsApp to each active advertiser
   cron.schedule('35 15 * * *', async () => {
     try {
       await sendDailyPoPAllWA();
