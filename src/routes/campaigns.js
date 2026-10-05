@@ -95,19 +95,24 @@ router.get('/:id/qr', authenticate, async (req, res, next) => {
 // PUT /api/campaigns/:id/qr — save WhatsApp QR overlay settings
 router.put('/:id/qr', authenticate, async (req, res, next) => {
   try {
-    const { qr_enabled, qr_placement, qr_phone } = req.body;
+    const { qr_enabled, qr_placement, qr_phone, qr_message } = req.body;
     const check = await query('SELECT id, user_id FROM campaigns WHERE id = $1', [req.params.id]);
     if (!check.rows.length) return res.status(404).json({ error: 'Campaign not found' });
     if (!['admin', 'superadmin'].includes(req.user.role) && check.rows[0].user_id !== req.user.id) {
       return res.status(403).json({ error: 'Access denied' });
     }
-    const qrContentUrl = qr_enabled && qr_phone
-      ? `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(`https://wa.me/${qr_phone.replace(/\D/g, '')}`)}&size=250x250`
-      : null;
+    let qrContentUrl = null;
+    if (qr_enabled && qr_phone) {
+      const phone = qr_phone.replace(/\D/g, '');
+      const waUrl = qr_message && qr_message.trim()
+        ? `https://wa.me/${phone}?text=${encodeURIComponent(qr_message.trim())}`
+        : `https://wa.me/${phone}`;
+      qrContentUrl = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(waUrl)}&size=250x250`;
+    }
     const result = await query(
-      `UPDATE campaigns SET qr_enabled=$1, qr_placement=$2, qr_content_url=$3, updated_at=NOW()
-       WHERE id=$4 RETURNING id, qr_enabled, qr_placement, qr_content_url`,
-      [!!qr_enabled, qr_placement || 'bot-right', qrContentUrl, req.params.id]
+      `UPDATE campaigns SET qr_enabled=$1, qr_placement=$2, qr_content_url=$3, qr_message=$4, updated_at=NOW()
+       WHERE id=$5 RETURNING id, qr_enabled, qr_placement, qr_content_url, qr_message`,
+      [!!qr_enabled, qr_placement || 'bot-right', qrContentUrl, qr_message?.trim() || null, req.params.id]
     );
     res.json(result.rows[0]);
   } catch (err) { next(err); }

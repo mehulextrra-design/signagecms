@@ -1559,7 +1559,7 @@ function renderCampaignsTable(campaigns){
         ${c.status==='live'?`<button class="ca-btn ca-default" onclick="campaignPause('${c.id}',this)" title="Pause Campaign"><svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg></button>`:''}
         ${c.status==='paused'?`<button class="ca-btn ca-primary" onclick="campaignResume('${c.id}',this)" title="Resume Campaign"><svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></button>`:''}
         ${['live','paused','approved'].includes(c.status)?`<button class="ca-btn ca-purple${c.creative_change_status==='pending'?' ca-pulse':''}" onclick="openCreativeModal('${c.id}','${(c.title||'').replace(/'/g,"\\'")}','${c.creative_change_status||''}')" title="${c.creative_change_status==='pending'?'Creative review pending':'Change Creative'}"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>`:''}
-        ${['live','approved','paused'].includes(c.status)&&c.creative_type==='image'?`<button class="ca-btn ca-teal${c.qr_enabled?' ca-active':''}" onclick="openQRModal('${c.id}','${(c.campaign_code||'').replace(/'/g,"\\'")}','${(c.title||'').replace(/'/g,"\\'")}',${c.qr_enabled?'true':'false'},'${c.qr_placement||'bot-right'}','${c.qr_phone||''}',${c.qr_content_url?`'${c.qr_content_url}'`:'null'})" title="${c.qr_enabled?'QR Active':'Enable QR Overlay'}"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="3" height="3"/><rect x="18" y="18" width="3" height="3"/><rect x="14" y="18" width="3" height="3"/><rect x="18" y="14" width="3" height="3"/></svg></button>`:''}
+        ${['live','approved','paused'].includes(c.status)&&c.creative_type==='image'?`<button class="ca-btn ca-teal${c.qr_enabled?' ca-active':''}" onclick="openQRModal('${c.id}','${(c.campaign_code||'').replace(/'/g,"\\'")}','${(c.title||'').replace(/'/g,"\\'")}',${c.qr_enabled?'true':'false'},'${c.qr_placement||'bot-right'}','${c.qr_phone||''}',${c.qr_content_url?`'${c.qr_content_url}'`:'null'},'${(c.qr_message||'').replace(/'/g,"\\'")}')" title="${c.qr_enabled?'QR Active':'Enable QR Overlay'}"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="3" height="3"/><rect x="18" y="18" width="3" height="3"/><rect x="14" y="18" width="3" height="3"/><rect x="18" y="14" width="3" height="3"/></svg></button>`:''}
         ${['live','paused','approved'].includes(c.status)?`<button class="ca-btn ca-danger" onclick="campaignCancel('${c.id}','${(c.title||c.campaign_code).replace(/'/g,"\\'")}')` + `" title="Cancel Campaign"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></button>`:''}
         ${!['pending_payment','rejected','live','approved','paused'].includes(c.status)?'<span style="color:var(--text3);font-size:12px;">—</span>':''}
         </div>
@@ -2575,7 +2575,7 @@ async function submitCreativeChange(){
 // ── QR OVERLAY MODAL ─────────────────────────────────────────────────────────
 let qrModalCampaignId=null;
 
-function openQRModal(id,code,title,enabled,placement,phone,previewUrl){
+function openQRModal(id,code,title,enabled,placement,phone,previewUrl,message){
   qrModalCampaignId=id;
   document.getElementById('qr-modal-title').textContent=title||code;
   document.getElementById('qr-modal-code').textContent=code;
@@ -2583,6 +2583,7 @@ function openQRModal(id,code,title,enabled,placement,phone,previewUrl){
   toggleEl.checked=!!enabled;
   document.getElementById('qr-toggle-wrap').classList.toggle('qr-toggle-on',!!enabled);
   document.getElementById('qr-phone').value=phone||(currentUser&&currentUser.mobile?currentUser.mobile:'');
+  document.getElementById('qr-message').value=message||'Hi, I want to know more details about your product';
   document.getElementById('qr-preview-wrap').style.display=previewUrl&&enabled?'block':'none';
   if(previewUrl&&enabled)document.getElementById('qr-preview-img').src=previewUrl;
   // Set placement selection
@@ -2606,12 +2607,13 @@ async function saveQRSettings(){
   if(!qrModalCampaignId)return;
   const enabled=document.getElementById('qr-toggle').checked;
   const phone=document.getElementById('qr-phone').value.trim();
+  const message=document.getElementById('qr-message').value.trim();
   const placement=document.querySelector('.qr-pos-btn.active')?.dataset.pos||'bot-right';
   if(enabled&&!phone){toast('WhatsApp number required','error');return;}
   const btn=document.getElementById('qr-save-btn');
   btn.disabled=true;btn.textContent='Saving…';
   try{
-    const data=await api(`/campaigns/${qrModalCampaignId}/qr`,{method:'PUT',body:JSON.stringify({qr_enabled:enabled,qr_placement:placement,qr_phone:phone})});
+    const data=await api(`/campaigns/${qrModalCampaignId}/qr`,{method:'PUT',body:JSON.stringify({qr_enabled:enabled,qr_placement:placement,qr_phone:phone,qr_message:message})});
     toast(enabled?'QR overlay enabled!':'QR overlay disabled','success');
     if(data.qr_content_url&&enabled){
       document.getElementById('qr-preview-img').src=data.qr_content_url;
@@ -2670,6 +2672,11 @@ async function saveQRSettings(){
           <label style="font-size:12px;font-weight:600;color:var(--text2);display:block;margin-bottom:6px;">WhatsApp Number</label>
           <input type="tel" id="qr-phone" placeholder="+91 9876543210" style="width:100%;box-sizing:border-box;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;background:var(--surface);color:var(--text);">
           <div style="font-size:11px;color:var(--text2);margin-top:4px;">Include country code, e.g. 919876543210</div>
+        </div>
+        <div style="margin-bottom:16px;">
+          <label style="font-size:12px;font-weight:600;color:var(--text2);display:block;margin-bottom:6px;">Pre-filled WhatsApp Message</label>
+          <textarea id="qr-message" rows="3" placeholder="Hi, I want to know more details about your product" style="width:100%;box-sizing:border-box;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;background:var(--surface);color:var(--text);resize:vertical;font-family:inherit;"></textarea>
+          <div style="font-size:11px;color:var(--text2);margin-top:4px;">When user scans QR, WhatsApp opens with this message pre-filled. User just has to press Send.</div>
         </div>
 
         <!-- Placement Grid -->
