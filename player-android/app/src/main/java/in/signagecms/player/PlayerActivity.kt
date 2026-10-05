@@ -346,23 +346,57 @@ class PlayerActivity : AppCompatActivity() {
             qrView.visibility = View.GONE
             return
         }
-
-        val m = 16.dpToPx()
-        val params = qrView.layoutParams as FrameLayout.LayoutParams
-        params.gravity = when (campaign.qrPlacement) {
-            "top-left"  -> android.view.Gravity.TOP    or android.view.Gravity.START
-            "top-right" -> android.view.Gravity.TOP    or android.view.Gravity.END
-            "mid-left"  -> android.view.Gravity.CENTER_VERTICAL or android.view.Gravity.START
-            "mid-right" -> android.view.Gravity.CENTER_VERTICAL or android.view.Gravity.END
-            "bot-left"  -> android.view.Gravity.BOTTOM or android.view.Gravity.START
-            else        -> android.view.Gravity.BOTTOM or android.view.Gravity.END
-        }
-        params.setMargins(m, m, m, m)
-        qrView.layoutParams = params
+        Glide.with(this).load(campaign.qrContentUrl).into(qrView)
         qrView.visibility = View.VISIBLE
         qrView.bringToFront()
+        // Position after image view is fully laid out so we know actual image bounds
+        binding.ivImage.post { positionQrOnImage(campaign.qrPlacement) }
+    }
 
-        Glide.with(this).load(campaign.qrContentUrl).into(qrView)
+    private fun positionQrOnImage(placement: String?) {
+        val iv   = binding.ivImage
+        val qr   = binding.ivQrOverlay
+        val drawable = iv.drawable ?: return
+
+        val imgW  = drawable.intrinsicWidth.toFloat()
+        val imgH  = drawable.intrinsicHeight.toFloat()
+        if (imgW <= 0f || imgH <= 0f) return
+
+        val viewW = iv.width.toFloat()
+        val viewH = iv.height.toFloat()
+        if (viewW <= 0f || viewH <= 0f) return
+
+        // Compute where fitCenter actually draws the image
+        val scale   = minOf(viewW / imgW, viewH / imgH)
+        val scaledW = imgW * scale
+        val scaledH = imgH * scale
+        val offsetX = (viewW - scaledW) / 2f
+        val offsetY = (viewH - scaledH) / 2f
+
+        val qrSize = 56.dpToPx().toFloat()
+        val margin = 12.dpToPx().toFloat()
+
+        val left: Float
+        val top: Float
+        when (placement) {
+            "top-left"  -> { left = offsetX + margin;                         top = offsetY + margin }
+            "top-right" -> { left = offsetX + scaledW - qrSize - margin;      top = offsetY + margin }
+            "mid-left"  -> { left = offsetX + margin;                         top = offsetY + (scaledH - qrSize) / 2f }
+            "mid-right" -> { left = offsetX + scaledW - qrSize - margin;      top = offsetY + (scaledH - qrSize) / 2f }
+            "bot-left"  -> { left = offsetX + margin;                         top = offsetY + scaledH - qrSize - margin }
+            else        -> { left = offsetX + scaledW - qrSize - margin;      top = offsetY + scaledH - qrSize - margin }
+        }
+
+        val params = qr.layoutParams as FrameLayout.LayoutParams
+        params.gravity     = android.view.Gravity.TOP or android.view.Gravity.START
+        params.leftMargin  = left.toInt()
+        params.topMargin   = top.toInt()
+        params.rightMargin = 0
+        params.bottomMargin= 0
+        params.width       = qrSize.toInt()
+        params.height      = qrSize.toInt()
+        qr.layoutParams = params
+        qr.bringToFront()
     }
 
     private fun Int.dpToPx(): Int =

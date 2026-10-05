@@ -12,8 +12,8 @@ android {
         applicationId = "in.signagecms.player"
         minSdk = 21   // Android 5.0 — China boards ke liye
         targetSdk = 34
-        versionCode = System.getenv("BUILD_NUMBER")?.toIntOrNull() ?: 4
-        versionName = "1.${System.getenv("BUILD_NUMBER") ?: "4"}"
+        versionCode = System.getenv("BUILD_NUMBER")?.toIntOrNull() ?: 5
+        versionName = "1.${System.getenv("BUILD_NUMBER") ?: "5"}"
         buildConfigField("String", "API_BASE_URL", "\"https://signagecrm-production.up.railway.app/api/\"")
     }
 
