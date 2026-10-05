@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit
 object AppUpdater {
 
     private const val TAG = "AppUpdater"
-    private const val APK_FILENAME = "signagecms_update.apk"
+    private const val APK_FILENAME = "signagecms_update.apk" // always saved as .apk regardless of URL extension
 
     private val downloadClient by lazy {
         OkHttpClient.Builder()
