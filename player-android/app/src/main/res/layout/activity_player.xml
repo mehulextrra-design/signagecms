@@ -16,7 +16,7 @@
         android:id="@+id/ivImage"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scaleType="centerCrop"
+        android:scaleType="fitCenter"
         android:visibility="gone" />
 
     <!-- Offline / idle screen -->
@@ -78,8 +78,8 @@
     <!-- QR code overlay — positioned dynamically by PlayerActivity based on qr_placement -->
     <ImageView
         android:id="@+id/ivQrOverlay"
-        android:layout_width="72dp"
-        android:layout_height="72dp"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
         android:layout_gravity="bottom|end"
         android:layout_margin="16dp"
         android:visibility="gone"
