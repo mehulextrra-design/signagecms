@@ -121,15 +121,41 @@ jobs:
           path: player-android/app/build/outputs/apk/release/app-release.apk
           retention-days: 90
 
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: v1.${{ github.run_number }}
-          name: SignageCMS Player v1.${{ github.run_number }}
-          files: player-android/app/build/outputs/apk/release/app-release.apk
-          body: |
-            **Railway env vars to set for auto-update:**
-            ```
-            APK_VERSION_CODE=${{ github.run_number }}
-            APK_DOWNLOAD_URL=https://github.com/${{ github.repository }}/releases/download/v1.${{ github.run_number }}/app-release.apk
-            ```
+      - name: Upload APK to Cloudinary
+        id: cloudinary
+        env:
+          CLOUDINARY_CLOUD_NAME: ${{ secrets.CLOUDINARY_CLOUD_NAME }}
+          CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
+          CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
+        run: |
+          APK_PATH="player-android/app/build/outputs/apk/release/app-release.apk"
+          PUBLIC_ID="signagecms-player-v1.${{ github.run_number }}"
+          TIMESTAMP=$(date +%s)
+          SIGNATURE=$(echo -n "public_id=${PUBLIC_ID}&timestamp=${TIMESTAMP}${CLOUDINARY_API_SECRET}" | sha256sum | cut -d' ' -f1)
+
+          RESPONSE=$(curl -s -X POST \
+            "https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/raw/upload" \
+            -F "file=@${APK_PATH}" \
+            -F "public_id=${PUBLIC_ID}" \
+            -F "api_key=${CLOUDINARY_API_KEY}" \
+            -F "timestamp=${TIMESTAMP}" \
+            -F "signature=${SIGNATURE}")
+
+          echo "Cloudinary response: $RESPONSE"
+          APK_URL=$(echo "$RESPONSE" | grep -o '"secure_url":"[^"]*"' | cut -d'"' -f4)
+
+          if [ -z "$APK_URL" ]; then
+            echo "❌ Cloudinary upload failed"
+            exit 1
+          fi
+
+          echo "apk_url=$APK_URL" >> $GITHUB_OUTPUT
+          echo "## ✅ APK Ready" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Railway pe update karo:**" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          echo "APK_VERSION_CODE=${{ github.run_number }}" >> $GITHUB_STEP_SUMMARY
+          echo "APK_DOWNLOAD_URL=$APK_URL" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          echo ""
+          echo "✅ APK URL: $APK_URL"
