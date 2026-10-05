@@ -343,22 +343,20 @@ class PlayerActivity : AppCompatActivity() {
             return
         }
 
-        // Position the QR view according to qr_placement
+        val m = 16.dpToPx()
         val params = qrView.layoutParams as FrameLayout.LayoutParams
-        val margin = resources.getDimensionPixelSize(
-            android.R.dimen.notification_large_icon_width
-        ).coerceAtLeast(20.dpToPx())
         params.gravity = when (campaign.qrPlacement) {
-            "top-left"  -> android.view.Gravity.TOP or android.view.Gravity.START
-            "top-right" -> android.view.Gravity.TOP or android.view.Gravity.END
+            "top-left"  -> android.view.Gravity.TOP    or android.view.Gravity.START
+            "top-right" -> android.view.Gravity.TOP    or android.view.Gravity.END
             "mid-left"  -> android.view.Gravity.CENTER_VERTICAL or android.view.Gravity.START
             "mid-right" -> android.view.Gravity.CENTER_VERTICAL or android.view.Gravity.END
             "bot-left"  -> android.view.Gravity.BOTTOM or android.view.Gravity.START
-            else        -> android.view.Gravity.BOTTOM or android.view.Gravity.END  // bot-right default
+            else        -> android.view.Gravity.BOTTOM or android.view.Gravity.END
         }
-        params.setMargins(20.dpToPx(), 20.dpToPx(), 20.dpToPx(), 20.dpToPx())
+        params.setMargins(m, m, m, m)
         qrView.layoutParams = params
         qrView.visibility = View.VISIBLE
+        qrView.bringToFront()
 
         Glide.with(this).load(campaign.qrContentUrl).into(qrView)
     }
