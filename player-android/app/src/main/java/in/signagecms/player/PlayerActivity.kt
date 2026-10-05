@@ -19,6 +19,11 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
+import android.graphics.drawable.Drawable
 import `in`.signagecms.player.api.RetrofitClient
 import `in`.signagecms.player.api.models.HeartbeatRequest
 import `in`.signagecms.player.api.models.PlayEntry
@@ -349,8 +354,7 @@ class PlayerActivity : AppCompatActivity() {
         Glide.with(this).load(campaign.qrContentUrl).into(qrView)
         qrView.visibility = View.VISIBLE
         qrView.bringToFront()
-        // Position after image view is fully laid out so we know actual image bounds
-        binding.ivImage.post { positionQrOnImage(campaign.qrPlacement) }
+        // positionQrOnImage() is called from the Glide image load listener (after drawable is ready)
     }
 
     private fun positionQrOnImage(placement: String?) {
@@ -442,7 +446,17 @@ class PlayerActivity : AppCompatActivity() {
         releasePlayer()
 
         val uri = getContentUri(campaign)
-        Glide.with(this).load(uri).into(binding.ivImage)
+        Glide.with(this).load(uri)
+            .listener(object : RequestListener<Drawable> {
+                override fun onLoadFailed(e: GlideException?, model: Any?, target: Target<Drawable>, isFirstResource: Boolean): Boolean {
+                    return false
+                }
+                override fun onResourceReady(resource: Drawable, model: Any, target: Target<Drawable>?, dataSource: DataSource, isFirstResource: Boolean): Boolean {
+                    binding.ivImage.post { positionQrOnImage(campaign.qrPlacement) }
+                    return false
+                }
+            })
+            .into(binding.ivImage)
 
         val durationMs = (campaign.durationSec * 1000).toLong().coerceAtLeast(3000L)
         val runnable = Runnable {
