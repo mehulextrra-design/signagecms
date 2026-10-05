@@ -131,7 +131,7 @@ jobs:
           APK_PATH="player-android/app/build/outputs/apk/release/app-release.apk"
           PUBLIC_ID="signagecms-player-v1.${{ github.run_number }}"
           TIMESTAMP=$(date +%s)
-          SIGNATURE=$(echo -n "public_id=${PUBLIC_ID}&timestamp=${TIMESTAMP}${CLOUDINARY_API_SECRET}" | sha256sum | cut -d' ' -f1)
+          SIGNATURE=$(echo -n "public_id=${PUBLIC_ID}&timestamp=${TIMESTAMP}${CLOUDINARY_API_SECRET}" | openssl sha1 | awk '{print $2}')
 
           RESPONSE=$(curl -s -X POST \
             "https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/raw/upload" \
