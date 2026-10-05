@@ -119,13 +119,46 @@ jobs:
           path: player-android/app/build/outputs/apk/release/app-release.apk
           retention-days: 90
 
-      - name: APK Info
-        working-directory: player-android
-        run: |
-          APK_PATH="app/build/outputs/apk/release/app-release.apk"
-          APK_SIZE=$(du -sh "$APK_PATH" | cut -f1)
-          echo "## ✅ APK Build Success" >> $GITHUB_STEP_SUMMARY
-          echo "- **APK:** SignageCMS-Player-v1.${{ github.run_number }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Size:** $APK_SIZE" >> $GITHUB_STEP_SUMMARY
-          echo "- **Version:** 1.${{ github.run_number }} (versionCode ${{ github.run_number }})" >> $GITHUB_STEP_SUMMARY
-          echo "- **Type:** Release — signed, TV kiosk mode" >> $GITHUB_STEP_SUMMARY
+      - name: Create GitHub Release
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const tag = `v1.${{ github.run_number }}`;
+            const fs = require('fs');
+            const apkData = fs.readFileSync('player-android/app/build/outputs/apk/release/app-release.apk');
+
+            // Create or update release
+            let release;
+            try {
+              release = await github.rest.repos.getReleaseByTag({ owner: context.repo.owner, repo: context.repo.repo, tag });
+              await github.rest.repos.deleteRelease({ owner: context.repo.owner, repo: context.repo.repo, release_id: release.data.id });
+              await github.rest.git.deleteRef({ owner: context.repo.owner, repo: context.repo.repo, ref: `tags/${tag}` });
+            } catch (e) {}
+
+            release = await github.rest.repos.createRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              tag_name: tag,
+              name: `SignageCMS Player ${tag}`,
+              body: `Auto-built from commit ${{ github.sha }}`,
+              make_latest: 'true'
+            });
+
+            await github.rest.repos.uploadReleaseAsset({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              release_id: release.data.id,
+              name: 'app-release.apk',
+              data: apkData
+            });
+
+            const url = `https://github.com/${context.repo.owner}/${context.repo.repo}/releases/download/${tag}/app-release.apk`;
+            core.summary.addHeading('✅ APK Build Success');
+            core.summary.addList([
+              `Tag: ${tag}`,
+              `Download: ${url}`,
+              `Set Railway env: APK_VERSION_CODE=${{ github.run_number }}`,
+              `Set Railway env: APK_DOWNLOAD_URL=${url}`
+            ]);
+            await core.summary.write();
+            console.log(`\n✅ Release: ${url}\n`);
