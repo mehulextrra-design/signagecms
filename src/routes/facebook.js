@@ -119,4 +119,74 @@ router.get('/status', authenticate, async (req, res) => {
   });
 });
 
+// ── Social posting ────────────────────────────────────────────────────────────
+
+function fbPost(pageId, pageToken, message) {
+  return new Promise((resolve, reject) => {
+    const body = JSON.stringify({ message, access_token: pageToken });
+    const req = https.request({
+      hostname: 'graph.facebook.com',
+      path: `/v21.0/${pageId}/feed`,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept-Encoding': 'identity', 'Content-Length': Buffer.byteLength(body) }
+    }, res => {
+      let data = '';
+      res.on('data', d => data += d);
+      res.on('end', () => { try { resolve(JSON.parse(data)); } catch (e) { reject(new Error(data.slice(0, 200))); } });
+    });
+    req.on('error', reject);
+    req.write(body);
+    req.end();
+  });
+}
+
+function igPost(igUserId, pageToken, message) {
+  return new Promise((resolve, reject) => {
+    // Step 1: create media container (text-only caption)
+    const body = JSON.stringify({ caption: message, media_type: 'REELS', access_token: pageToken });
+    const req = https.request({
+      hostname: 'graph.facebook.com',
+      path: `/v21.0/${igUserId}/media`,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept-Encoding': 'identity', 'Content-Length': Buffer.byteLength(body) }
+    }, res => {
+      let data = '';
+      res.on('data', d => data += d);
+      res.on('end', () => { try { resolve(JSON.parse(data)); } catch (e) { reject(new Error(data.slice(0, 200))); } });
+    });
+    req.on('error', reject);
+    req.write(body);
+    req.end();
+  });
+}
+
+async function postCampaignToSocial(campaignId) {
+  const result = await query(
+    `SELECT c.id, c.title, c.campaign_code, c.start_date, c.end_date,
+            u.fb_page_id, u.fb_page_name, u.fb_page_access_token, u.ig_user_id
+     FROM campaigns c
+     JOIN users u ON u.id = c.user_id
+     WHERE c.id = $1`,
+    [campaignId]
+  );
+  const row = result.rows[0];
+  if (!row || !row.fb_page_id || !row.fb_page_access_token) return;
+
+  const message = `🎯 Campaign "${row.title}" is now LIVE!\n📅 Running: ${row.start_date} to ${row.end_date}\n🔖 Code: ${row.campaign_code}`;
+
+  try {
+    const fbRes = await fbPost(row.fb_page_id, row.fb_page_access_token, message);
+    if (fbRes.error) throw new Error(fbRes.error.message);
+    console.log(`[Social] Posted to FB page for campaign ${row.campaign_code}: post_id=${fbRes.id}`);
+  } catch (err) {
+    console.error(`[Social] FB post failed for campaign ${row.campaign_code}:`, err.message);
+  }
+
+  // Instagram — skip if not linked (Instagram requires media, not text-only; log for now)
+  if (row.ig_user_id) {
+    console.log(`[Social] Instagram post skipped for ${row.campaign_code} — media required for IG publishing`);
+  }
+}
+
 module.exports = router;
+module.exports.postCampaignToSocial = postCampaignToSocial;

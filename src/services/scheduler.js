@@ -2,6 +2,7 @@ const cron = require('node-cron');
 const { query } = require('../db');
 const { sendWeeklyReports, sendExpiryReminderWA, sendCampaignCompletedWA, sendDailyPoPAllWA } = require('./whatsapp');
 const { sendDailyPoPReport, sendDailyPoPEmailAll } = require('./email');
+const { postCampaignToSocial } = require('../routes/facebook');
 
 // Plays per screen per day based on package slot duration (WLRP model: 15h × 75% utilisation)
 function _playsPerDay(slotSec, startTime, endTime) {
@@ -106,6 +107,9 @@ const startScheduler = () => {
       );
       if (activated.rows.length) {
         console.log(`[Scheduler] Activated ${activated.rows.length} campaign(s):`, activated.rows.map(r => r.campaign_code));
+        for (const row of activated.rows) {
+          postCampaignToSocial(row.id).catch(e => console.error('[Scheduler] Social post error:', e.message));
+        }
       }
     } catch (err) {
       console.error('[Scheduler] Activate error:', err.message);
