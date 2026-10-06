@@ -2494,7 +2494,7 @@ async function createAdvertiser() {
   if(password.length < 8) { showToast('Password must be at least 8 characters', 'error'); return; }
   btn.disabled = true; btn.textContent = 'Creating…';
   try {
-    await api('/auth/register', { method: 'POST', body: JSON.stringify({ first_name, last_name, email, mobile, password, business_name, city, gst_number }) });
+    await api('/auth/register-admin', { method: 'POST', body: JSON.stringify({ first_name, last_name, email, mobile, password, business_name, city, gst_number }) });
     showToast('Advertiser created!', 'success');
     closeModal('create-adv-modal');
     loadAdvertisers();

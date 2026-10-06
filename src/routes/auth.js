@@ -83,6 +83,38 @@ router.post('/register', [
   } catch (err) { next(err); }
 });
 
+// POST /api/auth/register-admin — admin creates user, skips OTP, sets password
+router.post('/register-admin', authenticate, [
+  body('email').isEmail().normalizeEmail(),
+  body('first_name').trim().notEmpty(),
+  body('last_name').trim().notEmpty(),
+  body('mobile').isMobilePhone('en-IN'),
+  body('password').isLength({ min: 8 }),
+], async (req, res, next) => {
+  if (req.user.role !== 'admin') return res.status(403).json({ error: 'Admin only' });
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
+
+  const { email, first_name, last_name, mobile, password, business_name, business_type, gst_number, pan_number, city } = req.body;
+  const normalized = mobile.replace(/\D/g, '').slice(-10);
+  try {
+    const exists = await query('SELECT id FROM users WHERE email = $1', [email]);
+    if (exists.rows.length) return res.status(409).json({ error: 'Email already registered' });
+
+    const mobileExists = await query('SELECT id FROM users WHERE mobile = $1', [normalized]);
+    if (mobileExists.rows.length) return res.status(409).json({ error: 'Mobile number already registered' });
+
+    const password_hash = await bcrypt.hash(password, 12);
+    const result = await query(
+      `INSERT INTO users (email, first_name, last_name, mobile, password_hash, business_name, business_type, gst_number, pan_number, city, mobile_verified)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,false) RETURNING id, email, role`,
+      [email, first_name, last_name, normalized, password_hash, business_name, business_type, gst_number, pan_number, city]
+    );
+    const user = result.rows[0];
+    res.status(201).json({ user: { id: user.id, email: user.email, role: user.role } });
+  } catch (err) { next(err); }
+});
+
 // POST /api/auth/login-otp — passwordless login via WhatsApp OTP
 router.post('/login-otp', [
   body('mobile').isMobilePhone('en-IN'),
