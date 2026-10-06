@@ -30,7 +30,7 @@ function fbGet(path) {
 // GET /api/auth/facebook/connect — returns OAuth URL for frontend
 router.get('/connect', authenticate, (req, res) => {
   const state = Buffer.from(JSON.stringify({ userId: req.user.id })).toString('base64');
-  const scope = 'pages_show_list,pages_manage_posts,instagram_basic,instagram_content_publish,business_management';
+  const scope = 'pages_show_list,pages_manage_posts,instagram_basic,instagram_content_publish';
   const url = `https://www.facebook.com/v21.0/dialog/oauth?client_id=${APP_ID}&redirect_uri=${encodeURIComponent(REDIRECT)}&scope=${scope}&state=${encodeURIComponent(state)}&response_type=code`;
   res.json({ url });
 });
