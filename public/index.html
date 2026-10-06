@@ -830,11 +830,11 @@
               </div>
               <div class="form-group">
                 <label class="form-label">Campaign Start Time <span style="color:var(--text3);font-weight:400;font-size:11px;">(auto-set to now)</span></label>
-                <input type="time" id="sch-time-start" class="form-input" value="08:00" min="08:00" max="23:00" onchange="onStartTimeChange()">
+                <input type="time" id="sch-time-start" class="form-input" min="00:00" max="23:59" onchange="onStartTimeChange()">
               </div>
               <div class="form-group">
                 <label class="form-label">Campaign End Time <span style="color:var(--text3);font-weight:400;font-size:11px;">(auto: 1 min before start)</span></label>
-                <input type="time" id="sch-time-end" class="form-input" value="07:59" min="07:59" max="23:00" readonly style="background:var(--surface2);cursor:not-allowed;opacity:0.8;">
+                <input type="time" id="sch-time-end" class="form-input" min="00:00" max="23:59" readonly style="background:var(--surface2);cursor:not-allowed;opacity:0.8;">
               </div>
             </div>
             <!-- hidden end date kept for backend compatibility -->
@@ -1163,7 +1163,7 @@ window.addEventListener('DOMContentLoaded',()=>{
   const now=new Date();
   const e2=new Date(now);e2.setDate(now.getDate()+7);
   const sd=document.getElementById('sch-start');const ed=document.getElementById('sch-end');
-  if(sd)sd.value=d(now);if(ed)ed.value=d(e2);
+  if(sd){sd.value=d(now);onStartDateChange();}if(ed)ed.value=d(e2);
   ['login-mobile','login-otp','admin-email','admin-password'].forEach(id=>{
     const el=document.getElementById(id);
     if(el)el.addEventListener('keydown',e=>{if(e.key==='Enter'){if(id==='login-mobile')sendLoginOtp();else if(id==='login-otp')doLogin();else doAdminLogin();}});
@@ -2181,8 +2181,8 @@ function selectPkg(pkg){
 }
 
 function clampEndTime(el){
-  if(el.value>'23:00'){el.value='23:00';}
-  if(el.value<'07:59'){el.value='07:59';}
+  if(el.value>'23:59'){el.value='23:59';}
+  if(el.value<'00:00'){el.value='00:00';}
 }
 
 function onStartDateChange(){
@@ -2205,9 +2205,8 @@ function onStartTimeChange(){
   // end_time = start_time - 1 minute (campaign expires exactly duration days after it starts)
   let endH=h, endM=m-1;
   if(endM<0){endM=59;endH=(endH-1+24)%24;}
-  // Clamp between 07:59 and 23:00
-  if(endH>23||(endH===23&&endM>0)){endH=23;endM=0;}
-  if(endH<8&&!(endH===7&&endM===59)){endH=7;endM=59;}
+  // Clamp to valid 24h range
+  if(endH>23||(endH===23&&endM>59)){endH=23;endM=59;}
   document.getElementById('sch-time-end').value=`${String(endH).padStart(2,'0')}:${String(endM).padStart(2,'0')}`;
   updateEndFromDuration();
 }
