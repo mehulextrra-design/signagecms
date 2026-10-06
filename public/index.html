@@ -1155,8 +1155,8 @@ window.addEventListener('DOMContentLoaded',()=>{
   const _fbError=new URLSearchParams(location.search).get('fb_error');
   if(_fbConnected||_fbError) history.replaceState({},'','/');
   if(token) loadUserInfo().then(()=>{
-    if(_fbConnected){toast('Facebook connected successfully!','success');}
-    if(_fbError){toast('Facebook error: '+decodeURIComponent(_fbError),'error');}
+    if(_fbConnected){navigate('profile');toast('Facebook connected successfully!','success');loadFbStatus();}
+    if(_fbError){navigate('profile');toast('Facebook error: '+decodeURIComponent(_fbError),'error');}
   }).catch(()=>{clearToken();showAuthScreen();});
   else showAuthScreen();
   const d=s=>s.toISOString().slice(0,10);
