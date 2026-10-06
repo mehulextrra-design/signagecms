@@ -441,10 +441,36 @@
     </details>
     <h2 class="auth-heading">Sign in</h2>
     <p class="auth-subtext">Welcome back — manage your campaigns</p>
-    <div class="form-group"><label class="form-label">Email</label><input type="email" id="login-email" class="form-input" placeholder="you@company.com"></div>
-    <div class="form-group"><label class="form-label">Password</label><input type="password" id="login-password" class="form-input" placeholder="••••••••"></div>
-    <button class="btn btn-primary btn-full" id="login-btn" onclick="doLogin()">Sign in</button>
+    <div class="form-group">
+      <label class="form-label">Mobile Number</label>
+      <div style="display:flex;gap:8px;">
+        <input type="tel" id="login-mobile" class="form-input" placeholder="+91 98765 43210" style="flex:1;">
+        <button type="button" id="login-otp-btn" onclick="sendLoginOtp()" style="white-space:nowrap;padding:0 14px;border-radius:8px;border:none;background:var(--primary);color:#fff;font-weight:600;font-size:13px;cursor:pointer;">Send OTP</button>
+      </div>
+    </div>
+    <div class="form-group hidden" id="login-otp-group">
+      <label class="form-label">WhatsApp OTP</label>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <input type="text" id="login-otp" class="form-input" placeholder="6-digit OTP" maxlength="6" inputmode="numeric" style="flex:1;letter-spacing:4px;font-size:18px;font-weight:700;">
+        <span id="login-otp-timer" style="font-size:12px;color:var(--text2);min-width:40px;"></span>
+      </div>
+    </div>
+    <button class="btn btn-primary btn-full" id="login-btn" onclick="doLogin()" disabled>Sign in</button>
+    <div style="text-align:center;margin-top:8px;"><a onclick="showAdminLogin()" style="font-size:12px;color:var(--text2);cursor:pointer;">Admin? Login with password</a></div>
     <div class="auth-switch">No account? <a onclick="showRegister()">Create one</a></div>
+  </div>
+
+  <!-- Admin password login (hidden by default) -->
+  <div id="admin-login-card" class="auth-card hidden">
+    <div class="auth-logo">
+      <div class="auth-logo-icon"><svg viewBox="0 0 24 24"><path d="M3 4h18v2H3V4zm0 7h12v2H3v-2zm0 7h18v2H3v-2z"/></svg></div>
+      <div><div class="auth-logo-name">SignageCMS</div><div class="auth-logo-tag">Admin Login</div></div>
+    </div>
+    <h2 class="auth-heading">Admin Sign in</h2>
+    <div class="form-group"><label class="form-label">Email</label><input type="email" id="admin-email" class="form-input" placeholder="admin@signagecms.in"></div>
+    <div class="form-group"><label class="form-label">Password</label><input type="password" id="admin-password" class="form-input" placeholder="••••••••"></div>
+    <button class="btn btn-primary btn-full" id="admin-login-btn" onclick="doAdminLogin()">Sign in</button>
+    <div style="text-align:center;margin-top:8px;"><a onclick="showLogin()" style="font-size:12px;color:var(--text2);cursor:pointer;">← Back to OTP login</a></div>
   </div>
 
   <div id="register-card" class="auth-card hidden" style="max-width:520px">
@@ -474,7 +500,6 @@
       </div>
       <div style="font-size:12px;color:var(--success,#10B981);margin-top:4px;" id="otp-sent-msg"></div>
     </div>
-    <div class="form-group"><label class="form-label">Password</label><input type="password" id="reg-password" class="form-input" placeholder="Min 8 characters"></div>
     <button class="btn btn-primary btn-full" id="register-btn" onclick="doRegister()" disabled>Create account</button>
     <div class="auth-switch">Have an account? <a onclick="showLogin()">Sign in</a></div>
   </div>
@@ -1139,14 +1164,27 @@ window.addEventListener('DOMContentLoaded',()=>{
   const e2=new Date(now);e2.setDate(now.getDate()+7);
   const sd=document.getElementById('sch-start');const ed=document.getElementById('sch-end');
   if(sd)sd.value=d(now);if(ed)ed.value=d(e2);
-  ['login-email','login-password'].forEach(id=>{
+  ['login-mobile','login-otp','admin-email','admin-password'].forEach(id=>{
     const el=document.getElementById(id);
-    if(el)el.addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+    if(el)el.addEventListener('keydown',e=>{if(e.key==='Enter'){if(id==='login-mobile')sendLoginOtp();else if(id==='login-otp')doLogin();else doAdminLogin();}});
   });
 });
 
 function showAuthScreen(){document.getElementById('auth-overlay').classList.remove('hidden');document.getElementById('app').classList.add('hidden');}
-function showLogin(){document.getElementById('login-card').classList.remove('hidden');document.getElementById('register-card').classList.add('hidden');}
+function showLogin(){
+  document.getElementById('login-card').classList.remove('hidden');
+  document.getElementById('register-card').classList.add('hidden');
+  document.getElementById('admin-login-card').classList.add('hidden');
+  document.getElementById('login-otp-group').classList.add('hidden');
+  document.getElementById('login-btn').disabled=true;
+  document.getElementById('login-otp-btn').textContent='Send OTP';
+  document.getElementById('login-otp-timer').textContent='';
+  if(_loginOtpTimer)clearInterval(_loginOtpTimer);
+}
+function showAdminLogin(){
+  document.getElementById('login-card').classList.add('hidden');
+  document.getElementById('admin-login-card').classList.remove('hidden');
+}
 function showRegister(){
   document.getElementById('login-card').classList.add('hidden');
   document.getElementById('register-card').classList.remove('hidden');
@@ -1157,13 +1195,44 @@ function showRegister(){
   document.getElementById('send-otp-btn').textContent='Send OTP';
   if(_otpTimerInterval)clearInterval(_otpTimerInterval);
 }
-function fillTest(e,p){document.getElementById('login-email').value=e;document.getElementById('login-password').value=p;}
+let _loginOtpTimer=null;
+async function sendLoginOtp(){
+  const mobile=document.getElementById('login-mobile').value.trim();
+  if(!mobile){toast('Mobile number daalo','error');return;}
+  const btn=document.getElementById('login-otp-btn');btn.disabled=true;btn.textContent='Sending…';
+  try{
+    const r=await fetch(`${API}/auth/send-otp`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mobile})});
+    const data=await r.json();if(!r.ok)throw new Error(data.error||'OTP send failed');
+    document.getElementById('login-otp-group').classList.remove('hidden');
+    document.getElementById('login-btn').disabled=false;
+    let secs=600;
+    if(_loginOtpTimer)clearInterval(_loginOtpTimer);
+    const timerEl=document.getElementById('login-otp-timer');
+    _loginOtpTimer=setInterval(()=>{secs--;const m=Math.floor(secs/60),s=secs%60;timerEl.textContent=`${m}:${String(s).padStart(2,'0')}`;if(secs<=0){clearInterval(_loginOtpTimer);timerEl.textContent='Expired';document.getElementById('login-btn').disabled=true;}},1000);
+    btn.textContent='Resend OTP';toast('OTP WhatsApp pe bheja gaya!','success');
+  }catch(e){toast(e.message,'error');btn.textContent='Send OTP';}
+  finally{btn.disabled=false;}
+}
 
 async function doLogin(){
-  const email=document.getElementById('login-email').value.trim();
-  const pass=document.getElementById('login-password').value;
-  if(!email||!pass){toast('Enter email and password','error');return;}
+  const mobile=document.getElementById('login-mobile').value.trim();
+  const otp=document.getElementById('login-otp').value.trim();
+  if(!mobile||!otp){toast('Mobile aur OTP daalo','error');return;}
   const btn=document.getElementById('login-btn');btn.innerHTML='<div class="loading-spinner"></div>';btn.disabled=true;
+  try{
+    const r=await fetch(`${API}/auth/login-otp`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mobile,otp})});
+    const data=await r.json();if(!r.ok)throw new Error(data.error||'Login failed');
+    if(_loginOtpTimer)clearInterval(_loginOtpTimer);
+    setToken(data.token);currentUser=data.user;showApp();toast(`Welcome back, ${currentUser.name||currentUser.email}!`,'success');
+    loadUserInfo().then(()=>updateSidebarUser()).catch(()=>{});
+  }catch(e){toast(e.message,'error');}finally{btn.innerHTML='Sign in';btn.disabled=false;}
+}
+
+async function doAdminLogin(){
+  const email=document.getElementById('admin-email').value.trim();
+  const pass=document.getElementById('admin-password').value;
+  if(!email||!pass){toast('Enter email and password','error');return;}
+  const btn=document.getElementById('admin-login-btn');btn.innerHTML='<div class="loading-spinner"></div>';btn.disabled=true;
   try{
     const r=await fetch(`${API}/auth/login`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password:pass})});
     const data=await r.json();if(!r.ok)throw new Error(data.error||'Login failed');
