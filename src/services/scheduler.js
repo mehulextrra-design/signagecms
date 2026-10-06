@@ -30,7 +30,8 @@ async function generateServerPlayLogs(hoursAgo = 1) {
       WHERE c.status IN ('live','completed')
         AND c.start_date <= $1::date
         AND c.end_date   >= $1::date
-    `, [dateStr]);
+        AND (c.start_date::date + COALESCE(c.start_time, '00:00:00')::time) <= $2::timestamptz
+    `, [dateStr, hourStr]);
   } catch (e) {
     console.error('[ServerLogs] Campaign query error:', e.message);
     return 0;
@@ -234,6 +235,22 @@ const startScheduler = () => {
       console.error('[Scheduler] Server play log error:', err.message);
     }
   });
+
+  // On startup, delete server-estimated logs inserted before a campaign's actual start datetime
+  setTimeout(async () => {
+    try {
+      const cleaned = await query(`
+        DELETE FROM play_logs pl
+        USING campaigns c
+        WHERE pl.campaign_id = c.id
+          AND pl.source = 'server'
+          AND pl.played_at < (c.start_date::date + COALESCE(c.start_time, '00:00:00')::time)::timestamptz
+      `);
+      if (cleaned.rowCount > 0) console.log(`[Scheduler] Cleaned ${cleaned.rowCount} pre-start server log(s)`);
+    } catch (err) {
+      console.error('[Scheduler] Cleanup pre-start logs error:', err.message);
+    }
+  }, 5000);
 
   // On startup, backfill the last 7 days so analytics isn't empty on first load
   setTimeout(async () => {
