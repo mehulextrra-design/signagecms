@@ -563,7 +563,10 @@ textarea.form-input{resize:vertical;min-height:80px;}
       <div id="page-advertisers" class="page">
         <div class="section-head">
           <h2>Advertisers</h2>
-          <div class="search-wrap"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg><input type="text" class="search-input" id="adv-search" placeholder="Search…" oninput="filterAdvertisers()"></div>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <div class="search-wrap"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg><input type="text" class="search-input" id="adv-search" placeholder="Search…" oninput="filterAdvertisers()"></div>
+            <button class="btn btn-primary" onclick="openCreateAdvertiser()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>New Advertiser</button>
+          </div>
         </div>
         <div class="table-card">
           <div class="table-wrap"><table><thead><tr><th>Name</th><th>Email</th><th>Business</th><th>City</th><th>GST</th><th>Joined</th><th>Status</th><th>Actions</th></tr></thead><tbody id="adv-table"></tbody></table></div>
@@ -1084,6 +1087,32 @@ textarea.form-input{resize:vertical;min-height:80px;}
     <div class="modal-body" id="adv-modal-body"></div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('adv-modal')">Close</button>
+      <button class="btn btn-primary" id="adv-edit-btn" onclick="switchToEditMode()">Edit</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop hidden" id="create-adv-modal">
+  <div class="modal" style="max-width:520px;">
+    <div class="modal-header">
+      <span class="modal-title">New Advertiser</span>
+      <button class="modal-close" onclick="closeModal('create-adv-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div><label style="font-size:11px;font-weight:600;color:var(--text2);display:block;margin-bottom:4px;">First Name *</label><input id="ca-first" class="form-input" style="width:100%;" placeholder="Raj"></div>
+        <div><label style="font-size:11px;font-weight:600;color:var(--text2);display:block;margin-bottom:4px;">Last Name *</label><input id="ca-last" class="form-input" style="width:100%;" placeholder="Sharma"></div>
+        <div style="grid-column:1/-1;"><label style="font-size:11px;font-weight:600;color:var(--text2);display:block;margin-bottom:4px;">Email *</label><input id="ca-email" type="email" class="form-input" style="width:100%;" placeholder="raj@business.com"></div>
+        <div><label style="font-size:11px;font-weight:600;color:var(--text2);display:block;margin-bottom:4px;">Mobile *</label><input id="ca-mobile" class="form-input" style="width:100%;" placeholder="9876543210"></div>
+        <div><label style="font-size:11px;font-weight:600;color:var(--text2);display:block;margin-bottom:4px;">Password *</label><input id="ca-pass" type="password" class="form-input" style="width:100%;" placeholder="Min 8 chars"></div>
+        <div style="grid-column:1/-1;"><label style="font-size:11px;font-weight:600;color:var(--text2);display:block;margin-bottom:4px;">Business Name</label><input id="ca-biz" class="form-input" style="width:100%;" placeholder="Raj Sports"></div>
+        <div><label style="font-size:11px;font-weight:600;color:var(--text2);display:block;margin-bottom:4px;">City</label><input id="ca-city" class="form-input" style="width:100%;" placeholder="Mumbai"></div>
+        <div><label style="font-size:11px;font-weight:600;color:var(--text2);display:block;margin-bottom:4px;">GST Number</label><input id="ca-gst" class="form-input" style="width:100%;font-family:monospace;" placeholder="22AAAAA0000A1Z5"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('create-adv-modal')">Cancel</button>
+      <button class="btn btn-primary" id="ca-save-btn" onclick="createAdvertiser()">Create Advertiser</button>
     </div>
   </div>
 </div>
@@ -2378,10 +2407,15 @@ async function activateUser(id) {
   } catch(e) { showToast('Error: ' + e.message, 'error'); }
 }
 
+let _currentAdvId = null;
+
 async function viewAdvertiser(id) {
   const u = allAdvertisers.find(x => x.id === id);
   if(!u) return;
+  _currentAdvId = id;
   document.getElementById('adv-modal-title').textContent = (u.first_name||'') + ' ' + (u.last_name||'');
+  document.getElementById('adv-edit-btn').textContent = 'Edit';
+  document.getElementById('adv-edit-btn').onclick = switchToEditMode;
   document.getElementById('adv-modal-body').innerHTML = `
     <div class="info-grid">
       <div class="info-item"><label>Full Name</label><span>${u.first_name||'—'} ${u.last_name||''}</span></div>
@@ -2396,6 +2430,76 @@ async function viewAdvertiser(id) {
       <div class="info-item"><label>Joined</label><span>${fmtDate(u.created_at)}</span></div>
     </div>`;
   document.getElementById('adv-modal').classList.remove('hidden');
+}
+
+function switchToEditMode() {
+  const u = allAdvertisers.find(x => x.id === _currentAdvId);
+  if(!u) return;
+  document.getElementById('adv-modal-title').textContent = 'Edit: ' + (u.first_name||'') + ' ' + (u.last_name||'');
+  document.getElementById('adv-modal-body').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+      <div><label style="font-size:11px;font-weight:600;color:var(--text2);display:block;margin-bottom:4px;">First Name</label><input id="ae-first" class="form-input" style="width:100%;" value="${u.first_name||''}"></div>
+      <div><label style="font-size:11px;font-weight:600;color:var(--text2);display:block;margin-bottom:4px;">Last Name</label><input id="ae-last" class="form-input" style="width:100%;" value="${u.last_name||''}"></div>
+      <div style="grid-column:1/-1;"><label style="font-size:11px;font-weight:600;color:var(--text2);display:block;margin-bottom:4px;">Email</label><input id="ae-email" type="email" class="form-input" style="width:100%;" value="${u.email||''}"></div>
+      <div><label style="font-size:11px;font-weight:600;color:var(--text2);display:block;margin-bottom:4px;">Mobile</label><input id="ae-mobile" class="form-input" style="width:100%;" value="${u.mobile||''}"></div>
+      <div><label style="font-size:11px;font-weight:600;color:var(--text2);display:block;margin-bottom:4px;">City</label><input id="ae-city" class="form-input" style="width:100%;" value="${u.city||''}"></div>
+      <div style="grid-column:1/-1;"><label style="font-size:11px;font-weight:600;color:var(--text2);display:block;margin-bottom:4px;">Business Name</label><input id="ae-biz" class="form-input" style="width:100%;" value="${u.business_name||''}"></div>
+      <div><label style="font-size:11px;font-weight:600;color:var(--text2);display:block;margin-bottom:4px;">Business Type</label><input id="ae-biz-type" class="form-input" style="width:100%;" value="${u.business_type||''}"></div>
+      <div><label style="font-size:11px;font-weight:600;color:var(--text2);display:block;margin-bottom:4px;">GST Number</label><input id="ae-gst" class="form-input" style="width:100%;font-family:monospace;" value="${u.gst_number||''}"></div>
+    </div>`;
+  document.getElementById('adv-edit-btn').textContent = 'Save Changes';
+  document.getElementById('adv-edit-btn').onclick = saveAdvertiserEdit;
+}
+
+async function saveAdvertiserEdit() {
+  const btn = document.getElementById('adv-edit-btn');
+  btn.disabled = true; btn.textContent = 'Saving…';
+  try {
+    const body = {
+      first_name: document.getElementById('ae-first').value,
+      last_name: document.getElementById('ae-last').value,
+      email: document.getElementById('ae-email').value,
+      mobile: document.getElementById('ae-mobile').value,
+      city: document.getElementById('ae-city').value,
+      business_name: document.getElementById('ae-biz').value,
+      business_type: document.getElementById('ae-biz-type').value,
+      gst_number: document.getElementById('ae-gst').value,
+    };
+    await api(`/users/${_currentAdvId}`, { method: 'PUT', body: JSON.stringify(body) });
+    showToast('Advertiser updated!', 'success');
+    closeModal('adv-modal');
+    loadAdvertisers();
+  } catch(e) { showToast('Error: ' + e.message, 'error'); }
+  finally { btn.disabled = false; btn.textContent = 'Save Changes'; }
+}
+
+function openCreateAdvertiser() {
+  ['ca-first','ca-last','ca-email','ca-mobile','ca-pass','ca-biz','ca-city','ca-gst'].forEach(id => {
+    const el = document.getElementById(id); if(el) el.value = '';
+  });
+  document.getElementById('create-adv-modal').classList.remove('hidden');
+}
+
+async function createAdvertiser() {
+  const btn = document.getElementById('ca-save-btn');
+  const first_name = document.getElementById('ca-first').value.trim();
+  const last_name = document.getElementById('ca-last').value.trim();
+  const email = document.getElementById('ca-email').value.trim();
+  const mobile = document.getElementById('ca-mobile').value.trim();
+  const password = document.getElementById('ca-pass').value;
+  const business_name = document.getElementById('ca-biz').value.trim();
+  const city = document.getElementById('ca-city').value.trim();
+  const gst_number = document.getElementById('ca-gst').value.trim();
+  if(!first_name||!last_name||!email||!mobile||!password) { showToast('Fill all required fields', 'error'); return; }
+  if(password.length < 8) { showToast('Password must be at least 8 characters', 'error'); return; }
+  btn.disabled = true; btn.textContent = 'Creating…';
+  try {
+    await api('/auth/register', { method: 'POST', body: JSON.stringify({ first_name, last_name, email, mobile, password, business_name, city, gst_number }) });
+    showToast('Advertiser created!', 'success');
+    closeModal('create-adv-modal');
+    loadAdvertisers();
+  } catch(e) { showToast(e.message, 'error'); }
+  finally { btn.disabled = false; btn.textContent = 'Create Advertiser'; }
 }
 
 // ── INVOICES ──────────────────────────────────────────────────────────────

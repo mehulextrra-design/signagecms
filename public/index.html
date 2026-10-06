@@ -1145,7 +1145,8 @@ async function doLogin(){
   try{
     const r=await fetch(`${API}/auth/login`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password:pass})});
     const data=await r.json();if(!r.ok)throw new Error(data.error||'Login failed');
-    setToken(data.token);currentUser=data.user;showApp();toast(`Welcome back, ${currentUser.first_name||currentUser.email}!`,'success');
+    setToken(data.token);currentUser=data.user;showApp();toast(`Welcome back, ${currentUser.name||currentUser.email}!`,'success');
+    loadUserInfo().then(()=>updateSidebarUser()).catch(()=>{});
   }catch(e){toast(e.message,'error');}finally{btn.innerHTML='Sign in';btn.disabled=false;}
 }
 
