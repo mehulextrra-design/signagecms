@@ -1274,13 +1274,12 @@ async function doRegister(){
   const business_name=document.getElementById('reg-biz').value.trim();
   const email=document.getElementById('reg-email').value.trim();
   const mobile=document.getElementById('reg-mobile').value.trim();
-  const password=document.getElementById('reg-password').value;
   const otp=document.getElementById('reg-otp').value.trim();
-  if(!first_name||!email||!password||!mobile){toast('Fill all required fields','error');return;}
+  if(!first_name||!email||!mobile){toast('Fill all required fields','error');return;}
   if(!otp||otp.length!==6){toast('6-digit OTP daalo','error');return;}
   const btn=document.getElementById('register-btn');btn.innerHTML='<div class="loading-spinner"></div>';btn.disabled=true;
   try{
-    const r=await fetch(`${API}/auth/register`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({first_name,last_name,business_name,email,mobile,password,otp})});
+    const r=await fetch(`${API}/auth/register`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({first_name,last_name,business_name,email,mobile,otp})});
     const data=await r.json();if(!r.ok)throw new Error(data.error||'Registration failed');
     if(_otpTimerInterval)clearInterval(_otpTimerInterval);
     setToken(data.token);currentUser=data.user;showApp();
