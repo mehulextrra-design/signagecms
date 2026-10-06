@@ -11,12 +11,17 @@ const REDIRECT   = process.env.FB_REDIRECT_URI || 'https://signagecrm-production
 
 function fbGet(path) {
   return new Promise((resolve, reject) => {
-    https.get(`https://graph.facebook.com/v21.0${path}`, res => {
+    const options = {
+      hostname: 'graph.facebook.com',
+      path: `/v21.0${path}`,
+      headers: { 'Accept-Encoding': 'identity' }
+    };
+    https.get(options, res => {
       let data = '';
       res.on('data', d => data += d);
       res.on('end', () => {
         try { resolve(JSON.parse(data)); }
-        catch (e) { reject(e); }
+        catch (e) { reject(new Error(`FB parse error: ${data.slice(0,200)}`)); }
       });
     }).on('error', reject);
   });
