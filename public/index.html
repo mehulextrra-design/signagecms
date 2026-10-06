@@ -1776,7 +1776,7 @@ async function loadPop(){
       return;
     }
     tbody.innerHTML=rows.map(r=>{
-      const playedAt=r.played_at?new Date(r.played_at).toLocaleString('en-IN',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}):'—';
+      const playedAt=r.played_at?new Date(r.played_at).toLocaleString('en-IN',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false}):'—';
       const srcBadge=r.source==='server'?`<span style="font-size:10px;background:#fef3c7;color:#92400e;border-radius:4px;padding:1px 6px;font-weight:600;">estimated</span>`:`<span style="font-size:10px;background:#f0fdf4;color:#166534;border-radius:4px;padding:1px 6px;font-weight:600;">live</span>`;
       return`<tr style="border-bottom:1px solid var(--border);">
         <td style="padding:9px 12px;white-space:nowrap;">${playedAt}</td>
