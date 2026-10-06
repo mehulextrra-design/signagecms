@@ -140,10 +140,6 @@ function fbApiPost(path, payload) {
   });
 }
 
-function fmtDate(d) {
-  return new Date(d).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
-}
-
 async function postCampaignToSocial(campaignId) {
   const result = await query(
     `SELECT c.id, c.title, c.campaign_code, c.start_date, c.end_date,
@@ -158,23 +154,20 @@ async function postCampaignToSocial(campaignId) {
   const row = result.rows[0];
   if (!row || !row.fb_page_id || !row.fb_page_access_token) return;
 
-  const caption = `🎯 Campaign "${row.title}" is now LIVE!\n📅 ${fmtDate(row.start_date)} – ${fmtDate(row.end_date)}\n🔖 Code: ${row.campaign_code}`;
-
   try {
     let fbRes;
     if (row.file_url && row.content_type === 'image') {
-      // Post with image
       fbRes = await fbApiPost(`/${row.fb_page_id}/photos`, {
         url: row.file_url,
-        caption,
         access_token: row.fb_page_access_token
       });
+    } else if (row.file_url && row.content_type === 'video') {
+      // Video post — just log, video upload needs multipart not JSON
+      console.log(`[Social] Video campaign ${row.campaign_code} — video upload not supported yet`);
+      return;
     } else {
-      // Text-only post (video or no content)
-      fbRes = await fbApiPost(`/${row.fb_page_id}/feed`, {
-        message: caption,
-        access_token: row.fb_page_access_token
-      });
+      console.log(`[Social] No media for campaign ${row.campaign_code} — skipping FB post`);
+      return;
     }
     if (fbRes.error) throw new Error(fbRes.error.message);
     console.log(`[Social] Posted to FB page for campaign ${row.campaign_code}: post_id=${fbRes.id}`);
@@ -187,7 +180,6 @@ async function postCampaignToSocial(campaignId) {
     try {
       const container = await fbApiPost(`/${row.ig_user_id}/media`, {
         image_url: row.file_url,
-        caption,
         access_token: row.fb_page_access_token
       });
       if (container.error) throw new Error(container.error.message);
