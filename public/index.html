@@ -460,9 +460,22 @@
     </div>
     <div class="form-group"><label class="form-label">Business name</label><input type="text" id="reg-biz" class="form-input" placeholder="Your Company Pvt Ltd"></div>
     <div class="form-group"><label class="form-label">Email</label><input type="email" id="reg-email" class="form-input" placeholder="you@company.com"></div>
-    <div class="form-group"><label class="form-label">Mobile</label><input type="tel" id="reg-mobile" class="form-input" placeholder="+91 98765 43210"></div>
+    <div class="form-group"><label class="form-label">Mobile</label>
+      <div style="display:flex;gap:8px;">
+        <input type="tel" id="reg-mobile" class="form-input" placeholder="+91 98765 43210" style="flex:1;">
+        <button type="button" id="send-otp-btn" onclick="sendOtp()" style="white-space:nowrap;padding:0 14px;border-radius:8px;border:none;background:var(--primary);color:#fff;font-weight:600;font-size:13px;cursor:pointer;">Send OTP</button>
+      </div>
+    </div>
+    <div class="form-group hidden" id="otp-group">
+      <label class="form-label">WhatsApp OTP</label>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <input type="text" id="reg-otp" class="form-input" placeholder="6-digit OTP" maxlength="6" inputmode="numeric" style="flex:1;letter-spacing:4px;font-size:18px;font-weight:700;">
+        <span id="otp-timer" style="font-size:12px;color:var(--text2);min-width:40px;"></span>
+      </div>
+      <div style="font-size:12px;color:var(--success,#10B981);margin-top:4px;" id="otp-sent-msg"></div>
+    </div>
     <div class="form-group"><label class="form-label">Password</label><input type="password" id="reg-password" class="form-input" placeholder="Min 8 characters"></div>
-    <button class="btn btn-primary btn-full" id="register-btn" onclick="doRegister()">Create account</button>
+    <button class="btn btn-primary btn-full" id="register-btn" onclick="doRegister()" disabled>Create account</button>
     <div class="auth-switch">Have an account? <a onclick="showLogin()">Sign in</a></div>
   </div>
 </div>
@@ -1134,7 +1147,16 @@ window.addEventListener('DOMContentLoaded',()=>{
 
 function showAuthScreen(){document.getElementById('auth-overlay').classList.remove('hidden');document.getElementById('app').classList.add('hidden');}
 function showLogin(){document.getElementById('login-card').classList.remove('hidden');document.getElementById('register-card').classList.add('hidden');}
-function showRegister(){document.getElementById('login-card').classList.add('hidden');document.getElementById('register-card').classList.remove('hidden');}
+function showRegister(){
+  document.getElementById('login-card').classList.add('hidden');
+  document.getElementById('register-card').classList.remove('hidden');
+  document.getElementById('otp-group').classList.add('hidden');
+  document.getElementById('otp-sent-msg').textContent='';
+  document.getElementById('otp-timer').textContent='';
+  document.getElementById('register-btn').disabled=true;
+  document.getElementById('send-otp-btn').textContent='Send OTP';
+  if(_otpTimerInterval)clearInterval(_otpTimerInterval);
+}
 function fillTest(e,p){document.getElementById('login-email').value=e;document.getElementById('login-password').value=p;}
 
 async function doLogin(){
@@ -1150,6 +1172,33 @@ async function doLogin(){
   }catch(e){toast(e.message,'error');}finally{btn.innerHTML='Sign in';btn.disabled=false;}
 }
 
+let _otpTimerInterval=null;
+async function sendOtp(){
+  const mobile=document.getElementById('reg-mobile').value.trim();
+  if(!mobile){toast('Mobile number daalo pehle','error');return;}
+  const btn=document.getElementById('send-otp-btn');
+  btn.disabled=true;btn.textContent='Sending…';
+  try{
+    const r=await fetch(`${API}/auth/send-otp`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mobile})});
+    const data=await r.json();if(!r.ok)throw new Error(data.error||'OTP send failed');
+    document.getElementById('otp-group').classList.remove('hidden');
+    document.getElementById('otp-sent-msg').textContent='✓ OTP aapke WhatsApp pe bheja gaya';
+    document.getElementById('register-btn').disabled=false;
+    // 10 min countdown
+    let secs=600;
+    if(_otpTimerInterval)clearInterval(_otpTimerInterval);
+    const timerEl=document.getElementById('otp-timer');
+    _otpTimerInterval=setInterval(()=>{
+      secs--;
+      const m=Math.floor(secs/60),s=secs%60;
+      timerEl.textContent=`${m}:${String(s).padStart(2,'0')}`;
+      if(secs<=0){clearInterval(_otpTimerInterval);timerEl.textContent='Expired';document.getElementById('register-btn').disabled=true;}
+    },1000);
+    btn.textContent='Resend OTP';
+  }catch(e){toast(e.message,'error');btn.textContent='Send OTP';}
+  finally{btn.disabled=false;}
+}
+
 async function doRegister(){
   const first_name=document.getElementById('reg-first').value.trim();
   const last_name=document.getElementById('reg-last').value.trim();
@@ -1157,12 +1206,17 @@ async function doRegister(){
   const email=document.getElementById('reg-email').value.trim();
   const mobile=document.getElementById('reg-mobile').value.trim();
   const password=document.getElementById('reg-password').value;
-  if(!first_name||!email||!password){toast('Fill all required fields','error');return;}
+  const otp=document.getElementById('reg-otp').value.trim();
+  if(!first_name||!email||!password||!mobile){toast('Fill all required fields','error');return;}
+  if(!otp||otp.length!==6){toast('6-digit OTP daalo','error');return;}
   const btn=document.getElementById('register-btn');btn.innerHTML='<div class="loading-spinner"></div>';btn.disabled=true;
   try{
-    const r=await fetch(`${API}/auth/register`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({first_name,last_name,business_name,email,mobile,password})});
+    const r=await fetch(`${API}/auth/register`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({first_name,last_name,business_name,email,mobile,password,otp})});
     const data=await r.json();if(!r.ok)throw new Error(data.error||'Registration failed');
-    setToken(data.token);currentUser=data.user;showApp();toast('Account created! Welcome to SignageCMS.','success');
+    if(_otpTimerInterval)clearInterval(_otpTimerInterval);
+    setToken(data.token);currentUser=data.user;showApp();
+    loadUserInfo().then(()=>updateSidebarUser()).catch(()=>{});
+    toast('Account created! Welcome to SignageCMS.','success');
   }catch(e){toast(e.message,'error');}finally{btn.innerHTML='Create account';btn.disabled=false;}
 }
 
