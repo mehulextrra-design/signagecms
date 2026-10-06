@@ -121,12 +121,12 @@ router.get('/status', authenticate, async (req, res) => {
 
 // ── Social posting ────────────────────────────────────────────────────────────
 
-function fbPost(pageId, pageToken, message) {
+function fbApiPost(path, payload) {
   return new Promise((resolve, reject) => {
-    const body = JSON.stringify({ message, access_token: pageToken });
+    const body = JSON.stringify(payload);
     const req = https.request({
       hostname: 'graph.facebook.com',
-      path: `/v21.0/${pageId}/feed`,
+      path: `/v21.0${path}`,
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept-Encoding': 'identity', 'Content-Length': Buffer.byteLength(body) }
     }, res => {
@@ -140,51 +140,66 @@ function fbPost(pageId, pageToken, message) {
   });
 }
 
-function igPost(igUserId, pageToken, message) {
-  return new Promise((resolve, reject) => {
-    // Step 1: create media container (text-only caption)
-    const body = JSON.stringify({ caption: message, media_type: 'REELS', access_token: pageToken });
-    const req = https.request({
-      hostname: 'graph.facebook.com',
-      path: `/v21.0/${igUserId}/media`,
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Accept-Encoding': 'identity', 'Content-Length': Buffer.byteLength(body) }
-    }, res => {
-      let data = '';
-      res.on('data', d => data += d);
-      res.on('end', () => { try { resolve(JSON.parse(data)); } catch (e) { reject(new Error(data.slice(0, 200))); } });
-    });
-    req.on('error', reject);
-    req.write(body);
-    req.end();
-  });
+function fmtDate(d) {
+  return new Date(d).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
 }
 
 async function postCampaignToSocial(campaignId) {
   const result = await query(
     `SELECT c.id, c.title, c.campaign_code, c.start_date, c.end_date,
-            u.fb_page_id, u.fb_page_name, u.fb_page_access_token, u.ig_user_id
+            u.fb_page_id, u.fb_page_name, u.fb_page_access_token, u.ig_user_id,
+            ct.file_url, ct.type AS content_type
      FROM campaigns c
      JOIN users u ON u.id = c.user_id
+     LEFT JOIN content ct ON ct.id = c.content_id
      WHERE c.id = $1`,
     [campaignId]
   );
   const row = result.rows[0];
   if (!row || !row.fb_page_id || !row.fb_page_access_token) return;
 
-  const message = `🎯 Campaign "${row.title}" is now LIVE!\n📅 Running: ${row.start_date} to ${row.end_date}\n🔖 Code: ${row.campaign_code}`;
+  const caption = `🎯 Campaign "${row.title}" is now LIVE!\n📅 ${fmtDate(row.start_date)} – ${fmtDate(row.end_date)}\n🔖 Code: ${row.campaign_code}`;
 
   try {
-    const fbRes = await fbPost(row.fb_page_id, row.fb_page_access_token, message);
+    let fbRes;
+    if (row.file_url && row.content_type === 'image') {
+      // Post with image
+      fbRes = await fbApiPost(`/${row.fb_page_id}/photos`, {
+        url: row.file_url,
+        caption,
+        access_token: row.fb_page_access_token
+      });
+    } else {
+      // Text-only post (video or no content)
+      fbRes = await fbApiPost(`/${row.fb_page_id}/feed`, {
+        message: caption,
+        access_token: row.fb_page_access_token
+      });
+    }
     if (fbRes.error) throw new Error(fbRes.error.message);
     console.log(`[Social] Posted to FB page for campaign ${row.campaign_code}: post_id=${fbRes.id}`);
   } catch (err) {
     console.error(`[Social] FB post failed for campaign ${row.campaign_code}:`, err.message);
   }
 
-  // Instagram — skip if not linked (Instagram requires media, not text-only; log for now)
-  if (row.ig_user_id) {
-    console.log(`[Social] Instagram post skipped for ${row.campaign_code} — media required for IG publishing`);
+  // Instagram with image
+  if (row.ig_user_id && row.file_url && row.content_type === 'image') {
+    try {
+      const container = await fbApiPost(`/${row.ig_user_id}/media`, {
+        image_url: row.file_url,
+        caption,
+        access_token: row.fb_page_access_token
+      });
+      if (container.error) throw new Error(container.error.message);
+      const publish = await fbApiPost(`/${row.ig_user_id}/media_publish`, {
+        creation_id: container.id,
+        access_token: row.fb_page_access_token
+      });
+      if (publish.error) throw new Error(publish.error.message);
+      console.log(`[Social] Posted to Instagram for campaign ${row.campaign_code}: media_id=${publish.id}`);
+    } catch (err) {
+      console.error(`[Social] IG post failed for campaign ${row.campaign_code}:`, err.message);
+    }
   }
 }
 
