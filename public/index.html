@@ -1000,6 +1000,24 @@
             <button class="btn btn-ghost btn-sm" onclick="changePassword()">Update Password</button>
           </div>
 
+          <!-- Social Accounts -->
+          <div class="profile-section" id="social-accounts-section">
+            <div class="profile-section-title">Social Accounts</div>
+            <div id="fb-connect-status" style="margin-bottom:12px;">
+              <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--border);border-radius:8px;background:var(--bg);">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="#1877F2"><path d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.41c0-3.025 1.792-4.697 4.533-4.697 1.312 0 2.686.236 2.686.236v2.97h-1.514c-1.491 0-1.956.93-1.956 1.886v2.269h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z"/></svg>
+                <div style="flex:1;">
+                  <div style="font-size:13px;font-weight:600;color:var(--text);" id="fb-page-name">Facebook Page</div>
+                  <div style="font-size:11px;color:var(--text2);" id="fb-ig-name">Not connected</div>
+                </div>
+                <button id="fb-connect-btn" onclick="connectFacebook()" style="padding:6px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:none;background:#1877F2;color:#fff;">Connect</button>
+              </div>
+            </div>
+            <div style="font-size:11px;color:var(--text2);line-height:1.5;">
+              Connect your Facebook Page to automatically post campaigns to Facebook &amp; Instagram when they go live.
+            </div>
+          </div>
+
         </div>
       </div>
 
@@ -1095,7 +1113,13 @@ function clearToken(){try{localStorage.removeItem('scms_token');}catch(e){}token
 
 window.addEventListener('DOMContentLoaded',()=>{
   token=getToken();
-  if(token) loadUserInfo().catch(()=>{clearToken();showAuthScreen();});
+  const _fbConnected=new URLSearchParams(location.search).get('fb_connected');
+  const _fbError=new URLSearchParams(location.search).get('fb_error');
+  if(_fbConnected||_fbError) history.replaceState({},'','/');
+  if(token) loadUserInfo().then(()=>{
+    if(_fbConnected){toast('Facebook connected successfully!','success');}
+    if(_fbError){toast('Facebook error: '+decodeURIComponent(_fbError),'error');}
+  }).catch(()=>{clearToken();showAuthScreen();});
   else showAuthScreen();
   const d=s=>s.toISOString().slice(0,10);
   const now=new Date();
@@ -1219,7 +1243,7 @@ function navigate(page, fromPopstate){
   if(page==='invoices')loadInvoices();
   if(page==='analytics')loadAnalytics();
   if(page==='pop')initPop();
-  if(page==='profile')loadProfile();
+  if(page==='profile'){loadProfile();loadFbStatus();}
   if(page==='screens'){ loadScreens().then(()=>{ renderScreensList(); if(_screensView==='map') renderScreensMap(); }); }
   if(page==='new-campaign')initWizard();
   if(page==='wallet')loadWallet();
@@ -1856,6 +1880,42 @@ async function changePassword(){
   if(!cur||!nw){toast('Enter current and new password','error');return;}
   try{await api('/users/change-password',{method:'POST',body:JSON.stringify({current_password:cur,new_password:nw})});document.getElementById('prof-pass-cur').value='';document.getElementById('prof-pass-new').value='';toast('Password updated!','success');}
   catch(e){toast(e.message,'error');}
+}
+
+async function loadFbStatus(){
+  try{
+    const s=await api('/auth/facebook/status');
+    const btn=document.getElementById('fb-connect-btn');
+    const pageName=document.getElementById('fb-page-name');
+    const igName=document.getElementById('fb-ig-name');
+    if(!btn)return;
+    if(s.connected){
+      pageName.textContent=s.page_name||'Facebook Page Connected';
+      igName.textContent=s.ig_username?`Instagram: @${s.ig_username}`:'No Instagram linked';
+      btn.textContent='Disconnect';btn.style.background='#e53e3e';
+      btn.onclick=disconnectFacebook;
+    }else{
+      pageName.textContent='Facebook Page';igName.textContent='Not connected';
+      btn.textContent='Connect';btn.style.background='#1877F2';
+      btn.onclick=connectFacebook;
+    }
+  }catch(_){}
+}
+
+async function connectFacebook(){
+  try{
+    const data=await api('/auth/facebook/connect');
+    window.location.href=data.url;
+  }catch(e){toast('Could not start Facebook login','error');}
+}
+
+async function disconnectFacebook(){
+  if(!confirm('Disconnect Facebook? Auto-posting will stop.'))return;
+  try{
+    await api('/auth/facebook/disconnect',{method:'POST'});
+    toast('Facebook disconnected','success');
+    loadFbStatus();
+  }catch(e){toast('Could not disconnect','error');}
 }
 
 function initWizard(){

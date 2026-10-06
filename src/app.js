@@ -20,6 +20,7 @@ const notificationRoutes = require('./routes/notifications');
 const walletRoutes = require('./routes/wallet');
 const venuePartnerRoutes = require('./routes/venuePartners');
 const fillerRoutes = require('./routes/filler');
+const facebookRoutes = require('./routes/facebook');
 
 const { startScheduler } = require('./services/scheduler');
 
@@ -77,6 +78,38 @@ app.use('/api/notifications', notificationRoutes);
 app.use('/api/wallet', walletRoutes);
 app.use('/api/venue-partners', venuePartnerRoutes);
 app.use('/api/filler', fillerRoutes);
+app.use('/api/auth/facebook', facebookRoutes);
+
+// Privacy Policy — required by Meta app review
+app.get('/privacy', (req, res) => {
+  res.setHeader('Content-Type', 'text/html');
+  res.send(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Privacy Policy – SignageCMS</title>
+  <style>body{font-family:sans-serif;max-width:800px;margin:40px auto;padding:0 20px;line-height:1.6;color:#333}</style></head>
+  <body><h1>Privacy Policy</h1><p>Last updated: October 2026</p>
+  <p>SignageCMS ("we") collects and uses data to provide digital signage advertising services.</p>
+  <h2>Data We Collect</h2><ul>
+  <li>Account information (name, email, phone)</li>
+  <li>Campaign content (images, videos)</li>
+  <li>Facebook/Instagram page access tokens (when you connect your account)</li></ul>
+  <h2>How We Use Data</h2><ul>
+  <li>To display your campaigns on connected screens</li>
+  <li>To post campaign content to your Facebook/Instagram pages (only when you authorize)</li></ul>
+  <h2>Data Sharing</h2><p>We do not sell your data. Facebook/Instagram data is only used to post on your behalf.</p>
+  <h2>Contact</h2><p>Email: support@signagecms.in</p></body></html>`);
+});
+
+// Data Deletion — required by Meta
+app.get('/data-deletion', (req, res) => {
+  res.setHeader('Content-Type', 'text/html');
+  res.send(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Data Deletion – SignageCMS</title>
+  <style>body{font-family:sans-serif;max-width:800px;margin:40px auto;padding:0 20px;line-height:1.6;color:#333}</style></head>
+  <body><h1>Data Deletion Request</h1>
+  <p>To delete your data from SignageCMS:</p>
+  <ol><li>Log in to your account</li>
+  <li>Go to Profile → Social Accounts → Disconnect Facebook</li>
+  <li>Or email us at support@signagecms.in with subject "Delete My Data"</li></ol>
+  <p>We will remove all your data within 30 days.</p></body></html>`);
+});
 
 // Venue portal shortcut — no-cache
 app.get('/venue', (req, res) => {
