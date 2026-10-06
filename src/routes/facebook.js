@@ -157,8 +157,16 @@ async function postCampaignToSocial(campaignId) {
   try {
     let fbRes;
     if (row.file_url && row.content_type === 'image') {
-      fbRes = await fbApiPost(`/${row.fb_page_id}/photos`, {
+      // Step 1: upload photo unpublished to get photo_id
+      const photoRes = await fbApiPost(`/${row.fb_page_id}/photos`, {
         url: row.file_url,
+        published: false,
+        access_token: row.fb_page_access_token
+      });
+      if (photoRes.error) throw new Error(photoRes.error.message);
+      // Step 2: create feed post with photo attached — appears in page timeline
+      fbRes = await fbApiPost(`/${row.fb_page_id}/feed`, {
+        attached_media: [{ media_fbid: photoRes.id }],
         access_token: row.fb_page_access_token
       });
     } else if (row.file_url && row.content_type === 'video') {
