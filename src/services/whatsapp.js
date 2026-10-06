@@ -476,6 +476,7 @@ async function sendDailyPoPAllWA() {
 }
 
 module.exports = {
+  sendWhatsApp,
   sendWeeklyReports, sendReportForUser, buildWeeklyReport,
   sendCampaignApprovedWA, sendInvoiceConfirmedWA,
   sendExpiryReminderWA, sendCampaignCompletedWA,
