@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+</head>
+<body>
+<title>extrravenue</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Magra:wght@400;700&family=Libre+Franklin:wght@300;400;500;600;700&display=swap">
+<style>
+/* ── Trendora design system (from Alloy capture) ── */
+.cf {
+  --bg: #f2efe9;
+  --surface: #ebe6dd;
+  --dark: #1e1e1e;
+  --orange: #ff5c00;
+  --line: rgba(30,30,30,.12);
+  --line-strong: rgba(30,30,30,.22);
+  --muted: rgba(30,30,30,.58);
+  --onDarkMuted: rgba(242,239,233,.62);
+  --ease: cubic-bezier(.22,.61,.36,1);
+  --r: 24px;
+  background: var(--bg);
+  color: var(--dark);
+  font-family: 'Libre Franklin', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
+}
+.cf *,.cf *::before,.cf *::after{box-sizing:border-box;}
+.cf h1,.cf h2,.cf h3,.cf h4{font-family:'Magra',sans-serif;font-weight:700;margin:0;letter-spacing:-0.02em;line-height:1.02;}
+.cf p{margin:0;}.cf ul{margin:0;padding:0;list-style:none;}
+.cf button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;}
+.cf a{text-decoration:none;}
+
+.wrap{width:100%;max-width:1200px;margin:0 auto;padding:0 24px;}
+.sec{padding:112px 0;position:relative;}
+.sec-tight{padding:72px 0;}
+
+/* type */
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;padding:7px 14px 7px 11px;border:1px solid var(--line-strong);border-radius:999px;color:var(--dark);background:rgba(255,255,255,.35);}
+.eyebrow i{width:7px;height:7px;border-radius:50%;background:var(--orange);display:block;}
+.eyebrow.on-dark{border-color:rgba(242,239,233,.24);background:rgba(242,239,233,.06);color:var(--bg);}
+.eyebrow.on-orange{border-color:rgba(30,30,30,.3);background:rgba(255,255,255,.14);color:#fff;}
+.eyebrow.on-orange i{background:#fff;}
+.h-xl{font-size:clamp(42px,7.4vw,96px);}
+.h-lg{font-size:clamp(34px,4.6vw,62px);}
+.h-md{font-size:clamp(26px,2.6vw,38px);}
+.h-sm{font-size:clamp(20px,1.6vw,24px);}
+.lead{font-size:clamp(16px,1.15vw,18.5px);color:var(--muted);font-weight:400;}
+.sec-head{display:flex;flex-direction:column;align-items:flex-start;gap:20px;max-width:720px;}
+.sec-head .lead{max-width:58ch;}
+.center{align-items:center;text-align:center;margin:0 auto;}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;gap:10px;padding:14px 22px;border-radius:999px;font-size:14.5px;font-weight:600;letter-spacing:.01em;transition:background-color .28s var(--ease),color .28s var(--ease),border-color .28s var(--ease),box-shadow .28s var(--ease);white-space:nowrap;}
+.btn svg{transition:transform .32s var(--ease);}
+.btn:hover svg{transform:translate(3px,-3px);}
+.btn-orange{background:var(--orange);color:#fff;}
+.btn-orange:hover{background:#e04f00;box-shadow:0 10px 28px -12px rgba(255,92,0,.75);}
+.btn-dark{background:var(--dark);color:var(--bg);}
+.btn-dark:hover{background:var(--orange);color:#fff;}
+.btn-ghost{border:1px solid var(--line-strong);color:var(--dark);}
+.btn-ghost:hover{border-color:var(--dark);background:var(--dark);color:var(--bg);}
+.btn-sm{padding:11px 18px;font-size:13.5px;}
+
+/* nav */
+.nav{position:fixed;inset:0 0 auto 0;z-index:60;padding:18px 24px;display:flex;justify-content:center;animation:navIn .9s var(--ease) both;}
+@keyframes navIn{from{transform:translateY(-130%);opacity:0;}to{transform:none;opacity:1;}}
+.nav-pill{width:100%;max-width:1140px;display:flex;align-items:center;gap:24px;background:rgba(30,30,30,.92);backdrop-filter:blur(14px);border:1px solid rgba(242,239,233,.1);border-radius:999px;padding:10px 10px 10px 20px;transition:box-shadow .35s var(--ease),max-width .45s var(--ease);color:var(--bg);}
+.nav.scrolled .nav-pill{box-shadow:0 18px 44px -24px rgba(30,30,30,.8);max-width:1040px;}
+.brand{display:flex;align-items:center;gap:10px;color:var(--bg);}
+.brand-mark{width:26px;height:26px;border-radius:8px;background:var(--orange);display:grid;place-items:center;flex:none;overflow:hidden;}
+.brand-mark svg{color:#fff;}
+.brand-name{font-family:'Magra',sans-serif;font-weight:700;font-size:17.5px;letter-spacing:.01em;}
+.nav-links{display:flex;align-items:center;gap:4px;margin-left:auto;}
+.nav-links a{font-size:13.5px;font-weight:500;color:var(--onDarkMuted);padding:9px 14px;border-radius:999px;transition:color .22s var(--ease),background-color .22s var(--ease);}
+.nav-links a:hover{color:var(--bg);background:rgba(242,239,233,.08);}
+.nav-cta{display:flex;align-items:center;gap:8px;}
+.nav-burger{display:none;width:42px;height:42px;border-radius:999px;color:var(--bg);place-items:center;background:rgba(242,239,233,.08);}
+.nav-sheet{position:fixed;inset:86px 24px auto 24px;z-index:59;background:var(--dark);border-radius:26px;padding:14px;display:none;flex-direction:column;gap:2px;box-shadow:0 30px 60px -30px rgba(30,30,30,.9);}
+.nav-sheet.open{display:flex;}
+.nav-sheet a{color:var(--bg);padding:14px 16px;border-radius:16px;font-size:16px;font-weight:500;}
+.nav-sheet a:hover{background:rgba(242,239,233,.08);color:var(--orange);}
+
+/* hero */
+.hero{padding:160px 0 80px;}
+/* 2-col layout: text left, cards right */
+.hero-in{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:start;}
+.hero-top{display:flex;flex-direction:column;align-items:flex-start;text-align:left;gap:22px;}
+.hero h1{max-width:16ch;}
+.hero h1 em{font-style:normal;color:var(--orange);}
+.hero .lead{max-width:46ch;}
+.hero-actions{display:flex;flex-wrap:wrap;gap:10px;justify-content:flex-start;margin-top:6px;}
+.hero-proof{display:flex;flex-direction:column;align-items:flex-start;gap:8px;margin-top:10px;}
+.proof-text{font-size:13px;color:var(--muted);}
+.proof-stars{display:inline-flex;gap:2px;vertical-align:-2px;margin-right:6px;}
+/* hero-vis: 4 independent columns, scroll-driven parallax stagger */
+.hero-vis{overflow:hidden;height:620px;display:flex;align-items:flex-start;justify-content:flex-end;gap:16px;-webkit-mask-image:linear-gradient(to right,transparent 0,black 72px,black 100%);mask-image:linear-gradient(to right,transparent 0,black 72px,black 100%);}
+.hcol{display:flex;flex-direction:column;gap:10px;flex:none;will-change:transform;}
+.hcol:nth-child(1){margin-top:320px;}
+.hcol:nth-child(2){margin-top:210px;}
+.hcol:nth-child(3){margin-top:110px;}
+.hcol:nth-child(4){margin-top:0;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.6;transform:scale(1.3);}}
+.hcard{width:148px;height:190px;border-radius:24px;overflow:hidden;position:relative;flex-shrink:0;}
+.himg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;}
+.hoverlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(30,30,30,.45) 0%,transparent 35%,transparent 55%,rgba(30,30,30,.72) 100%);z-index:2;}
+.hplay{position:absolute;top:10px;right:10px;width:28px;height:28px;background:rgba(242,239,233,.9);border-radius:50%;display:grid;place-items:center;font-size:10px;color:var(--dark);z-index:4;flex:none;}
+.hcb{position:absolute;bottom:0;left:0;right:0;padding:10px 12px;z-index:3;}
+.hct{font-family:'Magra',sans-serif;font-weight:700;font-size:13px;color:#fff;letter-spacing:-0.02em;line-height:1.15;}
+.hcs{font-size:10px;color:rgba(242,239,233,.72);margin-top:2px;}
+.hchip{position:absolute;top:10px;left:10px;font-size:9.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:5px 9px;border-radius:999px;z-index:3;}
+.hchip-d{background:rgba(30,30,30,.68);color:rgba(242,239,233,.92);backdrop-filter:blur(4px);}
+.hchip-l{background:rgba(242,239,233,.82);color:var(--dark);backdrop-filter:blur(4px);}
+.hcard-body{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:14px;z-index:3;text-align:center;pointer-events:none;}
+.hcard-big{font-family:'Magra',sans-serif;font-weight:700;font-size:18px;color:#fff;letter-spacing:-0.03em;line-height:1.15;text-shadow:0 1px 6px rgba(0,0,0,.35);}
+.hcard-stat{font-family:'Magra',sans-serif;font-weight:700;font-size:36px;color:#fff;letter-spacing:-0.04em;line-height:1;text-shadow:0 2px 10px rgba(0,0,0,.35);}
+.hcard-lbl{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.68);margin-top:5px;}
+.hcard-dot{width:9px;height:9px;border-radius:50%;margin-bottom:8px;}
+.hcard-dot-or{background:#ff5c00;box-shadow:0 0 10px rgba(255,92,0,.8);}
+.hcard-dot-wh{background:rgba(242,239,233,.8);box-shadow:0 0 8px rgba(242,239,233,.5);}
+.hcard-rule{width:36px;height:2px;background:rgba(255,255,255,.3);border-radius:1px;margin-top:9px;}
+.hcard-row{display:flex;gap:6px;margin-top:6px;}
+.hc-dk{background:linear-gradient(155deg,#1e1a28 0%,#2c2040 50%,#140e20 100%);}
+.hc-or{background:linear-gradient(155deg,#ff9060 0%,#d04010 60%,#7a1a00 100%);}
+.hc-pink{background:linear-gradient(155deg,#f5b8cc 0%,#e0789a 45%,#b84070 100%);}
+.hc-city{background:linear-gradient(155deg,#b0c8dc 0%,#6090b0 50%,#2a5070 100%);}
+.hc-warm{background:linear-gradient(155deg,#d0b898 0%,#906840 50%,#503020 100%);}
+.hc-green{background:linear-gradient(155deg,#60d0a0 0%,#208060 50%,#084030 100%);}
+
+/* portrait card */
+.pcard{position:relative;border-radius:22px;overflow:hidden;aspect-ratio:3/4.1;background:var(--surface);border:1px solid var(--line);transition:box-shadow .4s var(--ease),border-color .4s var(--ease);}
+.pcard:hover{box-shadow:0 26px 50px -26px rgba(30,30,30,.55);border-color:var(--line-strong);}
+.ph{position:absolute;inset:0;}
+.ph-veil{position:absolute;inset:0;background:linear-gradient(to top,rgba(30,30,30,.72) 0%,rgba(30,30,30,.1) 46%,rgba(30,30,30,.18) 100%);}
+.ph-sil::before{content:'';position:absolute;background:rgba(255,255,255,.12);width:30%;aspect-ratio:1;border-radius:50%;left:35%;bottom:45%;}
+.ph-sil::after{content:'';position:absolute;background:rgba(255,255,255,.08);width:60%;height:44%;left:20%;bottom:-4%;border-radius:46% 46% 0 0/60% 60% 0 0;}
+.pcard-top{position:absolute;top:12px;left:12px;right:12px;display:flex;justify-content:space-between;align-items:center;}
+.chip{font-size:10.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:6px 10px;border-radius:999px;background:rgba(242,239,233,.9);color:var(--dark);backdrop-filter:blur(6px);}
+.chip-dark{background:rgba(30,30,30,.72);color:var(--bg);}
+.play{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;flex:none;background:rgba(242,239,233,.92);color:var(--dark);transition:background-color .3s var(--ease),color .3s var(--ease);position:relative;}
+.play::after{content:'';position:absolute;inset:-2px;border-radius:50%;border:2px solid rgba(242,239,233,.8);animation:ping 2.4s var(--ease) infinite;}
+@keyframes ping{0%{transform:scale(1);opacity:.9;}100%{transform:scale(1.7);opacity:0;}}
+.pcard:hover .play{background:var(--orange);color:#fff;}
+.pcard-bot{position:absolute;left:14px;right:14px;bottom:14px;color:var(--bg);}
+.pcard-bot b{font-family:'Magra',sans-serif;font-size:17px;display:block;}
+.pcard-bot small{font-size:12px;color:rgba(242,239,233,.72);}
+.pcard-grad{position:absolute;inset:0;}
+
+/* marquee */
+.marquee{background:var(--dark);color:var(--bg);padding:26px 0;overflow:hidden;}
+.mq-inner{display:flex;width:max-content;animation:mq 34s linear infinite;}
+.mq-inner.rev{animation-direction:reverse;animation-duration:40s;}
+.marquee:hover .mq-inner{animation-play-state:paused;}
+@keyframes mq{from{transform:translate3d(0,0,0);}to{transform:translate3d(-50%,0,0);}}
+.mq-group{display:flex;align-items:center;}
+.mq-group span{font-family:'Magra',sans-serif;font-weight:700;font-size:clamp(24px,3vw,40px);text-transform:uppercase;letter-spacing:-0.01em;padding:0 28px;white-space:nowrap;}
+.mq-group i{width:11px;height:11px;border-radius:50%;background:var(--orange);flex:none;display:block;}
+.marquee-alt{background:var(--orange);color:#fff;padding:18px 0;}
+.marquee-alt .mq-group i{background:var(--dark);}
+
+/* service cards */
+.svc-rows{display:flex;flex-direction:column;gap:18px;margin-top:56px;}
+.svc-r1{display:grid;grid-template-columns:1fr 2fr;gap:18px;}
+.svc-r2{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+.scard{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:30px;display:flex;flex-direction:column;gap:16px;min-height:290px;transition:background-color .35s var(--ease),border-color .35s var(--ease),box-shadow .35s var(--ease);}
+.scard:hover{border-color:var(--line-strong);box-shadow:0 22px 44px -28px rgba(30,30,30,.4);}
+.scard-idx{display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:600;letter-spacing:.14em;color:var(--muted);}
+.scard-idx .dot{width:8px;height:8px;border-radius:50%;background:var(--orange);}
+.scard h3{max-width:22ch;}
+.scard p{font-size:15px;color:var(--muted);}
+.scard-foot{margin-top:auto;display:flex;flex-wrap:wrap;gap:8px;}
+.stag{font-size:12px;font-weight:500;padding:7px 13px;border-radius:999px;border:1px solid var(--line-strong);color:var(--dark);transition:background-color .25s var(--ease),color .25s var(--ease),border-color .25s var(--ease);}
+.scard:hover .stag{border-color:var(--dark);}
+.stag:hover{background:var(--dark);border-color:var(--dark);color:var(--bg);}
+.scard-vis{flex:0 0 38%;border-radius:16px;position:relative;overflow:hidden;min-height:180px;border:1px solid var(--line);}
+.bars{position:absolute;inset:0;display:flex;align-items:flex-end;gap:7px;padding:18px;}
+.bars span{flex:1;background:rgba(30,30,30,.2);border-radius:4px 4px 0 0;transition:background-color .3s var(--ease),height .5s var(--ease);}
+.scard:hover .bars span{background:var(--orange);}
+.scard-orange{background:var(--orange);border-color:var(--orange);color:#fff;flex-direction:row;align-items:center;justify-content:space-between;gap:32px;min-height:0;padding:44px;}
+.scard-orange:hover{background:#e95400;box-shadow:0 26px 54px -26px rgba(255,92,0,.7);}
+.scard-orange p{color:rgba(255,255,255,.82);max-width:46ch;}
+.scard-orange .scard-idx{color:rgba(255,255,255,.8);}
+.scard-orange .scard-idx .dot{background:#fff;}
+.so-left{display:flex;flex-direction:column;gap:14px;}
+.so-ring{flex:none;width:118px;height:118px;border-radius:50%;border:1.5px dashed rgba(255,255,255,.55);display:grid;place-items:center;color:#fff;animation:spin 16s linear infinite;}
+.so-ring span{display:grid;place-items:center;width:62px;height:62px;border-radius:50%;background:#fff;color:var(--orange);animation:spin 16s linear infinite reverse;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* steps */
+.steps{background:var(--surface);border-top:1px solid var(--line);border-bottom:1px solid var(--line);}
+.steps-line{position:relative;height:2px;background:var(--line);margin-top:48px;overflow:hidden;}
+.steps-line i{position:absolute;inset:0;background:var(--orange);transform:scaleX(0);transform-origin:left;transition:transform 1.8s var(--ease) .2s;}
+.steps-line.in i{transform:scaleX(1);}
+.steps-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:32px;}
+.step{padding:0 26px;border-left:1px solid var(--line);display:flex;flex-direction:column;gap:14px;}
+.step:first-child{border-left:0;padding-left:0;}
+.step:last-child{padding-right:0;}
+.step-no{font-family:'Magra',sans-serif;font-weight:700;font-size:54px;line-height:1;color:transparent;-webkit-text-stroke:1.4px var(--line-strong);transition:-webkit-text-stroke-color .35s var(--ease),color .35s var(--ease);}
+.step:hover .step-no{color:var(--orange);-webkit-text-stroke-color:var(--orange);}
+.step h3{font-size:21px;}
+.step p{font-size:14.5px;color:var(--muted);}
+.step-tick{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;color:var(--orange);margin-top:4px;}
+
+/* benefits */
+.ben-layout{display:grid;grid-template-columns:.85fr 1.15fr;gap:56px;align-items:start;}
+.ben-cols{display:grid;grid-template-columns:1fr 1fr;column-gap:40px;}
+.ben-item{padding:22px 0;border-top:1px solid var(--line);display:flex;gap:14px;align-items:flex-start;}
+.ben-cols>.ben-item:nth-child(1),.ben-cols>.ben-item:nth-child(2){border-top:0;padding-top:0;}
+.ben-ic{flex:none;width:30px;height:30px;border-radius:9px;display:grid;place-items:center;background:rgba(30,30,30,.07);color:var(--dark);font-size:16px;transition:background-color .28s var(--ease),color .28s var(--ease);}
+.ben-item:hover .ben-ic{background:var(--orange);color:#fff;}
+.ben-item h4{font-size:17.5px;margin-bottom:4px;}
+.ben-item p{font-size:14px;color:var(--muted);}
+.ben-aside{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:28px;display:flex;flex-direction:column;gap:18px;margin-top:32px;}
+.ben-aside .big{font-family:'Magra',sans-serif;font-weight:700;font-size:44px;line-height:1;color:var(--orange);}
+
+/* metrics */
+.metrics{background:var(--dark);color:var(--bg);overflow:hidden;}
+.metrics .lead{color:var(--onDarkMuted);}
+.dots-bg{position:absolute;inset:0;pointer-events:none;z-index:0;}
+.dots-bg i{position:absolute;border-radius:50%;background:var(--orange);display:block;opacity:.9;animation:bob 5s ease-in-out infinite;}
+@keyframes bob{50%{transform:translateY(-16px);}}
+.met-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:60px;position:relative;}
+.met{padding:0 28px;border-left:1px solid rgba(242,239,233,.14);}
+.met:first-child{border-left:0;padding-left:0;}
+.met-n{font-family:'Magra',sans-serif;font-weight:700;font-size:clamp(40px,4.6vw,66px);line-height:1;letter-spacing:-0.03em;}
+.met-n span{color:var(--orange);}
+.met-l{font-size:13.5px;color:var(--onDarkMuted);margin-top:10px;max-width:20ch;}
+
+/* quote */
+.quote-card{background:var(--surface);border:1px solid var(--line);border-radius:30px;padding:60px;display:flex;flex-direction:column;gap:32px;position:relative;overflow:hidden;}
+.quote-mark{font-family:'Magra',sans-serif;font-weight:700;font-size:170px;line-height:.6;color:var(--orange);opacity:.16;position:absolute;top:44px;right:48px;user-select:none;}
+.quote-card blockquote{margin:0;font-family:'Magra',sans-serif;font-weight:700;font-size:clamp(22px,2.5vw,38px);line-height:1.22;letter-spacing:-0.02em;max-width:30ch;position:relative;}
+.quote-by{display:flex;align-items:center;gap:14px;}
+.avatar{width:52px;height:52px;border-radius:50%;flex:none;background:var(--orange);display:grid;place-items:center;font-family:'Magra',sans-serif;font-weight:700;font-size:22px;color:#fff;}
+.quote-by b{display:block;font-size:15px;}
+.quote-by small{font-size:13px;color:var(--muted);}
+.quote-stat{margin-left:auto;text-align:right;}
+.quote-stat b{font-family:'Magra',sans-serif;font-size:30px;color:var(--orange);display:block;line-height:1;}
+.quote-stat small{font-size:12.5px;color:var(--muted);}
+.testi-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:56px;}
+.testi-dark{background:var(--dark);border-radius:30px;padding:60px;display:flex;flex-direction:column;justify-content:space-between;gap:40px;position:relative;overflow:hidden;min-height:360px;}
+.testi-dark-bg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;}
+.testi-dark-bg-txt{font-family:'Magra',sans-serif;font-weight:700;font-size:clamp(60px,8vw,110px);letter-spacing:-0.04em;color:rgba(255,255,255,.04);white-space:nowrap;}
+.testi-dark-person{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:12px;}
+.testi-av-lg{width:100px;height:100px;border-radius:50%;background:linear-gradient(135deg,var(--orange),#ff7a30);display:grid;place-items:center;font-family:'Magra',sans-serif;font-weight:700;font-size:40px;color:#fff;box-shadow:0 0 0 8px rgba(255,92,0,.12);}
+.stars{display:flex;gap:4px;margin-top:4px;}
+
+/* cta */
+.cta-card{background:var(--dark);color:var(--bg);border-radius:30px;padding:72px 56px;display:flex;flex-direction:column;align-items:center;gap:24px;text-align:center;position:relative;overflow:hidden;}
+.cta-card h2{max-width:20ch;}
+.cta-card .lead{color:var(--onDarkMuted);max-width:48ch;}
+
+/* faq */
+.faq-layout{display:grid;grid-template-columns:.8fr 1.2fr;gap:56px;align-items:start;}
+.faq-layout>.sec-head{position:sticky;top:108px;}
+.faq-list{border-top:1px solid var(--line);}
+.faq-item{border-bottom:1px solid var(--line);}
+.faq-q{width:100%;display:flex;align-items:center;gap:20px;text-align:left;padding:24px 0;font-family:'Magra',sans-serif;font-weight:700;font-size:19px;letter-spacing:-0.01em;transition:color .25s var(--ease);}
+.faq-q:hover{color:var(--orange);}
+.faq-ic{margin-left:auto;flex:none;width:34px;height:34px;border-radius:50%;border:1px solid var(--line-strong);display:grid;place-items:center;transition:transform .35s var(--ease),background-color .3s var(--ease),color .3s var(--ease),border-color .3s var(--ease);}
+.faq-item.open .faq-ic{transform:rotate(45deg);background:var(--orange);border-color:var(--orange);color:#fff;}
+.faq-body{display:grid;grid-template-rows:0fr;transition:grid-template-rows .4s var(--ease);}
+.faq-item.open .faq-body{grid-template-rows:1fr;}
+.faq-body>div{overflow:hidden;}
+.faq-body p{font-size:15px;color:var(--muted);padding-bottom:26px;max-width:62ch;}
+
+/* footer */
+.footer{background:var(--orange);color:#fff;padding-top:88px;overflow:hidden;}
+.f-top{display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:40px;padding-bottom:64px;}
+.f-blurb{font-size:15px;color:rgba(255,255,255,.82);max-width:34ch;margin-top:18px;}
+.f-col h4{font-size:12px;letter-spacing:.16em;text-transform:uppercase;font-family:'Libre Franklin',sans-serif;font-weight:600;color:rgba(255,255,255,.7);margin-bottom:16px;}
+.f-col li{margin-bottom:11px;}
+.f-col a{font-size:15px;color:rgba(255,255,255,.95);transition:color .22s var(--ease),padding-left .22s var(--ease);}
+.f-col a:hover{color:var(--dark);padding-left:5px;}
+.f-word{font-family:'Magra',sans-serif;font-weight:700;font-size:clamp(56px,17.2vw,268px);line-height:.78;letter-spacing:-0.035em;text-align:center;white-space:nowrap;color:#fff;margin:0 0 -0.08em;padding-bottom:8px;}
+.f-word span{display:inline-block;transform:translateY(70%);opacity:0;transition:transform 1s var(--ease),opacity 1s var(--ease);}
+.f-word.in span{transform:none;opacity:1;}
+.f-bar{border-top:1px solid rgba(255,255,255,.28);margin-top:28px;display:flex;align-items:center;justify-content:space-between;gap:18px;padding:22px 0 26px;font-size:13px;color:rgba(255,255,255,.85);}
+.f-social{display:flex;gap:8px;}
+.f-social a{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;border:1px solid rgba(255,255,255,.4);transition:background-color .25s var(--ease),color .25s var(--ease),border-color .25s var(--ease);}
+.f-social a:hover{background:var(--dark);border-color:var(--dark);color:#fff;}
+.f-legal{display:flex;gap:20px;color:rgba(255,255,255,.85);}
+
+/* pricing */
+.pricing-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:32px;}
+.pric{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:32px;display:flex;flex-direction:column;gap:6px;transition:box-shadow .35s var(--ease),border-color .35s var(--ease);}
+.pric:hover{border-color:var(--line-strong);box-shadow:0 22px 44px -28px rgba(30,30,30,.35);}
+.pric-feat{background:var(--dark);border-color:var(--dark);color:var(--bg);}
+.pric-feat:hover{box-shadow:0 26px 54px -26px rgba(30,30,30,.7);}
+.pric-badge{font-size:10.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--orange);margin-bottom:6px;}
+.pric-feat .pric-badge{color:#ff9060;}
+.pric-name{font-family:'Magra',sans-serif;font-weight:700;font-size:24px;}
+.pric-sub{font-size:14px;color:var(--muted);margin-bottom:12px;}
+.pric-feat .pric-sub{color:var(--onDarkMuted);}
+.pric-div{border:0;border-top:1px solid var(--line);margin:16px 0;}
+.pric-feat .pric-div{border-color:rgba(242,239,233,.14);}
+.pric-list{display:flex;flex-direction:column;gap:11px;margin-bottom:20px;flex:1;}
+.pric-row{display:flex;align-items:flex-start;gap:10px;font-size:14.5px;}
+.pric-row .tick{flex:none;width:20px;height:20px;border-radius:50%;background:rgba(30,30,30,.07);display:grid;place-items:center;font-size:11px;margin-top:1px;}
+.pric-feat .pric-row .tick{background:rgba(242,239,233,.1);}
+.pric-row .tick.hi{background:var(--orange);color:#fff;}
+.pric-foot{margin-top:auto;}
+@media(max-width:900px){.pricing-grid{grid-template-columns:1fr 1fr;}}
+
+/* confidence section */
+.conf-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:56px;}
+.conf-card{background:var(--bg);border:1px solid var(--line);border-radius:var(--r);padding:28px 26px;display:flex;flex-direction:column;gap:12px;transition:border-color .35s var(--ease),box-shadow .35s var(--ease),background-color .35s var(--ease);}
+.conf-card:hover{border-color:var(--orange);box-shadow:0 18px 40px -24px rgba(255,92,0,.2);}
+.conf-num{font-family:'Magra',sans-serif;font-weight:700;font-size:13px;color:var(--orange);letter-spacing:.06em;}
+.conf-card h3{font-size:19px;line-height:1.18;}
+.conf-card p{font-size:14.5px;color:var(--muted);line-height:1.6;}
+
+/* reveal */
+.cf [data-reveal]{opacity:0;transform:translateY(26px);transition:opacity .72s var(--ease),transform .72s var(--ease);}
+.cf [data-reveal].in{opacity:1;transform:translateY(0);}
+.hero-vis>[data-reveal].in{transform:translateY(0);}
+@media(prefers-reduced-motion:reduce){
+  .cf [data-reveal]{opacity:1!important;transform:none!important;}
+  .hcol{transform:none!important;}
+  .mq-inner,.so-ring,.so-ring span,.dots-bg i,.play::after,.nav,.f-word span{animation:none!important;}
+}
+
+/* responsive */
+@media(max-width:1100px){
+  .conf-grid{grid-template-columns:1fr 1fr;}
+  .svc-r1,.svc-r2{grid-template-columns:1fr;}
+  .ben-layout,.faq-layout{grid-template-columns:1fr;gap:36px;}
+  .faq-layout>.sec-head{position:static;}
+  .steps-grid{grid-template-columns:1fr 1fr;row-gap:36px;}
+  .step:nth-child(3){border-left:0;padding-left:0;}
+  .met-grid{grid-template-columns:1fr 1fr;row-gap:40px;}
+  .met:nth-child(3){border-left:0;padding-left:0;}
+  .hero-in{grid-template-columns:1fr;}
+  .hero-vis{display:none;}
+  .hero-top{align-items:center;text-align:center;}
+  .hero-actions{justify-content:center;}
+  .hero-proof{align-items:center;}
+  .nav-links{display:none;}
+  .nav-burger{display:grid;}
+  .f-top{grid-template-columns:1fr 1fr;}
+  .testi-grid{grid-template-columns:1fr;}
+  .testi-dark{min-height:280px;}
+}
+@media(max-width:768px){
+  .conf-grid{grid-template-columns:1fr;}
+  .sec{padding:72px 0;}
+  .sec-tight{padding:48px 0;}
+  .wrap{padding:0 16px;}
+  .hero{padding-top:96px;}
+  .pcard-bot b{font-size:14px;}
+  .pcard-bot small{font-size:11px;}
+  .scard-orange{flex-direction:column;padding:28px;}
+  .so-ring{display:none;}
+  .f-top{grid-template-columns:1fr;}
+  .quote-card{padding:28px 20px;}
+  .quote-mark{font-size:100px;top:22px;right:20px;}
+  .quote-stat{display:none;}
+  .cta-card{padding:40px 20px;border-radius:22px;}
+  .cta-card h2{font-size:clamp(24px,6vw,34px);}
+  .steps-grid{grid-template-columns:1fr;}
+  .step{border-left:0;padding-left:0;padding-top:22px;border-top:1px solid var(--line);}
+  .step:first-child{border-top:0;padding-top:0;}
+  .met-grid{grid-template-columns:1fr 1fr;}
+  .ben-cols{grid-template-columns:1fr;}
+  .ben-cols>.ben-item:nth-child(2){border-top:1px solid var(--line);padding-top:22px;}
+  .ben-aside{margin-top:16px;}
+  .testi-dark{padding:36px 24px;min-height:240px;}
+  .testi-av-lg{width:72px;height:72px;font-size:28px;}
+  .pricing-grid{grid-template-columns:1fr;}
+  .pric{padding:22px 18px;}
+  .sec-head h2{text-wrap:balance;}
+}
+@media(max-width:480px){
+  .nav{padding:12px 14px;}
+  .nav-pill{padding:8px 8px 8px 16px;gap:12px;}
+  .brand-name{font-size:15px;}
+  .nav-sheet{inset:76px 14px auto 14px;padding:10px;}
+  .hero h1{font-size:clamp(34px,9vw,54px);}
+  .hero .lead{font-size:15px;}
+  .hero-actions .btn{padding:12px 18px;font-size:13.5px;}
+  .svc-rows{gap:12px;}
+  .scard{padding:22px 18px;min-height:0;}
+  .met-grid{grid-template-columns:1fr 1fr;column-gap:0;}
+  .met{padding:0 16px;}
+  .met:nth-child(2){border-left:1px solid rgba(242,239,233,.14);}
+  .met:nth-child(3){border-left:0;padding-left:0;}
+  .met:nth-child(4){border-left:1px solid rgba(242,239,233,.14);}
+  .f-word{font-size:clamp(32px,12vw,268px);}
+  .f-bar{flex-direction:column;align-items:flex-start;gap:12px;}
+  .f-legal{flex-wrap:wrap;gap:12px;}
+  .quote-card blockquote{font-size:clamp(18px,4.5vw,26px);}
+  .eyebrow{font-size:10px;padding:6px 12px 6px 9px;}
+  .step-no{font-size:40px;}
+  .btn{padding:12px 18px;font-size:13.5px;}
+  .hero-proof{font-size:12px;}
+}
+</style>
+
+<div class="cf">
+
+<!-- NAV -->
+<nav class="nav" id="nav">
+  <div class="nav-pill">
+    <a class="brand" href="#">
+      <div class="brand-mark">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><rect x="2" y="3" width="20" height="14" rx="2" stroke="currentColor" stroke-width="2"/><path d="M8 21h8M12 17v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </div>
+      <span class="brand-name">extrravenue</span>
+    </a>
+    <nav class="nav-links">
+      <a href="#services">Services</a>
+      <a href="#steps">Process</a>
+      <a href="#benefits">Benefits</a>
+      <a href="#results">Impact</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+    <div class="nav-cta">
+      <a class="btn btn-sm btn-orange" href="https://signagecrm-production.up.railway.app">Get Started</a>
+      <button class="nav-burger" onclick="document.getElementById('msheet').classList.toggle('open')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+      </button>
+    </div>
+  </div>
+</nav>
+<div class="nav-sheet" id="msheet">
+  <a href="#services" onclick="document.getElementById('msheet').classList.remove('open')">Services</a>
+  <a href="#steps" onclick="document.getElementById('msheet').classList.remove('open')">Process</a>
+  <a href="#benefits" onclick="document.getElementById('msheet').classList.remove('open')">Benefits</a>
+  <a href="#results" onclick="document.getElementById('msheet').classList.remove('open')">Impact</a>
+  <a href="#pricing" onclick="document.getElementById('msheet').classList.remove('open')">Pricing</a>
+  <a href="#faq" onclick="document.getElementById('msheet').classList.remove('open')">FAQ</a>
+  <a href="https://signagecrm-production.up.railway.app" style="color:var(--orange)">Get Started &rarr;</a>
+</div>
+
+<!-- HERO -->
+<section class="hero sec">
+  <div class="wrap">
+    <div class="hero-in">
+      <!-- Left: hero text -->
+      <div class="hero-top">
+        <div class="eyebrow" data-reveal><i></i>Digital Screens Across India</div>
+        <h1 class="h-xl" data-reveal style="transition-delay:.06s">Apna ad dikhao<br>sahi <em>jagah par</em>.</h1>
+        <p class="lead" data-reveal style="transition-delay:.12s">Malls, offices aur busy areas mein screens par apna ad chalao. Book karo, pay karo, aur dekho ki aapka ad actually chala.</p>
+        <div class="hero-actions" data-reveal style="transition-delay:.16s">
+          <a class="btn btn-orange" href="https://signagecrm-production.up.railway.app">Abhi shuru karein</a>
+          <a class="btn btn-ghost" href="https://signagecrm-production.up.railway.app/admin">Admin Login</a>
+        </div>
+        <div class="hero-proof" data-reveal style="transition-delay:.2s">
+          <span class="proof-text"><span class="proof-stars">★★★★★</span>85+ advertisers already running campaigns across India</span>
+          <span class="proof-text" style="display:flex;align-items:center;gap:8px;">
+            <span style="display:inline-flex;gap:6px;align-items:center;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="#1877F2"><path d="M24 12.07C24 5.41 18.63 0 12 0S0 5.4 0 12.07C0 18.1 4.39 23.1 10.13 24v-8.44H7.08v-3.49h3.04V9.41c0-3.02 1.8-4.7 4.54-4.7 1.31 0 2.68.24 2.68.24v2.97h-1.51c-1.49 0-1.95.93-1.95 1.88v2.26h3.32l-.53 3.5h-2.8V24C19.62 23.1 24 18.1 24 12.07z"/></svg>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="url(#ig)"><defs><linearGradient id="ig" x1="0%" y1="100%" x2="100%" y2="0%"><stop offset="0%" stop-color="#f09433"/><stop offset="25%" stop-color="#e6683c"/><stop offset="50%" stop-color="#dc2743"/><stop offset="75%" stop-color="#cc2366"/><stop offset="100%" stop-color="#bc1888"/></linearGradient></defs><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
+            </span>
+            <span>Ek campaign — screen par bhi, Facebook par bhi, Instagram par bhi</span>
+          </span>
+        </div>
+      </div>
+
+      <!-- Right: 4 columns, scroll-driven parallax — rightmost moves first -->
+      <div class="hero-vis" data-reveal style="transition-delay:.22s">
+
+        <!-- Col 1: leftmost, starts moving last (delay=360px scroll) -->
+        <div class="hcol">
+          <div class="hcard hc-pink"><div class="hoverlay"></div><div class="hcard-body"><div class="hcard-big" style="font-size:22px;letter-spacing:-.02em;">extra<br>venue</div><div class="hcard-lbl" style="margin-top:6px;">Mall &middot; Retail &middot; OOH</div></div><div class="hplay">&#9654;</div><div class="hchip hchip-l">Platform</div><div class="hcb"><div class="hct">extrravenue</div><div class="hcs">Book &middot; Run &middot; Prove</div></div></div>
+          <div class="hcard hc-or"><div class="hoverlay"></div><div class="hcard-body"><div class="hcard-dot hcard-dot-or" style="animation:pulse 1.4s ease infinite;"></div><div class="hcard-big">Your Ad,<br>Live Now.</div><div class="hcard-lbl">Screen 4 &middot; Active</div></div><div class="hplay">&#9654;</div><div class="hchip hchip-l">Live</div><div class="hcb"><div class="hct">Your Ad, Live Now.</div><div class="hcs">Vasna Mall &middot; Scr 4</div></div></div>
+          <div class="hcard hc-dk"><div class="hoverlay"></div><div class="hcard-body"><div class="hcard-dot hcard-dot-wh"></div><div class="hcard-big">Outdoor<br>Billboard</div><div class="hcard-rule"></div></div><div class="hplay">&#9654;</div><div class="hchip hchip-d">OOH</div><div class="hcb"><div class="hct">Premium Spot</div><div class="hcs">High Visibility</div></div></div>
+          <div class="hcard hc-city"><div class="hoverlay"></div><div class="hcard-body"><div class="hcard-big" style="font-size:14px;opacity:.8;">Vasna Mall</div><div class="hcard-stat" style="font-size:28px;margin-top:4px;">Scr 1</div><div class="hcard-lbl">Peak Hours</div></div><div class="hplay">&#9654;</div><div class="hchip hchip-d">Mall</div><div class="hcb"><div class="hct">Mall Atrium</div><div class="hcs">Atrium &middot; On Air</div></div></div>
+        </div>
+
+        <!-- Col 2: starts at scroll=240 -->
+        <div class="hcol">
+          <div class="hcard hc-green"><div class="hoverlay"></div><div class="hcard-body"><div class="hcard-stat" style="font-size:44px;">3</div><div class="hcard-big" style="font-size:14px;margin-top:2px;">Screens<br>Active</div><div class="hcard-lbl">All Live</div></div><div class="hplay">&#9654;</div><div class="hchip hchip-d">Network</div><div class="hcb"><div class="hct">Multi-Screen</div><div class="hcs">3 Locations &middot; Live</div></div></div>
+          <div class="hcard hc-dk"><div class="hoverlay"></div><div class="hcard-body"><div class="hcard-stat" style="font-size:44px;">5&times;</div><div class="hcard-big" style="font-size:12px;margin-top:2px;">More Reach</div><div class="hcard-lbl">vs Traditional</div></div><div class="hplay">&#9654;</div><div class="hchip hchip-d">ROI</div><div class="hcb"><div class="hct">5x More Reach</div><div class="hcs">vs Traditional</div></div></div>
+          <div class="hcard hc-warm"><div class="hoverlay"></div><div class="hcard-body"><div class="hcard-big" style="font-size:26px;letter-spacing:-.04em;">FESTIVE<br>SALE</div><div class="hcard-stat" style="font-size:26px;margin-top:2px;">50%</div></div><div class="hplay">&#9654;</div><div class="hchip hchip-l">Offer</div><div class="hcb"><div class="hct">Festive Sale</div><div class="hcs">3 Screens &middot; Running</div></div></div>
+          <div class="hcard hc-or" style="background:linear-gradient(155deg,#ffb040 0%,#e06010 50%,#903000 100%);"><div class="hoverlay"></div><div class="hcard-body"><div class="hcard-big" style="font-size:24px;">NEW<br>LAUNCH</div><div class="hcard-big" style="font-size:18px;opacity:.7;margin-top:2px;">&rarr;</div></div><div class="hplay">&#9654;</div><div class="hchip hchip-l">Launch</div><div class="hcb"><div class="hct">New Launch!</div><div class="hcs">Mall &middot; Active Now</div></div></div>
+        </div>
+
+        <!-- Col 3: starts at scroll=120 -->
+        <div class="hcol">
+          <div class="hcard hc-city" style="background:linear-gradient(155deg,#80a8c8 0%,#3868a0 50%,#104878 100%);"><div class="hoverlay"></div><div class="hcard-body"><div class="hcard-lbl">Monthly</div><div class="hcard-stat">1.2L</div><div class="hcard-lbl" style="margin-top:4px;">Views</div></div><div class="hplay">&#9654;</div><div class="hchip hchip-d">Analytics</div><div class="hcb"><div class="hct">Screen ROI</div><div class="hcs">Tracked &middot; Verified</div></div></div>
+          <div class="hcard hc-warm"><div class="hoverlay"></div><div class="hcard-body"><div class="hcard-lbl">Campaign</div><div class="hcard-stat" style="font-size:26px;margin-top:4px;">3,840</div><div class="hcard-lbl" style="margin-top:2px;">Plays Today</div></div><div class="hplay">&#9654;</div><div class="hchip hchip-l">Running</div><div class="hcb"><div class="hct">Campaign Live</div><div class="hcs">Screen 3 &middot; On</div></div></div>
+          <div class="hcard hc-pink"><div class="hoverlay"></div><div class="hcard-body"><div class="hcard-big" style="font-size:22px;">Summer<br>2024</div><div class="hcard-lbl">Campaign &middot; Live</div></div><div class="hplay">&#9654;</div><div class="hchip hchip-l">Summer</div><div class="hcb"><div class="hct">Summer Campaign</div><div class="hcs">Office Zone &middot; Live</div></div></div>
+          <div class="hcard hc-city"><div class="hoverlay"></div><div class="hcard-body"><div class="hcard-dot hcard-dot-or"></div><div class="hcard-big" style="font-size:16px;">Brand<br>Activation</div><div class="hcard-lbl">Event &middot; Spot</div></div><div class="hplay">&#9654;</div><div class="hchip hchip-d">Event</div><div class="hcb"><div class="hct">Brand Activation</div><div class="hcs">Event &middot; Screen On</div></div></div>
+        </div>
+
+        <!-- Col 4: rightmost, starts moving first (delay=0, immediately on scroll) -->
+        <div class="hcol">
+          <div class="hcard hc-dk" style="background:linear-gradient(155deg,#120c1c 0%,#1e1430 50%,#0c0814 100%);"><div class="hoverlay"></div><div class="hcard-body"><div class="hcard-big" style="font-size:12px;letter-spacing:.06em;opacity:.6;">&#9679; &#9679; &#9679; &#9679; &#9679;<br>&#9679; &#9679; &#9679; &#9679; &#9679;<br>&#9679; &#9679; &#9679; &#9679; &#9679;</div><div class="hcard-lbl" style="margin-top:8px;">Cinema Lobby</div></div><div class="hplay">&#9654;</div><div class="hchip hchip-d">Cinema</div><div class="hcb"><div class="hct">Brand Story</div><div class="hcs">Lobby &middot; On</div></div></div>
+          <div class="hcard hc-green"><div class="hoverlay"></div><div class="hcard-body"><div class="hcard-big" style="font-size:12px;opacity:.75;font-weight:400;line-height:1.8;">09:14 &#9679; Scr 3<br>09:29 &#9679; Scr 1<br>09:44 &#9679; Scr 3<br>09:59 &#9679; Scr 2</div></div><div class="hplay">&#9654;</div><div class="hchip hchip-d">Proof</div><div class="hcb"><div class="hct">Har Play Log</div><div class="hcs">Proof &middot; CSV</div></div></div>
+          <div class="hcard hc-dk"><div class="hoverlay"></div><div class="hcard-body"><div class="hcard-stat" style="font-size:44px;">5&times;</div><div class="hcard-big" style="font-size:12px;margin-top:2px;">More ROI</div><div class="hcard-lbl">Proven Results</div></div><div class="hplay">&#9654;</div><div class="hchip hchip-d">Results</div><div class="hcb"><div class="hct">5x More ROI</div><div class="hcs">vs Traditional</div></div></div>
+          <div class="hcard hc-or" style="background:linear-gradient(155deg,#ffd060 0%,#e08020 50%,#904000 100%);"><div class="hoverlay"></div><div class="hcard-body"><div class="hcard-big" style="font-size:22px;">FOOD<br>FEST</div><div class="hcard-big" style="font-size:12px;margin-top:4px;opacity:.7;">2024 Edition</div></div><div class="hplay">&#9654;</div><div class="hchip hchip-l">Food</div><div class="hcb"><div class="hct">Food Festival</div><div class="hcs">Food Court &middot; Scr 1</div></div></div>
+        </div>
+
+      </div><!-- /hero-vis -->
+    </div><!-- /hero-in -->
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee">
+  <div class="mq-inner">
+    <div class="mq-group"><span>Mall mein dikhoge, yaad rahoge</span><i></i><span>Ek ad — screen, Facebook aur Instagram par</span><i></i><span>Ad chala — proof haath mein</span><i></i><span>QR scan se seedha aapka customer</span><i></i><span>Busy area mein aapka brand sabse pehle</span><i></i><span>Screen book karo, aaj se dikhna shuru</span><i></i><span>Har play ka record — koi doubt nahi</span><i></i><span>Kam budget mein zyada jagah dikhna</span><i></i><span>Competitor se aage rehna screen pe</span><i></i></div>
+    <div class="mq-group"><span>Mall mein dikhoge, yaad rahoge</span><i></i><span>Ek ad — screen, Facebook aur Instagram par</span><i></i><span>Ad chala — proof haath mein</span><i></i><span>QR scan se seedha aapka customer</span><i></i><span>Busy area mein aapka brand sabse pehle</span><i></i><span>Screen book karo, aaj se dikhna shuru</span><i></i><span>Har play ka record — koi doubt nahi</span><i></i><span>Kam budget mein zyada jagah dikhna</span><i></i><span>Competitor se aage rehna screen pe</span><i></i></div>
+  </div>
+</div>
+
+<!-- SERVICES -->
+<section class="sec" id="services">
+  <div class="wrap">
+    <div class="sec-head" data-reveal>
+      <div class="eyebrow"><i></i>Kya milta hai aapko</div>
+      <h2 class="h-lg">Sab kuch ek jagah,<br>aasaan tarike se</h2>
+      <p class="lead">Screen book karo, ad upload karo, pay karo — aur dekho ki aapka ad kab aur kitni baar chala. Kuch bhi complicated nahi.</p>
+    </div>
+    <div class="svc-rows">
+      <div class="svc-r1">
+        <div class="scard" data-reveal style="transition-delay:.07s">
+          <div class="scard-idx"><span>01</span><div class="dot"></div></div>
+          <h3 class="h-sm">Apni screen chuniye</h3>
+          <p>City aur area ke hisaab se screens dekho. Mall ho, office ho ya busy market — jo screen chahiye book karo. Kitne din ke liye chahiye woh bhi aap decide karte ho.</p>
+          <div class="scard-foot">
+            <span class="stag">City ke hisaab se</span><span class="stag">Area filter</span><span class="stag">Din &amp; time choose karo</span>
+          </div>
+        </div>
+        <div class="scard" data-reveal style="transition-delay:.12s">
+          <div class="scard-idx"><span>02</span><div class="dot"></div></div>
+          <h3 class="h-sm">Apna ad upload karein</h3>
+          <p>Photo ya video — dono chalte hain. Upload karo aur hum check karte hain ki screen par sahi dikhega. Koi back-and-forth nahi, hum khayal rakhte hain.</p>
+          <div class="scard-foot">
+            <span class="stag">Photo</span><span class="stag">Video</span><span class="stag">Hum check karte hain</span>
+          </div>
+        </div>
+      </div>
+      <div class="svc-r2">
+        <div class="scard" data-reveal style="transition-delay:.18s">
+          <div class="scard-idx"><span>03</span><div class="dot"></div></div>
+          <h3 class="h-sm">Asaan payment, pakki receipt</h3>
+          <p>Card, UPI ya wallet — jo easy lage. Coupon code hai to woh bhi laga lo. Payment hote hi GST bill aapke email par aa jaata hai — accounting ke liye ready.</p>
+          <div class="scard-vis">
+            <div class="bars">
+              <span style="height:38%"></span><span style="height:56%"></span><span style="height:44%"></span><span style="height:78%"></span><span style="height:52%"></span><span style="height:94%"></span>
+            </div>
+          </div>
+        </div>
+        <div class="scard" data-reveal style="transition-delay:.24s">
+          <div class="scard-idx"><span>04</span><div class="dot"></div></div>
+          <h3 class="h-sm">Proof ki aapka ad chala</h3>
+          <p>Har baar jab aapka ad screen par chala — date, time aur kitni baar chala sab record hota hai. Report download karo aur client ko ya khud rakh lo — black &amp; white proof.</p>
+          <div class="scard-foot">
+            <span class="stag">Date &amp; time log</span><span class="stag">Download report</span><span class="stag">QR scan track</span>
+          </div>
+        </div>
+      </div>
+      <!-- Social auto-post highlight -->
+      <div style="background:var(--dark);border-radius:var(--r);padding:36px 40px;display:flex;flex-direction:column;gap:20px;position:relative;overflow:hidden;" data-reveal style="transition-delay:.28s">
+        <div style="position:absolute;right:-20px;bottom:-30px;opacity:.05;font-family:'Magra',sans-serif;font-weight:700;font-size:120px;line-height:1;color:#fff;pointer-events:none;white-space:nowrap;">3 IN 1</div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.5);">Sirf extrravenue par milta hai</div>
+        </div>
+        <h3 style="font-family:'Magra',sans-serif;font-weight:700;font-size:clamp(22px,2.4vw,32px);color:#fff;letter-spacing:-0.02em;line-height:1.1;max-width:28ch;">Ek campaign — Screen par, <span style="color:var(--orange);">Facebook par</span> aur <span style="color:var(--orange);">Instagram par</span> bhi</h3>
+        <p style="font-size:15px;color:rgba(255,255,255,.7);max-width:60ch;">Jab aapka campaign approve hokar live hota hai, tab aapka ad automatically Facebook page par aur Instagram par bhi post ho jaata hai. Aapko alag se kuch share nahi karna — ek kaam, teen jagah dikhta hai aapka ad.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;">
+          <div style="display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:999px;padding:9px 16px;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="#4267B2"><path d="M24 12.07C24 5.41 18.63 0 12 0S0 5.4 0 12.07C0 18.1 4.39 23.1 10.13 24v-8.44H7.08v-3.49h3.04V9.41c0-3.02 1.8-4.7 4.54-4.7 1.31 0 2.68.24 2.68.24v2.97h-1.51c-1.49 0-1.95.93-1.95 1.88v2.26h3.32l-.53 3.5h-2.8V24C19.62 23.1 24 18.1 24 12.07z"/></svg>
+            <span style="font-size:13px;font-weight:600;color:#fff;">Facebook par auto-post</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:999px;padding:9px 16px;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="url(#ig2)"><defs><linearGradient id="ig2" x1="0%" y1="100%" x2="100%" y2="0%"><stop offset="0%" stop-color="#f09433"/><stop offset="50%" stop-color="#dc2743"/><stop offset="100%" stop-color="#bc1888"/></linearGradient></defs><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
+            <span style="font-size:13px;font-weight:600;color:#fff;">Instagram par auto-post</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;background:rgba(255,92,0,.18);border:1px solid rgba(255,92,0,.3);border-radius:999px;padding:9px 16px;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="2.5"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4" stroke-linecap="round"/></svg>
+            <span style="font-size:13px;font-weight:600;color:var(--orange);">Digital screen par live</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="scard scard-orange" data-reveal style="transition-delay:.36s">
+        <div class="so-left">
+          <div class="scard-idx" style="justify-content:flex-start;gap:10px"><span>06</span><div class="dot"></div></div>
+          <h3 class="h-md">Aapke paas screen hai? Paise kamao.</h3>
+          <p>Agar aapke venue — mall, office ya shop — mein screen lagi hai, to usse platform par register karo. Jab bhi koi advertiser us screen par ad chalata hai, aapko revenue milta hai. Aapko kuch karna nahi — system sab track karta hai.</p>
+          <a class="btn btn-sm" style="background:#fff;color:var(--dark);border-radius:999px;padding:11px 20px;font-size:13.5px;font-weight:600;" href="https://signagecrm-production.up.railway.app">Venue partner bano &rarr;</a>
+        </div>
+        <div class="so-ring"><span><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STEPS -->
+<section class="steps sec-tight" id="steps">
+  <div class="wrap">
+    <div class="sec-head center" data-reveal>
+      <div class="eyebrow"><i></i>Kaise kaam karta hai</div>
+      <h2 class="h-lg">Sign up se ad live<br>— sirf kuch minute mein</h2>
+    </div>
+    <div class="steps-line" id="sline"><i></i></div>
+    <div class="steps-grid">
+      <div class="step" data-reveal style="transition-delay:.06s">
+        <div class="step-no">01</div>
+        <h3>Account banao, ad upload karo</h3>
+        <p>Free account banao aur apna ad — photo ya video — upload karo. Hum turant check karte hain ki screen par achha dikhega ya nahi.</p>
+        <span class="step-tick">✓ Sirf 2 minute ka kaam</span>
+      </div>
+      <div class="step" data-reveal style="transition-delay:.14s">
+        <div class="step-no">02</div>
+        <h3>Screen aur dates chuniye</h3>
+        <p>City aur area ke hisaab se screens dekho. Jinhe chahiye select karo, dates set karo aur total price GST ke saath screen par dikhta hai — koi hidden charge nahi.</p>
+        <span class="step-tick">✓ Sab kuch transparent</span>
+      </div>
+      <div class="step" data-reveal style="transition-delay:.22s">
+        <div class="step-no">03</div>
+        <h3>Pay karo — bill turant aata hai</h3>
+        <p>Card, UPI ya wallet se pay karo. Coupon code hai to lagao. Payment hone ke saath hi GST bill aapke email par — usi waqt.</p>
+        <span class="step-tick">✓ Bill aaya, done</span>
+      </div>
+      <div class="step" data-reveal style="transition-delay:.3s">
+        <div class="step-no">04</div>
+        <h3>Ad live — teen jagah ek saath</h3>
+        <p>Ad approve hote hi screen par chal jaata hai — aur saath hi Facebook aur Instagram par bhi automatically post hota hai. Dashboard mein dekho kitni baar chala. Report download karo.</p>
+        <span class="step-tick">✓ Screen + FB + IG — ek saath</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BENEFITS -->
+<section class="sec" id="benefits">
+  <div class="wrap">
+    <div class="ben-layout">
+      <div data-reveal>
+        <div class="sec-head">
+          <div class="eyebrow"><i></i>Aapke liye kya hai</div>
+          <h2 class="h-lg">Chinta mat karo,<br>hum sambhalte hain</h2>
+          <p class="lead">Aap sirf apna ad dete ho — baaki sab extrravenue handle karta hai. Payment se lekar proof tak.</p>
+        </div>
+        <div class="ben-aside">
+          <div class="big">120+</div>
+          <hr style="border:0;border-top:1px solid var(--line);margin:0;">
+          <p style="font-size:14px;color:var(--muted)">Campaigns run ho chuki hain India bhar mein — aur har ek ka proof record mein hai.</p>
+        </div>
+      </div>
+      <div class="ben-cols" data-reveal style="transition-delay:.1s">
+        <div class="ben-item"><div class="ben-ic">🖼</div><div><h4>Aapka ad safe rahega</h4><p>Jo ad aap upload karte ho woh hamesha save rehta hai — kabhi nahi jaata. Kisi bhi device se dekh sakte ho.</p></div></div>
+        <div class="ben-item"><div class="ben-ic">👀</div><div><h4>Hum pehle check karte hain</h4><p>Ad screen par jaane se pehle hum verify karte hain ki sahi dikhega. Koi gadbad nahi hogi screen par.</p></div></div>
+        <div class="ben-item"><div class="ben-ic">💳</div><div><h4>Wallet se pay karo</h4><p>Ek baar wallet top up karo, phir har campaign ke liye baar baar card details daalne ki zaroorat nahi. Refund bhi le sakte ho UPI par.</p></div></div>
+        <div class="ben-item"><div class="ben-ic">🏷</div><div><h4>Coupon code hai? Lagao.</h4><p>Discount code hai to checkout par laga lo — seedha total amount se kat jaata hai. Koi panga nahi.</p></div></div>
+        <div class="ben-item"><div class="ben-ic">📄</div><div><h4>GST bill turant milta hai</h4><p>Pay karo aur bill email par aa jaata hai — invoice number, amount, GST sab ke saath. Accountant ko dene ke liye ready.</p></div></div>
+        <div class="ben-item"><div class="ben-ic">📲</div><div><h4>WhatsApp par update aata hai</h4><p>Ad approve hone par, khatam hone wala ho tab — WhatsApp par message aata hai. Kuch miss nahi hoga.</p></div></div>
+        <div class="ben-item"><div class="ben-ic">📱</div><div><h4>Screen + Facebook + Instagram — ek saath</h4><p>Campaign live hote hi aapka ad Facebook page aur Instagram par bhi automatically post ho jaata hai. Teen jagah dikhta hai — alag se kuch karna nahi padta.</p></div></div>
+        <div class="ben-item"><div class="ben-ic">📷</div><div><h4>Screen se directly lead</h4><p>Har ad ke saath ek QR code hota hai. Koi scan kare to seedha aapke WhatsApp par aa jaata hai — wahi pe baat karo.</p></div></div>
+        <div class="ben-item"><div class="ben-ic">📊</div><div><h4>Poora record download karo</h4><p>Kab chala, kitni baar chala, kaunsi screen par — sab ek file mein. Client ko dikhana ho ya khud rakhna — ready hai.</p></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- METRICS -->
+<section class="sec metrics" id="results" style="position:relative;">
+  <div class="dots-bg">
+    <i style="width:8px;height:8px;opacity:.35;top:15%;left:8%;animation-delay:0s"></i>
+    <i style="width:14px;height:14px;opacity:.55;top:35%;left:4%;animation-delay:.6s"></i>
+    <i style="width:22px;height:22px;opacity:.75;top:20%;left:22%;animation-delay:1.2s"></i>
+    <i style="width:14px;height:14px;opacity:.55;top:10%;left:42%;animation-delay:.3s"></i>
+    <i style="width:22px;height:22px;opacity:.75;top:25%;left:60%;animation-delay:.9s"></i>
+    <i style="width:14px;height:14px;opacity:.55;top:52%;left:68%;animation-delay:1.5s"></i>
+    <i style="width:22px;height:22px;opacity:.75;top:68%;left:80%;animation-delay:.4s"></i>
+  </div>
+  <div class="wrap" style="position:relative;z-index:1;">
+    <div class="sec-head" data-reveal>
+      <div class="eyebrow on-dark"><i></i>Numbers mein baat karte hain</div>
+      <h2 class="h-lg">Itne log pehle se<br>saath hain</h2>
+      <p class="lead">India bhar mein advertisers apne campaigns chalate hain — aur results dekhte hain.</p>
+    </div>
+    <div class="met-grid">
+      <div class="met" data-reveal style="transition-delay:.06s">
+        <div class="met-n"><span class="counter" data-target="120">0</span><span>+</span></div>
+        <div class="met-l">Campaigns chali</div>
+      </div>
+      <div class="met" data-reveal style="transition-delay:.14s">
+        <div class="met-n"><span class="counter" data-target="85">0</span><span>+</span></div>
+        <div class="met-l">Advertisers ka bharosa</div>
+      </div>
+      <div class="met" data-reveal style="transition-delay:.22s">
+        <div class="met-n"><span class="counter" data-target="4" data-dec="1">0</span><span>.9</span></div>
+        <div class="met-l">Average rating</div>
+      </div>
+      <div class="met" data-reveal style="transition-delay:.3s">
+        <div class="met-n"><span>24</span><span style="font-size:.5em">/7</span></div>
+        <div class="met-l">Hamesha live monitoring</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIAL -->
+<section class="sec">
+  <div class="wrap">
+    <div class="sec-head" data-reveal>
+      <div class="eyebrow"><i></i>Unka kehna</div>
+      <h2 class="h-lg">Jo log use kar rahe hain<br>woh yeh kehte hain</h2>
+    </div>
+    <div class="testi-grid">
+      <div class="quote-card" data-reveal style="transition-delay:.06s">
+        <div class="quote-mark">"</div>
+        <blockquote>Pehle hum manually follow karte the ki ad chala ya nahi. Yahaan sab record rehta hai — payment se lekar proof tak. Bahut asaan ho gaya.</blockquote>
+        <div class="quote-by">
+          <div class="avatar">R</div>
+          <div><b>Raj Mehta</b><small>Marketing Manager &middot; Vasna Mall, Ahmedabad</small></div>
+          <div class="quote-stat"><b>5.0</b><small>★★★★★</small></div>
+        </div>
+      </div>
+      <div class="testi-dark" data-reveal style="transition-delay:.14s">
+        <div class="testi-dark-bg"><span class="testi-dark-bg-txt">TRUSTED</span></div>
+        <div class="testi-dark-person">
+          <div class="testi-av-lg">R</div>
+          <div style="color:var(--bg);font-family:'Magra',sans-serif;font-weight:700;font-size:18px;margin-top:4px;">Raj Mehta</div>
+          <div style="color:var(--onDarkMuted);font-size:13px;">Vasna Mall &middot; Ahmedabad</div>
+          <div class="stars" style="color:var(--orange);font-size:20px;">★★★★★</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONFIDENCE / POSITIONING -->
+<section class="sec" id="concerns" style="background:var(--surface);border-top:1px solid var(--line);border-bottom:1px solid var(--line);">
+  <div class="wrap">
+    <div class="sec-head center" data-reveal>
+      <div class="eyebrow"><i></i>Ye jaanna zaroori hai</div>
+      <h2 class="h-lg">Screen advertising<br>actually aisa kaam karta hai</h2>
+      <p class="lead">Jo cheezein sirf extrravenue par milti hain — aur kyun ye dusre options se alag hai.</p>
+    </div>
+    <div class="conf-grid">
+
+      <div class="conf-card" data-reveal style="transition-delay:.06s">
+        <div class="conf-num">01</div>
+        <h3>Mall mein log screen ko ignore nahi kar sakte</h3>
+        <p>Social media par ad aaya — skip kar diya. Mall mein khade ho — screen ke saamne ho, kuch nahi kar sakte. Yahi fark hai. Captive audience hoti hai — woh genuinely dekh rahi hoti hai, scroll nahi kar rahi.</p>
+      </div>
+
+      <div class="conf-card" data-reveal style="transition-delay:.1s">
+        <div class="conf-num">02</div>
+        <h3>Screen se seedha aapke WhatsApp mein inquiry</h3>
+        <p>Har ad ke saath QR code hota hai. Koi interested ho, scan kare — seedha aapke WhatsApp par aa jaata hai. Baith ke wait nahi karna padta. Aur dashboard mein dikhta hai kitne logo ne scan kiya — engagement ka real data.</p>
+      </div>
+
+      <div class="conf-card" data-reveal style="transition-delay:.14s">
+        <div class="conf-num">03</div>
+        <h3>Ek payment — Screen, Facebook aur Instagram teeno</h3>
+        <p>Yahan sirf screen book nahi hoti. Jab ad live hota hai, automatically Facebook page aur Instagram par bhi post hota hai. Teen platforms ek saath — alag alag karna padta to teen guna kaam aur paisa lagta.</p>
+      </div>
+
+      <div class="conf-card" data-reveal style="transition-delay:.18s">
+        <div class="conf-num">04</div>
+        <h3>Ek screen, ek din se shuru karo — koi lock-in nahi</h3>
+        <p>Bade commitment ki zaroorat nahi. Pehle ek screen, 1-2 din ke liye try karo. Results dekho. Phir apni marzi se badhao ya wahi raho. Koi contract, koi minimum spend, koi penalty nahi.</p>
+      </div>
+
+      <div class="conf-card" data-reveal style="transition-delay:.22s">
+        <div class="conf-num">05</div>
+        <h3>Sirf premium spots — wahan jahan log actually jaate hain</h3>
+        <p>Hamare screens mall, corporate offices aur busy markets mein hain — yahan daily hazaron ki footfall hoti hai. 100 choti jagah se ek busy mall ki screen zyada kaam aati hai. Reach quality mein hoti hai, sirf quantity mein nahi.</p>
+      </div>
+
+      <div class="conf-card" data-reveal style="transition-delay:.26s">
+        <div class="conf-num">06</div>
+        <h3>Ad chala — proof haath mein, koi doubt nahi</h3>
+        <p>Date, time, kitni baar chala — sab record hota hai. "Proof of Play" report download karo — black and white data. Client ko dikhana ho, ya khud rakhna ho — ready hai. Sirf baat nahi, actual data.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="sec-tight" style="padding:80px 0;">
+  <div class="wrap">
+    <div class="cta-card" data-reveal>
+      <div class="eyebrow on-dark"><i style="background:#fff;"></i>Shuru karein aaj</div>
+      <h2 class="h-lg">Aapka ad sahi jagah<br>dikhna chahiye</h2>
+      <p class="lead">Sirf upload karo, screen book karo, pay karo — aur dekho. Itna hi simple hai.</p>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;">
+        <a class="btn btn-orange" href="https://signagecrm-production.up.railway.app">Free mein shuru karein</a>
+        <a class="btn btn-ghost" style="border-color:rgba(242,239,233,.3);color:var(--bg);" href="https://signagecrm-production.up.railway.app/admin">Admin Login</a>
+      </div>
+      <span style="font-size:12.5px;color:rgba(242,239,233,.45);">Koi contract nahi. Koi hidden charge nahi.</span>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="sec" id="pricing">
+  <div class="wrap">
+    <div class="sec-head center" data-reveal>
+      <div class="eyebrow"><i></i>Pricing</div>
+      <h2 class="h-lg">Pehle try karo,<br>phir plan chuniye</h2>
+      <p class="lead">Sabhi rates ek screen ke liye hain. Zyada screens book karoge to accordingly calculate hoga. Har plan mein FB + IG auto-post aur QR tracking included hai.</p>
+    </div>
+
+    <!-- Trial Banner -->
+    <div data-reveal style="margin-top:44px;background:var(--dark);border-radius:var(--r);padding:32px 36px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;">
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div style="font-size:10.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--orange);">Pehli baar? Yahan se shuru karo</div>
+        <div style="font-family:'Magra',sans-serif;font-weight:700;font-size:clamp(22px,2.4vw,30px);color:#fff;letter-spacing:-0.02em;line-height:1.1;">Trial &nbsp;&middot;&nbsp; &#8377;1,999 <span style="font-family:'Libre Franklin',sans-serif;font-weight:400;font-size:clamp(14px,1.2vw,17px);color:rgba(255,255,255,.55);">sirf 7 din ke liye (ek baar)</span></div>
+        <p style="font-size:14.5px;color:rgba(255,255,255,.6);margin:0;max-width:56ch;">10 sec ad slot &nbsp;&middot;&nbsp; &asymp;&#8377;285/din &nbsp;&middot;&nbsp; ~8,100 plays/day &nbsp;&middot;&nbsp; Ek screen pe result dekho pehle, phir bado.</p>
+      </div>
+      <a class="btn btn-orange" href="https://signagecrm-production.up.railway.app" style="flex:none;">Trial book karo &rarr;</a>
+    </div>
+
+    <div style="margin:36px 0 4px;text-align:center;" data-reveal>
+      <span style="font-size:11.5px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);">Ya seedha monthly plan chuniye</span>
+    </div>
+
+    <!-- 4 monthly plans -->
+    <div class="pricing-grid" data-reveal style="transition-delay:.06s">
+
+      <div class="pric">
+        <div class="pric-badge">Entry level</div>
+        <div class="pric-name">Spot</div>
+        <div style="margin:10px 0 2px;display:flex;align-items:baseline;gap:6px;">
+          <span style="font-family:'Magra',sans-serif;font-weight:700;font-size:32px;letter-spacing:-0.03em;">&#8377;8,000</span>
+          <span style="font-size:14px;color:var(--muted);">/mo</span>
+        </div>
+        <div style="font-size:12.5px;color:var(--muted);margin-bottom:4px;">&asymp; &#8377;267/din &nbsp;&middot;&nbsp; 10 sec slot</div>
+        <div style="font-size:12.5px;font-weight:600;color:var(--orange);margin-bottom:14px;">~8,100 plays/day</div>
+        <hr class="pric-div">
+        <div class="pric-list">
+          <div class="pric-row"><span class="tick hi">✓</span><span>10 second ad slot</span></div>
+          <div class="pric-row"><span class="tick hi">✓</span><span>FB + IG auto-post</span></div>
+          <div class="pric-row"><span class="tick hi">✓</span><span>Proof of Play report</span></div>
+          <div class="pric-row"><span class="tick hi">✓</span><span>QR scan tracking</span></div>
+          <div class="pric-row"><span class="tick hi">✓</span><span>GST invoice</span></div>
+        </div>
+        <div style="font-size:12px;color:var(--muted);padding:12px 0 0;border-top:1px solid var(--line);margin-top:auto;">Tea shops, salons, tuition</div>
+        <div class="pric-foot" style="margin-top:12px;">
+          <a class="btn btn-dark btn-sm" style="width:100%;justify-content:center;" href="https://signagecrm-production.up.railway.app">Book karo &rarr;</a>
+        </div>
+      </div>
+
+      <div class="pric pric-feat">
+        <div class="pric-badge">⭐ Sabse popular</div>
+        <div class="pric-name">Regular</div>
+        <div style="margin:10px 0 2px;display:flex;align-items:baseline;gap:6px;">
+          <span style="font-family:'Magra',sans-serif;font-weight:700;font-size:32px;letter-spacing:-0.03em;color:#fff;">&#8377;13,000</span>
+          <span style="font-size:14px;color:var(--onDarkMuted);">/mo</span>
+        </div>
+        <div style="font-size:12.5px;color:var(--onDarkMuted);margin-bottom:4px;">&asymp; &#8377;433/din &nbsp;&middot;&nbsp; 15 sec slot</div>
+        <div style="font-size:12.5px;font-weight:600;color:#ff9060;margin-bottom:14px;">~5,400 plays/day</div>
+        <hr class="pric-div">
+        <div class="pric-list">
+          <div class="pric-row"><span class="tick hi">✓</span><span>15 second ad slot</span></div>
+          <div class="pric-row"><span class="tick hi">✓</span><span>FB + IG auto-post</span></div>
+          <div class="pric-row"><span class="tick hi">✓</span><span>Proof of Play report</span></div>
+          <div class="pric-row"><span class="tick hi">✓</span><span>QR scan tracking</span></div>
+          <div class="pric-row"><span class="tick hi">✓</span><span>GST invoice</span></div>
+        </div>
+        <div style="font-size:12px;color:var(--onDarkMuted);padding:12px 0 0;border-top:1px solid rgba(242,239,233,.14);margin-top:auto;">Restaurants, clinics, coaching</div>
+        <div class="pric-foot" style="margin-top:12px;">
+          <a class="btn btn-orange" style="width:100%;justify-content:center;" href="https://signagecrm-production.up.railway.app">Book karo &rarr;</a>
+        </div>
+      </div>
+
+      <div class="pric">
+        <div class="pric-badge">Zyada waqt</div>
+        <div class="pric-name">Premium</div>
+        <div style="margin:10px 0 2px;display:flex;align-items:baseline;gap:6px;">
+          <span style="font-family:'Magra',sans-serif;font-weight:700;font-size:32px;letter-spacing:-0.03em;">&#8377;18,000</span>
+          <span style="font-size:14px;color:var(--muted);">/mo</span>
+        </div>
+        <div style="font-size:12.5px;color:var(--muted);margin-bottom:4px;">&asymp; &#8377;600/din &nbsp;&middot;&nbsp; 20 sec slot</div>
+        <div style="font-size:12.5px;font-weight:600;color:var(--orange);margin-bottom:14px;">~4,050 plays/day</div>
+        <hr class="pric-div">
+        <div class="pric-list">
+          <div class="pric-row"><span class="tick hi">✓</span><span>20 second ad slot</span></div>
+          <div class="pric-row"><span class="tick hi">✓</span><span>FB + IG auto-post</span></div>
+          <div class="pric-row"><span class="tick hi">✓</span><span>Proof of Play report</span></div>
+          <div class="pric-row"><span class="tick hi">✓</span><span>QR scan tracking</span></div>
+          <div class="pric-row"><span class="tick hi">✓</span><span>GST invoice</span></div>
+        </div>
+        <div style="font-size:12px;color:var(--muted);padding:12px 0 0;border-top:1px solid var(--line);margin-top:auto;">Real estate, jewellers, hospitals</div>
+        <div class="pric-foot" style="margin-top:12px;">
+          <a class="btn btn-dark btn-sm" style="width:100%;justify-content:center;" href="https://signagecrm-production.up.railway.app">Book karo &rarr;</a>
+        </div>
+      </div>
+
+      <div class="pric">
+        <div class="pric-badge">Full attention</div>
+        <div class="pric-name">Exclusive</div>
+        <div style="margin:10px 0 2px;display:flex;align-items:baseline;gap:6px;">
+          <span style="font-family:'Magra',sans-serif;font-weight:700;font-size:32px;letter-spacing:-0.03em;">&#8377;25,000</span>
+          <span style="font-size:14px;color:var(--muted);">/mo</span>
+        </div>
+        <div style="font-size:12.5px;color:var(--muted);margin-bottom:4px;">&asymp; &#8377;833/din &nbsp;&middot;&nbsp; 30 sec slot</div>
+        <div style="font-size:12.5px;font-weight:600;color:var(--orange);margin-bottom:14px;">~2,700 plays/day</div>
+        <hr class="pric-div">
+        <div class="pric-list">
+          <div class="pric-row"><span class="tick hi">✓</span><span>30 second ad slot</span></div>
+          <div class="pric-row"><span class="tick hi">✓</span><span>FB + IG auto-post</span></div>
+          <div class="pric-row"><span class="tick hi">✓</span><span>Proof of Play report</span></div>
+          <div class="pric-row"><span class="tick hi">✓</span><span>QR scan tracking</span></div>
+          <div class="pric-row"><span class="tick hi">✓</span><span>GST invoice</span></div>
+        </div>
+        <div style="font-size:12px;color:var(--muted);padding:12px 0 0;border-top:1px solid var(--line);margin-top:auto;">Banks, builders, showrooms</div>
+        <div class="pric-foot" style="margin-top:12px;">
+          <a class="btn btn-dark btn-sm" style="width:100%;justify-content:center;" href="https://signagecrm-production.up.railway.app">Book karo &rarr;</a>
+        </div>
+      </div>
+
+    </div>
+
+    <p style="text-align:center;font-size:12.5px;color:var(--muted);margin-top:16px;" data-reveal>Ad ki duration package slot ke ±20% ke andar honi chahiye. Zyada lamba content upload hone ke waqt reject hoga.</p>
+
+    <!-- Venue Partner -->
+    <div data-reveal style="margin-top:18px;background:var(--orange);border-radius:var(--r);padding:32px 36px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;">
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div style="font-size:10.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.7);">Screen owner ke liye</div>
+        <div style="font-family:'Magra',sans-serif;font-weight:700;font-size:clamp(20px,2.2vw,28px);color:#fff;letter-spacing:-0.02em;line-height:1.1;">Venue Partner — Aapki screen se aap kamate ho</div>
+        <p style="font-size:14.5px;color:rgba(255,255,255,.75);margin:0;max-width:58ch;">Mall, office ya shop mein screen hai? Platform par register karo — advertisers ad chalayenge aur aapko revenue milega. Android TV app pe sab automatic.</p>
+      </div>
+      <a class="btn" style="background:#fff;color:var(--dark);flex:none;font-weight:700;" href="https://signagecrm-production.up.railway.app">Venue partner bano &rarr;</a>
+    </div>
+
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="sec" id="faq">
+  <div class="wrap">
+    <div class="faq-layout">
+      <div class="sec-head" data-reveal>
+        <div class="eyebrow"><i></i>Sawaal jawab</div>
+        <h2 class="h-lg">Jo aksar poochha<br>jaata hai</h2>
+        <p class="lead">Pehli baar book karne se pehle jo confusion hoti hai — woh yahaan clear hoti hai.</p>
+        <a class="btn btn-dark btn-sm" href="https://signagecrm-production.up.railway.app">Abhi shuru karo &rarr;</a>
+      </div>
+      <div class="faq-list" data-reveal style="transition-delay:.08s">
+        <div class="faq-item open">
+          <button class="faq-q" onclick="this.parentElement.classList.toggle('open')">Price kaise pata chalega? <span class="faq-ic">+</span></button>
+          <div class="faq-body"><div><p>Portal mein jaao, screen chunao — wahan dikhta hai har screen ki rate. Jitni screens, jitne din — total GST ke saath sab calculate hokar screen par dikhta hai. Pay karne se pehle koi surprise nahi.</p></div></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q" onclick="this.parentElement.classList.toggle('open')">Kaunsa ad format upload kar sakte hain? <span class="faq-ic">+</span></button>
+          <div class="faq-body"><div><p>Photo — JPG ya PNG. Video — MP4. Size 200 MB tak chal sakta hai. Upload karo aur hum check karte hain ki screen par sahi dikhega ya nahi — phir live hota hai.</p></div></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q" onclick="this.parentElement.classList.toggle('open')">Wallet kya hota hai aur kaise use karein? <span class="faq-ic">+</span></button>
+          <div class="faq-body"><div><p>Wallet mein paise dalo — phir jab bhi campaign book karo tab wallet se pay ho jaata hai. Baar baar card nahi daalna padta. Agar balance bacha ho aur waapis chahiye, to UPI ya bank account mein request kar sakte ho.</p></div></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q" onclick="this.parentElement.classList.toggle('open')">GST bill kahan milega? <span class="faq-ic">+</span></button>
+          <div class="faq-body"><div><p>Pay karte hi email par aa jaata hai — invoice number, amount, GST sab ke saath. Accountant ko dene ke liye ready. Baad mein bhi billing page se download kar sakte ho.</p></div></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q" onclick="this.parentElement.classList.toggle('open')">Kaise prove karein ki ad actually chala? <span class="faq-ic">+</span></button>
+          <div class="faq-body"><div><p>Dashboard mein "Reports" mein jaao — wahan dikhega kab chala, kitni baar chala, kaunsi screen par. CSV mein download karo aur client ko bhej do ya khud rakh lo.</p></div></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q" onclick="this.parentElement.classList.toggle('open')">Mere venue mein screen hai — kya main bhi join kar sakta hoon? <span class="faq-ic">+</span></button>
+          <div class="faq-body"><div><p>Bilkul. Venue partner ke roop mein register karo. Aapki screen platform par list ho jaayegi. Advertisers uspe ad chalayenge aur aapko har play ka share milega — khud kuch nahi karna.</p></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="wrap">
+    <div class="f-top">
+      <div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div class="brand-mark"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><rect x="2" y="3" width="20" height="14" rx="2" stroke="currentColor" stroke-width="2"/><path d="M8 21h8M12 17v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div>
+          <span style="font-family:'Magra',sans-serif;font-weight:700;font-size:17.5px;color:#fff;">extrravenue</span>
+        </div>
+        <p class="f-blurb">Screen book karo, ad upload karo, pay karo — aur proof pao ki chala. India ka sabse seedha advertising platform.</p>
+      </div>
+      <div class="f-col">
+        <h4>Pages</h4>
+        <ul>
+          <li><a href="https://signagecrm-production.up.railway.app">Advertiser Portal</a></li>
+          <li><a href="https://signagecrm-production.up.railway.app/admin">Admin Dashboard</a></li>
+          <li><a href="#results">Analytics</a></li>
+          <li><a href="#services">Proof of Play</a></li>
+        </ul>
+      </div>
+      <div class="f-col">
+        <h4>Information</h4>
+        <ul>
+          <li><a href="#">Privacy Policy</a></li>
+          <li><a href="#">Terms of Service</a></li>
+          <li><a href="#">Contact</a></li>
+          <li><a href="#">Pricing</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="f-word" id="fword"><span>extrravenue</span></div>
+    <div class="f-bar">
+      <span>© 2026 extrravenue &middot; Built for India's OOH Advertising Network</span>
+      <div class="f-social">
+        <a href="#" title="Instagram"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/></svg></a>
+        <a href="#" title="LinkedIn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/><path d="M8 9h4v3s1-3 5-3 5 2.5 5 6v6h-4v-6c0-1.5-.5-3-2-3s-4 1.5-4 3v6H8z"/></svg></a>
+      </div>
+      <div class="f-legal">
+        <a href="#">Privacy</a><a href="#">Terms</a><a href="#">Cookies</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</div><!-- .cf -->
+
+<script>
+// Nav scroll
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => { nav.classList.toggle('scrolled', window.scrollY > 60); }, {passive:true});
+
+// Reveal on scroll
+const ro = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); ro.unobserve(e.target); }});
+}, {threshold:.07, rootMargin:'0px 0px -24px 0px'});
+document.querySelectorAll('[data-reveal]').forEach(el => ro.observe(el));
+
+// Steps line
+const sl = document.getElementById('sline');
+const slo = new IntersectionObserver(e => { if(e[0].isIntersecting){sl.classList.add('in');slo.disconnect();}},{threshold:.5});
+slo.observe(sl);
+
+// Footer word
+const fw = document.getElementById('fword');
+const fwo = new IntersectionObserver(e => { if(e[0].isIntersecting){fw.classList.add('in');fwo.disconnect();}},{threshold:.3});
+fwo.observe(fw);
+
+// Counter
+const co = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (!e.isIntersecting) return;
+    const el = e.target, t = parseInt(el.dataset.target), dec = parseInt(el.dataset.dec||'0'), t0 = performance.now();
+    const tick = now => { const p = Math.min((now-t0)/1600,1), ep = 1-Math.pow(1-p,3), v = Math.round(t*ep); el.textContent = dec ? (v/10).toFixed(1) : v; if(p<1) requestAnimationFrame(tick); };
+    requestAnimationFrame(tick);
+    co.unobserve(el);
+  });
+}, {threshold:.5});
+document.querySelectorAll('.counter').forEach(el => co.observe(el));
+
+// Hero-vis: scroll-driven staggered parallax
+// Col 4 (rightmost, index 3) starts immediately; col 1 (leftmost) starts last
+(function(){
+  var vis = document.querySelector('.hero-vis');
+  if(!vis) return;
+  var cols = vis.querySelectorAll('.hcol');
+  if(!cols.length) return;
+  var n = cols.length;
+  function updateVis(){
+    var sy = window.scrollY;
+    for(var i=0;i<n;i++){
+      // rightmost = i=n-1 &rarr; delay 0; leftmost = i=0 &rarr; delay max
+      var delay = (n-1-i)*120;
+      var move = Math.max(0,(sy-delay))*0.38;
+      cols[i].style.transform='translateY(-'+move+'px)';
+    }
+  }
+  window.addEventListener('scroll',updateVis,{passive:true});
+  updateVis();
+})();
+</script>
+
+</body>
+</html>
