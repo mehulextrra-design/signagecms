@@ -5,11 +5,15 @@
     android:background="#000000">
 
     <!-- Video player (ExoPlayer) -->
+    <!-- surface_type=texture_view: TextureView applies video rotation metadata
+         automatically; SurfaceView (default) ignores it on many TV hardware decoders -->
     <androidx.media3.ui.PlayerView
         android:id="@+id/playerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="gone" />
+        android:visibility="gone"
+        app:surface_type="texture_view"
+        xmlns:app="http://schemas.android.com/apk/res-auto" />
 
     <!-- Image display -->
     <ImageView
