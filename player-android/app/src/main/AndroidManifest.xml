@@ -59,7 +59,6 @@
             android:name=".PlayerActivity"
             android:exported="false"
             android:theme="@style/Theme.Player.Fullscreen"
-            android:screenOrientation="portrait"
             android:configChanges="keyboard|keyboardHidden|navigation|screenLayout|screenSize|uiMode"
             android:launchMode="singleTop" />
 
