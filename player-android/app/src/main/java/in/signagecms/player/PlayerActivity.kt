@@ -421,6 +421,7 @@ class PlayerActivity : AppCompatActivity() {
         binding.playerView.player = player
         binding.playerView.useController = false
         binding.playerView.resizeMode = androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_ZOOM
+        player.volume = 0f
 
         val uri = getContentUri(campaign)
         player.addListener(object : Player.Listener {
