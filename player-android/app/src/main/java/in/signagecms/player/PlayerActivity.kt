@@ -78,6 +78,7 @@ class PlayerActivity : AppCompatActivity() {
     private val syncRunnable = object : Runnable {
         override fun run() {
             syncSchedule()
+            lifecycleScope.launch { AppUpdater.checkAndUpdate(this@PlayerActivity) }
             handler.postDelayed(this, prefs.syncIntervalSec * 1000L)
         }
     }
