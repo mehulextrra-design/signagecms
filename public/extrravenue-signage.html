@@ -388,9 +388,9 @@
 .f-legal{display:flex;gap:20px;color:rgba(255,255,255,.85);}
 
 /* Marquee Band */
-.marquee-band{background:var(--dark);padding:15px 0;overflow:hidden;white-space:nowrap;position:relative;z-index:10;}
+.marquee-band{background:#111;padding:15px 0;overflow:hidden;white-space:nowrap;position:relative;z-index:10;}
 .marquee-track{display:inline-flex;gap:34px;animation:mq 26s linear infinite;}
-.marquee-track span{font-family:'Magra',sans-serif;font-size:11.5px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:rgba(242,239,233,.3);}
+.marquee-track span{font-family:'Magra',sans-serif;font-size:11.5px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#fff;}
 .marquee-track .dot{color:var(--orange);font-size:9px;}
 @keyframes mq{from{transform:translateX(0);}to{transform:translateX(-50%);}}
 
@@ -529,7 +529,6 @@
         <p class="lead" data-reveal style="transition-delay:.12s">Malls, corporate offices aur high-street markets mein premium digital screens par apna ad chalao. Real-time proof of play aur automated social sharing ke saath.</p>
         <div class="hero-actions" data-reveal style="transition-delay:.16s">
           <a class="btn btn-orange" href="https://signagecrm-production.up.railway.app">Abhi shuru karein</a>
-          <a class="btn btn-ghost" href="https://signagecrm-production.up.railway.app/admin">Admin Login</a>
         </div>
         <div class="hero-proof" data-reveal style="transition-delay:.2s">
           <span class="proof-text"><span class="proof-stars">★★★★★</span>85+ active advertisers running campaigns daily</span>
@@ -879,6 +878,35 @@
           <div class="scard-idx"><span>04</span><div class="dot"></div></div>
           <h3 class="h-sm">Proof of Play &amp; Reports</h3>
           <p>Har display telecast ka timestamped proof record hota hai. Detail log download karke aap exact date, time aur frequency verify kar sakte hain.</p>
+          <div style="background:rgba(30,30,30,.05);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-top:4px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+              <span style="font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);">Plays this week</span>
+              <span style="font-size:13px;font-weight:700;color:var(--orange);">↑ 2,340</span>
+            </div>
+            <svg viewBox="0 0 220 60" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:60px;overflow:visible;">
+              <defs>
+                <linearGradient id="popGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="var(--orange)" stop-opacity="0.18"/>
+                  <stop offset="100%" stop-color="var(--orange)" stop-opacity="0"/>
+                </linearGradient>
+              </defs>
+              <!-- Area fill -->
+              <path d="M0,52 L28,44 L56,38 L84,30 L112,22 L140,16 L168,10 L196,4 L220,2 L220,60 L0,60 Z" fill="url(#popGrad)"/>
+              <!-- Line -->
+              <polyline points="0,52 28,44 56,38 84,30 112,22 140,16 168,10 196,4 220,2" fill="none" stroke="var(--orange)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <!-- Dots -->
+              <circle cx="0" cy="52" r="3" fill="var(--orange)" opacity=".4"/>
+              <circle cx="56" cy="38" r="3" fill="var(--orange)" opacity=".5"/>
+              <circle cx="112" cy="22" r="3" fill="var(--orange)" opacity=".6"/>
+              <circle cx="168" cy="10" r="3" fill="var(--orange)" opacity=".8"/>
+              <circle cx="220" cy="2" r="3.5" fill="var(--orange)"/>
+              <!-- Day labels -->
+              <text x="0" y="60" font-size="8" fill="var(--muted)" font-family="sans-serif" opacity=".7">Mon</text>
+              <text x="52" y="60" font-size="8" fill="var(--muted)" font-family="sans-serif" opacity=".7">Wed</text>
+              <text x="107" y="60" font-size="8" fill="var(--muted)" font-family="sans-serif" opacity=".7">Fri</text>
+              <text x="163" y="60" font-size="8" fill="var(--muted)" font-family="sans-serif" opacity=".7">Sun</text>
+            </svg>
+          </div>
           <div class="scard-foot">
             <span class="stag">Timestamp logs</span><span class="stag">Download CSV</span><span class="stag">QR interaction</span>
           </div>
