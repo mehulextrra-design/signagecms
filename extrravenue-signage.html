@@ -1,0 +1,1386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>extrravenue — Digital Screen Advertising Network</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Magra:wght@400;700&family=Libre+Franklin:wght@300;400;500;600;700&display=swap">
+<style>
+/* ── Trendora Design System ── */
+.cf {
+  --bg: #f2efe9;
+  --surface: #ebe6dd;
+  --dark: #1e1e1e;
+  --orange: #ff5c00;
+  --line: rgba(30,30,30,.12);
+  --line-strong: rgba(30,30,30,.22);
+  --muted: rgba(30,30,30,.58);
+  --onDarkMuted: rgba(242,239,233,.62);
+  --ease: cubic-bezier(.22,.61,.36,1);
+  --r: 24px;
+  background: var(--bg);
+  color: var(--dark);
+  font-family: 'Libre Franklin', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
+}
+.cf *,.cf *::before,.cf *::after{box-sizing:border-box;}
+.cf h1,.cf h2,.cf h3,.cf h4{font-family:'Magra',sans-serif;font-weight:700;margin:0;letter-spacing:-0.02em;line-height:1.02;}
+.cf p{margin:0;}.cf ul{margin:0;padding:0;list-style:none;}
+.cf button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;}
+.cf a{text-decoration:none;}
+
+.wrap{width:100%;max-width:1240px;margin:0 auto;padding:0 24px;}
+.sec{padding:112px 0;position:relative;z-index:10;}
+.sec-tight{padding:72px 0;}
+
+/* Typography */
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;padding:7px 14px 7px 11px;border:1px solid var(--line-strong);border-radius:999px;color:var(--dark);background:rgba(255,255,255,.35);}
+.eyebrow i{width:7px;height:7px;border-radius:50%;background:var(--orange);display:block;}
+.eyebrow.on-dark{border-color:rgba(242,239,233,.24);background:rgba(242,239,233,.06);color:var(--bg);}
+.eyebrow.on-orange{border-color:rgba(30,30,30,.3);background:rgba(255,255,255,.14);color:#fff;}
+.eyebrow.on-orange i{background:#fff;}
+.h-xl{font-size:clamp(46px,5.8vw,82px);letter-spacing:-0.035em;line-height:1.02;}
+.h-lg{font-size:clamp(34px,4.6vw,62px);}
+.h-md{font-size:clamp(26px,2.6vw,38px);}
+.h-sm{font-size:clamp(20px,1.6vw,24px);}
+.lead{font-size:clamp(16px,1.15vw,18.5px);color:var(--muted);font-weight:400;}
+.sec-head{display:flex;flex-direction:column;align-items:flex-start;gap:20px;max-width:720px;}
+.sec-head .lead{max-width:58ch;}
+.center{align-items:center;text-align:center;margin:0 auto;}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;gap:10px;padding:14px 26px;border-radius:999px;font-size:15px;font-weight:600;letter-spacing:.01em;transition:background-color .28s var(--ease),color .28s var(--ease),border-color .28s var(--ease),box-shadow .28s var(--ease);white-space:nowrap;}
+.btn svg{transition:transform .32s var(--ease);}
+.btn:hover svg{transform:translate(3px,-3px);}
+.btn-orange{background:var(--orange);color:#fff;}
+.btn-orange:hover{background:#e04f00;box-shadow:0 10px 28px -12px rgba(255,92,0,.75);}
+.btn-dark{background:var(--dark);color:var(--bg);}
+.btn-dark:hover{background:var(--orange);color:#fff;}
+.btn-ghost{border:1px solid var(--line-strong);color:var(--dark);}
+.btn-ghost:hover{border-color:var(--dark);background:var(--dark);color:var(--bg);}
+.btn-sm{padding:11px 18px;font-size:13.5px;}
+
+/* Navbar */
+.nav{position:fixed;inset:0 0 auto 0;z-index:60;padding:18px 24px;display:flex;justify-content:center;animation:navIn .9s var(--ease) both;}
+@keyframes navIn{from{transform:translateY(-130%);opacity:0;}to{transform:none;opacity:1;}}
+.nav-pill{width:100%;max-width:1140px;display:flex;align-items:center;gap:24px;background:rgba(242,239,233,.92);backdrop-filter:blur(14px);border:1px solid rgba(30,30,30,.1);border-radius:999px;padding:10px 10px 10px 20px;transition:box-shadow .35s var(--ease),max-width .45s var(--ease);color:var(--dark);}
+.nav.scrolled .nav-pill{box-shadow:0 18px 44px -24px rgba(30,30,30,.22);max-width:1040px;}
+.brand{display:flex;align-items:center;gap:10px;color:var(--dark);}
+.brand-mark{width:26px;height:26px;border-radius:8px;background:var(--orange);display:grid;place-items:center;flex:none;overflow:hidden;}
+.brand-mark svg{color:#fff;}
+.brand-name{font-family:'Magra',sans-serif;font-weight:700;font-size:17.5px;letter-spacing:.01em;}
+.nav-links{display:flex;align-items:center;gap:4px;margin-left:auto;}
+.nav-links a{font-size:13.5px;font-weight:500;color:rgba(30,30,30,.55);padding:9px 14px;border-radius:999px;transition:color .22s var(--ease),background-color .22s var(--ease);}
+.nav-links a:hover{color:var(--dark);background:rgba(30,30,30,.06);}
+.nav-cta{display:flex;align-items:center;gap:8px;}
+.nav-burger{display:none;width:42px;height:42px;border-radius:999px;color:var(--dark);place-items:center;background:rgba(30,30,30,.08);}
+.nav-sheet{position:fixed;inset:86px 24px auto 24px;z-index:59;background:var(--dark);border-radius:26px;padding:14px;display:none;flex-direction:column;gap:2px;box-shadow:0 30px 60px -30px rgba(30,30,30,.9);}
+.nav-sheet.open{display:flex;}
+.nav-sheet a{color:var(--bg);padding:14px 16px;border-radius:16px;font-size:16px;font-weight:500;}
+.nav-sheet a:hover{background:rgba(242,239,233,.08);color:var(--orange);}
+
+/* ── HERO SECTION: PROPER VIEWPORT & SCROLL CLEARANCE ── */
+.hero{
+  padding:130px 0 160px;
+  position:relative;
+  overflow:visible;
+}
+.hero-in{
+  position:relative;
+  width:100%;
+  min-height:1640px;
+  display:flex;
+  align-items:flex-start;
+}
+.hero-top{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  text-align:left;
+  gap:26px;
+  position:sticky; /* Scroll karte waqt text view me pinned rahega */
+  top:120px;
+  z-index:10;
+  max-width:540px;
+}
+.hero h1{
+  max-width:14ch;
+}
+.hero h1 em{font-style:normal;color:var(--orange);}
+.hero .lead{
+  max-width:44ch;
+  font-size:18.5px;
+  line-height:1.6;
+  color:rgba(30,30,30,.7);
+}
+.hero-actions{display:flex;flex-wrap:wrap;gap:14px;justify-content:flex-start;margin-top:4px;}
+.hero-proof{display:flex;flex-direction:column;align-items:flex-start;gap:8px;margin-top:12px;}
+.proof-text{font-size:13.5px;color:var(--muted);}
+.proof-stars{display:inline-flex;gap:3px;color:var(--orange);margin-right:6px;}
+
+/* Trendora Staircase Carousel Visual */
+.hero-vis{
+  position:absolute;
+  left:540px;
+  right:calc(-1 * (100vw - 100%) / 2);
+  top:-20px;
+  bottom:-80px; /* Allows bottom images to fully breathe without clipping */
+  overflow:visible;
+  display:flex;
+  align-items:flex-start;
+  justify-content:flex-start;
+  gap:18px;
+  pointer-events:none;
+  z-index:2;
+}
+.hcol{
+  display:flex;
+  flex-direction:column;
+  gap:18px;
+  flex:none;
+  will-change:transform;
+  transform:translate3d(0,0,0);
+}
+
+/* Staircase Offset: compact stagger like Trendora */
+.hcol:nth-child(5){ margin-top: 0px; }
+.hcol:nth-child(4){ margin-top: 90px; }
+.hcol:nth-child(3){ margin-top: 180px; }
+.hcol:nth-child(2){ margin-top: 270px; }
+.hcol:nth-child(1){ margin-top: 360px; }
+
+.hcard{
+  width:230px;
+  height:310px;
+  border-radius:24px;
+  overflow:hidden;
+  position:relative;
+  flex-shrink:0;
+  background:#262322;
+  box-shadow:0 18px 36px -12px rgba(0,0,0,.32);
+}
+.himg{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  z-index:1;
+}
+.hoverlay{
+  position:absolute;
+  inset:0;
+  background:linear-gradient(180deg, rgba(30,30,30,.25) 0%, rgba(30,30,30,0) 40%, rgba(30,30,30,.8) 100%);
+  z-index:2;
+}
+.hplay{
+  position:absolute;
+  top:14px;
+  right:14px;
+  width:32px;
+  height:32px;
+  background:rgba(255,255,255,.94);
+  backdrop-filter:blur(8px);
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  font-size:11px;
+  color:var(--dark);
+  z-index:4;
+  box-shadow:0 4px 10px rgba(0,0,0,.18);
+}
+.hchip{
+  position:absolute;
+  top:14px;
+  left:14px;
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  padding:5px 11px;
+  border-radius:999px;
+  z-index:3;
+}
+.hchip-d{background:rgba(30,30,30,.78);color:rgba(242,239,233,.98);backdrop-filter:blur(6px);}
+.hchip-l{background:rgba(242,239,233,.92);color:var(--dark);backdrop-filter:blur(6px);}
+.hcb{
+  position:absolute;
+  bottom:0;
+  left:0;
+  right:0;
+  padding:16px;
+  z-index:3;
+}
+.hct{font-family:'Magra',sans-serif;font-weight:700;font-size:16px;color:#fff;letter-spacing:-0.01em;line-height:1.2;}
+.hcs{font-size:11.5px;color:rgba(242,239,233,.8);margin-top:3px;}
+.hcard-body{
+  position:absolute;
+  inset:0;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding:16px;
+  z-index:3;
+  text-align:center;
+  pointer-events:none;
+}
+.hcard-stat{font-family:'Magra',sans-serif;font-weight:700;font-size:52px;color:#fff;line-height:1;letter-spacing:-0.03em;}
+.hcard-big{font-family:'Magra',sans-serif;font-weight:700;font-size:24px;color:#fff;line-height:1.15;letter-spacing:-0.02em;}
+.hcard-lbl{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.8);margin-top:6px;}
+.hcard-dot{width:10px;height:10px;border-radius:50%;margin-bottom:8px;}
+.hcard-dot-or{background:#ff5c00;box-shadow:0 0 12px rgba(255,92,0,.9);}
+.hc-or{background:linear-gradient(155deg,#ff7b30 0%,#d04010 60%,#7a1a00 100%);}
+.hc-dk{background:linear-gradient(155deg,#1f1b2b 0%,#2d2142 50%,#140e20 100%);}
+.hc-pink{background:linear-gradient(155deg,#f5b8cc 0%,#e0789a 45%,#b84070 100%);}
+.hc-city{background:linear-gradient(155deg,#8fb2ce 0%,#4b7fa6 50%,#204566 100%);}
+.hc-warm{background:linear-gradient(155deg,#d2bc9e 0%,#9c7247 50%,#4e2d19 100%);}
+.hc-green{background:linear-gradient(155deg,#60d0a0 0%,#208060 50%,#084030 100%);}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.6;transform:scale(1.25);}}
+
+/* Service cards */
+.svc-rows{display:flex;flex-direction:column;gap:18px;margin-top:56px;}
+.svc-r1{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+.svc-r2{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+.scard{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:30px;display:flex;flex-direction:column;gap:16px;min-height:290px;transition:background-color .35s var(--ease),border-color .35s var(--ease),box-shadow .35s var(--ease);}
+.scard:hover{border-color:var(--line-strong);box-shadow:0 22px 44px -28px rgba(30,30,30,.4);}
+.scard-idx{display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:600;letter-spacing:.14em;color:var(--muted);}
+.scard-idx .dot{width:8px;height:8px;border-radius:50%;background:var(--orange);}
+.scard h3{max-width:22ch;}
+.scard p{font-size:15px;color:var(--muted);}
+.scard-foot{margin-top:auto;display:flex;flex-wrap:wrap;gap:8px;}
+.stag{font-size:12px;font-weight:500;padding:7px 13px;border-radius:999px;border:1px solid var(--line-strong);color:var(--dark);transition:background-color .25s var(--ease),color .25s var(--ease),border-color .25s var(--ease);}
+.scard:hover .stag{border-color:var(--dark);}
+.stag:hover{background:var(--dark);border-color:var(--dark);color:var(--bg);}
+.scard-vis{flex:0 0 38%;border-radius:16px;position:relative;overflow:hidden;min-height:180px;border:1px solid var(--line);}
+.bars{position:absolute;inset:0;display:flex;align-items:flex-end;gap:7px;padding:18px;}
+.bars span{flex:1;background:rgba(30,30,30,.2);border-radius:4px 4px 0 0;transition:background-color .3s var(--ease),height .5s var(--ease);}
+.scard:hover .bars span{background:var(--orange);}
+.scard-orange{background:var(--orange);border-color:var(--orange);color:#fff;flex-direction:row;align-items:center;justify-content:space-between;gap:32px;min-height:0;padding:44px;}
+.scard-orange:hover{background:#e95400;box-shadow:0 26px 54px -26px rgba(255,92,0,.7);}
+.scard-orange p{color:rgba(255,255,255,.82);max-width:46ch;}
+.scard-orange .scard-idx{color:rgba(255,255,255,.8);}
+.scard-orange .scard-idx .dot{background:#fff;}
+.so-left{display:flex;flex-direction:column;gap:14px;}
+.so-ring{flex:none;width:118px;height:118px;border-radius:50%;border:1.5px dashed rgba(255,255,255,.55);display:grid;place-items:center;color:#fff;animation:spin 16s linear infinite;}
+.so-ring span{display:grid;place-items:center;width:62px;height:62px;border-radius:50%;background:#fff;color:var(--orange);animation:spin 16s linear infinite reverse;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* Steps */
+.steps{background:var(--surface);border-top:1px solid var(--line);border-bottom:1px solid var(--line);}
+.steps-line{position:relative;height:2px;background:var(--line);margin-top:48px;overflow:hidden;}
+.steps-line i{position:absolute;inset:0;background:var(--orange);transform:scaleX(0);transform-origin:left;transition:transform 1.8s var(--ease) .2s;}
+.steps-line.in i{transform:scaleX(1);}
+.steps-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:32px;}
+.step{padding:0 26px;border-left:1px solid var(--line);display:flex;flex-direction:column;gap:14px;}
+.step:first-child{border-left:0;padding-left:0;}
+.step:last-child{padding-right:0;}
+.step-no{font-family:'Magra',sans-serif;font-weight:700;font-size:54px;line-height:1;color:transparent;-webkit-text-stroke:1.4px var(--line-strong);transition:-webkit-text-stroke-color .35s var(--ease),color .35s var(--ease);}
+.step:hover .step-no{color:var(--orange);-webkit-text-stroke-color:var(--orange);}
+.step h3{font-size:21px;}
+.step p{font-size:14.5px;color:var(--muted);}
+.step-tick{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;color:var(--orange);margin-top:4px;}
+
+/* Benefits */
+.ben-layout{display:grid;grid-template-columns:.85fr 1.15fr;gap:56px;align-items:start;}
+.ben-cols{display:grid;grid-template-columns:1fr 1fr;column-gap:40px;}
+.ben-item{padding:22px 0;border-top:1px solid var(--line);display:flex;gap:14px;align-items:flex-start;}
+.ben-cols>.ben-item:nth-child(1),.ben-cols>.ben-item:nth-child(2){border-top:0;padding-top:0;}
+.ben-ic{flex:none;width:30px;height:30px;border-radius:9px;display:grid;place-items:center;background:rgba(30,30,30,.07);color:var(--dark);font-size:16px;transition:background-color .28s var(--ease),color .28s var(--ease);}
+.ben-item:hover .ben-ic{background:var(--orange);color:#fff;}
+.ben-item h4{font-size:17.5px;margin-bottom:4px;}
+.ben-item p{font-size:14px;color:var(--muted);}
+.ben-aside{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:28px;display:flex;flex-direction:column;gap:18px;margin-top:32px;}
+.ben-aside .big{font-family:'Magra',sans-serif;font-weight:700;font-size:44px;line-height:1;color:var(--orange);}
+
+/* Metrics */
+.metrics{background:var(--dark);color:var(--bg);overflow:hidden;}
+.metrics .lead{color:var(--onDarkMuted);}
+.dots-bg{position:absolute;inset:0;pointer-events:none;z-index:0;}
+.dots-bg i{position:absolute;border-radius:50%;background:var(--orange);display:block;opacity:.9;animation:bob 5s ease-in-out infinite;}
+@keyframes bob{50%{transform:translateY(-16px);}}
+.met-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:60px;position:relative;}
+.met{padding:0 28px;border-left:1px solid rgba(242,239,233,.14);}
+.met:first-child{border-left:0;padding-left:0;}
+.met-n{font-family:'Magra',sans-serif;font-weight:700;font-size:clamp(40px,4.6vw,66px);line-height:1;letter-spacing:-0.03em;}
+.met-n span{color:var(--orange);}
+.met-l{font-size:13.5px;color:var(--onDarkMuted);margin-top:10px;max-width:20ch;}
+
+/* Testimonial */
+.quote-card{background:var(--surface);border:1px solid var(--line);border-radius:30px;padding:60px;display:flex;flex-direction:column;gap:32px;position:relative;overflow:hidden;}
+.quote-mark{font-family:'Magra',sans-serif;font-weight:700;font-size:170px;line-height:.6;color:var(--orange);opacity:.16;position:absolute;top:44px;right:48px;user-select:none;}
+.quote-card blockquote{margin:0;font-family:'Magra',sans-serif;font-weight:700;font-size:clamp(22px,2.5vw,38px);line-height:1.22;letter-spacing:-0.02em;max-width:30ch;position:relative;}
+.quote-by{display:flex;align-items:center;gap:14px;}
+.avatar{width:52px;height:52px;border-radius:50%;flex:none;background:var(--orange);display:grid;place-items:center;font-family:'Magra',sans-serif;font-weight:700;font-size:22px;color:#fff;}
+.quote-by b{display:block;font-size:15px;}
+.quote-by small{font-size:13px;color:var(--muted);}
+.quote-stat{margin-left:auto;text-align:right;}
+.quote-stat b{font-family:'Magra',sans-serif;font-size:30px;color:var(--orange);display:block;line-height:1;}
+.quote-stat small{font-size:12.5px;color:var(--muted);}
+.testi-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:56px;}
+.testi-dark{background:var(--dark);border-radius:30px;padding:60px;display:flex;flex-direction:column;justify-content:space-between;gap:40px;position:relative;overflow:hidden;min-height:360px;}
+.testi-dark-bg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;}
+.testi-dark-bg-txt{font-family:'Magra',sans-serif;font-weight:700;font-size:clamp(60px,8vw,110px);letter-spacing:-0.04em;color:rgba(255,255,255,.04);white-space:nowrap;}
+.testi-dark-person{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:12px;}
+.testi-av-lg{width:100px;height:100px;border-radius:50%;background:linear-gradient(135deg,var(--orange),#ff7a30);display:grid;place-items:center;font-family:'Magra',sans-serif;font-weight:700;font-size:40px;color:#fff;box-shadow:0 0 0 8px rgba(255,92,0,.12);}
+.stars{display:flex;gap:4px;margin-top:4px;}
+
+/* Confidence */
+.conf-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:56px;}
+.conf-card{background:var(--bg);border:1px solid var(--line);border-radius:var(--r);padding:28px 26px;display:flex;flex-direction:column;gap:12px;transition:border-color .35s var(--ease),box-shadow .35s var(--ease),background-color .35s var(--ease);}
+.conf-card:hover{border-color:var(--orange);box-shadow:0 18px 40px -24px rgba(255,92,0,.2);}
+.conf-num{font-family:'Magra',sans-serif;font-weight:700;font-size:13px;color:var(--orange);letter-spacing:.06em;}
+.conf-card h3{font-size:19px;line-height:1.18;}
+.conf-card p{font-size:14.5px;color:var(--muted);line-height:1.6;}
+
+/* Pricing */
+.pricing-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:32px;}
+.pric{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:32px;display:flex;flex-direction:column;gap:6px;transition:box-shadow .35s var(--ease),border-color .35s var(--ease);}
+.pric:hover{border-color:var(--line-strong);box-shadow:0 22px 44px -28px rgba(30,30,30,.35);}
+.pric-feat{background:var(--dark);border-color:var(--dark);color:var(--bg);}
+.pric-feat:hover{box-shadow:0 26px 54px -26px rgba(30,30,30,.7);}
+.pric-badge{font-size:10.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--orange);margin-bottom:6px;}
+.pric-feat .pric-badge{color:#ff9060;}
+.pric-name{font-family:'Magra',sans-serif;font-weight:700;font-size:24px;}
+.pric-div{border:0;border-top:1px solid var(--line);margin:16px 0;}
+.pric-feat .pric-div{border-color:rgba(242,239,233,.14);}
+.pric-list{display:flex;flex-direction:column;gap:11px;margin-bottom:20px;flex:1;}
+.pric-row{display:flex;align-items:flex-start;gap:10px;font-size:14.5px;}
+.pric-row .tick{flex:none;width:20px;height:20px;border-radius:50%;background:rgba(30,30,30,.07);display:grid;place-items:center;font-size:11px;margin-top:1px;}
+.pric-feat .pric-row .tick{background:rgba(242,239,233,.1);}
+.pric-row .tick.hi{background:var(--orange);color:#fff;}
+.pric-foot{margin-top:auto;}
+
+/* FAQ */
+.faq-layout{display:grid;grid-template-columns:.8fr 1.2fr;gap:56px;align-items:start;}
+.faq-layout>.sec-head{position:sticky;top:108px;}
+.faq-list{border-top:1px solid var(--line);}
+.faq-item{border-bottom:1px solid var(--line);}
+.faq-q{width:100%;display:flex;align-items:center;gap:20px;text-align:left;padding:24px 0;font-family:'Magra',sans-serif;font-weight:700;font-size:19px;letter-spacing:-0.01em;transition:color .25s var(--ease);}
+.faq-q:hover{color:var(--orange);}
+.faq-ic{margin-left:auto;flex:none;width:34px;height:34px;border-radius:50%;border:1px solid var(--line-strong);display:grid;place-items:center;transition:transform .35s var(--ease),background-color .3s var(--ease),color .3s var(--ease),border-color .3s var(--ease);}
+.faq-item.open .faq-ic{transform:rotate(45deg);background:var(--orange);border-color:var(--orange);color:#fff;}
+.faq-body{display:grid;grid-template-rows:0fr;transition:grid-template-rows .4s var(--ease);}
+.faq-item.open .faq-body{grid-template-rows:1fr;}
+.faq-body>div{overflow:hidden;}
+.faq-body p{font-size:15px;color:var(--muted);padding-bottom:26px;max-width:62ch;}
+
+/* Footer */
+.footer{background:var(--orange);color:#fff;padding-top:88px;overflow:hidden;}
+.f-top{display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:40px;padding-bottom:64px;}
+.f-blurb{font-size:15px;color:rgba(255,255,255,.82);max-width:34ch;margin-top:18px;}
+.f-col h4{font-size:12px;letter-spacing:.16em;text-transform:uppercase;font-family:'Libre Franklin',sans-serif;font-weight:600;color:rgba(255,255,255,.7);margin-bottom:16px;}
+.f-col li{margin-bottom:11px;}
+.f-col a{font-size:15px;color:rgba(255,255,255,.95);transition:color .22s var(--ease),padding-left .22s var(--ease);}
+.f-col a:hover{color:var(--dark);padding-left:5px;}
+.f-word{font-family:'Magra',sans-serif;font-weight:700;font-size:clamp(56px,17.2vw,268px);line-height:.78;letter-spacing:-0.035em;text-align:center;white-space:nowrap;color:#fff;margin:0 0 -0.08em;padding-bottom:8px;}
+.f-word span{display:inline-block;transform:translateY(70%);opacity:0;transition:transform 1s var(--ease),opacity 1s var(--ease);}
+.f-word.in span{transform:none;opacity:1;}
+.f-bar{border-top:1px solid rgba(255,255,255,.28);margin-top:28px;display:flex;align-items:center;justify-content:space-between;gap:18px;padding:22px 0 26px;font-size:13px;color:rgba(255,255,255,.85);}
+.f-social{display:flex;gap:8px;}
+.f-social a{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;border:1px solid rgba(255,255,255,.4);transition:background-color .25s var(--ease),color .25s var(--ease),border-color .25s var(--ease);}
+.f-social a:hover{background:var(--dark);border-color:var(--dark);color:#fff;}
+.f-legal{display:flex;gap:20px;color:rgba(255,255,255,.85);}
+
+/* Marquee Band */
+.marquee-band{background:#111;padding:15px 0;overflow:hidden;white-space:nowrap;position:relative;z-index:10;}
+.marquee-track{display:inline-flex;gap:34px;animation:mq 26s linear infinite;}
+.marquee-track span{font-family:'Magra',sans-serif;font-size:11.5px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#fff;}
+.marquee-track .dot{color:var(--orange);font-size:9px;}
+@keyframes mq{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+
+/* Scroll Reveal */
+.cf [data-reveal]{opacity:0;transform:translateY(26px);transition:opacity .72s var(--ease),transform .72s var(--ease);}
+.cf [data-reveal].in{opacity:1;transform:translateY(0);}
+
+@media(prefers-reduced-motion:reduce){
+  .cf [data-reveal]{opacity:1!important;transform:none!important;}
+  .hcol{transform:none!important;}
+  .so-ring,.so-ring span,.dots-bg i,.nav,.f-word span{animation:none!important;}
+}
+
+/* Responsive */
+@media(max-width:1200px){
+  .hero-vis{left:500px;}
+  .hcard{width:205px;height:280px;}
+}
+@media(max-width:1024px){
+  .hero{padding-top:110px;min-height:auto;}
+  .hero-in{min-height:auto;flex-direction:column;align-items:center;}
+  .hero-vis{
+    position:relative;
+    left:auto;right:auto;top:auto;bottom:auto;
+    width:100%;height:auto;
+    overflow:visible;
+    padding:24px 16px;
+    flex-wrap:wrap;
+    gap:14px;
+    justify-content:center;
+  }
+  .hcol{display:contents;}
+  .hcard{
+    width:230px!important;
+    height:310px!important;
+    flex:none;
+    transform:none!important;
+  }
+  .hero-top{position:static;align-items:center;text-align:center;max-width:100%;padding-bottom:20px;}
+  .hero-actions{justify-content:center;}
+  .hero-proof{align-items:center;}
+  .nav-links{display:none;}
+  .nav-cta .btn{display:none;}
+  .nav-cta{margin-left:auto;padding-right:4px;}
+  .nav-burger{display:grid;}
+  .f-top{grid-template-columns:1fr 1fr;}
+  .testi-grid{grid-template-columns:1fr;}
+  .pricing-grid{grid-template-columns:1fr 1fr;}
+  .svc-r1,.svc-r2{grid-template-columns:1fr;}
+  .ben-layout{grid-template-columns:1fr;gap:32px;}
+  .faq-layout{grid-template-columns:1fr;gap:32px;}
+  .faq-layout>.sec-head{position:static;}
+  .met-grid{grid-template-columns:1fr 1fr;}
+  .met{border-left:0;border-top:1px solid rgba(242,239,233,.14);padding:24px 0;}
+  .met:nth-child(odd){border-left:0;padding-left:0;}
+  .met:nth-child(even){border-left:1px solid rgba(242,239,233,.14);padding-left:24px;}
+  .met:nth-child(-n+2){border-top:0;padding-top:0;}
+}
+@media(max-width:768px){
+  .conf-grid{grid-template-columns:1fr;}
+  .sec{padding:64px 0;}
+  .sec-tight{padding:40px 0;}
+  .wrap{padding:0 16px;}
+  .hero{padding-top:90px;}
+  .hcard{width:230px!important;height:310px!important;}
+  .scard-orange{flex-direction:column;padding:28px;}
+  .so-ring{display:none;}
+  .f-top{grid-template-columns:1fr;}
+  .quote-card{padding:28px 20px;}
+  .quote-mark{font-size:100px;top:22px;right:20px;}
+  .quote-stat{display:none;}
+  .cta-card{padding:40px 20px;border-radius:22px;}
+  .cta-card h2{font-size:clamp(24px,6vw,34px);}
+  .steps-grid{grid-template-columns:1fr;}
+  .step{border-left:0;padding-left:0;padding-top:22px;border-top:1px solid var(--line);}
+  .step:first-child{border-top:0;padding-top:0;}
+  .ben-layout{grid-template-columns:1fr;}
+  .ben-cols{grid-template-columns:1fr;}
+  .pricing-grid{grid-template-columns:1fr;}
+  .testi-dark{padding:36px 24px;min-height:auto;}
+  .met-grid{grid-template-columns:1fr 1fr;margin-top:36px;}
+  .svc-r1,.svc-r2{grid-template-columns:1fr;}
+  .faq-layout{grid-template-columns:1fr;gap:24px;}
+  .nav-pill{padding:8px 8px 8px 16px;}
+}
+</style>
+</head>
+<body>
+
+<div class="cf">
+
+<!-- NAV -->
+<nav class="nav" id="nav">
+  <div class="nav-pill">
+    <a class="brand" href="#">
+      <div class="brand-mark">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><rect x="2" y="3" width="20" height="14" rx="2" stroke="currentColor" stroke-width="2"/><path d="M8 21h8M12 17v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </div>
+      <span class="brand-name">extrravenue</span>
+    </a>
+    <nav class="nav-links">
+      <a href="#services">Services</a>
+      <a href="#steps">Process</a>
+      <a href="#benefits">Benefits</a>
+      <a href="#results">Impact</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+    <div class="nav-cta">
+      <a class="btn btn-sm btn-orange" href="https://signagecrm-production.up.railway.app">Get Started</a>
+      <button class="nav-burger" onclick="document.getElementById('msheet').classList.toggle('open')" aria-label="Toggle navigation">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+      </button>
+    </div>
+  </div>
+</nav>
+<div class="nav-sheet" id="msheet">
+  <a href="#services" onclick="document.getElementById('msheet').classList.remove('open')">Services</a>
+  <a href="#steps" onclick="document.getElementById('msheet').classList.remove('open')">Process</a>
+  <a href="#benefits" onclick="document.getElementById('msheet').classList.remove('open')">Benefits</a>
+  <a href="#results" onclick="document.getElementById('msheet').classList.remove('open')">Impact</a>
+  <a href="#pricing" onclick="document.getElementById('msheet').classList.remove('open')">Pricing</a>
+  <a href="#faq" onclick="document.getElementById('msheet').classList.remove('open')">FAQ</a>
+  <a href="https://signagecrm-production.up.railway.app" style="color:var(--orange)">Get Started &rarr;</a>
+</div>
+
+<!-- HERO WITH FULL-HEIGHT PYRAMID VISUAL -->
+<section class="hero">
+  <div class="wrap">
+    <div class="hero-in">
+      <!-- Left Hero Content (Sticky so you can scroll to see all cards without losing text) -->
+      <div class="hero-top">
+        <div class="eyebrow" data-reveal><i></i>Digital Screens Across India</div>
+        <h1 class="h-xl" data-reveal style="transition-delay:.06s">Apna ad dikhao<br>sahi <em>jagah par</em>.</h1>
+        <p class="lead" data-reveal style="transition-delay:.12s">Malls, corporate offices aur high-street markets mein premium digital screens par apna ad chalao. Real-time proof of play aur automated social sharing ke saath.</p>
+        <div class="hero-actions" data-reveal style="transition-delay:.16s">
+          <a class="btn btn-orange" href="https://signagecrm-production.up.railway.app">Abhi shuru karein</a>
+        </div>
+        <div class="hero-proof" data-reveal style="transition-delay:.2s">
+          <span class="proof-text"><span class="proof-stars">★★★★★</span>85+ active advertisers running campaigns daily</span>
+          <span class="proof-text" style="display:flex;align-items:center;gap:8px;">
+            <span style="display:inline-flex;gap:6px;align-items:center;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="#1877F2"><path d="M24 12.07C24 5.41 18.63 0 12 0S0 5.4 0 12.07C0 18.1 4.39 23.1 10.13 24v-8.44H7.08v-3.49h3.04V9.41c0-3.02 1.8-4.7 4.54-4.7 1.31 0 2.68.24 2.68.24v2.97h-1.51c-1.49 0-1.95.93-1.95 1.88v2.26h3.32l-.53 3.5h-2.8V24C19.62 23.1 24 18.1 24 12.07z"/></svg>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="#E4405F"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
+            </span>
+            <span>Ek campaign: Screens + Facebook + Instagram sabhi par synced</span>
+          </span>
+        </div>
+      </div>
+
+      <!-- Right: Columns with full bottom card visibility -->
+      <div class="hero-vis" id="heroVis">
+        
+        <!-- Column 1 (Leftmost) -->
+        <div class="hcol">
+          <div class="hcard hc-pink">
+            <img class="himg" src="assets/trendora/8K805BudqKDRpoISvFXJS1TRUc0cf.png" alt="Retail Display">
+            <div class="hoverlay"></div>
+            <div class="hplay">&#9654;</div>
+            <div class="hchip hchip-l">Platform</div>
+            <div class="hcb">
+              <div class="hct">extrravenue</div>
+              <div class="hcs">Book &middot; Run &middot; Verify</div>
+            </div>
+          </div>
+          <div class="hcard hc-or">
+            <div class="hoverlay"></div>
+            <div class="hcard-body">
+              <div class="hcard-dot hcard-dot-or" style="animation:pulse 1.4s ease infinite;"></div>
+              <div class="hcard-big">Your Ad,<br>Live Now.</div>
+              <div class="hcard-lbl">Screen 4 &middot; Active</div>
+            </div>
+            <div class="hplay">&#9654;</div>
+            <div class="hchip hchip-l">Live</div>
+            <div class="hcb">
+              <div class="hct">Prime Slot</div>
+              <div class="hcs">Vasna Mall &middot; Scr 4</div>
+            </div>
+          </div>
+          <div class="hcard hc-dk">
+            <img class="himg" src="assets/trendora/69gqr1LTuwdx9iand9gGgMvr07451.jpg" alt="Billboard">
+            <div class="hoverlay"></div>
+            <div class="hplay">&#9654;</div>
+            <div class="hchip hchip-d">OOH</div>
+            <div class="hcb">
+              <div class="hct">Digital Billboard</div>
+              <div class="hcs">High Footfall Hub</div>
+            </div>
+          </div>
+          <div class="hcard hc-city">
+            <img class="himg" src="assets/trendora/3hAQ3UUGzQJYoNa9OPinwdUDMQ8079.png" alt="Mall Atrium">
+            <div class="hoverlay"></div>
+            <div class="hplay">&#9654;</div>
+            <div class="hchip hchip-d">Atrium</div>
+            <div class="hcb">
+              <div class="hct">Central Atrium</div>
+              <div class="hcs">Screen 1 &middot; Peak Hours</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Column 2 -->
+        <div class="hcol">
+          <div class="hcard hc-green">
+            <div class="hoverlay"></div>
+            <div class="hcard-body">
+              <div class="hcard-stat">3</div>
+              <div class="hcard-big" style="font-size:15px;margin-top:2px;">Screens<br>Active</div>
+              <div class="hcard-lbl">Realtime Sync</div>
+            </div>
+            <div class="hplay">&#9654;</div>
+            <div class="hchip hchip-d">Network</div>
+            <div class="hcb">
+              <div class="hct">Multi-Screen</div>
+              <div class="hcs">Ahmedabad &middot; Live</div>
+            </div>
+          </div>
+          <div class="hcard hc-dk">
+            <div class="hoverlay"></div>
+            <div class="hcard-body">
+              <div class="hcard-stat">5&times;</div>
+              <div class="hcard-big" style="font-size:13px;margin-top:2px;">Higher Recall</div>
+              <div class="hcard-lbl">vs Print Banners</div>
+            </div>
+            <div class="hplay">&#9654;</div>
+            <div class="hchip hchip-d">ROI</div>
+            <div class="hcb">
+              <div class="hct">High Impact</div>
+              <div class="hcs">Audience Retention</div>
+            </div>
+          </div>
+          <div class="hcard hc-warm">
+            <img class="himg" src="assets/trendora/MaseZYLKg7kxu4ycDpL1wGBo05Y683f.png" alt="Festive Sale">
+            <div class="hoverlay"></div>
+            <div class="hplay">&#9654;</div>
+            <div class="hchip hchip-l">Offer</div>
+            <div class="hcb">
+              <div class="hct">Festive Brand Sale</div>
+              <div class="hcs">12 Screens &middot; Running</div>
+            </div>
+          </div>
+          <div class="hcard hc-or">
+            <div class="hoverlay"></div>
+            <div class="hcard-body">
+              <div class="hcard-big" style="font-size:26px;">NEW<br>LAUNCH</div>
+              <div class="hcard-big" style="font-size:18px;opacity:.8;margin-top:2px;">&rarr;</div>
+            </div>
+            <div class="hplay">&#9654;</div>
+            <div class="hchip hchip-l">Launch</div>
+            <div class="hcb">
+              <div class="hct">Product Debut</div>
+              <div class="hcs">Commercial Towers</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Column 3 (Center) -->
+        <div class="hcol">
+          <div class="hcard hc-city">
+            <div class="hoverlay"></div>
+            <div class="hcard-body">
+              <div class="hcard-lbl">Monthly</div>
+              <div class="hcard-stat">1.2L</div>
+              <div class="hcard-lbl" style="margin-top:4px;">Impressions</div>
+            </div>
+            <div class="hplay">&#9654;</div>
+            <div class="hchip hchip-d">Analytics</div>
+            <div class="hcb">
+              <div class="hct">Footfall Tracking</div>
+              <div class="hcs">Verified Metrics</div>
+            </div>
+          </div>
+          <div class="hcard hc-warm">
+            <div class="hoverlay"></div>
+            <div class="hcard-body">
+              <div class="hcard-lbl">Delivery</div>
+              <div class="hcard-stat" style="font-size:32px;margin-top:4px;">3,840</div>
+              <div class="hcard-lbl" style="margin-top:2px;">Plays Logged</div>
+            </div>
+            <div class="hplay">&#9654;</div>
+            <div class="hchip hchip-l">Live Log</div>
+            <div class="hcb">
+              <div class="hct">Daily Target Met</div>
+              <div class="hcs">Screen 3 &middot; Active</div>
+            </div>
+          </div>
+          <div class="hcard hc-pink">
+            <img class="himg" src="assets/trendora/0XYbInC55sGGGm9GX4gixp1sUSYc0cf.png" alt="Fashion">
+            <div class="hoverlay"></div>
+            <div class="hplay">&#9654;</div>
+            <div class="hchip hchip-l">Fashion</div>
+            <div class="hcb">
+              <div class="hct">Summer Collection</div>
+              <div class="hcs">City Center &middot; Live</div>
+            </div>
+          </div>
+          <div class="hcard hc-city">
+            <div class="hoverlay"></div>
+            <div class="hcard-body">
+              <div class="hcard-dot hcard-dot-or"></div>
+              <div class="hcard-big" style="font-size:18px;">Brand<br>Activation</div>
+              <div class="hcard-lbl">Gyms &middot; Lounges</div>
+            </div>
+            <div class="hplay">&#9654;</div>
+            <div class="hchip hchip-d">Events</div>
+            <div class="hcb">
+              <div class="hct">Lifestyle Media</div>
+              <div class="hcs">Targeted Display</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Column 4 -->
+        <div class="hcol">
+          <div class="hcard hc-dk">
+            <img class="himg" src="assets/trendora/8ziPvLMmqNE3eak0qPXO1V0d827.jpg" alt="Cinema">
+            <div class="hoverlay"></div>
+            <div class="hplay">&#9654;</div>
+            <div class="hchip hchip-d">Cinema</div>
+            <div class="hcb">
+              <div class="hct">Multiplex Lobby</div>
+              <div class="hcs">Screen 2 &middot; On Air</div>
+            </div>
+          </div>
+          <div class="hcard hc-green">
+            <div class="hoverlay"></div>
+            <div class="hcard-body">
+              <div class="hcard-big" style="font-size:13px;opacity:.9;font-weight:500;line-height:2;">
+                09:14 &#9679; Scr 3<br>
+                09:29 &#9679; Scr 1<br>
+                09:44 &#9679; Scr 3<br>
+                09:59 &#9679; Scr 2
+              </div>
+            </div>
+            <div class="hplay">&#9654;</div>
+            <div class="hchip hchip-d">Proof</div>
+            <div class="hcb">
+              <div class="hct">Automated Logs</div>
+              <div class="hcs">CSV Proof Download</div>
+            </div>
+          </div>
+          <div class="hcard hc-dk">
+            <div class="hoverlay"></div>
+            <div class="hcard-body">
+              <div class="hcard-stat">98%</div>
+              <div class="hcard-big" style="font-size:14px;margin-top:2px;">Uptime SLA</div>
+              <div class="hcard-lbl">Realtime Monitoring</div>
+            </div>
+            <div class="hplay">&#9654;</div>
+            <div class="hchip hchip-d">Reliability</div>
+            <div class="hcb">
+              <div class="hct">Guaranteed Play</div>
+              <div class="hcs">Zero Downtime</div>
+            </div>
+          </div>
+          <div class="hcard hc-or">
+            <img class="himg" src="assets/trendora/7c8SgDopN73TqYwB6SsQa4vnCAI0ecc.png" alt="Food Court">
+            <div class="hoverlay"></div>
+            <div class="hplay">&#9654;</div>
+            <div class="hchip hchip-l">Food</div>
+            <div class="hcb">
+              <div class="hct">Food Court Special</div>
+              <div class="hcs">Atrium Screen 1</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Column 5 (Rightmost, aligned with clear bottom clearance) -->
+        <div class="hcol">
+          <div class="hcard hc-or">
+            <img class="himg" src="assets/trendora/IivirAWxo8LDF3YCVScEr8R7Ec7451.jpg" alt="Ad Display">
+            <div class="hoverlay"></div>
+            <div class="hplay">&#9654;</div>
+            <div class="hchip hchip-l">Live</div>
+            <div class="hcb">
+              <div class="hct">Ad Transmission</div>
+              <div class="hcs">Silver Flora &middot; Scr 1</div>
+            </div>
+          </div>
+          <div class="hcard hc-city">
+            <div class="hoverlay"></div>
+            <div class="hcard-body">
+              <div class="hcard-lbl">Total Reach</div>
+              <div class="hcard-stat" style="font-size:42px;">2.4L</div>
+              <div class="hcard-lbl" style="margin-top:4px;">Monthly Viewers</div>
+            </div>
+            <div class="hplay">&#9654;</div>
+            <div class="hchip hchip-d">Stats</div>
+            <div class="hcb">
+              <div class="hct">Cross-Complex</div>
+              <div class="hcs">All Hubs Combined</div>
+            </div>
+          </div>
+          <div class="hcard hc-warm">
+            <img class="himg" src="assets/trendora/DQYDxzRLJXgijGSGl6MLRHb87451.jpg" alt="Boutique">
+            <div class="hoverlay"></div>
+            <div class="hplay">&#9654;</div>
+            <div class="hchip hchip-l">Spotlight</div>
+            <div class="hcb">
+              <div class="hct">Premium Showcase</div>
+              <div class="hcs">Kasturi 2 Hub</div>
+            </div>
+          </div>
+          <div class="hcard hc-dk">
+            <div class="hoverlay"></div>
+            <div class="hcard-body">
+              <div class="hcard-lbl">Campaign</div>
+              <div class="hcard-stat" style="font-size:40px;">100%</div>
+              <div class="hcard-lbl" style="margin-top:4px;">Proof Delivered</div>
+            </div>
+            <div class="hplay">&#9654;</div>
+            <div class="hchip hchip-d">Report</div>
+            <div class="hcb">
+              <div class="hct">Audit Reports</div>
+              <div class="hcs">Transparent Data</div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /hero-vis -->
+    </div><!-- /hero-in -->
+  </div>
+</section>
+
+<!-- MARQUEE BAND -->
+<div class="marquee-band">
+  <div class="marquee-track">
+    <span>Digital Screens</span><span class="dot">✦</span>
+    <span>Proof of Play</span><span class="dot">✦</span>
+    <span>Social Sync</span><span class="dot">✦</span>
+    <span>Transparent Pricing</span><span class="dot">✦</span>
+    <span>Real-Time Analytics</span><span class="dot">✦</span>
+    <span>QR Leads</span><span class="dot">✦</span>
+    <span>Brand Activation</span><span class="dot">✦</span>
+    <span>Digital Screens</span><span class="dot">✦</span>
+    <span>Proof of Play</span><span class="dot">✦</span>
+    <span>Social Sync</span><span class="dot">✦</span>
+    <span>Transparent Pricing</span><span class="dot">✦</span>
+    <span>Real-Time Analytics</span><span class="dot">✦</span>
+    <span>QR Leads</span><span class="dot">✦</span>
+    <span>Brand Activation</span><span class="dot">✦</span>
+  </div>
+</div>
+
+<!-- SERVICES -->
+<section class="sec" id="services">
+  <div class="wrap">
+    <div class="sec-head" data-reveal>
+      <div class="eyebrow"><i></i>Kya milta hai aapko</div>
+      <h2 class="h-lg">Sab kuch ek jagah,<br>aasaan tarike se</h2>
+      <p class="lead">Screen book karo, ad upload karo, pay karo — aur dekho ki aapka ad kab aur kitni baar chala. Har cheez transparent aur automated.</p>
+    </div>
+    <div class="svc-rows">
+      <div class="svc-r1">
+        <div class="scard" data-reveal style="transition-delay:.07s">
+          <div class="scard-idx"><span>01</span><div class="dot"></div></div>
+          <h3 class="h-sm">Apni screen chuniye</h3>
+          <p>City aur area ke hisaab se screens dekho. Mall ho, office ho ya busy commercial complexes — jo location chahiye book karo. Duration aap decide karte ho.</p>
+          <div class="scard-foot">
+            <span class="stag">Location-wise search</span><span class="stag">Area filtering</span><span class="stag">Custom schedule</span>
+          </div>
+        </div>
+        <div class="scard" data-reveal style="transition-delay:.12s">
+          <div class="scard-idx"><span>02</span><div class="dot"></div></div>
+          <h3 class="h-sm">Apna ad upload karein</h3>
+          <p>High-resolution creative ya video direct upload karein. Hamara automated quality check ensure karta hai ki display par ad crisp aur impactful dikhe.</p>
+          <div class="scard-foot">
+            <span class="stag">Photo &amp; Poster</span><span class="stag">1080p Video</span><span class="stag">Aspect check</span>
+          </div>
+        </div>
+      </div>
+      <div class="svc-r2">
+        <div class="scard" data-reveal style="transition-delay:.18s">
+          <div class="scard-idx"><span>03</span><div class="dot"></div></div>
+          <h3 class="h-sm">Aasan payment, pakki receipt</h3>
+          <p>UPI, cards ya company wallet se secure checkout. Payment hote hi verified GST invoice aapke registered email par instant deliver ho jaati hai.</p>
+          <div class="scard-vis">
+            <div class="bars">
+              <span style="height:38%"></span><span style="height:56%"></span><span style="height:44%"></span><span style="height:78%"></span><span style="height:52%"></span><span style="height:94%"></span>
+            </div>
+          </div>
+        </div>
+        <div class="scard" data-reveal style="transition-delay:.24s">
+          <div class="scard-idx"><span>04</span><div class="dot"></div></div>
+          <h3 class="h-sm">Proof of Play &amp; Reports</h3>
+          <p>Har display telecast ka timestamped proof record hota hai. Detail log download karke aap exact date, time aur frequency verify kar sakte hain.</p>
+          <div style="background:rgba(30,30,30,.05);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-top:4px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+              <span style="font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);">Plays this week</span>
+              <span style="font-size:13px;font-weight:700;color:var(--orange);">↑ 2,340</span>
+            </div>
+            <svg viewBox="0 0 220 60" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:60px;overflow:visible;">
+              <defs>
+                <linearGradient id="popGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="var(--orange)" stop-opacity="0.18"/>
+                  <stop offset="100%" stop-color="var(--orange)" stop-opacity="0"/>
+                </linearGradient>
+              </defs>
+              <!-- Area fill -->
+              <path d="M0,52 L28,44 L56,38 L84,30 L112,22 L140,16 L168,10 L196,4 L220,2 L220,60 L0,60 Z" fill="url(#popGrad)"/>
+              <!-- Line -->
+              <polyline points="0,52 28,44 56,38 84,30 112,22 140,16 168,10 196,4 220,2" fill="none" stroke="var(--orange)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <!-- Dots -->
+              <circle cx="0" cy="52" r="3" fill="var(--orange)" opacity=".4"/>
+              <circle cx="56" cy="38" r="3" fill="var(--orange)" opacity=".5"/>
+              <circle cx="112" cy="22" r="3" fill="var(--orange)" opacity=".6"/>
+              <circle cx="168" cy="10" r="3" fill="var(--orange)" opacity=".8"/>
+              <circle cx="220" cy="2" r="3.5" fill="var(--orange)"/>
+              <!-- Day labels -->
+              <text x="0" y="60" font-size="8" fill="var(--muted)" font-family="sans-serif" opacity=".7">Mon</text>
+              <text x="52" y="60" font-size="8" fill="var(--muted)" font-family="sans-serif" opacity=".7">Wed</text>
+              <text x="107" y="60" font-size="8" fill="var(--muted)" font-family="sans-serif" opacity=".7">Fri</text>
+              <text x="163" y="60" font-size="8" fill="var(--muted)" font-family="sans-serif" opacity=".7">Sun</text>
+            </svg>
+          </div>
+          <div class="scard-foot">
+            <span class="stag">Timestamp logs</span><span class="stag">Download CSV</span><span class="stag">QR interaction</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 3-in-1 Synced Campaigns -->
+      <div style="background:var(--dark);border-radius:var(--r);padding:36px 40px;display:flex;flex-direction:column;gap:20px;position:relative;overflow:hidden;transition-delay:.28s" data-reveal>
+        <div style="position:absolute;right:-20px;bottom:-30px;opacity:.05;font-family:'Magra',sans-serif;font-weight:700;font-size:120px;line-height:1;color:#fff;pointer-events:none;white-space:nowrap;">3 IN 1</div>
+        <div style="font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.5);">Omnichannel Feature</div>
+        <h3 style="font-family:'Magra',sans-serif;font-weight:700;font-size:clamp(22px,2.4vw,32px);color:#fff;letter-spacing:-0.02em;line-height:1.1;max-width:28ch;">Ek campaign — Screen par, <span style="color:var(--orange);">Facebook par</span> aur <span style="color:var(--orange);">Instagram par</span> bhi</h3>
+        <p style="font-size:15px;color:rgba(255,255,255,.7);max-width:60ch;">Campaign live hote hi aapka creative extrravenue media channels par automatically syndicate ho jata hai. Screen footfall ke saath saath online social reach bhi milti hai.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;">
+          <div style="display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:999px;padding:9px 16px;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="#4267B2"><path d="M24 12.07C24 5.41 18.63 0 12 0S0 5.4 0 12.07C0 18.1 4.39 23.1 10.13 24v-8.44H7.08v-3.49h3.04V9.41c0-3.02 1.8-4.7 4.54-4.7 1.31 0 2.68.24 2.68.24v2.97h-1.51c-1.49 0-1.95.93-1.95 1.88v2.26h3.32l-.53 3.5h-2.8V24C19.62 23.1 24 18.1 24 12.07z"/></svg>
+            <span style="font-size:13px;font-weight:600;color:#fff;">Facebook auto-broadcast</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:999px;padding:9px 16px;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="#E4405F"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
+            <span style="font-size:13px;font-weight:600;color:#fff;">Instagram auto-post</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;background:rgba(255,92,0,.18);border:1px solid rgba(255,92,0,.3);border-radius:999px;padding:9px 16px;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="2.5"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4" stroke-linecap="round"/></svg>
+            <span style="font-size:13px;font-weight:600;color:var(--orange);">Digital Screens Live</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Venue Partner Card -->
+      <div class="scard scard-orange" data-reveal style="transition-delay:.36s">
+        <div class="so-left">
+          <div class="scard-idx" style="justify-content:flex-start;gap:10px"><span>06</span><div class="dot"></div></div>
+          <h3 class="h-md">Aapke paas screen hai? Revenue generate karein.</h3>
+          <p>Agar aapke venue — commercial complex, society lobby, gym ya cafe — mein display screens hain, to unhe extrravenue network par register karein. Advertisers ads chalayenge aur aapko monthly automated payouts milenge.</p>
+          <a class="btn btn-sm" style="background:#fff;color:var(--dark);border-radius:999px;padding:11px 20px;font-size:13.5px;font-weight:600;" href="https://signagecrm-production.up.railway.app">Venue partner bano &rarr;</a>
+        </div>
+        <div class="so-ring"><span><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STEPS -->
+<section class="steps sec-tight" id="steps">
+  <div class="wrap">
+    <div class="sec-head center" data-reveal>
+      <div class="eyebrow"><i></i>Kaise kaam karta hai</div>
+      <h2 class="h-lg">Sign up se ad live<br>— sirf 4 simple steps</h2>
+    </div>
+    <div class="steps-line" id="sline"><i></i></div>
+    <div class="steps-grid">
+      <div class="step" data-reveal style="transition-delay:.06s">
+        <div class="step-no">01</div>
+        <h3>Account &amp; Creative Upload</h3>
+        <p>Apna advertiser account banayein aur high-res creative upload karein. Automatic validation system aspect ratio check karta hai.</p>
+        <span class="step-tick">✓ Fast onboarding</span>
+      </div>
+      <div class="step" data-reveal style="transition-delay:.14s">
+        <div class="step-no">02</div>
+        <h3>Target Locations &amp; Dates</h3>
+        <p>City complexes aur malls ke screens select karein. Dates aur duration chun kar transparent pricing dashboard mein dekhein.</p>
+        <span class="step-tick">✓ Realtime inventory</span>
+      </div>
+      <div class="step" data-reveal style="transition-delay:.22s">
+        <div class="step-no">03</div>
+        <h3>Instant Payment &amp; Invoice</h3>
+        <p>UPI ya cards se checkout karein. Payment hote hi GST tax invoice direct email aur dashboard par generate ho jaati hai.</p>
+        <span class="step-tick">✓ Instant billing</span>
+      </div>
+      <div class="step" data-reveal style="transition-delay:.3s">
+        <div class="step-no">04</div>
+        <h3>Broadcast &amp; Proof of Play</h3>
+        <p>Approval ke baad ad screens par live ho jata hai aur social feeds par post hota hai. Detailed playback analytics monitor karein.</p>
+        <span class="step-tick">✓ Guaranteed verification</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BENEFITS -->
+<section class="sec" id="benefits">
+  <div class="wrap">
+    <div class="ben-layout">
+      <div data-reveal>
+        <div class="sec-head">
+          <div class="eyebrow"><i></i>Aapke liye kya hai</div>
+          <h2 class="h-lg">Enterprise-grade network,<br>local brand power</h2>
+          <p class="lead">Aap apne business par focus karein — technical delivery, hardware connectivity aur verification hum manage karte hain.</p>
+        </div>
+        <div class="ben-aside">
+          <div class="big">120+</div>
+          <hr style="border:0;border-top:1px solid var(--line);margin:0;">
+          <p style="font-size:14px;color:var(--muted)">Verified campaigns successfully deployed across prime residential and retail complexes.</p>
+        </div>
+      </div>
+      <div class="ben-cols" data-reveal style="transition-delay:.1s">
+        <div class="ben-item"><div class="ben-ic">🖼</div><div><h4>Safe Media Hosting</h4><p>Aapke creatives cloud storage par secured rehte hain. Kabhi bhi dobara launch ya clone karein.</p></div></div>
+        <div class="ben-item"><div class="ben-ic">👀</div><div><h4>Pre-Flight Inspection</h4><p>Display broadcast se pehle compliance aur visual clarity verify ki jaati hai.</p></div></div>
+        <div class="ben-item"><div class="ben-ic">💳</div><div><h4>Prepaid Wallet</h4><p>Multiple campaigns run karne ke liye direct wallet funding aur quick refunds available.</p></div></div>
+        <div class="ben-item"><div class="ben-ic">🏷</div><div><h4>Promo Codes</h4><p>Special seasonal packages aur affiliate discounts instant apply karein.</p></div></div>
+        <div class="ben-item"><div class="ben-ic">📄</div><div><h4>Compliant GST Tax Invoices</h4><p>B2B accounting ke liye GST compliant bills instant PDF format mein available.</p></div></div>
+        <div class="ben-item"><div class="ben-ic">📲</div><div><h4>WhatsApp Alerts</h4><p>Campaign status, approval updates aur renewal reminders direct WhatsApp par.</p></div></div>
+        <div class="ben-item"><div class="ben-ic">📱</div><div><h4>Synced Social Reach</h4><p>Ek platform se outdoor captive audience aur online organic impressions dono receive karein.</p></div></div>
+        <div class="ben-item"><div class="ben-ic">📷</div><div><h4>Instant QR Leads</h4><p>Dynamic QR tags direct visitors ko aapke WhatsApp Business chat par connect karte hain.</p></div></div>
+        <div class="ben-item"><div class="ben-ic">📊</div><div><h4>Audit-Ready CSVs</h4><p>Every single playback log record transparently store hota hai audit verification ke liye.</p></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- METRICS -->
+<section class="sec metrics" id="results" style="position:relative;">
+  <div class="dots-bg">
+    <i style="width:8px;height:8px;opacity:.35;top:15%;left:8%;animation-delay:0s"></i>
+    <i style="width:14px;height:14px;opacity:.55;top:35%;left:4%;animation-delay:.6s"></i>
+    <i style="width:22px;height:22px;opacity:.75;top:20%;left:22%;animation-delay:1.2s"></i>
+    <i style="width:14px;height:14px;opacity:.55;top:10%;left:42%;animation-delay:.3s"></i>
+    <i style="width:22px;height:22px;opacity:.75;top:25%;left:60%;animation-delay:.9s"></i>
+    <i style="width:14px;height:14px;opacity:.55;top:52%;left:68%;animation-delay:1.5s"></i>
+    <i style="width:22px;height:22px;opacity:.75;top:68%;left:80%;animation-delay:.4s"></i>
+  </div>
+  <div class="wrap" style="position:relative;z-index:1;">
+    <div class="sec-head" data-reveal>
+      <div class="eyebrow on-dark"><i></i>Network Statistics</div>
+      <h2 class="h-lg">Numbers jo deliver<br>karte hain</h2>
+      <p class="lead">Consistently growing display footprint with reliable advertiser trust across India.</p>
+    </div>
+    <div class="met-grid">
+      <div class="met" data-reveal style="transition-delay:.06s">
+        <div class="met-n"><span class="counter" data-target="120">0</span><span>+</span></div>
+        <div class="met-l">Campaigns completed</div>
+      </div>
+      <div class="met" data-reveal style="transition-delay:.14s">
+        <div class="met-n"><span class="counter" data-target="85">0</span><span>+</span></div>
+        <div class="met-l">Active brand partners</div>
+      </div>
+      <div class="met" data-reveal style="transition-delay:.22s">
+        <div class="met-n"><span class="counter" data-target="4" data-dec="1">0</span><span>.9</span></div>
+        <div class="met-l">Client rating score</div>
+      </div>
+      <div class="met" data-reveal style="transition-delay:.3s">
+        <div class="met-n"><span>24</span><span style="font-size:.5em">/7</span></div>
+        <div class="met-l">Continuous server uptime</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIAL -->
+<section class="sec">
+  <div class="wrap">
+    <div class="sec-head" data-reveal>
+      <div class="eyebrow"><i></i>Client Stories</div>
+      <h2 class="h-lg">Jo log use kar rahe hain<br>woh kya kehte hain</h2>
+    </div>
+    <div class="testi-grid">
+      <div class="quote-card" data-reveal style="transition-delay:.06s">
+        <div class="quote-mark">"</div>
+        <blockquote>Pehle traditional hoardings par pata nahi chalta tha ki audience reach kitni hai. Extrravenue par har play ka exact timestamp aur automated social posting milta hai — transparency is unmatched.</blockquote>
+        <div class="quote-by">
+          <div class="avatar">R</div>
+          <div><b>Raj Mehta</b><small>Brand Lead &middot; Retail Operations, Ahmedabad</small></div>
+          <div class="quote-stat"><b>5.0</b><small>★★★★★</small></div>
+        </div>
+      </div>
+      <div class="testi-dark" data-reveal style="transition-delay:.14s">
+        <div class="testi-dark-bg"><span class="testi-dark-bg-txt">VERIFIED</span></div>
+        <div class="testi-dark-person">
+          <div class="testi-av-lg">R</div>
+          <div style="color:var(--bg);font-family:'Magra',sans-serif;font-weight:700;font-size:18px;margin-top:4px;">Raj Mehta</div>
+          <div style="color:var(--onDarkMuted);font-size:13px;">Commercial Network Partner</div>
+          <div class="stars" style="color:var(--orange);font-size:20px;">★★★★★</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONFIDENCE / VALUE POSITIONING -->
+<section class="sec" id="concerns" style="background:var(--surface);border-top:1px solid var(--line);border-bottom:1px solid var(--line);">
+  <div class="wrap">
+    <div class="sec-head center" data-reveal>
+      <div class="eyebrow"><i></i>Smart Advertising</div>
+      <h2 class="h-lg">Kyun digital screens<br>sabse zyada convert karti hain</h2>
+      <p class="lead">Traditional outdoor banners aur standard online ads ke mukable digital screens ka actual advantage.</p>
+    </div>
+    <div class="conf-grid">
+      <div class="conf-card" data-reveal style="transition-delay:.06s">
+        <div class="conf-num">01</div>
+        <h3>Captive &amp; Undivided Attention</h3>
+        <p>Social media ads 2 seconds mein scroll ho jaate hain. Malls aur elevators mein audience ambient displays ko naturally observe karti hai — ensuring 100% real eye contact.</p>
+      </div>
+      <div class="conf-card" data-reveal style="transition-delay:.1s">
+        <div class="conf-num">02</div>
+        <h3>Frictionless WhatsApp Conversion</h3>
+        <p>Banners par phone numbers yaad nahi rehte. Direct dynamic QR code scan se consumer seedha aapke WhatsApp chat ya landing page par arrive hota hai.</p>
+      </div>
+      <div class="conf-card" data-reveal style="transition-delay:.14s">
+        <div class="conf-num">03</div>
+        <h3>Integrated Cross-Channel Campaign</h3>
+        <p>Ek hi budget mein physically screen par bhi display aur social profiles par bhi exposure. High recall across both real world and digital world.</p>
+      </div>
+      <div class="conf-card" data-reveal style="transition-delay:.18s">
+        <div class="conf-num">04</div>
+        <h3>Flexible Commitments, Zero Lock-in</h3>
+        <p>Testing phase ke liye 7-day trial run karein. Results dekhne ke baad apni marzi se monthly scale karein bina kisi long-term mandatory contracts ke.</p>
+      </div>
+      <div class="conf-card" data-reveal style="transition-delay:.22s">
+        <div class="conf-num">05</div>
+        <h3>Prime Neighborhood Locations</h3>
+        <p>High-spending residential societies, gyms aur busy business complexes mein strategic installations jahan target demographic daily visit karti hai.</p>
+      </div>
+      <div class="conf-card" data-reveal style="transition-delay:.26s">
+        <div class="conf-num">06</div>
+        <h3>100% Verifiable Proof of Play</h3>
+        <p>No assumptions. Hardware telemetry har ad playback ko log karti hai jiska verified audit report aap direct dashboard se download kar sakte hain.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="sec" id="pricing">
+  <div class="wrap">
+    <div class="sec-head center" data-reveal>
+      <div class="eyebrow"><i></i>Pricing Plans</div>
+      <h2 class="h-lg">Transparent packages<br>har scale ke business ke liye</h2>
+      <p class="lead">Per-screen pricing with all features included: automated social distribution, proof of play, and QR tracking.</p>
+    </div>
+
+    <!-- Trial Banner -->
+    <div data-reveal style="margin-top:44px;background:var(--dark);border-radius:var(--r);padding:32px 36px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;">
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div style="font-size:10.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--orange);">Starter Trial</div>
+        <div style="font-family:'Magra',sans-serif;font-weight:700;font-size:clamp(22px,2.4vw,30px);color:#fff;letter-spacing:-0.02em;line-height:1.1;">Trial &nbsp;&middot;&nbsp; &#8377;1,999 <span style="font-family:'Libre Franklin',sans-serif;font-weight:400;font-size:clamp(14px,1.2vw,17px);color:rgba(255,255,255,.55);">7 Days Test Run</span></div>
+        <p style="font-size:14.5px;color:rgba(255,255,255,.6);margin:0;max-width:56ch;">10-sec ad slot &nbsp;&middot;&nbsp; ~16,200 plays/day &nbsp;&middot;&nbsp; Test engagement on prime display with zero risk.</p>
+      </div>
+      <a class="btn btn-orange" href="https://signagecrm-production.up.railway.app" style="flex:none;">Trial book karo &rarr;</a>
+    </div>
+
+    <div style="margin:36px 0 4px;text-align:center;" data-reveal>
+      <span style="font-size:11.5px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);">Standard Monthly Packages</span>
+    </div>
+
+    <!-- Pricing Cards -->
+    <div class="pricing-grid" data-reveal style="transition-delay:.06s">
+      <div class="pric">
+        <div class="pric-badge">Entry level</div>
+        <div class="pric-name">Spot</div>
+        <div style="margin:10px 0 2px;display:flex;align-items:baseline;gap:6px;">
+          <span style="font-family:'Magra',sans-serif;font-weight:700;font-size:32px;letter-spacing:-0.03em;">&#8377;8,000</span>
+          <span style="font-size:14px;color:var(--muted);">/mo</span>
+        </div>
+        <div style="font-size:12.5px;color:var(--muted);margin-bottom:4px;">&asymp; &#8377;267/din &nbsp;&middot;&nbsp; 10 sec slot</div>
+        <div style="font-size:12.5px;font-weight:600;color:var(--orange);margin-bottom:14px;">~16,200 plays/day</div>
+        <hr class="pric-div">
+        <div class="pric-list">
+          <div class="pric-row"><span class="tick hi">✓</span><span>10s Screen Slot</span></div>
+          <div class="pric-row"><span class="tick hi">✓</span><span>FB &amp; IG Sync</span></div>
+          <div class="pric-row"><span class="tick hi">✓</span><span>Proof of Play CSV</span></div>
+          <div class="pric-row"><span class="tick hi">✓</span><span>WhatsApp QR on Screen</span></div>
+        </div>
+        <div class="pric-foot">
+          <a class="btn btn-dark btn-sm" style="width:100%;justify-content:center;" href="https://signagecrm-production.up.railway.app">Book karo &rarr;</a>
+        </div>
+      </div>
+
+      <div class="pric pric-feat">
+        <div class="pric-badge">⭐ Most Popular</div>
+        <div class="pric-name">Regular</div>
+        <div style="margin:10px 0 2px;display:flex;align-items:baseline;gap:6px;">
+          <span style="font-family:'Magra',sans-serif;font-weight:700;font-size:32px;letter-spacing:-0.03em;color:#fff;">&#8377;13,000</span>
+          <span style="font-size:14px;color:var(--onDarkMuted);">/mo</span>
+        </div>
+        <div style="font-size:12.5px;color:var(--onDarkMuted);margin-bottom:4px;">&asymp; &#8377;433/din &nbsp;&middot;&nbsp; 15 sec slot</div>
+        <div style="font-size:12.5px;font-weight:600;color:#ff9060;margin-bottom:14px;">~10,800 plays/day</div>
+        <hr class="pric-div">
+        <div class="pric-list">
+          <div class="pric-row"><span class="tick hi">✓</span><span>15s Screen Slot</span></div>
+          <div class="pric-row"><span class="tick hi">✓</span><span>FB &amp; IG Sync</span></div>
+          <div class="pric-row"><span class="tick hi">✓</span><span>Proof of Play CSV</span></div>
+          <div class="pric-row"><span class="tick hi">✓</span><span>WhatsApp QR on Screen</span></div>
+        </div>
+        <div class="pric-foot">
+          <a class="btn btn-orange" style="width:100%;justify-content:center;" href="https://signagecrm-production.up.railway.app">Book karo &rarr;</a>
+        </div>
+      </div>
+
+      <div class="pric">
+        <div class="pric-badge">High Impact</div>
+        <div class="pric-name">Premium</div>
+        <div style="margin:10px 0 2px;display:flex;align-items:baseline;gap:6px;">
+          <span style="font-family:'Magra',sans-serif;font-weight:700;font-size:32px;letter-spacing:-0.03em;">&#8377;18,000</span>
+          <span style="font-size:14px;color:var(--muted);">/mo</span>
+        </div>
+        <div style="font-size:12.5px;color:var(--muted);margin-bottom:4px;">&asymp; &#8377;600/din &nbsp;&middot;&nbsp; 20 sec slot</div>
+        <div style="font-size:12.5px;font-weight:600;color:var(--orange);margin-bottom:14px;">~8,100 plays/day</div>
+        <hr class="pric-div">
+        <div class="pric-list">
+          <div class="pric-row"><span class="tick hi">✓</span><span>20s Screen Slot</span></div>
+          <div class="pric-row"><span class="tick hi">✓</span><span>FB &amp; IG Sync</span></div>
+          <div class="pric-row"><span class="tick hi">✓</span><span>Proof of Play CSV</span></div>
+          <div class="pric-row"><span class="tick hi">✓</span><span>WhatsApp QR on Screen</span></div>
+        </div>
+        <div class="pric-foot">
+          <a class="btn btn-dark btn-sm" style="width:100%;justify-content:center;" href="https://signagecrm-production.up.railway.app">Book karo &rarr;</a>
+        </div>
+      </div>
+
+      <div class="pric">
+        <div class="pric-badge">Exclusive</div>
+        <div class="pric-name">Dominance</div>
+        <div style="margin:10px 0 2px;display:flex;align-items:baseline;gap:6px;">
+          <span style="font-family:'Magra',sans-serif;font-weight:700;font-size:32px;letter-spacing:-0.03em;">&#8377;25,000</span>
+          <span style="font-size:14px;color:var(--muted);">/mo</span>
+        </div>
+        <div style="font-size:12.5px;color:var(--muted);margin-bottom:4px;">&asymp; &#8377;833/din &nbsp;&middot;&nbsp; 30 sec slot</div>
+        <div style="font-size:12.5px;font-weight:600;color:var(--orange);margin-bottom:14px;">~5,400 plays/day</div>
+        <hr class="pric-div">
+        <div class="pric-list">
+          <div class="pric-row"><span class="tick hi">✓</span><span>30s Screen Slot</span></div>
+          <div class="pric-row"><span class="tick hi">✓</span><span>FB &amp; IG Sync</span></div>
+          <div class="pric-row"><span class="tick hi">✓</span><span>Proof of Play CSV</span></div>
+          <div class="pric-row"><span class="tick hi">✓</span><span>WhatsApp QR on Screen</span></div>
+        </div>
+        <div class="pric-foot">
+          <a class="btn btn-dark btn-sm" style="width:100%;justify-content:center;" href="https://signagecrm-production.up.railway.app">Book karo &rarr;</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="sec" id="faq">
+  <div class="wrap">
+    <div class="faq-layout">
+      <div class="sec-head" data-reveal>
+        <div class="eyebrow"><i></i>Sawaal jawab</div>
+        <h2 class="h-lg">Frequently Asked<br>Questions</h2>
+        <p class="lead">Aapke sabhi operational doubts aur billing questions ka seedha jawab.</p>
+        <a class="btn btn-dark btn-sm" href="https://signagecrm-production.up.railway.app">Launch Campaign &rarr;</a>
+      </div>
+      <div class="faq-list" data-reveal style="transition-delay:.08s">
+        <div class="faq-item open">
+          <button class="faq-q" onclick="this.parentElement.classList.toggle('open')">Pricing calculate kaise hoti hai? <span class="faq-ic">+</span></button>
+          <div class="faq-body"><div><p>Portal mein screen select karne par fixed base pricing display hoti hai. Days aur slot length select karne par final total inclusive of 18% GST instant screen par calculate ho jata hai.</p></div></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q" onclick="this.parentElement.classList.toggle('open')">Kaunse creative formats supported hain? <span class="faq-ic">+</span></button>
+          <div class="faq-body"><div><p>Images mein standard 1080x1920 (vertical) ya 1920x1080 (horizontal) JPG/PNG files aur videos mein MP4 files support hoti hain.</p></div></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q" onclick="this.parentElement.classList.toggle('open')">Proof of play report kab milta hai? <span class="faq-ic">+</span></button>
+          <div class="faq-body"><div><p>Aapke advertiser dashboard mein daily telecast logs real-time update hote hain. Campaign end hone par detailed consolidated CSV report download ki ja sakti hai.</p></div></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q" onclick="this.parentElement.classList.toggle('open')">Kya venue owners apni screens connect kar sakte hain? <span class="faq-ic">+</span></button>
+          <div class="faq-body"><div><p>Haan, commercial venues, retail outlets aur gyms humare Android Signage Player app ke through screens monetize kar sakte hain aur passive ad revenue earn kar sakte hain.</p></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="wrap">
+    <div class="f-top">
+      <div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div class="brand-mark"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><rect x="2" y="3" width="20" height="14" rx="2" stroke="currentColor" stroke-width="2"/><path d="M8 21h8M12 17v4" stroke-linecap="round"/></svg></div>
+          <span style="font-family:'Magra',sans-serif;font-weight:700;font-size:17.5px;color:#fff;">extrravenue</span>
+        </div>
+        <p class="f-blurb">India's leading transparent programmatic digital signage network. Bridging outdoor physical displays with social channels.</p>
+      </div>
+      <div class="f-col">
+        <h4>Navigation</h4>
+        <ul>
+          <li><a href="https://signagecrm-production.up.railway.app">Advertiser Login</a></li>
+          <li><a href="https://signagecrm-production.up.railway.app/admin">Venue Admin</a></li>
+          <li><a href="#services">Network Coverage</a></li>
+          <li><a href="#pricing">Rate Card</a></li>
+        </ul>
+      </div>
+      <div class="f-col">
+        <h4>Connect</h4>
+        <ul>
+          <li><a href="#">Support Desk</a></li>
+          <li><a href="#">Privacy Policy</a></li>
+          <li><a href="#">Terms &amp; Conditions</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="f-word" id="fword"><span>extrravenue</span></div>
+    <div class="f-bar">
+      <span>© 2026 extrravenue &middot; All Rights Reserved.</span>
+      <div class="f-legal">
+        <a href="#">Privacy</a><a href="#">Terms</a><a href="#">Security</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</div>
+
+<script>
+// Navbar scroll toggle
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => { nav.classList.toggle('scrolled', window.scrollY > 60); }, {passive:true});
+
+// Intersection Observer for Data Reveal
+const ro = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); ro.unobserve(e.target); }});
+}, {threshold:.08, rootMargin:'0px 0px -20px 0px'});
+document.querySelectorAll('[data-reveal]').forEach(el => ro.observe(el));
+
+// Steps Line Fill
+const sl = document.getElementById('sline');
+if(sl) {
+  const slo = new IntersectionObserver(e => { if(e[0].isIntersecting){sl.classList.add('in');slo.disconnect();}},{threshold:.5});
+  slo.observe(sl);
+}
+
+// Footer Brand Reveal
+const fw = document.getElementById('fword');
+if(fw) {
+  const fwo = new IntersectionObserver(e => { if(e[0].isIntersecting){fw.classList.add('in');fwo.disconnect();}},{threshold:.25});
+  fwo.observe(fw);
+}
+
+// Stats Counter
+const co = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (!e.isIntersecting) return;
+    const el = e.target, t = parseInt(el.dataset.target), dec = parseInt(el.dataset.dec||'0'), t0 = performance.now();
+    const tick = now => { const p = Math.min((now-t0)/1600,1), ep = 1-Math.pow(1-p,3), v = Math.round(t*ep); el.textContent = dec ? (v/10).toFixed(1) : v; if(p<1) requestAnimationFrame(tick); };
+    requestAnimationFrame(tick);
+    co.unobserve(el);
+  });
+}, {threshold:.5});
+document.querySelectorAll('.counter').forEach(el => co.observe(el));
+
+// ── Trendora Staggered Scroll Parallax ──
+(function(){
+  const vis = document.getElementById('heroVis');
+  if(!vis) return;
+  const cols = vis.querySelectorAll('.hcol');
+  if(!cols.length) return;
+  
+  const numCols = cols.length; // 5 columns
+  let currentScroll = 0;
+  let targetScroll = 0;
+
+  function render() {
+    targetScroll = window.scrollY || window.pageYOffset;
+    currentScroll += (targetScroll - currentScroll) * 0.12;
+
+    for (let i = 0; i < numCols; i++) {
+      // Rightmost moves first, others follow with calculated delay
+      const delay = (numCols - 1 - i) * 70;
+      const effectiveScroll = Math.max(0, currentScroll - delay);
+      const translateY = effectiveScroll * 0.38;
+      cols[i].style.transform = `translate3d(0, -${translateY}px, 0)`;
+    }
+
+    requestAnimationFrame(render);
+  }
+
+  if (window.innerWidth > 1024) {
+    requestAnimationFrame(render);
+  }
+})();
+
+</script>
+
+</body>
+</html>
