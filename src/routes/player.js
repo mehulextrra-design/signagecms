@@ -46,13 +46,17 @@ router.post('/register', async (req, res, next) => {
 });
 
 // GET /api/player/app-version — public, no auth; returns latest APK version info
-// Set APK_VERSION_CODE and APK_DOWNLOAD_URL env vars in Railway after each build
+// Only APK_VERSION_CODE needs to be set in Railway after each build.
+// URL is auto-constructed from CLOUDINARY_CLOUD_NAME — no manual APK_DOWNLOAD_URL needed.
 router.get('/app-version', (req, res) => {
   const versionCode = parseInt(process.env.APK_VERSION_CODE || '3', 10);
+  const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
+  const apkUrl = process.env.APK_DOWNLOAD_URL ||
+    (cloudName ? `https://res.cloudinary.com/${cloudName}/raw/upload/signagecms-player-v1.${versionCode}.zip` : null);
   res.json({
     version_code: versionCode,
-    version_name: process.env.APK_VERSION_NAME || `1.${versionCode}`,
-    apk_url: process.env.APK_DOWNLOAD_URL || null,
+    version_name: `1.${versionCode}`,
+    apk_url: apkUrl,
   });
 });
 
