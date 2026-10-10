@@ -416,9 +416,10 @@
     position:relative;
     left:auto;right:auto;top:auto;bottom:auto;
     width:100%;height:auto;
-    overflow-x:auto;overflow-y:visible;
+    overflow-x:scroll;overflow-y:visible;
     -webkit-overflow-scrolling:touch;
     scrollbar-width:none;
+    touch-action:pan-x;
     padding:30px 0 24px;
     justify-content:flex-start;
     scroll-snap-type:x mandatory;
@@ -1387,6 +1388,50 @@ document.querySelectorAll('.counter').forEach(el => co.observe(el));
   if (window.innerWidth > 1024) {
     requestAnimationFrame(render);
   }
+})();
+
+// Hero carousel touch handler (mobile)
+(function() {
+  const vis = document.querySelector('.hero-vis');
+  if (!vis) return;
+
+  let startX = 0, startScrollLeft = 0, isDown = false, startY = 0, lockAxis = null;
+
+  vis.addEventListener('touchstart', function(e) {
+    startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
+    startScrollLeft = vis.scrollLeft;
+    isDown = true;
+    lockAxis = null;
+  }, { passive: true });
+
+  vis.addEventListener('touchmove', function(e) {
+    if (!isDown) return;
+    const dx = e.touches[0].clientX - startX;
+    const dy = e.touches[0].clientY - startY;
+
+    // Lock axis on first significant move
+    if (!lockAxis) {
+      lockAxis = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y';
+    }
+    if (lockAxis !== 'x') return;
+
+    e.preventDefault(); // block page scroll when swiping carousel
+    vis.scrollLeft = startScrollLeft - dx;
+  }, { passive: false });
+
+  vis.addEventListener('touchend', function(e) {
+    if (!isDown || lockAxis !== 'x') { isDown = false; return; }
+    isDown = false;
+    // Snap to nearest card
+    const card = vis.querySelector('.hcard');
+    if (!card) return;
+    const cardW = card.getBoundingClientRect().width;
+    const gap = 16;
+    const unit = cardW + gap;
+    const idx = Math.round(vis.scrollLeft / unit);
+    vis.scrollTo({ left: idx * unit, behavior: 'smooth' });
+  });
 })();
 </script>
 
