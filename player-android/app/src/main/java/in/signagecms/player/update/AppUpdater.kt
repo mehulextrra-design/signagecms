@@ -73,6 +73,14 @@ object AppUpdater {
             val packageInstaller = context.packageManager.packageInstaller
             val params = PackageInstaller.SessionParams(PackageInstaller.SessionParams.MODE_FULL_INSTALL)
             params.setAppPackageName(context.packageName)
+            // Device Owner policy install — suppresses user confirmation dialog on all Android versions
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                params.setInstallReason(android.content.pm.PackageManager.INSTALL_REASON_POLICY)
+            }
+            // Android 12+: explicitly mark as not requiring user action
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                params.setRequireUserAction(PackageInstaller.SessionParams.USER_ACTION_NOT_REQUIRED)
+            }
 
             val sessionId = packageInstaller.createSession(params)
             val session = packageInstaller.openSession(sessionId)
