@@ -1676,6 +1676,20 @@ function renderCampaigns(data) {
             <button class="ia-btn" title="Approve Creative" style="color:#16a34a;" onclick="approveCreative('${c.id}')"><svg width="17" height="17" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></button>
             <button class="ia-btn ia-danger" title="Reject Creative" onclick="rejectCreative('${c.id}')"><svg width="17" height="17" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button>
           </div>
+        ` : c.status === 'live' ? `
+          <div style="display:flex;align-items:center;gap:2px;">
+            <button class="ia-btn" title="Pause" style="color:#f59e0b;" onclick="pauseCampaign('${c.id}')"><svg width="17" height="17" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><rect x="6" y="4" width="4" height="16" rx="1" stroke-linecap="round"/><rect x="14" y="4" width="4" height="16" rx="1" stroke-linecap="round"/></svg></button>
+            <button class="ia-btn ia-danger" title="Cancel" onclick="cancelCampaignPrompt('${c.id}')"><svg width="17" height="17" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button>
+          </div>
+        ` : c.status === 'paused' ? `
+          <div style="display:flex;align-items:center;gap:2px;">
+            <button class="ia-btn" title="Resume" style="color:#16a34a;" onclick="resumeCampaign('${c.id}')"><svg width="17" height="17" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 3l14 9-14 9V3z"/></svg></button>
+            <button class="ia-btn ia-danger" title="Cancel" onclick="cancelCampaignPrompt('${c.id}')"><svg width="17" height="17" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button>
+          </div>
+        ` : !['cancelled','completed'].includes(c.status) ? `
+          <div style="display:flex;align-items:center;gap:2px;">
+            <button class="ia-btn ia-danger" title="Cancel" onclick="cancelCampaignPrompt('${c.id}')"><svg width="17" height="17" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button>
+          </div>
         ` : '—'}
       </td>
     </tr>`).join('');
@@ -1784,6 +1798,13 @@ async function openCampaignDetail(id) {
       const today = new Date().toISOString().slice(0,10);
       footer.innerHTML = `
         ${startDate > today ? `<button class="btn btn-primary" style="font-size:12px;" onclick="forceLiveCampaign('${id}')">⚡ Force Live Now</button>` : ''}
+        ${c.status === 'live' ? `<button class="btn" style="background:#f59e0b;color:#fff;font-size:13px;" onclick="pauseCampaign('${id}');closeModal('camp-detail-modal');">⏸ Pause</button>` : ''}
+        <button class="btn" style="background:#ef4444;color:#fff;font-size:13px;" onclick="closeModal('camp-detail-modal');cancelCampaignPrompt('${id}')">✕ Cancel</button>
+        <button class="btn btn-ghost" onclick="closeModal('camp-detail-modal')">Close</button>`;
+    } else if (c.status === 'paused') {
+      footer.innerHTML = `
+        <button class="btn btn-success" onclick="resumeCampaign('${id}');closeModal('camp-detail-modal');">▶ Resume</button>
+        <button class="btn" style="background:#ef4444;color:#fff;font-size:13px;" onclick="closeModal('camp-detail-modal');cancelCampaignPrompt('${id}')">✕ Cancel</button>
         <button class="btn btn-ghost" onclick="closeModal('camp-detail-modal')">Close</button>`;
     } else {
       footer.innerHTML = `<button class="btn btn-ghost" onclick="closeModal('camp-detail-modal')">Close</button>`;
@@ -1924,6 +1945,33 @@ async function rejectCreative(id) {
   try {
     await api(`/campaigns/${id}/reject-creative`, { method: 'POST', body: JSON.stringify({ reason }) });
     showToast('Creative change rejected', 'success');
+    loadCampaigns();
+  } catch(e) { showToast('Error: ' + e.message, 'error'); }
+}
+
+async function pauseCampaign(id) {
+  try {
+    await api(`/campaigns/${id}/pause`, { method: 'POST' });
+    showToast('Campaign paused', 'success');
+    loadCampaigns();
+  } catch(e) { showToast('Error: ' + e.message, 'error'); }
+}
+
+async function resumeCampaign(id) {
+  try {
+    await api(`/campaigns/${id}/resume`, { method: 'POST' });
+    showToast('Campaign resumed', 'success');
+    loadCampaigns();
+  } catch(e) { showToast('Error: ' + e.message, 'error'); }
+}
+
+async function cancelCampaignPrompt(id) {
+  const reason = prompt('Reason for cancelling this campaign (shown in notes):');
+  if(reason === null) return;
+  if(!confirm('Are you sure you want to CANCEL this campaign? This cannot be undone.')) return;
+  try {
+    await api(`/campaigns/${id}`, { method: 'DELETE', body: JSON.stringify({ reason: reason || 'Cancelled by admin' }) });
+    showToast('Campaign cancelled', 'success');
     loadCampaigns();
   } catch(e) { showToast('Error: ' + e.message, 'error'); }
 }

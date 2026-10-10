@@ -345,10 +345,11 @@ router.post('/:id/reject', authenticate, requireAdmin, async (req, res, next) =>
 // POST /api/campaigns/:id/pause
 router.post('/:id/pause', authenticate, async (req, res, next) => {
   try {
+    const isAdmin = ['admin', 'superadmin'].includes(req.user.role);
     const result = await query(
       `UPDATE campaigns SET status='paused', updated_at=NOW()
-       WHERE id=$1 AND user_id=$2 AND status='live' RETURNING *`,
-      [req.params.id, req.user.id]
+       WHERE id=$1 AND (user_id=$2 OR $3) AND status='live' RETURNING *`,
+      [req.params.id, req.user.id, isAdmin]
     );
     if (!result.rows.length) return res.status(404).json({ error: 'Campaign not found or not live' });
     res.json(result.rows[0]);
@@ -358,10 +359,11 @@ router.post('/:id/pause', authenticate, async (req, res, next) => {
 // POST /api/campaigns/:id/resume
 router.post('/:id/resume', authenticate, async (req, res, next) => {
   try {
+    const isAdmin = ['admin', 'superadmin'].includes(req.user.role);
     const result = await query(
       `UPDATE campaigns SET status='live', updated_at=NOW()
-       WHERE id=$1 AND user_id=$2 AND status='paused' RETURNING *`,
-      [req.params.id, req.user.id]
+       WHERE id=$1 AND (user_id=$2 OR $3) AND status='paused' RETURNING *`,
+      [req.params.id, req.user.id, isAdmin]
     );
     if (!result.rows.length) return res.status(404).json({ error: 'Campaign not found or not paused' });
     res.json(result.rows[0]);
@@ -372,10 +374,11 @@ router.post('/:id/resume', authenticate, async (req, res, next) => {
 router.delete('/:id', authenticate, async (req, res, next) => {
   try {
     const { reason } = req.body;
+    const isAdmin = ['admin', 'superadmin'].includes(req.user.role);
     const result = await query(
       `UPDATE campaigns SET status='cancelled', notes=$1, updated_at=NOW()
-       WHERE id=$2 AND user_id=$3 AND status NOT IN ('cancelled','completed') RETURNING *`,
-      [reason || 'Cancelled by advertiser', req.params.id, req.user.id]
+       WHERE id=$2 AND (user_id=$3 OR $4) AND status NOT IN ('cancelled','completed') RETURNING *`,
+      [reason || 'Cancelled by admin', req.params.id, req.user.id, isAdmin]
     );
     if (!result.rows.length) return res.status(404).json({ error: 'Cannot cancel this campaign' });
     res.json({ message: 'Campaign cancelled', campaign: result.rows[0] });
