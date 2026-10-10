@@ -122,8 +122,8 @@ class SetupActivity : AppCompatActivity() {
 
         binding.btnGoToPlayer.setOnClickListener { startPlayer() }
 
-        // Auto-start player after 30 seconds (TV remote navigation needs time)
-        Handler(Looper.getMainLooper()).postDelayed({ startPlayer() }, 30000)
+        // Auto-start player after 60 seconds (TV remote navigation needs time)
+        Handler(Looper.getMainLooper()).postDelayed({ startPlayer() }, 60000)
     }
 
     private fun showUpdateStatus(msg: String, colorHex: String) {
