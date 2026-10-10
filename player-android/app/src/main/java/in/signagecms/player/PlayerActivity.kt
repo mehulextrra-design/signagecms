@@ -185,9 +185,14 @@ class PlayerActivity : AppCompatActivity() {
         if (hasFocus) setFullscreen()
     }
 
-    // Block back button — kiosk mode: user cannot exit the player
+    // Back button → go to SetupActivity (shows version + update screen)
+    // App stays in Lock Task so user cannot exit to home/other apps
     @Suppress("DEPRECATION")
-    override fun onBackPressed() { /* intentionally empty */ }
+    override fun onBackPressed() {
+        startActivity(Intent(this, SetupActivity::class.java).apply {
+            addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        })
+    }
 
     // ── FULLSCREEN ────────────────────────────────────────────────────────
 

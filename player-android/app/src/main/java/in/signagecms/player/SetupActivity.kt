@@ -4,6 +4,8 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.os.PowerManager
 import android.provider.Settings
 import android.view.View
@@ -12,6 +14,7 @@ import androidx.lifecycle.lifecycleScope
 import `in`.signagecms.player.api.RetrofitClient
 import `in`.signagecms.player.api.models.RegisterRequest
 import `in`.signagecms.player.databinding.ActivitySetupBinding
+import `in`.signagecms.player.update.AppUpdater
 import `in`.signagecms.player.utils.Prefs
 import kotlinx.coroutines.launch
 
@@ -24,14 +27,14 @@ class SetupActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         prefs = Prefs.getInstance(this)
 
-        // Already registered → go straight to player
-        if (prefs.isRegistered) {
-            startPlayer()
-            return
-        }
-
         binding = ActivitySetupBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        // Already registered → show info screen (version + update button)
+        if (prefs.isRegistered) {
+            showRegisteredScreen()
+            return
+        }
 
         binding.btnRegister.setOnClickListener { doRegister() }
     }
@@ -85,6 +88,48 @@ class SetupActivity : AppCompatActivity() {
                 setLoading(false)
             }
         }
+    }
+
+    private fun showRegisteredScreen() {
+        binding.layoutRegistered.visibility = View.VISIBLE
+        binding.tvRegScreenCode.text = prefs.screenCode ?: "—"
+        binding.tvRegScreenName.text = prefs.screenName ?: "—"
+        binding.tvRegVersion.text = "Current version: v${BuildConfig.VERSION_NAME}"
+
+        binding.btnCheckUpdate.setOnClickListener {
+            binding.btnCheckUpdate.isEnabled = false
+            binding.btnCheckUpdate.text = "Checking…"
+            binding.tvUpdateStatus.visibility = View.GONE
+            lifecycleScope.launch {
+                try {
+                    val resp = RetrofitClient.apiService.getAppVersion()
+                    val info = resp.body()
+                    if (info != null && info.versionCode > BuildConfig.VERSION_CODE) {
+                        showUpdateStatus("Update available: v${info.versionName} — downloading…", "#16a34a")
+                        AppUpdater.checkAndUpdate(this@SetupActivity)
+                        showUpdateStatus("Update downloaded! App will restart shortly.", "#16a34a")
+                    } else {
+                        showUpdateStatus("Already on latest version (v${BuildConfig.VERSION_NAME})", "#64748B")
+                    }
+                } catch (e: Exception) {
+                    showUpdateStatus("Error: ${e.message}", "#EF4444")
+                } finally {
+                    binding.btnCheckUpdate.isEnabled = true
+                    binding.btnCheckUpdate.text = "Check for Update"
+                }
+            }
+        }
+
+        binding.btnGoToPlayer.setOnClickListener { startPlayer() }
+
+        // Auto-start player after 5 seconds
+        Handler(Looper.getMainLooper()).postDelayed({ startPlayer() }, 5000)
+    }
+
+    private fun showUpdateStatus(msg: String, colorHex: String) {
+        binding.tvUpdateStatus.text = msg
+        binding.tvUpdateStatus.setTextColor(android.graphics.Color.parseColor(colorHex))
+        binding.tvUpdateStatus.visibility = View.VISIBLE
     }
 
     private fun startPlayer() {
