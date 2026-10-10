@@ -10,6 +10,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.os.PowerManager
+import android.view.KeyEvent
 import android.view.View
 import android.view.WindowManager
 import android.widget.FrameLayout
@@ -185,8 +186,18 @@ class PlayerActivity : AppCompatActivity() {
         if (hasFocus) setFullscreen()
     }
 
-    // Back button → go to SetupActivity (shows version + update screen)
-    // App stays in Lock Task so user cannot exit to home/other apps
+    // Back / BACK key → go to SetupActivity (version info + update button)
+    // onKeyDown is more reliable than onBackPressed on Android TV in Lock Task mode
+    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            startActivity(Intent(this, SetupActivity::class.java).apply {
+                addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            })
+            return true
+        }
+        return super.onKeyDown(keyCode, event)
+    }
+
     @Suppress("DEPRECATION")
     override fun onBackPressed() {
         startActivity(Intent(this, SetupActivity::class.java).apply {
