@@ -416,28 +416,29 @@
     position:relative;
     left:auto;right:auto;top:auto;bottom:auto;
     width:100%;height:auto;
-    overflow-x:scroll;overflow-y:visible;
-    -webkit-overflow-scrolling:touch;
-    scrollbar-width:none;
-    touch-action:pan-x;
-    padding:30px 0 24px;
+    overflow:hidden;
+    padding:24px 0;
     justify-content:flex-start;
-    scroll-snap-type:x mandatory;
-    scroll-padding-left:24px;
     gap:0;
+    cursor:grab;
   }
-  .hero-vis::-webkit-scrollbar{display:none;}
-  /* Flatten columns → each card is a direct scroll item */
+  /* inner slider track moved via JS transform */
+  .hero-vis .hslider{
+    display:flex;
+    gap:0;
+    will-change:transform;
+    transition:transform .35s cubic-bezier(.25,.46,.45,.94);
+    padding-left:24px;
+  }
+  /* Flatten columns → each card is a direct flex item in .hslider */
   .hcol{display:contents;}
   .hcard{
-    width:calc(100vw - 80px)!important;
+    width:calc(100vw - 64px)!important;
     height:360px!important;
     flex:none;
-    scroll-snap-align:start;
     transform:none!important;
-    margin-left:16px;
+    margin-right:16px;
   }
-  .hcard:last-child{margin-right:24px;}
   .hero-top{position:static;align-items:center;text-align:center;max-width:100%;padding-bottom:20px;}
   .hero-actions{justify-content:center;}
   .hero-proof{align-items:center;}
@@ -459,13 +460,12 @@
   .met:nth-child(-n+2){border-top:0;padding-top:0;}
 }
 @media(max-width:768px){
-  .cf{overflow-x:hidden;}
   .conf-grid{grid-template-columns:1fr;}
   .sec{padding:64px 0;}
   .sec-tight{padding:40px 0;}
   .wrap{padding:0 16px;}
   .hero{padding-top:90px;}
-  .hcard{width:calc(100vw - 64px)!important;height:400px!important;}
+  .hcard{width:calc(100vw - 64px)!important;height:380px!important;}
   .scard-orange{flex-direction:column;padding:28px;}
   .so-ring{display:none;}
   .f-top{grid-template-columns:1fr;}
@@ -1390,48 +1390,72 @@ document.querySelectorAll('.counter').forEach(el => co.observe(el));
   }
 })();
 
-// Hero carousel touch handler (mobile)
+// Hero carousel — transform-based (works regardless of parent overflow)
 (function() {
+  if (window.innerWidth > 1024) return;
+
   const vis = document.querySelector('.hero-vis');
   if (!vis) return;
 
-  let startX = 0, startScrollLeft = 0, isDown = false, startY = 0, lockAxis = null;
+  // Wrap all hcards in a single sliding track
+  const cards = Array.from(document.querySelectorAll('.hcard'));
+  if (!cards.length) return;
+
+  const track = document.createElement('div');
+  track.className = 'hslider';
+  cards.forEach(c => track.appendChild(c));
+  vis.appendChild(track);
+
+  let idx = 0;
+  let startX = 0, startY = 0, startOffset = 0;
+  let dragging = false, axis = null, delta = 0;
+
+  function cardW() {
+    return (cards[0] ? cards[0].getBoundingClientRect().width : 311) + 16;
+  }
+
+  function goTo(i, animate) {
+    i = Math.max(0, Math.min(i, cards.length - 1));
+    idx = i;
+    track.style.transition = animate ? 'transform .38s cubic-bezier(.25,.46,.45,.94)' : 'none';
+    track.style.transform = 'translateX(' + (-idx * cardW()) + 'px)';
+  }
 
   vis.addEventListener('touchstart', function(e) {
     startX = e.touches[0].clientX;
     startY = e.touches[0].clientY;
-    startScrollLeft = vis.scrollLeft;
-    isDown = true;
-    lockAxis = null;
+    startOffset = -idx * cardW();
+    dragging = true;
+    axis = null;
+    delta = 0;
+    track.style.transition = 'none';
   }, { passive: true });
 
   vis.addEventListener('touchmove', function(e) {
-    if (!isDown) return;
+    if (!dragging) return;
     const dx = e.touches[0].clientX - startX;
     const dy = e.touches[0].clientY - startY;
-
-    // Lock axis on first significant move
-    if (!lockAxis) {
-      lockAxis = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y';
+    if (!axis && (Math.abs(dx) > 8 || Math.abs(dy) > 8)) {
+      axis = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y';
     }
-    if (lockAxis !== 'x') return;
-
-    e.preventDefault(); // block page scroll when swiping carousel
-    vis.scrollLeft = startScrollLeft - dx;
+    if (axis !== 'x') return;
+    e.preventDefault();
+    delta = dx;
+    track.style.transform = 'translateX(' + (startOffset + dx) + 'px)';
   }, { passive: false });
 
-  vis.addEventListener('touchend', function(e) {
-    if (!isDown || lockAxis !== 'x') { isDown = false; return; }
-    isDown = false;
-    // Snap to nearest card
-    const card = vis.querySelector('.hcard');
-    if (!card) return;
-    const cardW = card.getBoundingClientRect().width;
-    const gap = 16;
-    const unit = cardW + gap;
-    const idx = Math.round(vis.scrollLeft / unit);
-    vis.scrollTo({ left: idx * unit, behavior: 'smooth' });
+  vis.addEventListener('touchend', function() {
+    if (!dragging) return;
+    dragging = false;
+    if (axis === 'x') {
+      if (delta < -50) goTo(idx + 1, true);
+      else if (delta > 50) goTo(idx - 1, true);
+      else goTo(idx, true);
+    }
   });
+
+  // Also handle window resize
+  window.addEventListener('resize', function() { goTo(idx, false); });
 })();
 </script>
 
