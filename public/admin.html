@@ -918,6 +918,38 @@ textarea.form-input{resize:vertical;min-height:80px;}
   </div>
 </div>
 
+<!-- Edit Media Modal -->
+<div class="modal-backdrop hidden" id="edit-media-modal">
+  <div class="modal" style="max-width:460px;width:95%;">
+    <div class="modal-header">
+      <span class="modal-title">Replace Campaign Creative</span>
+      <button class="modal-close" onclick="closeModal('edit-media-modal')">✕</button>
+    </div>
+    <div class="modal-body" style="padding:20px;display:flex;flex-direction:column;gap:16px;">
+      <input type="hidden" id="edit-media-campaign-id">
+      <div id="edit-media-preview" style="background:#0f1420;border-radius:8px;min-height:120px;display:flex;align-items:center;justify-content:center;overflow:hidden;">
+        <span style="color:rgba(255,255,255,0.25);font-size:12px;">Select a file to preview</span>
+      </div>
+      <div>
+        <label style="font-size:12px;font-weight:600;color:var(--text2);display:block;margin-bottom:6px;">Select New Media File</label>
+        <input type="file" id="edit-media-file" accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm"
+          style="width:100%;font-size:13px;color:var(--text);" onchange="previewEditMedia(this)">
+        <div style="font-size:11px;color:var(--text3);margin-top:4px;">Accepted: JPG, PNG, WebP, GIF, MP4, WebM · Max 200MB</div>
+      </div>
+      <div id="edit-media-progress" style="display:none;">
+        <div style="font-size:12px;color:var(--text2);margin-bottom:6px;" id="edit-media-progress-label">Uploading…</div>
+        <div style="height:4px;background:var(--surface2);border-radius:2px;overflow:hidden;">
+          <div id="edit-media-progress-bar" style="height:100%;background:var(--primary);width:0%;transition:width .3s;"></div>
+        </div>
+      </div>
+    </div>
+    <div style="padding:14px 20px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end;">
+      <button class="btn btn-ghost" onclick="closeModal('edit-media-modal')">Cancel</button>
+      <button class="btn btn-primary" id="edit-media-save-btn" onclick="saveEditMedia()">⬆ Upload &amp; Save</button>
+    </div>
+  </div>
+</div>
+
 <div class="modal-backdrop hidden" id="reject-modal">
   <div class="modal">
     <div class="modal-header">
@@ -1799,12 +1831,18 @@ async function openCampaignDetail(id) {
       footer.innerHTML = `
         ${startDate > today ? `<button class="btn btn-primary" style="font-size:12px;" onclick="forceLiveCampaign('${id}')">⚡ Force Live Now</button>` : ''}
         ${c.status === 'live' ? `<button class="btn" style="background:#f59e0b;color:#fff;font-size:13px;" onclick="pauseCampaign('${id}');closeModal('camp-detail-modal');">⏸ Pause</button>` : ''}
+        <button class="btn btn-ghost" style="font-size:13px;" onclick="openEditMedia('${id}')">✎ Edit Media</button>
         <button class="btn" style="background:#ef4444;color:#fff;font-size:13px;" onclick="closeModal('camp-detail-modal');cancelCampaignPrompt('${id}')">✕ Cancel</button>
         <button class="btn btn-ghost" onclick="closeModal('camp-detail-modal')">Close</button>`;
     } else if (c.status === 'paused') {
       footer.innerHTML = `
         <button class="btn btn-success" onclick="resumeCampaign('${id}');closeModal('camp-detail-modal');">▶ Resume</button>
+        <button class="btn btn-ghost" style="font-size:13px;" onclick="openEditMedia('${id}')">✎ Edit Media</button>
         <button class="btn" style="background:#ef4444;color:#fff;font-size:13px;" onclick="closeModal('camp-detail-modal');cancelCampaignPrompt('${id}')">✕ Cancel</button>
+        <button class="btn btn-ghost" onclick="closeModal('camp-detail-modal')">Close</button>`;
+    } else if (!['cancelled','completed'].includes(c.status)) {
+      footer.innerHTML = `
+        <button class="btn btn-ghost" style="font-size:13px;" onclick="openEditMedia('${id}')">✎ Edit Media</button>
         <button class="btn btn-ghost" onclick="closeModal('camp-detail-modal')">Close</button>`;
     } else {
       footer.innerHTML = `<button class="btn btn-ghost" onclick="closeModal('camp-detail-modal')">Close</button>`;
@@ -1974,6 +2012,85 @@ async function cancelCampaignPrompt(id) {
     showToast('Campaign cancelled', 'success');
     loadCampaigns();
   } catch(e) { showToast('Error: ' + e.message, 'error'); }
+}
+
+function openEditMedia(campaignId) {
+  document.getElementById('edit-media-campaign-id').value = campaignId;
+  document.getElementById('edit-media-file').value = '';
+  document.getElementById('edit-media-preview').innerHTML = '<span style="color:rgba(255,255,255,0.25);font-size:12px;">Select a file to preview</span>';
+  document.getElementById('edit-media-progress').style.display = 'none';
+  document.getElementById('edit-media-save-btn').disabled = false;
+  closeModal('camp-detail-modal');
+  openModal('edit-media-modal');
+}
+
+function previewEditMedia(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const wrap = document.getElementById('edit-media-preview');
+  const url = URL.createObjectURL(file);
+  if (file.type.startsWith('video/')) {
+    wrap.innerHTML = `<video src="${url}" controls style="max-width:100%;max-height:200px;display:block;background:#000;border-radius:6px;"></video>`;
+  } else {
+    wrap.innerHTML = `<img src="${url}" style="max-width:100%;max-height:200px;object-fit:contain;border-radius:6px;">`;
+  }
+}
+
+async function saveEditMedia() {
+  const campaignId = document.getElementById('edit-media-campaign-id').value;
+  const fileInput = document.getElementById('edit-media-file');
+  const file = fileInput.files[0];
+  if (!file) { showToast('Please select a file first', 'error'); return; }
+
+  const btn = document.getElementById('edit-media-save-btn');
+  const progressWrap = document.getElementById('edit-media-progress');
+  const progressBar = document.getElementById('edit-media-progress-bar');
+  const progressLabel = document.getElementById('edit-media-progress-label');
+
+  btn.disabled = true;
+  progressWrap.style.display = 'block';
+  progressLabel.textContent = 'Uploading to Cloudinary…';
+  progressBar.style.width = '20%';
+
+  try {
+    // Upload file via XHR to track progress
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const contentData = await new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', API + '/content/upload');
+      xhr.setRequestHeader('Authorization', 'Bearer ' + token);
+      xhr.upload.onprogress = e => {
+        if (e.lengthComputable) {
+          progressBar.style.width = Math.round((e.loaded / e.total) * 80) + '%';
+        }
+      };
+      xhr.onload = () => {
+        if (xhr.status >= 200 && xhr.status < 300) resolve(JSON.parse(xhr.responseText));
+        else reject(new Error(JSON.parse(xhr.responseText)?.error || 'Upload failed'));
+      };
+      xhr.onerror = () => reject(new Error('Network error'));
+      xhr.send(formData);
+    });
+
+    progressBar.style.width = '90%';
+    progressLabel.textContent = 'Saving to campaign…';
+
+    await api(`/campaigns/${campaignId}/admin-set-creative`, {
+      method: 'PATCH',
+      body: JSON.stringify({ content_id: contentData.id })
+    });
+
+    progressBar.style.width = '100%';
+    progressLabel.textContent = 'Done!';
+    showToast('Creative updated successfully', 'success');
+    setTimeout(() => { closeModal('edit-media-modal'); loadCampaigns(); }, 600);
+  } catch(e) {
+    showToast('Error: ' + e.message, 'error');
+    btn.disabled = false;
+    progressWrap.style.display = 'none';
+  }
 }
 
 function openRejectModal(id) {

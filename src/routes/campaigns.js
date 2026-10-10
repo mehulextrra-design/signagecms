@@ -342,6 +342,23 @@ router.post('/:id/reject', authenticate, requireAdmin, async (req, res, next) =>
   } catch (err) { next(err); }
 });
 
+// PATCH /api/campaigns/:id/admin-set-creative — admin direct creative replace (no approval workflow)
+router.patch('/:id/admin-set-creative', authenticate, requireAdmin, async (req, res, next) => {
+  try {
+    const { content_id } = req.body;
+    if (!content_id) return res.status(400).json({ error: 'content_id required' });
+    const contentRow = await query('SELECT id FROM content WHERE id=$1', [content_id]);
+    if (!contentRow.rows.length) return res.status(404).json({ error: 'Content not found' });
+    const result = await query(
+      `UPDATE campaigns SET content_id=$1, creative_change_status=NULL, pending_content_id=NULL, updated_at=NOW()
+       WHERE id=$2 RETURNING *`,
+      [content_id, req.params.id]
+    );
+    if (!result.rows.length) return res.status(404).json({ error: 'Campaign not found' });
+    res.json(result.rows[0]);
+  } catch (err) { next(err); }
+});
+
 // POST /api/campaigns/:id/pause
 router.post('/:id/pause', authenticate, async (req, res, next) => {
   try {
