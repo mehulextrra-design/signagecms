@@ -50,9 +50,9 @@ router.post('/register', async (req, res, next) => {
 // URL is auto-constructed from CLOUDINARY_CLOUD_NAME — no manual APK_DOWNLOAD_URL needed.
 router.get('/app-version', (req, res) => {
   const versionCode = parseInt(process.env.APK_VERSION_CODE || '3', 10);
-  const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
+  const repo = process.env.GITHUB_REPO || 'mehulextrra-design/signagecms';
   const apkUrl = process.env.APK_DOWNLOAD_URL ||
-    (cloudName ? `https://res.cloudinary.com/${cloudName}/raw/upload/signagecms-player-v1.${versionCode}.zip` : null);
+    `https://github.com/${repo}/releases/download/v1.${versionCode}/app-release.apk`;
   res.json({
     version_code: versionCode,
     version_name: `1.${versionCode}`,

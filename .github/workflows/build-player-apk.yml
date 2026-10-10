@@ -122,40 +122,21 @@ jobs:
           path: player-android/app/build/outputs/apk/release/app-release.apk
           retention-days: 90
 
-      - name: Upload APK to Cloudinary
-        id: cloudinary
+      - name: Create GitHub Release with APK
         env:
-          CLD_CLOUD: ${{ secrets.CLOUDINARY_CLOUD_NAME }}
-          CLD_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
-          CLD_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           RUN_NUM: ${{ github.run_number }}
         run: |
           APK=player-android/app/build/outputs/apk/release/app-release.apk
-          # Cloudinary blocks .apk — upload as .zip (AppUpdater downloads and renames back to .apk)
-          cp "$APK" /tmp/app-release.zip
-
-          TIMESTAMP=$(date +%s)
-          PUBLIC_ID="signagecms-player-v1.${RUN_NUM}"
-
-          SIGNATURE=$(printf "public_id=%s&timestamp=%s%s" "$PUBLIC_ID" "$TIMESTAMP" "$CLD_SECRET" | openssl dgst -sha1 -binary | xxd -p | tr -d '\n')
-
-          RESPONSE=$(curl -s -X POST \
-            "https://api.cloudinary.com/v1_1/${CLD_CLOUD}/raw/upload" \
-            -F "file=@/tmp/app-release.zip" \
-            -F "public_id=${PUBLIC_ID}" \
-            -F "api_key=${CLD_KEY}" \
-            -F "timestamp=${TIMESTAMP}" \
-            -F "signature=${SIGNATURE}")
-
-          echo "Cloudinary response: $RESPONSE"
-
-          APK_URL=$(echo "$RESPONSE" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('secure_url',''))" 2>/dev/null)
-
-          if [ -z "$APK_URL" ]; then
-            echo "ERROR: $RESPONSE"
-            exit 1
-          fi
-
+          TAG="v1.${RUN_NUM}"
+          # Delete existing release/tag if re-running the same run number
+          gh release delete "$TAG" --yes 2>/dev/null || true
+          git push origin --delete "$TAG" 2>/dev/null || true
+          # Create release and upload APK
+          gh release create "$TAG" "$APK" \
+            --title "SignageCMS Player v1.${RUN_NUM}" \
+            --notes "Auto-build #${RUN_NUM}" \
+            --repo "$GITHUB_REPOSITORY"
+          APK_URL="https://github.com/${GITHUB_REPOSITORY}/releases/download/${TAG}/app-release.apk"
           echo "SUCCESS: $APK_URL"
-          echo "apk_url=$APK_URL" >> "$GITHUB_OUTPUT"
           printf '## APK Ready\n```\nAPK_VERSION_CODE=%s\nAPK_DOWNLOAD_URL=%s\n```\n' "$RUN_NUM" "$APK_URL" >> "$GITHUB_STEP_SUMMARY"
