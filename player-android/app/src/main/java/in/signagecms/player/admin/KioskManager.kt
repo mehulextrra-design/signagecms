@@ -41,6 +41,26 @@ object KioskManager {
     }
 
     /**
+     * Set STAY_ON_WHILE_PLUGGED_IN = 3 (AC + USB) so the display never sleeps
+     * while the TV box is plugged in. Requires Device Owner.
+     * This is a system-level override — survives activity pauses and screen savers.
+     */
+    fun setDisplayAlwaysOn(context: Context) {
+        if (!isDeviceOwner(context)) {
+            Log.d(TAG, "Not Device Owner — skipping STAY_ON_WHILE_PLUGGED_IN")
+            return
+        }
+        try {
+            val dpm = context.getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
+            // 3 = BATTERY_PLUGGED_AC (1) | BATTERY_PLUGGED_USB (2)
+            dpm.setGlobalSetting(adminComponent(context), android.provider.Settings.Global.STAY_ON_WHILE_PLUGGED_IN, "3")
+            Log.d(TAG, "STAY_ON_WHILE_PLUGGED_IN set to 3")
+        } catch (e: Exception) {
+            Log.w(TAG, "Could not set STAY_ON_WHILE_PLUGGED_IN: ${e.message}")
+        }
+    }
+
+    /**
      * Reboot the device. Requires Device Owner + Android 7+.
      * Called from PlayerActivity when CMS sends a reboot command via heartbeat.
      * Uses reflection to call DevicePolicyManager.rebootDevice() to avoid

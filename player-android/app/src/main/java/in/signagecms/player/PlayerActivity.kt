@@ -109,9 +109,20 @@ class PlayerActivity : AppCompatActivity() {
         binding = ActivityPlayerBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // Start foreground service — keeps process alive, handles task-removed restart via START_STICKY
+        val serviceIntent = android.content.Intent(this, `in`.signagecms.player.service.PlayerService::class.java)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(serviceIntent)
+        } else {
+            startService(serviceIntent)
+        }
+
         // Start Lock Task Mode (true kiosk) if this app is Device Owner.
         // Back / Home / Recents are blocked by the OS — no user can exit.
         KioskManager.startLockTask(this)
+
+        // Set STAY_ON_WHILE_PLUGGED_IN at system level (Device Owner only)
+        KioskManager.setDisplayAlwaysOn(this)
 
         // ── Kiosk / display-override flags ────────────────────────────────
         // Show over lock screen and force-turn the display on.
