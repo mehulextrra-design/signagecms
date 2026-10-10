@@ -416,28 +416,18 @@
     position:relative;
     left:auto;right:auto;top:auto;bottom:auto;
     width:100%;height:auto;
-    overflow:hidden;
-    padding:24px 0;
-    justify-content:flex-start;
-    gap:0;
-    cursor:grab;
+    overflow:visible;
+    padding:24px 16px;
+    flex-wrap:wrap;
+    gap:14px;
+    justify-content:center;
   }
-  /* inner slider track moved via JS transform */
-  .hero-vis .hslider{
-    display:flex;
-    gap:0;
-    will-change:transform;
-    transition:transform .35s cubic-bezier(.25,.46,.45,.94);
-    padding-left:24px;
-  }
-  /* Flatten columns → each card is a direct flex item in .hslider */
   .hcol{display:contents;}
   .hcard{
-    width:calc(100vw - 64px)!important;
-    height:360px!important;
+    width:100%!important;
+    height:200px!important;
     flex:none;
     transform:none!important;
-    margin-right:16px;
   }
   .hero-top{position:static;align-items:center;text-align:center;max-width:100%;padding-bottom:20px;}
   .hero-actions{justify-content:center;}
@@ -465,7 +455,7 @@
   .sec-tight{padding:40px 0;}
   .wrap{padding:0 16px;}
   .hero{padding-top:90px;}
-  .hcard{width:calc(100vw - 64px)!important;height:380px!important;}
+  .hcard{width:100%!important;height:200px!important;}
   .scard-orange{flex-direction:column;padding:28px;}
   .so-ring{display:none;}
   .f-top{grid-template-columns:1fr;}
@@ -1390,73 +1380,6 @@ document.querySelectorAll('.counter').forEach(el => co.observe(el));
   }
 })();
 
-// Hero carousel — transform-based (works regardless of parent overflow)
-(function() {
-  if (window.innerWidth > 1024) return;
-
-  const vis = document.querySelector('.hero-vis');
-  if (!vis) return;
-
-  // Wrap all hcards in a single sliding track
-  const cards = Array.from(document.querySelectorAll('.hcard'));
-  if (!cards.length) return;
-
-  const track = document.createElement('div');
-  track.className = 'hslider';
-  cards.forEach(c => track.appendChild(c));
-  vis.appendChild(track);
-
-  let idx = 0;
-  let startX = 0, startY = 0, startOffset = 0;
-  let dragging = false, axis = null, delta = 0;
-
-  function cardW() {
-    return (cards[0] ? cards[0].getBoundingClientRect().width : 311) + 16;
-  }
-
-  function goTo(i, animate) {
-    i = Math.max(0, Math.min(i, cards.length - 1));
-    idx = i;
-    track.style.transition = animate ? 'transform .38s cubic-bezier(.25,.46,.45,.94)' : 'none';
-    track.style.transform = 'translateX(' + (-idx * cardW()) + 'px)';
-  }
-
-  vis.addEventListener('touchstart', function(e) {
-    startX = e.touches[0].clientX;
-    startY = e.touches[0].clientY;
-    startOffset = -idx * cardW();
-    dragging = true;
-    axis = null;
-    delta = 0;
-    track.style.transition = 'none';
-  }, { passive: true });
-
-  vis.addEventListener('touchmove', function(e) {
-    if (!dragging) return;
-    const dx = e.touches[0].clientX - startX;
-    const dy = e.touches[0].clientY - startY;
-    if (!axis && (Math.abs(dx) > 8 || Math.abs(dy) > 8)) {
-      axis = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y';
-    }
-    if (axis !== 'x') return;
-    e.preventDefault();
-    delta = dx;
-    track.style.transform = 'translateX(' + (startOffset + dx) + 'px)';
-  }, { passive: false });
-
-  vis.addEventListener('touchend', function() {
-    if (!dragging) return;
-    dragging = false;
-    if (axis === 'x') {
-      if (delta < -50) goTo(idx + 1, true);
-      else if (delta > 50) goTo(idx - 1, true);
-      else goTo(idx, true);
-    }
-  });
-
-  // Also handle window resize
-  window.addEventListener('resize', function() { goTo(idx, false); });
-})();
 </script>
 
 </body>
