@@ -69,14 +69,6 @@
   .btn:disabled { opacity:0.5;cursor:not-allowed; }
   .auth-switch { text-align:center;margin-top:20px;font-size:13px;color:var(--text2); }
   .auth-switch a { color:var(--primary);cursor:pointer;font-weight:500; }
-  .test-bar { background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:20px; }
-  .test-bar summary { font-size:12px;font-weight:600;color:var(--text2);cursor:pointer;list-style:none;display:flex;align-items:center;gap:6px; }
-  .test-bar summary::marker { display:none; }
-  .test-bar summary::before { content:'▶';font-size:9px;transition:transform 0.2s; }
-  .test-bar[open] summary::before { transform:rotate(90deg); }
-  .test-btn-list { display:flex;flex-direction:column;gap:6px;margin-top:10px; }
-  .test-btn-item { display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:var(--surface);border:1px solid var(--border);border-radius:6px;cursor:pointer; }
-  .test-btn-item:hover { border-color:var(--primary);background:var(--primary-light); }
 
   /* APP SHELL */
   #app { display:flex;height:100vh;overflow:hidden; }
@@ -426,19 +418,6 @@
       <div class="auth-logo-icon"><svg viewBox="0 0 24 24"><path d="M3 4h18v2H3V4zm0 7h12v2H3v-2zm0 7h18v2H3v-2z"/></svg></div>
       <div><div class="auth-logo-name">SignageCMS</div><div class="auth-logo-tag">Digital Out-of-Home Platform</div></div>
     </div>
-    <details class="test-bar">
-      <summary>Quick fill — test accounts</summary>
-      <div class="test-btn-list">
-        <div class="test-btn-item" onclick="fillTest('raj@dominos.in','Test@1234')">
-          <div><div style="font-size:13px;font-weight:600;">Raj Sharma — Domino's Pizza</div><div style="font-size:11px;color:var(--text2);">Advertiser · raj@dominos.in</div></div>
-          <span style="font-size:11px;color:var(--primary);font-weight:600;">Fill →</span>
-        </div>
-        <div class="test-btn-item" onclick="fillTest('admin@signagecms.in','Admin@123')">
-          <div><div style="font-size:13px;font-weight:600;">Platform Admin</div><div style="font-size:11px;color:var(--text2);">Superadmin · admin@signagecms.in</div></div>
-          <span style="font-size:11px;color:var(--primary);font-weight:600;">Fill →</span>
-        </div>
-      </div>
-    </details>
     <h2 class="auth-heading">Sign in</h2>
     <p class="auth-subtext">Welcome back — manage your campaigns</p>
     <div class="form-group">
