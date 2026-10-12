@@ -5,6 +5,7 @@ const { body, validationResult } = require('express-validator');
 const { query } = require('../db');
 const { authenticate } = require('../middleware/auth');
 const { sendWhatsApp } = require('../services/whatsapp');
+const { sendNewUserAlertEmail } = require('../services/email');
 
 const router = express.Router();
 const TPL_OTP = process.env.WA_TPL_OTP || 'signup_otp';
@@ -84,6 +85,7 @@ router.post('/register', [
     const user = result.rows[0];
     const token = generateToken(user.id, user.role);
     res.status(201).json({ token, user: { id: user.id, email: user.email, role: user.role, name: first_name } });
+    sendNewUserAlertEmail({ first_name, last_name, email, mobile: normalized, business_name, business_type, city }).catch(() => {});
   } catch (err) { next(err); }
 });
 

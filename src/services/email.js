@@ -312,4 +312,39 @@ async function sendDailyPoPEmailAll() {
   return sent;
 }
 
-module.exports = { sendInvoiceEmail, sendApprovedEmail, sendRejectedEmail, sendDailyPoPReport, sendDailyPoPEmailAll };
+// ── New user signup alert to admin ───────────────────────────────────────
+async function sendNewUserAlertEmail({ first_name, last_name, email, mobile, business_name, business_type, city }) {
+  try {
+    const adminEmail = process.env.ADMIN_EMAIL || process.env.GMAIL_USER;
+    if (!adminEmail) return;
+    const name = business_name || `${first_name} ${last_name}`.trim() || 'New User';
+    const joinedAt = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', hour12: true });
+
+    const body = `
+      <div class="tag">New Signup</div>
+      <h2>Naya User Register Hua! 👤</h2>
+      <p>Ek naya advertiser aapke platform pe register hua hai. Details yahan hain:</p>
+      <div class="card">
+        <div class="row"><span class="rl">Name</span><span class="rv">${name}</span></div>
+        ${business_name ? `<div class="row"><span class="rl">Business</span><span class="rv">${business_name}</span></div>` : ''}
+        ${business_type ? `<div class="row"><span class="rl">Type</span><span class="rv">${business_type}</span></div>` : ''}
+        <div class="row"><span class="rl">Email</span><span class="rv">${email}</span></div>
+        <div class="row"><span class="rl">Mobile</span><span class="rv">+91 ${mobile}</span></div>
+        ${city ? `<div class="row"><span class="rl">City</span><span class="rv">${city}</span></div>` : ''}
+        <div class="row"><span class="rl">Joined At</span><span class="rv">${joinedAt}</span></div>
+      </div>
+      <p>Admin dashboard pe jaake is user ka account manage karo.</p>
+      <a class="btn" href="${process.env.APP_URL || 'https://signagecrm-production.up.railway.app'}/admin">Admin Dashboard</a>`;
+
+    await sendMail({
+      to: adminEmail,
+      subject: `New Signup: ${name} (${email}) | SignageCMS`,
+      html: wrap('New User Signup', body),
+    });
+    console.log(`[Email] New user alert sent to admin — ${email}`);
+  } catch (err) {
+    console.error('[Email] sendNewUserAlertEmail error:', err.message);
+  }
+}
+
+module.exports = { sendInvoiceEmail, sendApprovedEmail, sendRejectedEmail, sendDailyPoPReport, sendDailyPoPEmailAll, sendNewUserAlertEmail };
