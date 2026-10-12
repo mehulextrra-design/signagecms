@@ -26,7 +26,7 @@ async function createOtp(mobile) {
     `INSERT INTO otp_requests (mobile, otp, expires_at) VALUES ($1, $2, NOW() + INTERVAL '10 minutes')`,
     [normalized, otp]
   );
-  const otpButtons = [{ type: 'url', urlSuffix: '' }];
+  const otpButtons = [{ type: 'url' }];
   await sendWhatsApp(normalized, `Your OTP is ${otp}`, [otp], TPL_OTP, null, otpButtons);
   return normalized;
 }
