@@ -172,7 +172,7 @@ async function buildWeeklyReport(userId) {
 
   const result = await query(
     `SELECT
-       u.first_name, u.business_name, u.phone,
+       u.first_name, u.business_name, u.mobile,
        c.title AS campaign_title, c.package_name, c.slot_duration_sec,
        COUNT(pl.id)::int AS total_plays,
        COUNT(DISTINCT pl.screen_id)::int AS screen_count,
@@ -181,14 +181,14 @@ async function buildWeeklyReport(userId) {
      JOIN campaigns c ON c.user_id = u.id
      LEFT JOIN play_logs pl ON pl.campaign_id = c.id AND pl.played_at >= $2
      WHERE u.id = $1 AND c.status IN ('live','completed')
-     GROUP BY u.first_name, u.business_name, u.phone, c.title, c.package_name, c.slot_duration_sec
+     GROUP BY u.first_name, u.business_name, u.mobile, c.title, c.package_name, c.slot_duration_sec
      ORDER BY total_plays DESC`,
     [userId, since.toISOString()]
   );
 
   if (!result.rows.length) return null;
 
-  const { first_name, business_name, phone } = result.rows[0];
+  const { first_name, business_name, mobile: phone } = result.rows[0];
   const name = business_name || first_name || 'Advertiser';
   const totalPlays = result.rows.reduce((s, r) => s + (r.total_plays || 0), 0);
   const totalScreens = Math.max(...result.rows.map(r => r.screen_count || 0));
@@ -224,7 +224,7 @@ async function sendWeeklyReports() {
       `SELECT DISTINCT u.id FROM users u
        JOIN campaigns c ON c.user_id = u.id
        WHERE u.role = 'advertiser' AND c.status = 'live'
-         AND u.phone IS NOT NULL AND u.phone != ''`
+         AND u.mobile IS NOT NULL AND u.mobile != ''`
     );
 
     let sent = 0, failed = 0, skipped = 0;
