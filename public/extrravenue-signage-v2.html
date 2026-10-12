@@ -127,17 +127,17 @@ body{margin:0;}
 
 /* Hero Scene — real-world environment illustration */
 .hero-vis{
-  flex:1 1 0;
-  min-width:0;
-  max-width:680px;
+  flex:none;
+  width:460px;
+  max-width:100%;
   position:relative;
   border-radius:28px;
   overflow:hidden;
   box-shadow:0 40px 100px -24px rgba(0,0,0,.45),0 0 0 1px rgba(255,255,255,.06);
   align-self:center;
 }
-.vslide-wrap{position:relative;width:100%;aspect-ratio:4/3;overflow:hidden;display:block;}
-.vslide{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;opacity:0;transition:opacity .9s ease;pointer-events:none;}
+.vslide-wrap{position:relative;width:100%;aspect-ratio:3/4;overflow:hidden;display:block;}
+.vslide{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;opacity:0;transition:opacity .9s ease;pointer-events:none;}
 .vslide.active{opacity:1;}
 
 .hcard{
@@ -392,7 +392,7 @@ body{margin:0;}
 
 /* Responsive */
 @media(max-width:1200px){
-  .hero-vis{max-width:580px;}
+  .hero-vis{width:420px;}
 }
 @media(max-width:1024px){
   .hero{padding-top:110px;min-height:auto;}
@@ -525,19 +525,6 @@ body{margin:0;}
           <img class="vslide" src="img/venue-cafe2.jpg" alt="Cafe — couple looking at screen">
         </div>
 
-        <!-- Overlay badge: Live Campaign -->
-        <div style="position:absolute;bottom:20px;right:20px;background:rgba(15,10,8,.82);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid rgba(255,92,0,.3);border-radius:12px;padding:10px 16px;display:flex;align-items:center;gap:10px;">
-          <span style="width:8px;height:8px;border-radius:50%;background:#ff5c00;display:block;flex-shrink:0;animation:pulse 1.4s ease infinite;"></span>
-          <span style="font-family:'Libre Franklin',sans-serif;font-size:12px;font-weight:600;color:#f2efe9;letter-spacing:.02em;">Live campaign running</span>
-        </div>
-
-        <!-- Venue type badges top-left -->
-        <div style="position:absolute;top:18px;left:18px;display:flex;flex-wrap:wrap;gap:7px;">
-          <span style="background:rgba(15,10,8,.75);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid rgba(242,239,233,.12);border-radius:8px;padding:5px 11px;font-family:'Libre Franklin',sans-serif;font-size:11px;font-weight:600;color:rgba(242,239,233,.85);letter-spacing:.04em;">☕ Cafe</span>
-          <span style="background:rgba(15,10,8,.75);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid rgba(242,239,233,.12);border-radius:8px;padding:5px 11px;font-family:'Libre Franklin',sans-serif;font-size:11px;font-weight:600;color:rgba(242,239,233,.85);letter-spacing:.04em;">💪 Gym</span>
-          <span style="background:rgba(15,10,8,.75);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid rgba(242,239,233,.12);border-radius:8px;padding:5px 11px;font-family:'Libre Franklin',sans-serif;font-size:11px;font-weight:600;color:rgba(242,239,233,.85);letter-spacing:.04em;">✂ Salon</span>
-          <span style="background:rgba(15,10,8,.75);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid rgba(242,239,233,.12);border-radius:8px;padding:5px 11px;font-family:'Libre Franklin',sans-serif;font-size:11px;font-weight:600;color:rgba(242,239,233,.85);letter-spacing:.04em;">🏢 Mall</span>
-        </div>
       </div><!-- /hero-vis -->
     </div><!-- /hero-in -->
   </div>
