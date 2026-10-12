@@ -136,6 +136,9 @@ body{margin:0;}
   box-shadow:0 40px 100px -24px rgba(0,0,0,.45),0 0 0 1px rgba(255,255,255,.06);
   align-self:center;
 }
+.vslide-wrap{position:relative;width:100%;aspect-ratio:4/3;overflow:hidden;display:block;}
+.vslide{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;opacity:0;transition:opacity .9s ease;pointer-events:none;}
+.vslide.active{opacity:1;}
 
 .hcard{
   width:230px;
@@ -514,245 +517,13 @@ body{margin:0;}
 
       <!-- Right: Real-world signage environment illustration -->
       <div class="hero-vis" id="heroVis">
-        <svg viewBox="0 0 700 525" width="700" height="525" xmlns="http://www.w3.org/2000/svg" style="display:block;width:100%;height:auto;">
-        <defs>
-          <linearGradient id="gymCeilG" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#101010"/><stop offset="100%" stop-color="#1c1a18"/></linearGradient>
-          <linearGradient id="gymFloorG" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#585350"/><stop offset="100%" stop-color="#484440"/></linearGradient>
-          <linearGradient id="gymLeftWG" x1="1" y1="0" x2="0" y2="0"><stop offset="0%" stop-color="#3c3834"/><stop offset="100%" stop-color="#2c2824"/></linearGradient>
-          <linearGradient id="gymRightWG" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#2a2622"/><stop offset="100%" stop-color="#1e1a16"/></linearGradient>
-          <linearGradient id="pillarG" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#626058"/><stop offset="30%" stop-color="#7c7870"/><stop offset="68%" stop-color="#88847c"/><stop offset="100%" stop-color="#6e6a62"/></linearGradient>
-          <linearGradient id="winG" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#5888a0"/><stop offset="55%" stop-color="#7aaab8"/><stop offset="100%" stop-color="#98c2d0"/></linearGradient>
-          <linearGradient id="adBgG" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ddf2d2"/><stop offset="100%" stop-color="#f5fcf2"/></linearGradient>
-          <linearGradient id="adHdrG" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#2e6228"/><stop offset="100%" stop-color="#408040"/></linearGradient>
-          <radialGradient id="scrGlowG" cx="50%" cy="50%" r="70%"><stop offset="0%" stop-color="#c8f0b8" stop-opacity="0.18"/><stop offset="100%" stop-color="#c8f0b8" stop-opacity="0"/></radialGradient>
-          <radialGradient id="v2vign" cx="50%" cy="50%" r="68%"><stop offset="48%" stop-color="transparent"/><stop offset="100%" stop-color="rgba(0,0,0,0.68)"/></radialGradient>
-          <filter id="bgBlurF"><feGaussianBlur stdDeviation="2.2"/></filter>
-          <clipPath id="scrClipG"><rect x="316" y="185" width="72" height="134" rx="2"/></clipPath>
-        </defs>
-
-        <!-- GYM BACKGROUND -->
-        <rect x="0" y="0" width="700" height="82" fill="url(#gymCeilG)"/>
-        <rect x="0" y="82" width="304" height="356" fill="url(#gymLeftWG)"/>
-        <rect x="402" y="82" width="298" height="356" fill="url(#gymRightWG)"/>
-        <rect x="0" y="438" width="700" height="87" fill="url(#gymFloorG)"/>
-        <g stroke="#4c4844" stroke-width="0.5" opacity="0.5">
-          <line x1="0" y1="468" x2="700" y2="468"/><line x1="0" y1="498" x2="700" y2="498"/>
-          <line x1="100" y1="438" x2="100" y2="525"/><line x1="200" y1="438" x2="200" y2="525"/>
-          <line x1="300" y1="438" x2="300" y2="525"/><line x1="400" y1="438" x2="400" y2="525"/>
-          <line x1="500" y1="438" x2="500" y2="525"/><line x1="600" y1="438" x2="600" y2="525"/>
-        </g>
-        <rect x="0" y="434" width="700" height="7" fill="#363230"/>
-
-        <!-- INDUSTRIAL CEILING -->
-        <rect x="0" y="8" width="700" height="30" rx="7" fill="#181614"/>
-        <rect x="0" y="9" width="700" height="6" fill="rgba(255,255,255,0.03)"/>
-        <line x1="0" y1="38" x2="700" y2="38" stroke="#242220" stroke-width="1"/>
-        <rect x="0" y="42" width="302" height="18" rx="4" fill="#161412"/>
-        <rect x="400" y="42" width="300" height="18" rx="4" fill="#161412"/>
-        <g stroke="#1e1c1a" stroke-width="2.5">
-          <line x1="80" y1="38" x2="80" y2="58"/><line x1="170" y1="38" x2="170" y2="58"/>
-          <line x1="455" y1="38" x2="455" y2="58"/><line x1="555" y1="38" x2="555" y2="58"/>
-          <line x1="645" y1="38" x2="645" y2="58"/>
-        </g>
-        <g fill="#202020">
-          <rect x="75" y="56" width="10" height="6" rx="1"/><rect x="165" y="56" width="10" height="6" rx="1"/>
-          <rect x="450" y="56" width="10" height="6" rx="1"/><rect x="550" y="56" width="10" height="6" rx="1"/>
-          <rect x="640" y="56" width="10" height="6" rx="1"/>
-        </g>
-        <line x1="0" y1="64" x2="700" y2="64" stroke="#fff8e0" stroke-width="1.5" opacity="0.3"/>
-        <rect x="0" y="60" width="700" height="18" fill="rgba(255,248,200,0.04)"/>
-
-        <!-- WINDOWS (left wall) -->
-        <rect x="10" y="92" width="80" height="118" rx="2" fill="url(#winG)" opacity="0.82"/>
-        <line x1="50" y1="92" x2="50" y2="210" stroke="rgba(200,228,240,0.48)" stroke-width="1.5"/>
-        <line x1="10" y1="151" x2="90" y2="151" stroke="rgba(200,228,240,0.48)" stroke-width="1.5"/>
-        <rect x="10" y="92" width="80" height="118" rx="2" fill="none" stroke="#282422" stroke-width="2"/>
-        <polygon points="10,210 90,210 116,438 -12,438" fill="rgba(175,210,228,0.05)"/>
-        <rect x="102" y="92" width="80" height="118" rx="2" fill="url(#winG)" opacity="0.70"/>
-        <line x1="142" y1="92" x2="142" y2="210" stroke="rgba(200,228,240,0.48)" stroke-width="1.5"/>
-        <line x1="102" y1="151" x2="182" y2="151" stroke="rgba(200,228,240,0.48)" stroke-width="1.5"/>
-        <rect x="102" y="92" width="80" height="118" rx="2" fill="none" stroke="#282422" stroke-width="2"/>
-        <rect x="195" y="100" width="65" height="102" rx="2" fill="url(#winG)" opacity="0.55"/>
-        <line x1="228" y1="100" x2="228" y2="202" stroke="rgba(200,228,240,0.48)" stroke-width="1.5"/>
-        <rect x="195" y="100" width="65" height="102" rx="2" fill="none" stroke="#282422" stroke-width="2"/>
-
-        <!-- TREADMILLS (left, blurred) -->
-        <g filter="url(#bgBlurF)" opacity="0.72">
-          <rect x="14" y="275" width="65" height="46" rx="4" fill="#201e1c"/>
-          <rect x="18" y="256" width="57" height="37" rx="3" fill="#1c1a18"/>
-          <rect x="20" y="258" width="53" height="32" rx="2" fill="#1a2030"/>
-          <rect x="14" y="319" width="65" height="16" rx="3" fill="#181614"/>
-          <rect x="12" y="260" width="4" height="54" rx="2" fill="#2a2826"/>
-          <rect x="81" y="260" width="4" height="54" rx="2" fill="#2a2826"/>
-          <rect x="98" y="267" width="72" height="52" rx="4" fill="#242220"/>
-          <rect x="102" y="244" width="64" height="42" rx="3" fill="#201e1c"/>
-          <rect x="104" y="246" width="60" height="36" rx="2" fill="#1c2234"/>
-          <rect x="98" y="317" width="72" height="18" rx="3" fill="#1a1816"/>
-          <rect x="96" y="249" width="4" height="62" rx="2" fill="#2c2a28"/>
-          <rect x="172" y="249" width="4" height="62" rx="2" fill="#2c2a28"/>
-          <circle cx="134" cy="222" r="10" fill="#28261e" opacity="0.55"/>
-          <ellipse cx="134" cy="238" rx="9" ry="13" fill="#28261e" opacity="0.55"/>
-          <line x1="129" y1="248" x2="122" y2="266" stroke="#28261e" stroke-width="5" stroke-linecap="round" opacity="0.55"/>
-          <line x1="139" y1="248" x2="146" y2="266" stroke="#28261e" stroke-width="5" stroke-linecap="round" opacity="0.55"/>
-          <rect x="190" y="258" width="76" height="58" rx="4" fill="#262422"/>
-          <rect x="194" y="232" width="68" height="46" rx="3" fill="#222020"/>
-          <rect x="196" y="234" width="64" height="40" rx="2" fill="#1e2238"/>
-          <rect x="190" y="314" width="76" height="20" rx="3" fill="#1c1a18"/>
-          <rect x="188" y="238" width="4" height="68" rx="2" fill="#2e2c2a"/>
-          <rect x="268" y="238" width="4" height="68" rx="2" fill="#2e2c2a"/>
-        </g>
-
-        <!-- WEIGHT RACK (right, blurred) -->
-        <g filter="url(#bgBlurF)" opacity="0.65">
-          <rect x="418" y="285" width="148" height="118" fill="#1a1816" stroke="#222" stroke-width="1"/>
-          <line x1="418" y1="308" x2="566" y2="308" stroke="#282624" stroke-width="2"/>
-          <line x1="418" y1="332" x2="566" y2="332" stroke="#282624" stroke-width="2"/>
-          <line x1="418" y1="358" x2="566" y2="358" stroke="#282624" stroke-width="2"/>
-          <ellipse cx="440" cy="306" rx="9" ry="6" fill="#38362e"/><rect x="431" y="300" width="18" height="6" fill="#2e2c28"/>
-          <ellipse cx="472" cy="306" rx="10" ry="6.5" fill="#38362e"/><rect x="462" y="299" width="20" height="7" fill="#2e2c28"/>
-          <ellipse cx="508" cy="306" rx="11" ry="7" fill="#38362e"/><rect x="497" y="299" width="22" height="7" fill="#2e2c28"/>
-          <ellipse cx="547" cy="306" rx="12" ry="7.5" fill="#38362e"/><rect x="535" y="298" width="24" height="8" fill="#2e2c28"/>
-          <ellipse cx="438" cy="330" rx="10" ry="6.5" fill="#302e28"/><rect x="428" y="323" width="20" height="7" fill="#28261e"/>
-          <ellipse cx="474" cy="330" rx="11" ry="7" fill="#302e28"/><rect x="463" y="323" width="22" height="7" fill="#28261e"/>
-          <ellipse cx="513" cy="330" rx="12" ry="7.5" fill="#302e28"/><rect x="501" y="322" width="24" height="8" fill="#28261e"/>
-        </g>
-
-        <!-- MOTIVATIONAL POSTER (right wall) -->
-        <g opacity="0.58">
-          <rect x="478" y="95" width="108" height="152" rx="3" fill="#161412" stroke="#1e1c1a" stroke-width="1"/>
-          <rect x="480" y="97" width="104" height="102" fill="#101010"/>
-          <circle cx="532" cy="118" r="11" fill="#282420"/>
-          <ellipse cx="532" cy="139" rx="13" ry="17" fill="#282420"/>
-          <line x1="520" y1="133" x2="504" y2="116" stroke="#282420" stroke-width="7" stroke-linecap="round"/>
-          <line x1="544" y1="133" x2="560" y2="116" stroke="#282420" stroke-width="7" stroke-linecap="round"/>
-          <circle cx="500" cy="113" r="8" fill="#343028"/><circle cx="564" cy="113" r="8" fill="#343028"/>
-          <rect x="480" y="199" width="104" height="46" fill="#0c0a08"/>
-          <text x="532" y="218" font-family="sans-serif" font-weight="800" font-size="12" fill="#e0dcd6" text-anchor="middle" letter-spacing="2">NO PAIN</text>
-          <text x="532" y="233" font-family="sans-serif" font-weight="800" font-size="12" fill="#e85c00" text-anchor="middle" letter-spacing="2">NO GAIN</text>
-          <text x="532" y="244" font-family="sans-serif" font-size="6.5" fill="#706a64" text-anchor="middle" letter-spacing="2">ARKHOUR FITNESS</text>
-        </g>
-
-        <!-- SQUAT RACK far right -->
-        <g filter="url(#bgBlurF)" opacity="0.42">
-          <line x1="618" y1="265" x2="618" y2="438" stroke="#2a2826" stroke-width="7" stroke-linecap="round"/>
-          <line x1="678" y1="265" x2="678" y2="438" stroke="#2a2826" stroke-width="7" stroke-linecap="round"/>
-          <line x1="618" y1="292" x2="678" y2="292" stroke="#2a2826" stroke-width="5" stroke-linecap="round"/>
-          <line x1="618" y1="348" x2="678" y2="348" stroke="#2a2826" stroke-width="5" stroke-linecap="round"/>
-          <line x1="595" y1="312" x2="700" y2="312" stroke="#3a3834" stroke-width="5" stroke-linecap="round"/>
-          <ellipse cx="604" cy="312" rx="7" ry="18" fill="#403e38"/><ellipse cx="694" cy="312" rx="7" ry="18" fill="#403e38"/>
-        </g>
-
-        <!-- CONCRETE PILLAR -->
-        <ellipse cx="353" cy="453" rx="58" ry="11" fill="rgba(0,0,0,0.28)"/>
-        <rect x="306" y="0" width="94" height="525" fill="url(#pillarG)"/>
-        <rect x="306" y="0" width="5" height="525" fill="rgba(220,220,200,0.07)"/>
-        <rect x="395" y="0" width="5" height="525" fill="rgba(0,0,0,0.10)"/>
-        <g stroke="rgba(0,0,0,0.065)" stroke-width="0.7">
-          <line x1="319" y1="0" x2="321" y2="525"/><line x1="337" y1="0" x2="335" y2="525"/>
-          <line x1="356" y1="0" x2="358" y2="525"/><line x1="375" y1="0" x2="373" y2="525"/>
-          <line x1="390" y1="0" x2="392" y2="525"/>
-        </g>
-        <g stroke="rgba(0,0,0,0.09)" stroke-width="0.9">
-          <line x1="306" y1="108" x2="400" y2="108"/><line x1="306" y1="216" x2="400" y2="216"/>
-          <line x1="306" y1="324" x2="400" y2="324"/><line x1="306" y1="432" x2="400" y2="432"/>
-        </g>
-
-        <!-- PORTRAIT SCREEN ON PILLAR -->
-        <rect x="306" y="158" width="94" height="228" fill="url(#scrGlowG)"/>
-        <!-- Mounting bracket top -->
-        <rect x="330" y="172" width="46" height="10" rx="3" fill="#181816"/>
-        <line x1="341" y1="181" x2="341" y2="190" stroke="#121210" stroke-width="5" stroke-linecap="round"/>
-        <line x1="365" y1="181" x2="365" y2="190" stroke="#121210" stroke-width="5" stroke-linecap="round"/>
-        <!-- Screen bezel (portrait 80x148) -->
-        <rect x="312" y="188" width="80" height="148" rx="5" fill="#080808"/>
-        <!-- Screen display (72x140) -->
-        <rect x="316" y="192" width="72" height="140" rx="3" fill="#0e0e0e" stroke="#1a1a1a" stroke-width="0.8"/>
-
-        <!-- AD CONTENT (healthcare brand, portrait) -->
-        <g clip-path="url(#scrClipG)">
-          <rect x="316" y="185" width="72" height="134" fill="url(#adBgG)"/>
-          <!-- Green header -->
-          <rect x="316" y="185" width="72" height="22" fill="url(#adHdrG)"/>
-          <circle cx="325" cy="196" r="7" fill="rgba(255,255,255,0.22)"/>
-          <text x="325" y="199.5" font-family="sans-serif" font-weight="700" font-size="6" fill="#fff" text-anchor="middle">G</text>
-          <text x="337" y="193" font-family="sans-serif" font-weight="700" font-size="5.5" fill="#fff">&#2711;&#2714;&#2714; &#2727;&#2376;&#2342;</text>
-          <text x="337" y="202" font-family="sans-serif" font-size="3.8" fill="rgba(255,255,255,0.82)">GARBA VAIDA CLINIC</text>
-          <!-- LIVE badge -->
-          <rect x="364" y="188" width="20" height="9" rx="2.5" fill="#e83018"/>
-          <circle cx="369" cy="192.5" r="2.5" fill="#fff" opacity="0.9"><animate attributeName="opacity" values="1;0.28;1" dur="1.4s" repeatCount="indefinite"/></circle>
-          <text x="380" y="195.5" font-family="sans-serif" font-weight="700" font-size="4.5" fill="#fff" text-anchor="middle">LIVE</text>
-          <!-- Photo area split 2 images -->
-          <rect x="316" y="207" width="35" height="58" fill="#b8d0a8"/>
-          <rect x="351" y="207" width="37" height="58" fill="#c2d8b0"/>
-          <circle cx="333" cy="221" r="9" fill="#587848" opacity="0.8"/>
-          <ellipse cx="333" cy="237" rx="11" ry="10" fill="#587848" opacity="0.8"/>
-          <circle cx="362" cy="220" r="8" fill="#4a6e3a" opacity="0.8"/>
-          <circle cx="374" cy="222" r="7" fill="#587040" opacity="0.8"/>
-          <ellipse cx="368" cy="237" rx="13" ry="10" fill="#4e6840" opacity="0.8"/>
-          <text x="333" y="254" font-family="sans-serif" font-weight="700" font-size="9" fill="#3a6028" text-anchor="middle" opacity="0.45">+</text>
-          <!-- Divider -->
-          <line x1="316" y1="265" x2="388" y2="265" stroke="#a8c8a0" stroke-width="0.8"/>
-          <!-- Text area -->
-          <rect x="316" y="265" width="72" height="38" fill="#f2fced"/>
-          <text x="352" y="276" font-family="sans-serif" font-weight="700" font-size="5.2" fill="#246020" text-anchor="middle">IVF - IUI - Fertility</text>
-          <text x="352" y="285" font-family="sans-serif" font-size="4.2" fill="#3a7030" text-anchor="middle">Free Consultation</text>
-          <text x="352" y="294" font-family="sans-serif" font-size="3.8" fill="#506848" text-anchor="middle">+91-9882 206 697</text>
-          <rect x="362" y="280" width="16" height="16" rx="1.5" fill="#0e0e0c"/>
-          <rect x="363" y="281" width="14" height="14" rx="1" fill="#fff"/>
-          <rect x="364" y="282" width="4" height="4" fill="#111"/>
-          <rect x="372" y="282" width="4" height="4" fill="#111"/>
-          <rect x="364" y="290" width="4" height="4" fill="#111"/>
-          <rect x="368" y="286" width="3" height="2" fill="#111"/>
-          <rect x="372" y="287" width="2" height="5" fill="#111"/>
-          <!-- extrravenue bar -->
-          <rect x="316" y="303" width="72" height="16" fill="#0c0c0a"/>
-          <rect x="319" y="306" width="12" height="8" rx="1.5" fill="#ff5c00"/>
-          <text x="325" y="312.5" font-family="sans-serif" font-weight="700" font-size="5" fill="#fff" text-anchor="middle">x</text>
-          <text x="335" y="312" font-family="sans-serif" font-weight="600" font-size="4.5" fill="#ccc8c4" letter-spacing="0.2">extrravenue</text>
-          <text x="385" y="312" font-family="sans-serif" font-size="3.8" fill="#706c68" text-anchor="end">400+ venues</text>
-        </g>
-        <!-- Screen glass sheen -->
-        <path d="M 316 192 Q 346 194 343 215 Q 331 211 316 205 Z" fill="rgba(255,255,255,0.055)"/>
-        <rect x="312" y="188" width="80" height="148" rx="5" fill="none" stroke="#242424" stroke-width="0.8"/>
-        <rect x="312" y="188" width="80" height="148" rx="5" fill="none" stroke="rgba(160,240,130,0.1)" stroke-width="2"/>
-        <!-- Mounting bracket bottom -->
-        <rect x="330" y="336" width="46" height="10" rx="3" fill="#181816"/>
-        <line x1="341" y1="336" x2="341" y2="346" stroke="#121210" stroke-width="5" stroke-linecap="round"/>
-        <line x1="365" y1="336" x2="365" y2="346" stroke="#121210" stroke-width="5" stroke-linecap="round"/>
-
-        <!-- PEOPLE (foreground) -->
-        <!-- Man (left, looking toward screen) -->
-        <circle cx="188" cy="348" r="22" fill="#b08258"/>
-        <ellipse cx="188" cy="333" rx="20" ry="13" fill="#181410"/>
-        <ellipse cx="170" cy="346" rx="7" ry="15" fill="#181410" opacity="0.85"/>
-        <ellipse cx="206" cy="346" rx="7" ry="14" fill="#181410" opacity="0.7"/>
-        <rect x="180" y="368" width="16" height="16" rx="4" fill="#b08258"/>
-        <ellipse cx="188" cy="430" rx="30" ry="52" fill="#5c5a58"/>
-        <path d="M 160 412 Q 144 424 138 448" stroke="#5c5a58" stroke-width="15" fill="none" stroke-linecap="round"/>
-        <path d="M 216 408 Q 230 420 234 442" stroke="#5c5a58" stroke-width="13" fill="none" stroke-linecap="round"/>
-        <path d="M 162 476 L 156 525 L 178 525 L 186 494 L 190 494 L 198 525 L 218 525 L 213 476 Z" fill="#222e3c"/>
-        <ellipse cx="165" cy="521" rx="13" ry="5" fill="#c4c0bc"/>
-        <ellipse cx="206" cy="521" rx="13" ry="5" fill="#c4c0bc"/>
-        <rect x="230" y="433" width="9" height="7" rx="2" fill="#b8b4b0" opacity="0.9"/>
-        <!-- Woman (right, looking toward screen) -->
-        <ellipse cx="528" cy="332" rx="26" ry="30" fill="#161210"/>
-        <circle cx="528" cy="340" r="19" fill="#c09070"/>
-        <ellipse cx="528" cy="320" rx="24" ry="17" fill="#161210"/>
-        <ellipse cx="509" cy="338" rx="9" ry="22" fill="#161210"/>
-        <ellipse cx="547" cy="337" rx="8" ry="20" fill="#161210"/>
-        <rect x="520" y="357" width="16" height="17" rx="4" fill="#c09070"/>
-        <ellipse cx="528" cy="422" rx="31" ry="52" fill="#1e1c2a"/>
-        <path d="M 499 400 Q 482 414 478 438" stroke="#1e1c2a" stroke-width="15" fill="none" stroke-linecap="round"/>
-        <path d="M 557 396 Q 572 410 576 432" stroke="#c09070" stroke-width="12" fill="none" stroke-linecap="round"/>
-        <ellipse cx="576" cy="434" rx="8" ry="6" fill="#c09070"/>
-        <path d="M 500 472 L 494 525 L 516 525 L 522 493 L 528 493 L 532 525 L 550 525 L 553 472 Z" fill="#1c1c26"/>
-        <ellipse cx="503" cy="521" rx="12" ry="5" fill="#e0dcd8"/>
-        <ellipse cx="542" cy="521" rx="12" ry="5" fill="#e0dcd8"/>
-
-        <!-- VIGNETTE -->
-        <rect x="0" y="0" width="700" height="525" fill="url(#v2vign)"/>
-
-        </svg>
+        <!-- Real venue photos — rotating slideshow -->
+        <div class="vslide-wrap">
+          <img class="vslide active" src="img/venue-gym.jpg" alt="Gym — digital screen on pillar">
+          <img class="vslide" src="img/venue-salon.jpg" alt="Salon — digital screen on marble pillar">
+          <img class="vslide" src="img/venue-cafe1.jpg" alt="Cafe — digital screen with audience">
+          <img class="vslide" src="img/venue-cafe2.jpg" alt="Cafe — couple looking at screen">
+        </div>
 
         <!-- Overlay badge: Live Campaign -->
         <div style="position:absolute;bottom:20px;right:20px;background:rgba(15,10,8,.82);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid rgba(255,92,0,.3);border-radius:12px;padding:10px 16px;display:flex;align-items:center;gap:10px;">
@@ -1337,6 +1108,19 @@ document.querySelectorAll('.counter').forEach(el => co.observe(el));
   }
 })();
 
+</script>
+
+<script>
+(function(){
+  var slides = document.querySelectorAll('.vslide');
+  if (!slides.length) return;
+  var cur = 0;
+  setInterval(function(){
+    slides[cur].classList.remove('active');
+    cur = (cur + 1) % slides.length;
+    slides[cur].classList.add('active');
+  }, 3500);
+})();
 </script>
 
 </body>
