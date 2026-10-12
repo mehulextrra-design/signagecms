@@ -41,8 +41,11 @@ async function verifyOtp(mobile, otp) {
   return normalized;
 }
 
+const normalizeMobile = v => v.replace(/\D/g, '').replace(/^91/, '').slice(-10);
+const mobileField = () => body('mobile').customSanitizer(normalizeMobile).isMobilePhone('en-IN');
+
 // POST /api/auth/send-otp
-router.post('/send-otp', [body('mobile').isMobilePhone('en-IN')], async (req, res, next) => {
+router.post('/send-otp', [mobileField()], async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) return res.status(400).json({ error: 'Invalid mobile number' });
   try {
@@ -56,7 +59,7 @@ router.post('/register', [
   body('email').isEmail().normalizeEmail(),
   body('first_name').trim().notEmpty(),
   body('last_name').trim().notEmpty(),
-  body('mobile').isMobilePhone('en-IN'),
+  mobileField(),
   body('otp').isLength({ min: 6, max: 6 }),
 ], async (req, res, next) => {
   const errors = validationResult(req);
@@ -88,7 +91,7 @@ router.post('/register-admin', authenticate, [
   body('email').isEmail().normalizeEmail(),
   body('first_name').trim().notEmpty(),
   body('last_name').trim().notEmpty(),
-  body('mobile').isMobilePhone('en-IN'),
+  mobileField(),
   body('password').isLength({ min: 8 }),
 ], async (req, res, next) => {
   if (req.user.role !== 'admin') return res.status(403).json({ error: 'Admin only' });
@@ -117,7 +120,7 @@ router.post('/register-admin', authenticate, [
 
 // POST /api/auth/login-otp — passwordless login via WhatsApp OTP
 router.post('/login-otp', [
-  body('mobile').isMobilePhone('en-IN'),
+  mobileField(),
   body('otp').isLength({ min: 6, max: 6 }),
 ], async (req, res, next) => {
   const errors = validationResult(req);
