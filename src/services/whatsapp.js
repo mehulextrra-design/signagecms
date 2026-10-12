@@ -80,7 +80,7 @@ function httpPost(url, payload, headers = {}) {
 // ── Send single WhatsApp message ──────────────────────────────────────────────
 // templateName: Aisensy campaign/template name (defaults to global TEMPLATE)
 // mediaUrl:     For Aisensy document-type templates — public URL of the PDF
-async function sendWhatsApp(phone, message, templateParams = null, templateName = null, mediaUrl = null) {
+async function sendWhatsApp(phone, message, templateParams = null, templateName = null, mediaUrl = null, buttons = null) {
   // Normalize phone: strip +91, spaces, dashes → 10-digit
   const normalized = phone.replace(/\D/g, '').replace(/^91/, '').slice(-10);
   if (normalized.length !== 10) {
@@ -99,6 +99,7 @@ async function sendWhatsApp(phone, message, templateParams = null, templateName 
       templateParams: templateParams || [message],
       source: 'signagecms-backend',
       media: mediaUrl ? { url: mediaUrl, filename: mediaUrl.split('/').pop() } : undefined,
+      buttons: buttons || [],
       paramsFallbackValue: { FirstName: firstName },
     };
     try {
