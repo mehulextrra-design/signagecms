@@ -804,52 +804,64 @@ body{margin:0;}
 <!-- DEMO SIMULATOR -->
 <section id="demo" style="background:var(--dark);padding:80px 0 96px;">
   <div class="wrap">
-    <div style="text-align:center;margin-bottom:48px;" data-reveal>
+    <div style="text-align:center;margin-bottom:40px;" data-reveal>
       <div class="eyebrow on-dark"><i></i>Campaign Simulator</div>
       <h2 class="h-lg" style="color:#fff;margin-top:16px;">Plan karo, instantly<br><span style="color:var(--orange);">result dekho</span></h2>
       <p style="color:rgba(255,255,255,.55);max-width:46ch;margin:14px auto 0;font-size:17px;line-height:1.55;">Screens aur package choose karo — har click pe result live update hoga.</p>
     </div>
 
-    <div style="max-width:840px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;border-radius:24px;overflow:hidden;border:1px solid rgba(255,255,255,.1);box-shadow:0 32px 80px rgba(0,0,0,.45);" id="sim-wrap">
+    <div id="sim-wrap">
 
       <!-- LEFT: Inputs -->
-      <div style="background:#ffffff;padding:32px 28px;">
-        <div style="font-size:10px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:rgba(30,30,30,.36);margin-bottom:6px;">CAMPAIGN PLANNER</div>
-        <div style="font-size:20px;font-weight:800;color:#1e1e1e;letter-spacing:-0.02em;line-height:1.2;margin-bottom:28px;">Apni reach<br>calculate karo</div>
+      <div class="sim-left">
+        <div style="font-size:10px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:rgba(30,30,30,.36);margin-bottom:16px;">CAMPAIGN PLANNER</div>
 
-        <div style="font-size:10px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:rgba(30,30,30,.36);margin-bottom:10px;">Screens</div>
-        <div id="screens-grid" style="display:flex;flex-direction:column;gap:6px;margin-bottom:6px;"></div>
-        <div style="font-size:10px;color:rgba(30,30,30,.36);margin-bottom:22px;" id="sel-count-label">2 screens selected</div>
+        <div class="sim-sec-label">Screens</div>
+        <div id="screens-grid" style="display:flex;flex-direction:column;gap:5px;margin-bottom:4px;"></div>
+        <div style="font-size:10px;color:rgba(30,30,30,.36);margin-bottom:16px;" id="sel-count-label">2 screens selected</div>
 
-        <div style="font-size:10px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:rgba(30,30,30,.36);margin-bottom:10px;">Package</div>
-        <div id="pkg-grid" style="display:flex;flex-direction:column;gap:6px;"></div>
+        <div class="sim-sec-label">Package</div>
+        <div id="pkg-grid" style="display:flex;flex-direction:column;gap:5px;margin-bottom:16px;"></div>
+
+        <div class="sim-sec-label">Ad Creative <span style="font-weight:400;text-transform:none;letter-spacing:0;">(optional)</span></div>
+        <div id="creative-drop" onclick="document.getElementById('sim-file').click()" style="border:1.5px dashed rgba(30,30,30,.18);border-radius:10px;cursor:pointer;overflow:hidden;transition:.15s;background:#fafafa;position:relative;">
+          <input type="file" id="sim-file" accept="image/*" style="display:none" onchange="simUploadCreative(this)">
+          <div id="creative-placeholder" style="aspect-ratio:16/9;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="rgba(30,30,30,.25)" stroke-width="1.5"><rect x="3" y="3" width="18" height="14" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            <div style="font-size:11px;color:rgba(30,30,30,.4);font-weight:600;">Click to upload creative</div>
+            <div style="font-size:9px;color:rgba(30,30,30,.28);">JPG · PNG · 16:9 recommended</div>
+          </div>
+          <div id="creative-preview" style="display:none;aspect-ratio:16/9;background-size:cover;background-position:center;position:relative;">
+            <button onclick="event.stopPropagation();simRemoveCreative()" style="position:absolute;top:7px;right:7px;background:rgba(0,0,0,.55);border:0;border-radius:999px;width:22px;height:22px;color:#fff;cursor:pointer;font-size:14px;line-height:22px;text-align:center;padding:0;">×</button>
+          </div>
+        </div>
       </div>
 
       <!-- RIGHT: Live Result -->
-      <div style="background:#0a0e1a;padding:32px 28px;display:flex;flex-direction:column;min-height:520px;">
+      <div class="sim-right">
         <div style="font-size:9px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:rgba(255,255,255,.26);margin-bottom:4px;">ESTIMATED REACH</div>
 
-        <div id="res-big" style="font-size:52px;font-weight:800;color:#fff;letter-spacing:-0.03em;line-height:1;font-variant-numeric:tabular-nums;margin-top:2px;">3,93,000</div>
-        <div style="font-size:12px;color:rgba(255,255,255,.3);margin-top:5px;margin-bottom:16px;">plays per month</div>
+        <div id="res-big" style="font-size:clamp(38px,5vw,56px);font-weight:800;color:#fff;letter-spacing:-0.03em;line-height:1;font-variant-numeric:tabular-nums;margin-top:2px;">—</div>
+        <div style="font-size:12px;color:rgba(255,255,255,.3);margin-top:4px;margin-bottom:14px;">plays per month</div>
 
-        <div id="res-badges" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px;min-height:28px;"></div>
+        <div id="res-badges" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;min-height:28px;"></div>
 
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;border-top:1px solid rgba(255,255,255,.07);padding-top:16px;margin-bottom:20px;">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;border-top:1px solid rgba(255,255,255,.07);padding-top:14px;margin-bottom:16px;">
           <div>
-            <div style="font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.26);margin-bottom:5px;">Screens</div>
-            <div id="r-screens" style="font-size:17px;font-weight:700;color:#fff;">2</div>
+            <div style="font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.26);margin-bottom:4px;">Screens</div>
+            <div id="r-screens" style="font-size:clamp(14px,2vw,18px);font-weight:700;color:#fff;">—</div>
           </div>
           <div>
-            <div style="font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.26);margin-bottom:5px;">Daily</div>
-            <div id="r-daily" style="font-size:17px;font-weight:700;color:#22d3ee;">13,100</div>
+            <div style="font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.26);margin-bottom:4px;">Daily</div>
+            <div id="r-daily" style="font-size:clamp(14px,2vw,18px);font-weight:700;color:#22d3ee;">—</div>
           </div>
           <div>
-            <div style="font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.26);margin-bottom:5px;">Cost</div>
-            <div id="r-cost" style="font-size:17px;font-weight:700;color:var(--orange);">₹13,000</div>
+            <div style="font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.26);margin-bottom:4px;">Cost</div>
+            <div id="r-cost" style="font-size:clamp(14px,2vw,18px);font-weight:700;color:var(--orange);">—</div>
           </div>
         </div>
 
-        <div style="display:flex;gap:4px;margin-bottom:14px;">
+        <div style="display:flex;gap:4px;margin-bottom:12px;">
           <button class="res-tab active" data-tab="summary" onclick="simTab(this)">Summary</button>
           <button class="res-tab" data-tab="screens" onclick="simTab(this)">Per Screen</button>
           <button class="res-tab" data-tab="cost" onclick="simTab(this)">Cost</button>
@@ -860,7 +872,7 @@ body{margin:0;}
         <div id="rt-cost" class="rt-panel" style="flex:1;display:none;"></div>
 
         <a href="https://signagecrm-production.up.railway.app"
-           style="background:var(--orange);color:#fff;text-decoration:none;padding:13px 20px;border-radius:999px;font-size:13px;font-weight:700;text-align:center;margin-top:20px;display:block;">
+           style="background:var(--orange);color:#fff;text-decoration:none;padding:13px 20px;border-radius:999px;font-size:13px;font-weight:700;text-align:center;margin-top:16px;display:block;">
           Abhi Book Karo →
         </a>
       </div>
@@ -869,21 +881,36 @@ body{margin:0;}
 </section>
 
 <style>
-.sc-row{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1.5px solid rgba(30,30,30,.1);border-radius:10px;cursor:pointer;transition:.15s;background:#fafafa;}
+/* Simulator layout */
+#sim-wrap{display:grid;grid-template-columns:1fr 1fr;border-radius:20px;overflow:hidden;border:1px solid rgba(255,255,255,.1);box-shadow:0 24px 64px rgba(0,0,0,.45);}
+.sim-left{background:#fff;padding:28px 26px;display:flex;flex-direction:column;}
+.sim-right{background:#0a0e1a;padding:28px 26px;display:flex;flex-direction:column;}
+.sim-sec-label{font-size:10px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:rgba(30,30,30,.36);margin-bottom:8px;}
+/* Screen row */
+.sc-row{display:flex;align-items:center;gap:10px;padding:9px 12px;border:1.5px solid rgba(30,30,30,.1);border-radius:10px;cursor:pointer;transition:.15s;background:#fafafa;}
 .sc-row:hover{border-color:rgba(255,92,0,.4);background:#fff8f4;}
 .sc-row.selected{border-color:var(--orange);background:#fff4ef;}
-.sc-check{width:18px;height:18px;border-radius:4px;border:1.5px solid rgba(30,30,30,.22);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:.15s;}
+.sc-check{width:17px;height:17px;border-radius:4px;border:1.5px solid rgba(30,30,30,.22);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:.15s;}
 .sc-row.selected .sc-check{background:var(--orange);border-color:var(--orange);}
-.pk-row{display:flex;align-items:center;padding:11px 13px;border:1.5px solid rgba(30,30,30,.1);border-radius:10px;cursor:pointer;transition:.15s;gap:10px;background:#fafafa;}
+/* Package row */
+.pk-row{display:flex;align-items:center;padding:10px 12px;border:1.5px solid rgba(30,30,30,.1);border-radius:10px;cursor:pointer;transition:.15s;gap:10px;background:#fafafa;}
 .pk-row:hover{border-color:rgba(255,92,0,.4);background:#fff8f4;}
 .pk-row.selected{border-color:var(--orange);background:#fff4ef;}
 .pk-dot{width:14px;height:14px;border-radius:50%;border:1.5px solid rgba(30,30,30,.22);flex-shrink:0;transition:.15s;display:flex;align-items:center;justify-content:center;}
 .pk-row.selected .pk-dot{background:var(--orange);border-color:var(--orange);}
-.res-tab{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.4);font:600 10px/1 'Libre Franklin',sans-serif;letter-spacing:.05em;padding:6px 11px;border-radius:999px;cursor:pointer;transition:.15s;}
+/* Creative drop hover */
+#creative-drop:hover{border-color:rgba(255,92,0,.4);background:#fff8f4;}
+/* Result tabs */
+.res-tab{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.4);font:600 10px/1 'Libre Franklin',sans-serif;letter-spacing:.05em;padding:6px 12px;border-radius:999px;cursor:pointer;transition:.15s;}
 .res-tab:hover{background:rgba(255,255,255,.1);}
 .res-tab.active{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.22);color:#fff;}
 .res-badge{display:inline-flex;align-items:center;padding:5px 10px;border-radius:999px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);font-size:11px;font-weight:600;color:rgba(255,255,255,.65);}
-@media(max-width:640px){#sim-wrap{grid-template-columns:1fr;}}
+/* Mobile */
+@media(max-width:700px){
+  #sim-wrap{grid-template-columns:1fr;}
+  .sim-right{order:1;border-radius:0;}
+  .sim-left{order:2;border-radius:0;}
+}
 </style>
 
 <script>
@@ -900,27 +927,26 @@ body{margin:0;}
     {id:'premium',name:'Premium',days:30,slot:'20s',price:18000},
   ];
   var COLORS=['#ff5c00','#22d3ee','#a855f7','#6ee7b7'];
-  var selScreens=[1,2],selPkg='regular',curTab='summary';
+  var selScreens=[1,2],selPkg='regular',curTab='summary',uploadedCreative=null;
 
   function fmt(n){return n.toLocaleString('en-IN');}
   function fmtRs(n){return '₹'+fmt(n);}
   function chk(){return '<svg width="10" height="8" viewBox="0 0 10 8" fill="none"><polyline points="1 4 3.8 7 9 1" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';}
-  function dot(){return '<svg width="6" height="6" viewBox="0 0 6 6"><circle cx="3" cy="3" r="3" fill="#fff"/></svg>';}
+  function radioFill(){return '<svg width="6" height="6" viewBox="0 0 6 6"><circle cx="3" cy="3" r="3" fill="#fff"/></svg>';}
 
   function buildScreens(){
-    var g=document.getElementById('screens-grid');
-    if(!g)return;
+    var g=document.getElementById('screens-grid'); if(!g)return;
     g.innerHTML=SCREENS.map(function(s){
       var sel=selScreens.indexOf(s.id)>-1;
       return '<div class="sc-row'+(sel?' selected':'')+'" onclick="simToggle('+s.id+')">'
         +'<div class="sc-check">'+(sel?chk():'')+'</div>'
         +'<div style="flex:1;min-width:0;">'
           +'<div style="font-size:13px;font-weight:700;color:#1e1e1e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+s.name+'</div>'
-          +'<div style="font-size:10px;color:rgba(30,30,30,.42);margin-top:1px;">'+s.area+'</div>'
+          +'<div style="font-size:10px;color:rgba(30,30,30,.4);margin-top:1px;">'+s.area+'</div>'
         +'</div>'
         +'<div style="text-align:right;flex-shrink:0;">'
           +'<div style="font-size:12px;font-weight:700;color:var(--orange);">'+fmt(s.plays)+'/day</div>'
-          +'<div style="font-size:9px;color:rgba(30,30,30,.35);margin-top:1px;">'+s.zone+' Zone</div>'
+          +'<div style="font-size:9px;color:rgba(30,30,30,.32);margin-top:1px;">'+s.zone+' Zone</div>'
         +'</div>'
       +'</div>';
     }).join('');
@@ -930,18 +956,17 @@ body{margin:0;}
   }
 
   function buildPkgs(){
-    var g=document.getElementById('pkg-grid');
-    if(!g)return;
+    var g=document.getElementById('pkg-grid'); if(!g)return;
     g.innerHTML=PKGS.map(function(p){
       var sel=selPkg===p.id;
       return '<div class="pk-row'+(sel?' selected':'')+'" onclick="simPickPkg(\''+p.id+'\')">'
-        +'<div class="pk-dot">'+(sel?dot():'')+'</div>'
+        +'<div class="pk-dot">'+(sel?radioFill():'')+'</div>'
         +'<div style="flex:1;">'
           +'<div style="display:flex;align-items:center;gap:6px;">'
             +'<span style="font-size:13px;font-weight:700;color:#1e1e1e;">'+p.name+'</span>'
             +(p.pop?'<span style="font-size:9px;font-weight:700;background:#fff0eb;color:var(--orange);padding:1px 6px;border-radius:999px;">Popular</span>':'')
           +'</div>'
-          +'<div style="font-size:10px;color:rgba(30,30,30,.42);margin-top:1px;">'+p.slot+' slot · '+(p.days===7?'7 days':'Monthly')+'</div>'
+          +'<div style="font-size:10px;color:rgba(30,30,30,.4);margin-top:1px;">'+p.slot+' slot · '+(p.days===7?'7 days':'Monthly')+'</div>'
         +'</div>'
         +'<div style="font-size:13px;font-weight:800;color:#1e1e1e;">'+fmtRs(p.price)+'</div>'
       +'</div>';
@@ -949,17 +974,16 @@ body{margin:0;}
   }
 
   function calcTotals(){
-    var totalDaily=selScreens.reduce(function(s,id){var sc=SCREENS.find(function(x){return x.id===id;});return s+(sc?sc.plays:0);},0);
+    var d=selScreens.reduce(function(s,id){var sc=SCREENS.find(function(x){return x.id===id;});return s+(sc?sc.plays:0);},0);
     var pkg=PKGS.find(function(p){return p.id===selPkg;})||PKGS[1];
-    return {totalDaily:totalDaily,totalMonthly:totalDaily*pkg.days,pkg:pkg};
+    return {totalDaily:d,totalMonthly:d*pkg.days,pkg:pkg};
   }
 
   function updateResult(){
     var t=calcTotals();
-    var el=document.getElementById('res-big');
-    if(el)el.textContent=t.totalMonthly>0?fmt(t.totalMonthly):'—';
-    var rd=document.getElementById('r-daily'); if(rd)rd.textContent=t.totalDaily>0?fmt(t.totalDaily):'0';
-    var rs=document.getElementById('r-screens'); if(rs)rs.textContent=selScreens.length;
+    var big=document.getElementById('res-big'); if(big)big.textContent=t.totalMonthly>0?fmt(t.totalMonthly):'—';
+    var rd=document.getElementById('r-daily'); if(rd)rd.textContent=t.totalDaily>0?fmt(t.totalDaily):'—';
+    var rs=document.getElementById('r-screens'); if(rs)rs.textContent=selScreens.length||'—';
     var rc=document.getElementById('r-cost'); if(rc)rc.textContent=selPkg?fmtRs(t.pkg.price):'—';
     var bdg=document.getElementById('res-badges');
     if(bdg){
@@ -974,11 +998,25 @@ body{margin:0;}
 
   function buildTab(tab){
     var t=calcTotals();
+
     if(tab==='summary'){
-      var el=document.getElementById('rt-summary'); if(!el)return;
-      if(selScreens.length===0||!selPkg){el.innerHTML='<div style="color:rgba(255,255,255,.2);font-size:12px;text-align:center;padding:20px 0;">Screens aur package choose karo</div>';return;}
+      var panel=document.getElementById('rt-summary'); if(!panel)return;
+      if(selScreens.length===0||!selPkg){
+        panel.innerHTML='<div style="color:rgba(255,255,255,.2);font-size:12px;text-align:center;padding:20px 0;">Screens aur package choose karo</div>';
+        return;
+      }
+      /* Creative preview strip */
+      var creativeHtml='';
+      if(uploadedCreative){
+        creativeHtml='<div style="border-radius:8px;overflow:hidden;margin-bottom:12px;border:2px solid rgba(255,255,255,.12);aspect-ratio:16/9;background:url(\''+uploadedCreative+'\') center/cover;position:relative;">'
+          +'<div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.5) 0%,transparent 50%);display:flex;align-items:flex-end;padding:8px 10px;">'
+            +'<span style="font-size:9px;font-weight:700;color:rgba(255,255,255,.7);letter-spacing:.08em;text-transform:uppercase;">Your Ad Preview</span>'
+          +'</div>'
+        +'</div>';
+      }
+      /* Donut chart */
       var total=t.totalDaily;
-      var cx=66,cy=66,r=48,sw=12,circ=2*Math.PI*r,segs='',off=0;
+      var cx=58,cy=58,r=42,sw=11,circ=2*Math.PI*r,segs='',off=0;
       selScreens.forEach(function(id,i){
         var sc=SCREENS.find(function(x){return x.id===id;}); if(!sc)return;
         var pct=sc.plays/total,dl=pct*circ,col=COLORS[i%COLORS.length];
@@ -988,67 +1026,78 @@ body{margin:0;}
       var legend=selScreens.map(function(id,i){
         var sc=SCREENS.find(function(x){return x.id===id;}); if(!sc)return '';
         var col=COLORS[i%COLORS.length],pct=Math.round(sc.plays/total*100);
-        return '<div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;">'
+        return '<div style="display:flex;align-items:center;gap:6px;margin-bottom:7px;">'
           +'<span style="width:7px;height:7px;border-radius:2px;background:'+col+';flex-shrink:0;display:inline-block;"></span>'
-          +'<span style="font-size:11px;color:rgba(255,255,255,.55);flex:1;">'+sc.name+'</span>'
-          +'<span style="font-size:11px;font-weight:700;color:#fff;font-variant-numeric:tabular-nums;">'+fmt(sc.plays)+'</span>'
-          +'<span style="font-size:10px;color:rgba(255,255,255,.3);width:26px;text-align:right;">'+pct+'%</span>'
+          +'<span style="font-size:11px;color:rgba(255,255,255,.5);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+sc.name+'</span>'
+          +'<span style="font-size:11px;font-weight:700;color:#fff;font-variant-numeric:tabular-nums;margin-left:4px;">'+fmt(sc.plays)+'</span>'
+          +'<span style="font-size:10px;color:rgba(255,255,255,.28);width:28px;text-align:right;flex-shrink:0;">'+pct+'%</span>'
         +'</div>';
       }).join('');
-      el.innerHTML='<div style="display:flex;align-items:center;gap:14px;">'
-        +'<div style="flex-shrink:0;">'
-          +'<svg width="132" height="132" viewBox="0 0 132 132">'
-            +'<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="rgba(255,255,255,.05)" stroke-width="'+sw+'"/>'
-            +segs
-            +'<text x="'+cx+'" y="'+cy+'" text-anchor="middle" dominant-baseline="middle" fill="#fff" font-size="12" font-weight="800" font-family="Libre Franklin,sans-serif">'+fmt(total)+'</text>'
-            +'<text x="'+cx+'" y="'+(cy+15)+'" text-anchor="middle" fill="rgba(255,255,255,.35)" font-size="8" font-family="Libre Franklin,sans-serif">per day</text>'
-          +'</svg>'
-        +'</div>'
-        +'<div style="flex:1;">'+legend+'</div>'
-      +'</div>';
+      panel.innerHTML=creativeHtml
+        +'<div style="display:flex;align-items:center;gap:14px;">'
+          +'<div style="flex-shrink:0;">'
+            +'<svg width="116" height="116" viewBox="0 0 116 116">'
+              +'<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="rgba(255,255,255,.05)" stroke-width="'+sw+'"/>'
+              +segs
+              +'<text x="'+cx+'" y="'+(cy-6)+'" text-anchor="middle" fill="#fff" font-size="11" font-weight="800" font-family="Libre Franklin,sans-serif" dominant-baseline="middle">'+fmt(total)+'</text>'
+              +'<text x="'+cx+'" y="'+(cy+9)+'" text-anchor="middle" fill="rgba(255,255,255,.32)" font-size="8" font-family="Libre Franklin,sans-serif">per day</text>'
+            +'</svg>'
+          +'</div>'
+          +'<div style="flex:1;min-width:0;">'+legend+'</div>'
+        +'</div>';
+
     } else if(tab==='screens'){
-      var el2=document.getElementById('rt-screens'); if(!el2)return;
-      if(selScreens.length===0){el2.innerHTML='<div style="color:rgba(255,255,255,.2);font-size:12px;text-align:center;padding:20px 0;">Koi screen select nahi ki</div>';return;}
+      var panel2=document.getElementById('rt-screens'); if(!panel2)return;
+      if(selScreens.length===0){
+        panel2.innerHTML='<div style="color:rgba(255,255,255,.2);font-size:12px;text-align:center;padding:20px 0;">Koi screen select nahi ki</div>';
+        return;
+      }
       var mx=Math.max.apply(null,selScreens.map(function(id){var sc=SCREENS.find(function(x){return x.id===id;});return sc?sc.plays:0;}));
-      el2.innerHTML=selScreens.map(function(id,i){
+      var t2=calcTotals();
+      panel2.innerHTML=selScreens.map(function(id,i){
         var sc=SCREENS.find(function(x){return x.id===id;}); if(!sc)return '';
         var pct=sc.plays/mx*100,col=COLORS[i%COLORS.length];
-        return '<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">'
-          +'<div style="width:88px;flex-shrink:0;">'
-            +'<div style="font-size:11px;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+sc.name+'</div>'
-            +'<div style="font-size:9px;color:rgba(255,255,255,.3);">'+sc.zone+' Zone</div>'
+        var monthlyThis=sc.plays*t2.pkg.days;
+        return '<div style="margin-bottom:14px;">'
+          +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">'
+            +'<div style="font-size:12px;font-weight:600;color:#fff;">'+sc.name+'</div>'
+            +'<div style="font-size:11px;font-weight:700;color:'+col+';font-variant-numeric:tabular-nums;">'+fmt(sc.plays)+'/day</div>'
           +'</div>'
-          +'<div style="flex:1;">'
-            +'<div style="background:rgba(255,255,255,.06);border-radius:3px;height:5px;overflow:hidden;">'
-              +'<div style="width:'+pct+'%;height:5px;background:'+col+';border-radius:3px;"></div>'
-            +'</div>'
+          +'<div style="background:rgba(255,255,255,.06);border-radius:4px;height:6px;overflow:hidden;margin-bottom:3px;">'
+            +'<div style="width:'+pct+'%;height:6px;background:'+col+';border-radius:4px;transition:.4s;"></div>'
           +'</div>'
-          +'<div style="font-size:11px;font-weight:700;color:#fff;text-align:right;width:54px;flex-shrink:0;font-variant-numeric:tabular-nums;">'+fmt(sc.plays)+'/d</div>'
+          +'<div style="font-size:9px;color:rgba(255,255,255,.28);">'+fmt(monthlyThis)+' plays in '+t2.pkg.days+' days</div>'
         +'</div>';
       }).join('');
+
     } else if(tab==='cost'){
-      var el3=document.getElementById('rt-cost'); if(!el3)return;
-      if(!selPkg){el3.innerHTML='<div style="color:rgba(255,255,255,.2);font-size:12px;text-align:center;padding:20px 0;">Package choose karo</div>';return;}
+      var panel3=document.getElementById('rt-cost'); if(!panel3)return;
+      if(!selPkg){
+        panel3.innerHTML='<div style="color:rgba(255,255,255,.2);font-size:12px;text-align:center;padding:20px 0;">Package choose karo</div>';
+        return;
+      }
       var pkg=t.pkg;
       var cpm=t.totalMonthly>0?Math.round(pkg.price/(t.totalMonthly/1000)):0;
       var perScr=selScreens.length>0?Math.round(pkg.price/selScreens.length):0;
-      function row(label,val){return '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.06);">'
-        +'<span style="font-size:11px;color:rgba(255,255,255,.42);">'+label+'</span>'
-        +'<span style="font-size:12px;font-weight:700;color:#fff;">'+val+'</span>'
-      +'</div>';}
-      el3.innerHTML='<div>'
-        +row('Package',pkg.name+' ('+pkg.slot+')')
-        +row('Total Cost','<span style="color:var(--orange)">'+fmtRs(pkg.price)+'</span>')
-        +row('Per Screen',fmtRs(perScr))
-        +(t.totalMonthly>0?row('CPM (per 1K plays)','<span style="color:#22d3ee">'+fmtRs(cpm)+'</span>'):'')
-      +'</div>';
+      function cRow(label,val){
+        return '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.06);">'
+          +'<span style="font-size:11px;color:rgba(255,255,255,.42);">'+label+'</span>'
+          +'<span style="font-size:12px;font-weight:700;">'+val+'</span>'
+        +'</div>';
+      }
+      panel3.innerHTML=''
+        +cRow('Package','<span style="color:#fff">'+pkg.name+' ('+pkg.slot+')</span>')
+        +cRow('Duration','<span style="color:#fff">'+(pkg.days===7?'7 days':'30 days')+'</span>')
+        +cRow('Total Cost','<span style="color:var(--orange)">'+fmtRs(pkg.price)+'</span>')
+        +cRow('Per Screen','<span style="color:#fff">'+fmtRs(perScr)+'</span>')
+        +(t.totalMonthly>0?cRow('CPM (per 1K plays)','<span style="color:#22d3ee">'+fmtRs(cpm)+'</span>'):'');
     }
   }
 
   window.simToggle=function(id){
     var i=selScreens.indexOf(id);
-    if(i>-1)selScreens.splice(i,1);else selScreens.push(id);
-    buildScreens();updateResult();
+    if(i>-1)selScreens.splice(i,1); else selScreens.push(id);
+    buildScreens(); updateResult();
   };
   window.simPickPkg=function(id){selPkg=id;buildPkgs();updateResult();};
   window.simTab=function(btn){
@@ -1056,8 +1105,31 @@ body{margin:0;}
     document.querySelectorAll('.res-tab').forEach(function(b){b.classList.remove('active');});
     btn.classList.add('active');
     document.querySelectorAll('.rt-panel').forEach(function(p){p.style.display='none';});
-    var p=document.getElementById('rt-'+curTab);if(p)p.style.display='';
+    var p=document.getElementById('rt-'+curTab); if(p)p.style.display='';
     buildTab(curTab);
+  };
+  window.simUploadCreative=function(input){
+    var file=input.files&&input.files[0]; if(!file)return;
+    var reader=new FileReader();
+    reader.onload=function(ev){
+      uploadedCreative=ev.target.result;
+      var ph=document.getElementById('creative-placeholder');
+      var pv=document.getElementById('creative-preview');
+      if(ph)ph.style.display='none';
+      if(pv){pv.style.display='block';pv.style.backgroundImage='url('+ev.target.result+')';}
+      if(curTab==='summary')buildTab('summary');
+    };
+    reader.readAsDataURL(file);
+  };
+  window.simRemoveCreative=function(){
+    uploadedCreative=null;
+    var ph=document.getElementById('creative-placeholder');
+    var pv=document.getElementById('creative-preview');
+    var fi=document.getElementById('sim-file');
+    if(ph)ph.style.display='';
+    if(pv){pv.style.display='none';pv.style.backgroundImage='';}
+    if(fi)fi.value='';
+    if(curTab==='summary')buildTab('summary');
   };
 
   document.addEventListener('DOMContentLoaded',function(){buildScreens();buildPkgs();updateResult();});
