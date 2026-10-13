@@ -799,6 +799,229 @@ body{margin:0;}
   </div>
 </section>
 
+<!-- DEMO SIMULATOR -->
+<section class="sec" id="demo" style="background:var(--dark);padding:80px 0 96px;">
+  <div class="wrap">
+    <div class="sec-head center" data-reveal>
+      <div class="eyebrow on-dark"><i></i>Live Simulator</div>
+      <h2 class="h-lg" style="color:#fff;">Khud try karo —<br><span style="color:var(--orange);">60 second</span> mein</h2>
+      <p class="lead" style="color:rgba(255,255,255,.6);max-width:52ch;margin:0 auto;">Screens choose karo, creative pick karo, package dekho — aur apna estimated result live dekhte hain.</p>
+    </div>
+    <div id="sim" style="max-width:740px;margin:48px auto 0;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:24px;overflow:hidden;">
+      <!-- Step tabs -->
+      <div style="display:flex;border-bottom:1px solid rgba(255,255,255,.08);" id="sim-tabs">
+        <div class="sim-tab sim-tab-active" id="tab1" onclick="simGo(1)" style="flex:1;padding:14px 8px;text-align:center;cursor:pointer;border-right:1px solid rgba(255,255,255,.08);transition:.2s;">
+          <div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--orange);">01</div>
+          <div style="font-size:12px;font-weight:600;margin-top:3px;color:#fff;">Screens</div>
+        </div>
+        <div class="sim-tab" id="tab2" onclick="simGo(2)" style="flex:1;padding:14px 8px;text-align:center;cursor:pointer;border-right:1px solid rgba(255,255,255,.08);transition:.2s;opacity:.45;">
+          <div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.5);">02</div>
+          <div style="font-size:12px;font-weight:600;margin-top:3px;color:rgba(255,255,255,.5);">Creative</div>
+        </div>
+        <div class="sim-tab" id="tab3" onclick="simGo(3)" style="flex:1;padding:14px 8px;text-align:center;cursor:pointer;border-right:1px solid rgba(255,255,255,.08);transition:.2s;opacity:.45;">
+          <div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.5);">03</div>
+          <div style="font-size:12px;font-weight:600;margin-top:3px;color:rgba(255,255,255,.5);">Package</div>
+        </div>
+        <div class="sim-tab" id="tab4" style="flex:1;padding:14px 8px;text-align:center;cursor:pointer;transition:.2s;opacity:.45;">
+          <div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.5);">04</div>
+          <div style="font-size:12px;font-weight:600;margin-top:3px;color:rgba(255,255,255,.5);">Result</div>
+        </div>
+      </div>
+      <!-- Panels -->
+      <div style="padding:28px 32px 32px;">
+
+        <!-- Panel 1: Select Screens -->
+        <div id="sp1">
+          <p style="color:rgba(255,255,255,.5);font-size:13px;margin-bottom:18px;">Kaunsi locations pe apna ad dikhana chahte ho? (Multiple select kar sakte ho)</p>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:22px;" id="screens-grid"></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span id="sel-count" style="color:rgba(255,255,255,.35);font-size:13px;">0 screens selected</span>
+            <button onclick="simGo(2)" style="background:var(--orange);color:#fff;border:0;padding:11px 26px;border-radius:999px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;">Continue →</button>
+          </div>
+        </div>
+
+        <!-- Panel 2: Choose Creative -->
+        <div id="sp2" style="display:none;">
+          <p style="color:rgba(255,255,255,.5);font-size:13px;margin-bottom:18px;">Apna ad creative choose karo</p>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:22px;" id="creative-grid"></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <button onclick="simGo(1)" style="background:rgba(255,255,255,.08);color:rgba(255,255,255,.6);border:0;padding:11px 22px;border-radius:999px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">← Back</button>
+            <button onclick="simGo(3)" style="background:var(--orange);color:#fff;border:0;padding:11px 26px;border-radius:999px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;">Continue →</button>
+          </div>
+        </div>
+
+        <!-- Panel 3: Choose Package -->
+        <div id="sp3" style="display:none;">
+          <p style="color:rgba(255,255,255,.5);font-size:13px;margin-bottom:18px;">Kitne din aur kaunsa slot chahiye?</p>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:22px;" id="pkg-grid"></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <button onclick="simGo(2)" style="background:rgba(255,255,255,.08);color:rgba(255,255,255,.6);border:0;padding:11px 22px;border-radius:999px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">← Back</button>
+            <button onclick="simGo(4)" style="background:var(--orange);color:#fff;border:0;padding:11px 26px;border-radius:999px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;">Result Dekho →</button>
+          </div>
+        </div>
+
+        <!-- Panel 4: Result -->
+        <div id="sp4" style="display:none;">
+          <div style="text-align:center;margin-bottom:24px;">
+            <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.3);border-radius:999px;padding:7px 16px;margin-bottom:20px;">
+              <span style="width:7px;height:7px;border-radius:50%;background:#22c55e;display:inline-block;animation:pulse 1.5s infinite;"></span>
+              <span style="font-size:12px;font-weight:700;color:#86efac;letter-spacing:.06em;">CAMPAIGN READY</span>
+            </div>
+            <div id="res-screen" style="max-width:360px;margin:0 auto 20px;border-radius:14px;overflow:hidden;border:2px solid rgba(255,255,255,.15);aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:800;color:#fff;letter-spacing:-1px;position:relative;">
+              <div id="res-bg" style="position:absolute;inset:0;"></div>
+              <span id="res-label" style="position:relative;z-index:1;text-shadow:0 2px 12px rgba(0,0,0,.5);"></span>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:24px;" id="res-stats"></div>
+          <div style="background:rgba(255,92,0,.1);border:1px solid rgba(255,92,0,.25);border-radius:14px;padding:18px 20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+            <div>
+              <div style="color:#fff;font-weight:700;font-size:15px;">Campaign book karne ke liye ready ho?</div>
+              <div style="color:rgba(255,255,255,.5);font-size:12px;margin-top:3px;">Real account mein 2 minute mein live ho sakta hai</div>
+            </div>
+            <a href="https://signagecrm-production.up.railway.app" style="background:var(--orange);color:#fff;text-decoration:none;padding:12px 26px;border-radius:999px;font-size:14px;font-weight:700;white-space:nowrap;">Abhi Book Karo →</a>
+          </div>
+          <div style="text-align:center;margin-top:16px;">
+            <button onclick="simReset()" style="background:none;border:0;color:rgba(255,255,255,.3);font-size:12px;cursor:pointer;font-family:inherit;text-decoration:underline;">Dobara try karo</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+.sim-tab:hover{opacity:1!important;background:rgba(255,255,255,.04);}
+.sim-tab-active{opacity:1!important;border-bottom:2px solid var(--orange);}
+.sc-card{background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.1);border-radius:12px;padding:14px;cursor:pointer;transition:.18s;}
+.sc-card:hover{border-color:rgba(255,92,0,.5);background:rgba(255,92,0,.06);}
+.sc-card.selected{border-color:var(--orange);background:rgba(255,92,0,.1);}
+.cr-card{aspect-ratio:1;border-radius:10px;cursor:pointer;position:relative;overflow:hidden;transition:.18s;border:2px solid transparent;}
+.cr-card:hover{transform:scale(1.04);}
+.cr-card.selected{border-color:var(--orange);box-shadow:0 0 0 3px rgba(255,92,0,.3);}
+.cr-check{position:absolute;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;opacity:0;transition:.18s;}
+.cr-card.selected .cr-check{opacity:1;}
+.pk-card{border:1.5px solid rgba(255,255,255,.12);border-radius:14px;padding:16px 14px;cursor:pointer;transition:.18s;text-align:center;}
+.pk-card:hover{border-color:rgba(255,92,0,.5);}
+.pk-card.selected{border-color:var(--orange);background:rgba(255,92,0,.1);}
+.res-stat{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:14px;text-align:center;}
+</style>
+
+<script>
+(function(){
+  const SCREENS=[
+    {id:1,name:'Tulsi Mall A',area:'Vasna, Ahmedabad',plays:2700,zone:'B Zone',color:'#1e3a5f'},
+    {id:2,name:'CG Road Premium',area:'CG Road, Ahmedabad',plays:3100,zone:'A Zone',color:'#2d1b69'},
+    {id:3,name:'SG Highway Hub',area:'SG Highway',plays:2400,zone:'B Zone',color:'#064e3b'},
+    {id:4,name:'Navrangpura Gate',area:'Navrangpura',plays:2900,zone:'A Zone',color:'#1e1b4b'},
+  ];
+  const CREATIVES=[
+    {id:1,label:'Brand Poster',grad:'linear-gradient(135deg,#ff5c00,#ff8c42)',icon:'🏷️'},
+    {id:2,label:'Product Video',grad:'linear-gradient(135deg,#0d9488,#14b8a6)',icon:'▶',isVideo:true},
+    {id:3,label:'Offer Banner',grad:'linear-gradient(135deg,#7c3aed,#a855f7)',icon:'🎁'},
+    {id:4,label:'Event Promo',grad:'linear-gradient(135deg,#0369a1,#0ea5e9)',icon:'📢',isVideo:true},
+    {id:5,label:'Service Ad',grad:'linear-gradient(135deg,#b45309,#d97706)',icon:'⭐'},
+    {id:6,label:'Festive',grad:'linear-gradient(135deg,#065f46,#059669)',icon:'🎉'},
+  ];
+  const PKGS=[
+    {id:'trial',name:'Trial',slot:'10s',days:'7 days',price:'₹1,999',ppd:285,color:'#6ee7b7'},
+    {id:'regular',name:'Regular',slot:'15s',days:'Monthly',price:'₹13,000',ppd:433,color:'#ff5c00',pop:true},
+    {id:'premium',name:'Premium',slot:'20s',days:'Monthly',price:'₹18,000',ppd:600,color:'#a855f7'},
+  ];
+  var selScreens=[],selCreative=null,selPkg=null,curStep=1;
+
+  function buildScreens(){
+    var g=document.getElementById('screens-grid');
+    if(!g)return;
+    g.innerHTML=SCREENS.map(s=>`
+      <div class="sc-card${selScreens.includes(s.id)?' selected':''}" onclick="simToggleScreen(${s.id})">
+        <div style="width:100%;aspect-ratio:16/9;background:${s.color};border-radius:8px;margin-bottom:10px;display:flex;align-items:center;justify-content:center;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.35)" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4" stroke-linecap="round"/></svg>
+        </div>
+        <div style="color:#fff;font-weight:700;font-size:13px;">${s.name}</div>
+        <div style="color:rgba(255,255,255,.45);font-size:11px;margin-top:2px;">${s.area}</div>
+        <div style="display:flex;justify-content:space-between;margin-top:8px;align-items:center;">
+          <span style="color:#2dd4bf;font-size:11px;font-weight:700;">~${s.plays.toLocaleString('en-IN')} plays/day</span>
+          <span style="font-size:10px;color:rgba(255,255,255,.3);background:rgba(255,255,255,.07);padding:2px 7px;border-radius:999px;">${s.zone}</span>
+        </div>
+      </div>`).join('');
+    document.getElementById('sel-count').textContent=selScreens.length+' screen'+(selScreens.length!==1?'s':'')+' selected';
+  }
+
+  function buildCreatives(){
+    var g=document.getElementById('creative-grid');
+    if(!g)return;
+    g.innerHTML=CREATIVES.map(c=>`
+      <div class="cr-card${selCreative===c.id?' selected':''}" onclick="simPickCreative(${c.id})" style="background:${c.grad};">
+        <div class="cr-check"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div style="position:absolute;bottom:6px;left:7px;right:7px;">
+          <div style="color:#fff;font-size:10px;font-weight:700;text-shadow:0 1px 4px rgba(0,0,0,.6);">${c.label}</div>
+          ${c.isVideo?'<div style="font-size:9px;color:rgba(255,255,255,.7);margin-top:1px;">Video · 15s</div>':'<div style="font-size:9px;color:rgba(255,255,255,.7);margin-top:1px;">Image</div>'}
+        </div>
+      </div>`).join('');
+  }
+
+  function buildPkgs(){
+    var g=document.getElementById('pkg-grid');
+    if(!g)return;
+    g.innerHTML=PKGS.map(p=>`
+      <div class="pk-card${selPkg===p.id?' selected':''}" onclick="simPickPkg('${p.id}')">
+        ${p.pop?'<div style="font-size:9px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">⭐ Popular</div>':'<div style="height:19px;margin-bottom:6px;"></div>'}
+        <div style="color:#fff;font-weight:800;font-size:15px;margin-bottom:2px;">${p.name}</div>
+        <div style="color:${p.color};font-size:22px;font-weight:800;line-height:1.1;">${p.slot}</div>
+        <div style="color:rgba(255,255,255,.4);font-size:10px;margin:4px 0 10px;">slot duration</div>
+        <div style="color:#fff;font-weight:700;font-size:14px;">${p.price}</div>
+        <div style="color:rgba(255,255,255,.35);font-size:10px;">${p.days}</div>
+        <div style="margin-top:8px;color:rgba(255,255,255,.5);font-size:10px;">~${p.ppd} plays/screen/day</div>
+      </div>`).join('');
+  }
+
+  function buildResult(){
+    var totalPlays=selScreens.reduce((s,id)=>{var sc=SCREENS.find(x=>x.id===id);return s+(sc?sc.plays:0);},0);
+    var pkg=PKGS.find(p=>p.id===selPkg)||PKGS[1];
+    var cr=CREATIVES.find(c=>c.id===selCreative)||CREATIVES[0];
+    var monthlyPlays=totalPlays*30;
+    document.getElementById('res-bg').style.background=cr.grad;
+    document.getElementById('res-label').textContent=cr.label;
+    document.getElementById('res-stats').innerHTML=`
+      <div class="res-stat"><div style="color:rgba(255,255,255,.45);font-size:10px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">Screens</div><div style="color:#fff;font-size:22px;font-weight:800;">${selScreens.length||1}</div><div style="color:rgba(255,255,255,.35);font-size:10px;">locations</div></div>
+      <div class="res-stat"><div style="color:rgba(255,255,255,.45);font-size:10px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">Daily Plays</div><div style="color:#2dd4bf;font-size:22px;font-weight:800;">${totalPlays.toLocaleString('en-IN')}</div><div style="color:rgba(255,255,255,.35);font-size:10px;">estimated</div></div>
+      <div class="res-stat"><div style="color:rgba(255,255,255,.45);font-size:10px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">Monthly</div><div style="color:var(--orange);font-size:22px;font-weight:800;">${(monthlyPlays/1000).toFixed(0)}K</div><div style="color:rgba(255,255,255,.35);font-size:10px;">total impressions</div></div>`;
+  }
+
+  window.simToggleScreen=function(id){
+    var i=selScreens.indexOf(id);
+    if(i>-1)selScreens.splice(i,1);else selScreens.push(id);
+    buildScreens();
+  };
+  window.simPickCreative=function(id){selCreative=id;buildCreatives();};
+  window.simPickPkg=function(id){selPkg=id;buildPkgs();};
+  window.simGo=function(step){
+    curStep=step;
+    [1,2,3,4].forEach(function(s){
+      var p=document.getElementById('sp'+s);
+      var t=document.getElementById('tab'+s);
+      if(p)p.style.display=s===step?'':'none';
+      if(t){
+        t.style.opacity=s<=step?'1':'0.45';
+        if(s===step){t.classList.add('sim-tab-active');}else{t.classList.remove('sim-tab-active');}
+        var num=t.querySelector('div:first-child');
+        var lbl=t.querySelector('div:last-child');
+        if(num)num.style.color=s===step?'var(--orange)':'rgba(255,255,255,.5)';
+        if(lbl)lbl.style.color=s<=step?'#fff':'rgba(255,255,255,.5)';
+      }
+    });
+    if(step===2)buildCreatives();
+    if(step===3)buildPkgs();
+    if(step===4)buildResult();
+  };
+  window.simReset=function(){selScreens=[];selCreative=null;selPkg=null;simGo(1);buildScreens();};
+
+  document.addEventListener('DOMContentLoaded',function(){buildScreens();});
+})();
+</script>
+
 <!-- BENEFITS -->
 <section class="sec" id="benefits">
   <div class="wrap">
