@@ -7,7 +7,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Magra:wght@400;700&family=Libre+Franklin:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap">
-<script src="https://cdn.tailwindcss.com"></script>
 <style>
 /* ── Trendora Design System ── */
 body{margin:0;}
@@ -261,45 +260,46 @@ body{margin:0;}
 .s3-left{display:flex;flex-direction:column;gap:16px;flex:1;}
 .s3-right{flex:0 0 280px;}
 
-/* Steps — Swatch Accordion */
+/* ── Steps Swatch Accordion ── */
 .acc-section{background:var(--surface);border-top:1px solid var(--line);border-bottom:1px solid var(--line);}
-#swatchContainer{font-family:'Plus Jakarta Sans',-apple-system,sans-serif;margin-top:48px;}
-/* Vertical text for collapsed desktop strips */
+#swatchContainer{font-family:'Plus Jakarta Sans',-apple-system,sans-serif;margin-top:48px;display:flex;flex-direction:column;gap:12px;}
+.swatch-item{border-radius:28px;overflow:hidden;border:4px solid #fff;box-shadow:0 4px 16px rgba(0,0,0,.08);padding:20px;position:relative;}
 .vertical-title{writing-mode:vertical-rl;transform:rotate(180deg);white-space:nowrap;letter-spacing:-.01em;}
-/* Swatch card shadow */
-.mockup-shadow{box-shadow:0 16px 36px -8px rgba(0,0,0,.08),0 4px 12px -2px rgba(0,0,0,.04);}
-/* Full card content always column — override any flex-row from existing page CSS */
-.full-card-content{flex-direction:column!important;}
-/* SVGs inside swatch cards — explicit sizes since rest of page SVGs use width/height attrs */
-#swatchContainer svg{flex-shrink:0;overflow:hidden;}
-#swatchContainer svg.w-3{width:.75rem!important;height:.75rem!important;}
-#swatchContainer svg.w-4{width:1rem!important;height:1rem!important;}
-#swatchContainer svg.w-5{width:1.25rem!important;height:1.25rem!important;}
-#swatchContainer svg.w-3\.5{width:.875rem!important;height:.875rem!important;}
-/* ── DESKTOP ─── */
+.sw-shadow{box-shadow:0 16px 36px -8px rgba(0,0,0,.08),0 4px 12px -2px rgba(0,0,0,.04);}
+/* Inner layout helpers */
+.sw-card{display:flex;flex-direction:column;justify-content:space-between;height:100%;width:100%;}
+.sw-hd{display:flex;align-items:center;justify-content:space-between;padding-bottom:16px;border-bottom:1px solid rgba(0,0,0,.05);flex-shrink:0;}
+.sw-hd-l{display:flex;align-items:center;gap:12px;}
+.sw-body{display:grid;grid-template-columns:1fr;gap:24px;align-items:center;padding:20px 0;}
+.sw-ft{display:flex;align-items:center;justify-content:space-between;padding-top:8px;border-top:1px solid rgba(0,0,0,.05);font-size:11px;font-weight:600;flex-shrink:0;}
+.sw-mockup{background:#fff;border-radius:16px;padding:20px;max-width:320px;width:100%;display:flex;flex-direction:column;gap:10px;box-shadow:0 16px 36px -8px rgba(0,0,0,.08);}
+.sw-desc{display:flex;flex-direction:column;gap:12px;}
+.sw-tag{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;}
+.sw-close{width:32px;height:32px;border-radius:50%;background:rgba(0,0,0,.06);display:flex;align-items:center;justify-content:center;cursor:pointer;border:0;font-size:inherit;flex-shrink:0;}
+.sw-close:hover{background:rgba(0,0,0,.1);}
+.sw-strip-btn{width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.06);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;line-height:1;flex-shrink:0;}
+/* Collapsed/expanded show-hide */
+.desktop-collapsed-strip{display:none;}
+.mobile-collapsed-bar{display:none;}
+.full-card-content{display:none;}
+.swatch-item.expanded .full-card-content{display:flex;flex-direction:column;justify-content:space-between;height:100%;animation:swFade .4s ease forwards;}
+/* ── MOBILE (default — stacked) ── */
+.swatch-item.collapsed .mobile-collapsed-bar{display:flex;align-items:center;justify-content:space-between;cursor:pointer;}
+.swatch-item.expanded .mobile-collapsed-bar{display:none;}
+/* ── DESKTOP ── */
 @media(min-width:1024px){
-  .swatch-item{transition:flex .6s cubic-bezier(.16,1,.3,1),transform .4s cubic-bezier(.16,1,.3,1);will-change:flex;}
+  #swatchContainer{flex-direction:row;height:560px;align-items:stretch;padding:0;}
+  .swatch-item{transition:flex .55s cubic-bezier(.16,1,.3,1);padding:36px;}
   .swatch-item.collapsed{flex:0 0 76px;cursor:pointer;overflow:hidden;}
-  .swatch-item.collapsed:hover{transform:translateY(-2px);}
+  .swatch-item.collapsed:hover{filter:brightness(.97);}
   .swatch-item.expanded{flex:1 1 0%;cursor:default;}
-  .swatch-item.collapsed .desktop-collapsed-strip{display:flex!important;opacity:1;}
-  .swatch-item.collapsed .full-card-content{display:none!important;}
-  .swatch-item.expanded .desktop-collapsed-strip{display:none!important;}
-  .swatch-item.expanded .full-card-content{display:flex!important;animation:swFade .45s cubic-bezier(.16,1,.3,1) forwards;}
+  .swatch-item.collapsed .desktop-collapsed-strip{display:flex;flex-direction:column;align-items:center;justify-content:space-between;height:100%;padding:16px 0;user-select:none;}
+  .swatch-item.expanded .desktop-collapsed-strip{display:none;}
   .mobile-collapsed-bar{display:none!important;}
-}
-/* ── MOBILE ─── */
-@media(max-width:1023px){
-  .swatch-item{transition:max-height .5s cubic-bezier(.16,1,.3,1),background .3s;width:100%;overflow:hidden;}
-  .swatch-item.collapsed{max-height:72px;}
-  .swatch-item.collapsed .mobile-collapsed-bar{display:flex!important;}
-  .swatch-item.collapsed .full-card-content{display:none!important;}
-  .swatch-item.expanded{max-height:1400px;}
-  .swatch-item.expanded .mobile-collapsed-bar{display:none!important;}
-  .swatch-item.expanded .full-card-content{display:flex!important;animation:swFade .4s ease forwards;}
-  .desktop-collapsed-strip{display:none!important;}
+  .sw-body{grid-template-columns:1fr 1fr;gap:40px;}
 }
 @keyframes swFade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+@media(min-width:1024px){#swatchDots{display:flex!important;}}
 
 /* Benefits */
 .ben-layout{display:grid;grid-template-columns:.85fr 1.15fr;gap:56px;align-items:start;}
@@ -843,328 +843,257 @@ body{margin:0;}
       <h2 class="h-lg">Sign up se ad live<br>— sirf 5 simple steps</h2>
     </div>
 
-    <div id="swatchContainer" class="flex flex-col lg:flex-row gap-3 lg:h-[550px] items-stretch w-full" data-reveal>
+    <div id="swatchContainer" data-reveal>
 
       <!-- Step 01 -->
-      <section data-step="0" tabindex="0" role="region" class="swatch-item expanded relative rounded-[28px] overflow-hidden border-4 border-white shadow-lg p-5 sm:p-8 lg:p-9" style="background-color:#F4EFE6;color:#1c1917;">
-        <div class="desktop-collapsed-strip hidden flex-col items-center justify-between h-full py-4 select-none w-full">
-          <span class="text-sm font-black font-mono tracking-wider opacity-60">01</span>
-          <span class="vertical-title text-base font-extrabold">Account &amp; Creative Upload</span>
-          <div class="w-9 h-9 rounded-full bg-black/5 hover:bg-black/10 flex items-center justify-center text-base font-bold transition-colors">+</div>
+      <section class="swatch-item expanded" data-step="0" tabindex="0" style="background:#F4EFE6;color:#1c1917;">
+        <div class="desktop-collapsed-strip" style="text-align:center;">
+          <span style="font-size:12px;font-weight:900;font-family:monospace;opacity:.5;">01</span>
+          <span class="vertical-title" style="font-size:14px;font-weight:800;">Account &amp; Creative Upload</span>
+          <div class="sw-strip-btn">+</div>
         </div>
-        <div class="mobile-collapsed-bar hidden items-center justify-between py-1 select-none w-full cursor-pointer">
-          <div class="flex items-center gap-3">
-            <span class="text-xs font-mono font-black opacity-60">01</span>
-            <span class="text-base font-bold">Account &amp; Creative Upload</span>
-          </div>
-          <div class="w-8 h-8 rounded-full bg-black/5 flex items-center justify-center text-base font-bold">+</div>
+        <div class="mobile-collapsed-bar">
+          <div style="display:flex;align-items:center;gap:10px;"><span style="font-size:11px;font-weight:900;font-family:monospace;opacity:.5;">01</span><span style="font-size:15px;font-weight:700;">Account &amp; Creative Upload</span></div>
+          <div class="sw-strip-btn" style="width:28px;height:28px;font-size:16px;">+</div>
         </div>
-        <div class="full-card-content flex flex-col justify-between h-full w-full">
-          <div class="flex items-center justify-between pb-4 border-b border-black/5">
-            <div class="flex items-center gap-3">
-              <span class="text-xs font-black font-mono tracking-wider opacity-50">01</span>
-              <h3 class="text-lg sm:text-xl font-black tracking-tight" style="font-family:'Magra',sans-serif;">Account &amp; Creative Upload</h3>
-            </div>
-            <button class="close-sw-btn w-8 h-8 rounded-full bg-black/5 hover:bg-black/10 flex items-center justify-center transition-colors">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+        <div class="full-card-content">
+          <div class="sw-hd">
+            <div class="sw-hd-l"><span style="font-size:11px;font-weight:900;font-family:monospace;opacity:.45;">01</span><h3 style="font-family:'Magra',sans-serif;font-size:18px;font-weight:700;margin:0;">Account &amp; Creative Upload</h3></div>
+            <button class="close-sw-btn sw-close">
+              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
           </div>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-10 my-auto py-5 items-center">
-            <div class="flex justify-center md:justify-start">
-              <div class="bg-white mockup-shadow rounded-2xl p-5 w-full max-w-xs flex flex-col gap-3 border border-stone-100">
-                <span class="text-xs font-bold uppercase tracking-wider text-stone-400">Drag and Drop Upload</span>
-                <div class="border-2 border-dashed border-stone-300 rounded-xl p-5 flex flex-col items-center justify-center text-center bg-stone-50/60">
-                  <div class="w-9 h-9 rounded-xl bg-stone-100 text-stone-600 flex items-center justify-center mb-2">
-                    <svg width="20" height="20" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+          <div class="sw-body">
+            <div>
+              <div class="sw-mockup" style="border:1px solid #e7e0d5;">
+                <span style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#9d9087;">Drag and Drop Upload</span>
+                <div style="border:2px dashed #c8bfb5;border-radius:12px;padding:20px;display:flex;flex-direction:column;align-items:center;text-align:center;background:rgba(255,255,255,.5);">
+                  <div style="width:36px;height:36px;border-radius:10px;background:#ede8e0;display:flex;align-items:center;justify-content:center;margin-bottom:8px;">
+                    <svg width="20" height="20" fill="none" stroke="#7a6e64" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
                   </div>
-                  <p class="text-xs font-bold text-stone-800">Creative drag karo ya click karo</p>
-                  <p class="text-xs text-stone-400 mt-1">1080×1920 · JPG / PNG / MP4</p>
+                  <p style="font-size:11px;font-weight:700;color:#3d3530;margin:0;">Creative drag karo ya click karo</p>
+                  <p style="font-size:10px;color:#9d9087;margin:4px 0 0;">1080×1920 · JPG / PNG / MP4</p>
                 </div>
-                <div class="bg-emerald-50 border border-emerald-200 rounded-xl py-2 px-3 flex items-center gap-2 text-xs font-semibold text-emerald-700">
-                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                <div style="background:#ecfdf5;border:1px solid #a7f3d0;border-radius:10px;padding:8px 12px;display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:#047857;">
+                  <svg width="12" height="12" fill="none" stroke="#059669" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
                   Quality check passed — 1080p ✓
                 </div>
               </div>
             </div>
-            <div class="flex flex-col justify-center gap-3">
-              <div class="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-stone-600">
-                <svg class="w-3.5 h-3.5" style="color:#ff5c00;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
-                Fast Onboarding
-              </div>
-              <h4 class="text-2xl sm:text-3xl font-black text-stone-900 leading-snug" style="font-family:'Magra',sans-serif;">Account &amp; Creative Upload</h4>
-              <p class="text-sm sm:text-base text-stone-700 leading-relaxed">Apna advertiser account banayein aur high-res creative upload karein. Automatic validation system aspect ratio, resolution aur file size check karta hai.</p>
+            <div class="sw-desc">
+              <div class="sw-tag" style="color:#6b5e52;"><svg width="14" height="14" fill="none" stroke="#ff5c00" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>Fast Onboarding</div>
+              <h4 style="font-family:'Magra',sans-serif;font-size:clamp(22px,2vw,30px);font-weight:700;line-height:1.15;margin:0;color:#1c1917;">Account &amp; Creative Upload</h4>
+              <p style="font-size:15px;line-height:1.6;color:#4a3f37;margin:0;">Apna advertiser account banayein aur high-res creative upload karein. Automatic validation system aspect ratio, resolution aur file size check karta hai.</p>
             </div>
           </div>
-          <div class="text-xs font-semibold text-stone-400 flex items-center justify-between pt-2 border-t border-black/5">
+          <div class="sw-ft" style="color:#9d9087;">
             <span>Step 01 of 05</span>
-            <span class="font-bold" style="color:#ff5c00;">Fast · ~60 seconds →</span>
+            <span style="font-weight:700;color:#ff5c00;">Fast · ~60 seconds →</span>
           </div>
         </div>
       </section>
 
       <!-- Step 02 -->
-      <section data-step="1" tabindex="0" role="region" class="swatch-item collapsed relative rounded-[28px] overflow-hidden border-4 border-white shadow-lg p-5 sm:p-8 lg:p-9" style="background-color:#DDF4EB;color:#064e3b;">
-        <div class="desktop-collapsed-strip hidden flex-col items-center justify-between h-full py-4 select-none w-full">
-          <span class="text-sm font-black font-mono tracking-wider opacity-60">02</span>
-          <span class="vertical-title text-base font-extrabold" style="color:#064e3b;">Target Locations &amp; Dates</span>
-          <div class="w-9 h-9 rounded-full bg-black/5 hover:bg-black/10 flex items-center justify-center text-base font-bold transition-colors">+</div>
+      <section class="swatch-item collapsed" data-step="1" tabindex="0" style="background:#DDF4EB;color:#064e3b;">
+        <div class="desktop-collapsed-strip" style="text-align:center;">
+          <span style="font-size:12px;font-weight:900;font-family:monospace;opacity:.5;">02</span>
+          <span class="vertical-title" style="font-size:14px;font-weight:800;">Target Locations &amp; Dates</span>
+          <div class="sw-strip-btn">+</div>
         </div>
-        <div class="mobile-collapsed-bar flex items-center justify-between py-1 select-none w-full cursor-pointer">
-          <div class="flex items-center gap-3">
-            <span class="text-xs font-mono font-black opacity-60">02</span>
-            <span class="text-base font-bold">Target Locations &amp; Dates</span>
-          </div>
-          <div class="w-8 h-8 rounded-full bg-black/5 flex items-center justify-center text-base font-bold">+</div>
+        <div class="mobile-collapsed-bar">
+          <div style="display:flex;align-items:center;gap:10px;"><span style="font-size:11px;font-weight:900;font-family:monospace;opacity:.5;">02</span><span style="font-size:15px;font-weight:700;">Target Locations &amp; Dates</span></div>
+          <div class="sw-strip-btn" style="width:28px;height:28px;font-size:16px;">+</div>
         </div>
-        <div class="full-card-content hidden flex-col justify-between h-full w-full">
-          <div class="flex items-center justify-between pb-4 border-b border-black/5">
-            <div class="flex items-center gap-3">
-              <span class="text-xs font-black font-mono tracking-wider opacity-50">02</span>
-              <h3 class="text-lg sm:text-xl font-black tracking-tight" style="font-family:'Magra',sans-serif;">Target Locations &amp; Dates</h3>
-            </div>
-            <button class="close-sw-btn w-8 h-8 rounded-full bg-black/5 hover:bg-black/10 flex items-center justify-center transition-colors">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
-            </button>
+        <div class="full-card-content">
+          <div class="sw-hd">
+            <div class="sw-hd-l"><span style="font-size:11px;font-weight:900;font-family:monospace;opacity:.45;">02</span><h3 style="font-family:'Magra',sans-serif;font-size:18px;font-weight:700;margin:0;">Target Locations &amp; Dates</h3></div>
+            <button class="close-sw-btn sw-close"><svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg></button>
           </div>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-10 my-auto py-5 items-center">
-            <div class="flex justify-center md:justify-start">
-              <div class="bg-white mockup-shadow rounded-2xl p-5 w-full max-w-xs flex flex-col gap-2.5 border border-emerald-100">
-                <span class="text-xs font-bold uppercase tracking-wider text-stone-400">Ahmedabad Screens</span>
-                <div class="flex items-center justify-between p-2.5 rounded-xl bg-emerald-50 border border-emerald-100">
-                  <div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-amber-500 flex-shrink-0"></div><div><p class="text-xs font-bold text-stone-800">Tulsi Mall, Vasna</p><p class="text-xs text-stone-400">Vasna · 2,700 plays/day</p></div></div>
-                  <span class="w-5 h-5 rounded-md bg-emerald-500 text-white flex items-center justify-center text-xs font-bold flex-shrink-0">✓</span>
+          <div class="sw-body">
+            <div>
+              <div class="sw-mockup" style="border:1px solid #a7f3d0;">
+                <span style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#9d9087;">Ahmedabad Screens</span>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:10px;border-radius:10px;background:#f0fdf4;border:1px solid #bbf7d0;">
+                  <div style="display:flex;align-items:center;gap:8px;"><div style="width:8px;height:8px;border-radius:50%;background:#f59e0b;flex-shrink:0;"></div><div><p style="font-size:11px;font-weight:700;margin:0;color:#1c1917;">Tulsi Mall, Vasna</p><p style="font-size:10px;color:#9d9087;margin:0;">Vasna · 2,700 plays/day</p></div></div>
+                  <span style="width:20px;height:20px;border-radius:6px;background:#10b981;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">✓</span>
                 </div>
-                <div class="flex items-center justify-between p-2.5 rounded-xl bg-emerald-50 border border-emerald-100">
-                  <div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-purple-500 flex-shrink-0"></div><div><p class="text-xs font-bold text-stone-800">CG Road Premium</p><p class="text-xs text-stone-400">CG Road · 3,100 plays/day</p></div></div>
-                  <span class="w-5 h-5 rounded-md bg-emerald-500 text-white flex items-center justify-center text-xs font-bold flex-shrink-0">✓</span>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:10px;border-radius:10px;background:#f0fdf4;border:1px solid #bbf7d0;">
+                  <div style="display:flex;align-items:center;gap:8px;"><div style="width:8px;height:8px;border-radius:50%;background:#a855f7;flex-shrink:0;"></div><div><p style="font-size:11px;font-weight:700;margin:0;color:#1c1917;">CG Road Premium</p><p style="font-size:10px;color:#9d9087;margin:0;">CG Road · 3,100 plays/day</p></div></div>
+                  <span style="width:20px;height:20px;border-radius:6px;background:#10b981;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">✓</span>
                 </div>
-                <div class="flex items-center justify-between p-2.5 rounded-xl bg-stone-50 border border-stone-200 opacity-60">
-                  <div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-sky-500 flex-shrink-0"></div><div><p class="text-xs font-bold text-stone-700">SG Highway Hub</p><p class="text-xs text-stone-400">SG Highway · 2,400 plays/day</p></div></div>
-                  <span class="w-5 h-5 rounded-md border border-stone-300 flex-shrink-0"></span>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:10px;border-radius:10px;background:#f8fafc;border:1px solid #e2e8f0;opacity:.6;">
+                  <div style="display:flex;align-items:center;gap:8px;"><div style="width:8px;height:8px;border-radius:50%;background:#38bdf8;flex-shrink:0;"></div><div><p style="font-size:11px;font-weight:700;margin:0;color:#3d3530;">SG Highway Hub</p><p style="font-size:10px;color:#9d9087;margin:0;">SG Highway · 2,400 plays/day</p></div></div>
+                  <span style="width:20px;height:20px;border-radius:6px;border:1px solid #cbd5e1;flex-shrink:0;"></span>
                 </div>
               </div>
             </div>
-            <div class="flex flex-col justify-center gap-3">
-              <div class="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-emerald-800">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                Realtime Inventory
-              </div>
-              <h4 class="text-2xl sm:text-3xl font-black text-emerald-950 leading-snug" style="font-family:'Magra',sans-serif;">Target Locations &amp; Dates</h4>
-              <p class="text-sm sm:text-base text-emerald-900 leading-relaxed" style="opacity:.8;">City complexes aur malls ke screens select karein. Dates aur duration chun kar transparent pricing dashboard mein live update dekho.</p>
+            <div class="sw-desc">
+              <div class="sw-tag" style="color:#065f46;"><svg width="14" height="14" fill="none" stroke="#059669" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>Realtime Inventory</div>
+              <h4 style="font-family:'Magra',sans-serif;font-size:clamp(22px,2vw,30px);font-weight:700;line-height:1.15;margin:0;color:#022c22;">Target Locations &amp; Dates</h4>
+              <p style="font-size:15px;line-height:1.6;color:#065f46;margin:0;opacity:.85;">City complexes aur malls ke screens select karein. Dates aur duration chun kar transparent pricing dashboard mein live update dekho.</p>
             </div>
           </div>
-          <div class="text-xs font-semibold text-emerald-800 flex items-center justify-between pt-2 border-t border-black/5" style="opacity:.7;">
-            <span>Step 02 of 05</span>
-            <span class="font-bold text-emerald-950">50+ Prime Locations →</span>
+          <div class="sw-ft" style="color:#047857;opacity:.7;">
+            <span>Step 02 of 05</span><span style="font-weight:700;color:#022c22;">50+ Prime Locations →</span>
           </div>
         </div>
       </section>
 
       <!-- Step 03 -->
-      <section data-step="2" tabindex="0" role="region" class="swatch-item collapsed relative rounded-[28px] overflow-hidden border-4 border-white shadow-lg p-5 sm:p-8 lg:p-9" style="background-color:#FFE6CE;color:#7c2d12;">
-        <div class="desktop-collapsed-strip hidden flex-col items-center justify-between h-full py-4 select-none w-full">
-          <span class="text-sm font-black font-mono tracking-wider opacity-60">03</span>
-          <span class="vertical-title text-base font-extrabold" style="color:#7c2d12;">Instant Payment &amp; Invoice</span>
-          <div class="w-9 h-9 rounded-full bg-black/5 hover:bg-black/10 flex items-center justify-center text-base font-bold transition-colors">+</div>
+      <section class="swatch-item collapsed" data-step="2" tabindex="0" style="background:#FFE6CE;color:#7c2d12;">
+        <div class="desktop-collapsed-strip" style="text-align:center;">
+          <span style="font-size:12px;font-weight:900;font-family:monospace;opacity:.5;">03</span>
+          <span class="vertical-title" style="font-size:14px;font-weight:800;">Instant Payment &amp; Invoice</span>
+          <div class="sw-strip-btn">+</div>
         </div>
-        <div class="mobile-collapsed-bar flex items-center justify-between py-1 select-none w-full cursor-pointer">
-          <div class="flex items-center gap-3">
-            <span class="text-xs font-mono font-black opacity-60">03</span>
-            <span class="text-base font-bold">Instant Payment &amp; Invoice</span>
-          </div>
-          <div class="w-8 h-8 rounded-full bg-black/5 flex items-center justify-center text-base font-bold">+</div>
+        <div class="mobile-collapsed-bar">
+          <div style="display:flex;align-items:center;gap:10px;"><span style="font-size:11px;font-weight:900;font-family:monospace;opacity:.5;">03</span><span style="font-size:15px;font-weight:700;">Instant Payment &amp; Invoice</span></div>
+          <div class="sw-strip-btn" style="width:28px;height:28px;font-size:16px;">+</div>
         </div>
-        <div class="full-card-content hidden flex-col justify-between h-full w-full">
-          <div class="flex items-center justify-between pb-4 border-b border-black/5">
-            <div class="flex items-center gap-3">
-              <span class="text-xs font-black font-mono tracking-wider opacity-50">03</span>
-              <h3 class="text-lg sm:text-xl font-black tracking-tight" style="font-family:'Magra',sans-serif;">Instant Payment &amp; Invoice</h3>
-            </div>
-            <button class="close-sw-btn w-8 h-8 rounded-full bg-black/5 hover:bg-black/10 flex items-center justify-center transition-colors">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
-            </button>
+        <div class="full-card-content">
+          <div class="sw-hd">
+            <div class="sw-hd-l"><span style="font-size:11px;font-weight:900;font-family:monospace;opacity:.45;">03</span><h3 style="font-family:'Magra',sans-serif;font-size:18px;font-weight:700;margin:0;">Instant Payment &amp; Invoice</h3></div>
+            <button class="close-sw-btn sw-close"><svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg></button>
           </div>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-10 my-auto py-5 items-center">
-            <div class="flex justify-center md:justify-start">
-              <div class="bg-white mockup-shadow rounded-2xl p-5 w-full max-w-xs flex flex-col gap-3 border border-amber-100">
-                <span class="text-xs font-bold uppercase tracking-wider text-stone-400">Order Summary</span>
-                <div class="flex flex-col gap-2 text-xs">
-                  <div class="flex justify-between text-stone-600"><span>2 Screens · 30 days</span><span class="font-bold text-stone-900">₹13,000</span></div>
-                  <div class="flex justify-between items-center"><span class="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 font-semibold">FIRST20 coupon</span><span class="text-emerald-700 font-bold">−₹2,600</span></div>
+          <div class="sw-body">
+            <div>
+              <div class="sw-mockup" style="border:1px solid #fed7aa;">
+                <span style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#9d9087;">Order Summary</span>
+                <div style="display:flex;flex-direction:column;gap:8px;font-size:11px;">
+                  <div style="display:flex;justify-content:space-between;color:#6b5e52;"><span>2 Screens · 30 days</span><span style="font-weight:700;color:#1c1917;">₹13,000</span></div>
+                  <div style="display:flex;justify-content:space-between;align-items:center;"><span style="padding:2px 8px;border-radius:6px;background:#ecfdf5;color:#047857;font-weight:600;">FIRST20 coupon</span><span style="color:#047857;font-weight:700;">−₹2,600</span></div>
                 </div>
-                <div class="pt-2 border-t border-stone-100 flex justify-between items-center">
-                  <span class="text-xs font-bold text-stone-800">Total</span>
-                  <span class="text-xl font-extrabold" style="color:#ff5c00;">₹10,400</span>
+                <div style="padding-top:10px;border-top:1px solid #f5f5f5;display:flex;justify-content:space-between;align-items:center;">
+                  <span style="font-size:11px;font-weight:700;color:#3d3530;">Total</span>
+                  <span style="font-size:20px;font-weight:800;color:#ff5c00;">₹10,400</span>
                 </div>
-                <button class="w-full bg-stone-900 text-white text-xs font-bold py-2.5 px-4 rounded-xl flex items-center justify-between">
-                  <span>Pay via UPI</span><span>→</span>
-                </button>
-                <div class="bg-emerald-50 border border-emerald-200 rounded-xl py-2 px-3 flex items-center gap-2 text-xs font-semibold text-emerald-700">
-                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                <button style="width:100%;background:#1c1917;color:#fff;font-size:11px;font-weight:700;padding:10px 16px;border-radius:12px;display:flex;align-items:center;justify-content:space-between;border:0;cursor:pointer;"><span>Pay via UPI</span><span>→</span></button>
+                <div style="background:#ecfdf5;border:1px solid #a7f3d0;border-radius:10px;padding:8px 12px;display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:#047857;">
+                  <svg width="12" height="12" fill="none" stroke="#059669" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
                   GST Invoice email pe ✓
                 </div>
               </div>
             </div>
-            <div class="flex flex-col justify-center gap-3">
-              <div class="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-amber-900">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
-                Instant Billing
-              </div>
-              <h4 class="text-2xl sm:text-3xl font-black text-amber-950 leading-snug" style="font-family:'Magra',sans-serif;">Instant Payment &amp; Invoice</h4>
-              <p class="text-sm sm:text-base text-amber-950 leading-relaxed" style="opacity:.75;">UPI ya cards se secure checkout karein. Payment hote hi verified GST tax invoice direct email aur dashboard par instant generate ho jaati hai.</p>
+            <div class="sw-desc">
+              <div class="sw-tag" style="color:#92400e;"><svg width="14" height="14" fill="none" stroke="#d97706" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>Instant Billing</div>
+              <h4 style="font-family:'Magra',sans-serif;font-size:clamp(22px,2vw,30px);font-weight:700;line-height:1.15;margin:0;color:#431407;">Instant Payment &amp; Invoice</h4>
+              <p style="font-size:15px;line-height:1.6;color:#7c2d12;margin:0;opacity:.85;">UPI ya cards se secure checkout karein. Payment hote hi verified GST tax invoice direct email aur dashboard par instant generate ho jaati hai.</p>
             </div>
           </div>
-          <div class="text-xs font-semibold text-amber-900 flex items-center justify-between pt-2 border-t border-black/5" style="opacity:.7;">
-            <span>Step 03 of 05</span>
-            <span class="font-bold text-amber-950">100% Tax Compliant →</span>
+          <div class="sw-ft" style="color:#92400e;opacity:.7;">
+            <span>Step 03 of 05</span><span style="font-weight:700;color:#431407;">100% Tax Compliant →</span>
           </div>
         </div>
       </section>
 
       <!-- Step 04 -->
-      <section data-step="3" tabindex="0" role="region" class="swatch-item collapsed relative rounded-[28px] overflow-hidden border-4 border-white shadow-lg p-5 sm:p-8 lg:p-9" style="background-color:#DCEBFA;color:#1e3a8a;">
-        <div class="desktop-collapsed-strip hidden flex-col items-center justify-between h-full py-4 select-none w-full">
-          <span class="text-sm font-black font-mono tracking-wider opacity-60">04</span>
-          <span class="vertical-title text-base font-extrabold" style="color:#1e3a8a;">Live Broadcast &amp; Proof of Play</span>
-          <div class="w-9 h-9 rounded-full bg-black/5 hover:bg-black/10 flex items-center justify-center text-base font-bold transition-colors">+</div>
+      <section class="swatch-item collapsed" data-step="3" tabindex="0" style="background:#DCEBFA;color:#1e3a8a;">
+        <div class="desktop-collapsed-strip" style="text-align:center;">
+          <span style="font-size:12px;font-weight:900;font-family:monospace;opacity:.5;">04</span>
+          <span class="vertical-title" style="font-size:14px;font-weight:800;">Live Broadcast &amp; Proof of Play</span>
+          <div class="sw-strip-btn">+</div>
         </div>
-        <div class="mobile-collapsed-bar flex items-center justify-between py-1 select-none w-full cursor-pointer">
-          <div class="flex items-center gap-3">
-            <span class="text-xs font-mono font-black opacity-60">04</span>
-            <span class="text-base font-bold">Live Broadcast &amp; Proof of Play</span>
-          </div>
-          <div class="w-8 h-8 rounded-full bg-black/5 flex items-center justify-center text-base font-bold">+</div>
+        <div class="mobile-collapsed-bar">
+          <div style="display:flex;align-items:center;gap:10px;"><span style="font-size:11px;font-weight:900;font-family:monospace;opacity:.5;">04</span><span style="font-size:15px;font-weight:700;">Live Broadcast &amp; Proof of Play</span></div>
+          <div class="sw-strip-btn" style="width:28px;height:28px;font-size:16px;">+</div>
         </div>
-        <div class="full-card-content hidden flex-col justify-between h-full w-full">
-          <div class="flex items-center justify-between pb-4 border-b border-black/5">
-            <div class="flex items-center gap-3">
-              <span class="text-xs font-black font-mono tracking-wider opacity-50">04</span>
-              <h3 class="text-lg sm:text-xl font-black tracking-tight" style="font-family:'Magra',sans-serif;">Live Broadcast &amp; Proof of Play</h3>
-            </div>
-            <button class="close-sw-btn w-8 h-8 rounded-full bg-black/5 hover:bg-black/10 flex items-center justify-center transition-colors">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
-            </button>
+        <div class="full-card-content">
+          <div class="sw-hd">
+            <div class="sw-hd-l"><span style="font-size:11px;font-weight:900;font-family:monospace;opacity:.45;">04</span><h3 style="font-family:'Magra',sans-serif;font-size:18px;font-weight:700;margin:0;">Live Broadcast &amp; Proof of Play</h3></div>
+            <button class="close-sw-btn sw-close"><svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg></button>
           </div>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-10 my-auto py-5 items-center">
-            <div class="flex justify-center md:justify-start">
-              <div class="bg-slate-900 mockup-shadow rounded-2xl p-5 w-full max-w-xs flex flex-col gap-3">
-                <div class="flex justify-between items-center">
-                  <div><span class="text-xs tracking-wider text-slate-400 uppercase font-bold block">Total Plays</span><div class="text-2xl font-black text-white mt-1">5,240</div></div>
-                  <span class="px-2.5 py-1 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-full text-xs font-bold flex items-center gap-1.5">
-                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>LIVE
-                  </span>
+          <div class="sw-body">
+            <div>
+              <div class="sw-mockup" style="background:#0f172a;border:none;">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+                  <div><span style="font-size:9px;letter-spacing:.12em;color:#94a3b8;text-transform:uppercase;font-weight:700;display:block;">Total Plays</span><div style="font-size:22px;font-weight:900;color:#fff;margin-top:4px;">5,240</div></div>
+                  <span style="padding:4px 10px;background:rgba(16,185,129,.15);color:#34d399;border:1px solid rgba(52,211,153,.25);border-radius:999px;font-size:10px;font-weight:700;display:flex;align-items:center;gap:5px;"><span style="width:6px;height:6px;border-radius:50%;background:#34d399;display:inline-block;"></span>LIVE</span>
                 </div>
-                <div class="bg-black/40 rounded-xl p-2.5 flex flex-col gap-1.5 text-xs">
-                  <div class="flex justify-between text-slate-400 border-b border-white/10 pb-1 uppercase text-xs font-semibold"><span>Played At</span><span>Screen</span><span>Plays</span></div>
-                  <div class="flex justify-between text-slate-200"><span>13 Oct 08:22</span><span class="text-slate-400">Tulsi A</span><span class="font-bold text-white">12</span></div>
-                  <div class="flex justify-between text-slate-200"><span>13 Oct 06:15</span><span class="text-slate-400">CG Road</span><span class="font-bold text-white">9</span></div>
-                  <div class="flex justify-between text-slate-200"><span>13 Oct 04:50</span><span class="text-slate-400">SG Hwy</span><span class="font-bold text-white">11</span></div>
+                <div style="background:rgba(0,0,0,.4);border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:6px;font-size:10px;">
+                  <div style="display:flex;justify-content:space-between;color:#64748b;border-bottom:1px solid rgba(255,255,255,.06);padding-bottom:5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;"><span>Played At</span><span>Screen</span><span>Plays</span></div>
+                  <div style="display:flex;justify-content:space-between;color:#e2e8f0;"><span>13 Oct 08:22</span><span style="color:#94a3b8;">Tulsi A</span><span style="font-weight:700;color:#fff;">12</span></div>
+                  <div style="display:flex;justify-content:space-between;color:#e2e8f0;"><span>13 Oct 06:15</span><span style="color:#94a3b8;">CG Road</span><span style="font-weight:700;color:#fff;">9</span></div>
+                  <div style="display:flex;justify-content:space-between;color:#e2e8f0;"><span>13 Oct 04:50</span><span style="color:#94a3b8;">SG Hwy</span><span style="font-weight:700;color:#fff;">11</span></div>
                 </div>
-                <div class="flex justify-between text-xs text-blue-400 font-semibold"><span>↓ Download CSV</span><span>💬 WhatsApp</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:10px;color:#60a5fa;font-weight:600;"><span>↓ Download CSV</span><span>💬 WhatsApp</span></div>
               </div>
             </div>
-            <div class="flex flex-col justify-center gap-3">
-              <div class="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-blue-900">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-                Guaranteed Verification
-              </div>
-              <h4 class="text-2xl sm:text-3xl font-black text-blue-950 leading-snug" style="font-family:'Magra',sans-serif;">Live Broadcast &amp; Proof of Play</h4>
-              <p class="text-sm sm:text-base text-blue-950 leading-relaxed" style="opacity:.75;">Approval ke baad ad screens par live ho jata hai. Har display ka timestamped proof record hota hai — exact date, time aur frequency verify karein.</p>
+            <div class="sw-desc">
+              <div class="sw-tag" style="color:#1e40af;"><svg width="14" height="14" fill="none" stroke="#3b82f6" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>Guaranteed Verification</div>
+              <h4 style="font-family:'Magra',sans-serif;font-size:clamp(22px,2vw,30px);font-weight:700;line-height:1.15;margin:0;color:#1e3a8a;">Live Broadcast &amp; Proof of Play</h4>
+              <p style="font-size:15px;line-height:1.6;color:#1e3a8a;margin:0;opacity:.8;">Approval ke baad ad screens par live ho jata hai. Har display ka timestamped proof record hota hai — exact date, time aur frequency verify karein.</p>
             </div>
           </div>
-          <div class="text-xs font-semibold text-blue-900 flex items-center justify-between pt-2 border-t border-black/5" style="opacity:.7;">
-            <span>Step 04 of 05</span>
-            <span class="font-bold text-blue-950">100% Transparent Logs →</span>
+          <div class="sw-ft" style="color:#1e40af;opacity:.7;">
+            <span>Step 04 of 05</span><span style="font-weight:700;color:#1e3a8a;">100% Transparent Logs →</span>
           </div>
         </div>
       </section>
 
       <!-- Step 05 -->
-      <section data-step="4" tabindex="0" role="region" class="swatch-item collapsed relative rounded-[28px] overflow-hidden border-4 border-slate-700 shadow-xl p-5 sm:p-8 lg:p-9" style="background-color:#141A29;color:#fff;">
-        <div class="desktop-collapsed-strip hidden flex-col items-center justify-between h-full py-4 select-none w-full">
-          <span class="text-sm font-black font-mono tracking-wider opacity-60">05</span>
-          <span class="vertical-title text-base font-extrabold text-white">Social Distribution — Automatic</span>
-          <div class="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-base font-bold transition-colors">+</div>
+      <section class="swatch-item collapsed" data-step="4" tabindex="0" style="background:#141A29;color:#fff;border-color:#334155;">
+        <div class="desktop-collapsed-strip" style="text-align:center;">
+          <span style="font-size:12px;font-weight:900;font-family:monospace;opacity:.45;color:#fff;">05</span>
+          <span class="vertical-title" style="font-size:14px;font-weight:800;color:#fff;">Social Distribution — Automatic</span>
+          <div class="sw-strip-btn" style="background:rgba(255,255,255,.1);">+</div>
         </div>
-        <div class="mobile-collapsed-bar flex items-center justify-between py-1 select-none w-full cursor-pointer">
-          <div class="flex items-center gap-3">
-            <span class="text-xs font-mono font-black opacity-60">05</span>
-            <span class="text-base font-bold text-white">Social Distribution — Automatic</span>
-          </div>
-          <div class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-base font-bold">+</div>
+        <div class="mobile-collapsed-bar">
+          <div style="display:flex;align-items:center;gap:10px;"><span style="font-size:11px;font-weight:900;font-family:monospace;opacity:.45;">05</span><span style="font-size:15px;font-weight:700;">Social Distribution — Automatic</span></div>
+          <div class="sw-strip-btn" style="width:28px;height:28px;font-size:16px;background:rgba(255,255,255,.1);">+</div>
         </div>
-        <div class="full-card-content hidden flex-col justify-between h-full w-full">
-          <div class="flex items-center justify-between pb-4 border-b border-white/10">
-            <div class="flex items-center gap-3">
-              <span class="text-xs font-black font-mono tracking-wider opacity-50">05</span>
-              <h3 class="text-lg sm:text-xl font-black tracking-tight text-white" style="font-family:'Magra',sans-serif;">Social Distribution — Automatic</h3>
-            </div>
-            <button class="close-sw-btn w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
-            </button>
+        <div class="full-card-content">
+          <div class="sw-hd" style="border-bottom-color:rgba(255,255,255,.1);">
+            <div class="sw-hd-l"><span style="font-size:11px;font-weight:900;font-family:monospace;opacity:.4;">05</span><h3 style="font-family:'Magra',sans-serif;font-size:18px;font-weight:700;margin:0;color:#fff;">Social Distribution — Automatic</h3></div>
+            <button class="close-sw-btn sw-close" style="background:rgba(255,255,255,.1);color:#fff;"><svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg></button>
           </div>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-10 my-auto py-5 items-center">
-            <div class="flex justify-center md:justify-start">
-              <div class="bg-slate-900/90 mockup-shadow rounded-2xl p-5 w-full max-w-xs flex flex-col gap-2.5 border border-slate-700/60">
-                <div class="flex items-center justify-between bg-white/5 p-2.5 rounded-xl border border-white/10">
-                  <div class="flex items-center gap-2.5">
-                    <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style="background:linear-gradient(135deg,#ff5c00,#ff8c42);">
-                      <svg class="w-4 h-4" fill="none" stroke="white" stroke-width="2.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="14" rx="2"/><circle cx="8.5" cy="8.5" r="1.5" fill="white" stroke="none"/><polyline points="21 15 16 10 5 21"/></svg>
+          <div class="sw-body">
+            <div>
+              <div class="sw-mockup" style="background:#1e293b;border:1px solid #334155;">
+                <div style="display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.04);padding:10px;border-radius:12px;border:1px solid rgba(255,255,255,.08);">
+                  <div style="display:flex;align-items:center;gap:10px;">
+                    <div style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#ff5c00,#ff8c42);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                      <svg width="16" height="16" fill="none" stroke="white" stroke-width="2.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="14" rx="2"/><circle cx="8.5" cy="8.5" r="1.5" fill="white" stroke="none"/><polyline points="21 15 16 10 5 21"/></svg>
                     </div>
-                    <div><p class="text-xs font-bold text-white">Aapka Creative</p><p class="text-xs text-slate-400">1 upload → everywhere</p></div>
+                    <div><p style="font-size:11px;font-weight:700;color:#fff;margin:0;">Aapka Creative</p><p style="font-size:10px;color:#94a3b8;margin:0;">1 upload → everywhere</p></div>
                   </div>
-                  <span class="text-xs font-bold text-emerald-400 bg-emerald-500/20 px-2 py-0.5 rounded-full flex-shrink-0">LIVE</span>
+                  <span style="font-size:10px;font-weight:700;color:#34d399;background:rgba(52,211,153,.1);padding:3px 8px;border-radius:999px;flex-shrink:0;">LIVE</span>
                 </div>
-                <div class="flex flex-col gap-1.5">
-                  <div class="flex items-center justify-between p-2 rounded-xl bg-blue-950/40 border border-blue-900/40 text-xs">
-                    <span class="text-blue-300 font-semibold flex items-center gap-1.5">
-                      <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="#1877F2"><path d="M24 12.07C24 5.41 18.63 0 12 0S0 5.4 0 12.07C0 18.1 4.39 23.1 10.13 24v-8.44H7.08v-3.49h3.04V9.41c0-3.02 1.8-4.7 4.54-4.7 1.31 0 2.68.24 2.68.24v2.97h-1.51c-1.49 0-1.95.93-1.95 1.88v2.26h3.32l-.53 3.5h-2.8V24C19.62 23.1 24 18.1 24 12.07z"/></svg>
-                      Facebook Page
-                    </span>
-                    <span class="text-emerald-400 font-bold">Posted ✓</span>
+                <div style="display:flex;flex-direction:column;gap:6px;">
+                  <div style="display:flex;align-items:center;justify-content:space-between;padding:8px;border-radius:10px;background:rgba(30,64,175,.25);border:1px solid rgba(30,64,175,.35);font-size:10px;">
+                    <span style="color:#93c5fd;font-weight:600;display:flex;align-items:center;gap:6px;"><svg width="13" height="13" viewBox="0 0 24 24" fill="#1877F2"><path d="M24 12.07C24 5.41 18.63 0 12 0S0 5.4 0 12.07C0 18.1 4.39 23.1 10.13 24v-8.44H7.08v-3.49h3.04V9.41c0-3.02 1.8-4.7 4.54-4.7 1.31 0 2.68.24 2.68.24v2.97h-1.51c-1.49 0-1.95.93-1.95 1.88v2.26h3.32l-.53 3.5h-2.8V24C19.62 23.1 24 18.1 24 12.07z"/></svg>Facebook Page</span>
+                    <span style="color:#34d399;font-weight:700;">Posted ✓</span>
                   </div>
-                  <div class="flex items-center justify-between p-2 rounded-xl bg-pink-950/40 border border-pink-900/40 text-xs">
-                    <span class="text-pink-300 font-semibold flex items-center gap-1.5">
-                      <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="#E4405F"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
-                      Instagram Profile
-                    </span>
-                    <span class="text-emerald-400 font-bold">Posted ✓</span>
+                  <div style="display:flex;align-items:center;justify-content:space-between;padding:8px;border-radius:10px;background:rgba(131,24,67,.25);border:1px solid rgba(131,24,67,.35);font-size:10px;">
+                    <span style="color:#f9a8d4;font-weight:600;display:flex;align-items:center;gap:6px;"><svg width="13" height="13" viewBox="0 0 24 24" fill="#E4405F"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>Instagram Profile</span>
+                    <span style="color:#34d399;font-weight:700;">Posted ✓</span>
                   </div>
-                  <div class="flex items-center justify-between p-2 rounded-xl text-xs" style="background:rgba(255,92,0,.08);border:1px solid rgba(255,92,0,.2);">
-                    <span class="font-semibold flex items-center gap-1.5" style="color:#ff8c42;">
-                      <svg class="w-3.5 h-3.5" fill="none" stroke="#ff5c00" stroke-width="2.5" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4" stroke-linecap="round"/></svg>
-                      Digital Screens
-                    </span>
-                    <span class="font-bold" style="color:#ff5c00;">● Live</span>
+                  <div style="display:flex;align-items:center;justify-content:space-between;padding:8px;border-radius:10px;background:rgba(255,92,0,.08);border:1px solid rgba(255,92,0,.2);font-size:10px;">
+                    <span style="color:#fdba74;font-weight:600;display:flex;align-items:center;gap:6px;"><svg width="13" height="13" fill="none" stroke="#ff5c00" stroke-width="2.5" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4" stroke-linecap="round"/></svg>Digital Screens</span>
+                    <span style="font-weight:700;color:#ff5c00;">● Live</span>
                   </div>
                 </div>
               </div>
             </div>
-            <div class="flex flex-col justify-center gap-3">
-              <div class="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-slate-400">
-                <span class="w-2 h-2 rounded-full bg-emerald-400 flex-shrink-0"></span>
-                Omnichannel
-              </div>
-              <h4 class="text-2xl sm:text-3xl font-black text-white leading-snug" style="font-family:'Magra',sans-serif;">Social Distribution — Automatic</h4>
-              <p class="text-sm sm:text-base text-slate-300 leading-relaxed">Creative ek baar upload karo. Campaign live hote hi Facebook Page, Instagram Profile aur Digital Screens — teeno pe automatically broadcast ho jata hai. Zero extra effort.</p>
+            <div class="sw-desc">
+              <div class="sw-tag" style="color:#94a3b8;"><span style="width:8px;height:8px;border-radius:50%;background:#34d399;display:inline-block;"></span>Omnichannel</div>
+              <h4 style="font-family:'Magra',sans-serif;font-size:clamp(22px,2vw,30px);font-weight:700;line-height:1.15;margin:0;color:#fff;">Social Distribution — Automatic</h4>
+              <p style="font-size:15px;line-height:1.6;color:#cbd5e1;margin:0;">Creative ek baar upload karo. Campaign live hote hi Facebook Page, Instagram Profile aur Digital Screens — teeno pe automatically broadcast ho jata hai. Zero extra effort.</p>
             </div>
           </div>
-          <div class="text-xs font-semibold text-slate-500 flex items-center justify-between pt-2 border-t border-white/10">
-            <span>Step 05 of 05</span>
-            <span class="text-white font-bold">Omnichannel Sync →</span>
+          <div class="sw-ft" style="color:#64748b;border-top-color:rgba(255,255,255,.08);">
+            <span>Step 05 of 05</span><span style="font-weight:700;color:#fff;">Omnichannel Sync →</span>
           </div>
         </div>
       </section>
 
-      <!-- Nav Dots -->
-      <div id="swatchDots" class="hidden lg:flex justify-center gap-2 mt-4">
-        <button data-dot="0" class="swatch-dot w-2 h-2 rounded-full bg-stone-800 opacity-100 transition-all" aria-label="Step 1"></button>
-        <button data-dot="1" class="swatch-dot w-2 h-2 rounded-full bg-stone-800 opacity-30 transition-all" aria-label="Step 2"></button>
-        <button data-dot="2" class="swatch-dot w-2 h-2 rounded-full bg-stone-800 opacity-30 transition-all" aria-label="Step 3"></button>
-        <button data-dot="3" class="swatch-dot w-2 h-2 rounded-full bg-stone-800 opacity-30 transition-all" aria-label="Step 4"></button>
-        <button data-dot="4" class="swatch-dot w-2 h-2 rounded-full bg-stone-800 opacity-30 transition-all" aria-label="Step 5"></button>
-      </div>
-
+    </div>
+    <!-- Nav Dots (desktop only) -->
+    <div id="swatchDots" style="display:none;justify-content:center;gap:8px;margin-top:16px;">
+      <button data-dot="0" class="swatch-dot" aria-label="Step 1" style="width:8px;height:8px;border-radius:50%;background:#292524;opacity:1;border:0;cursor:pointer;padding:0;transition:opacity .2s;"></button>
+      <button data-dot="1" class="swatch-dot" aria-label="Step 2" style="width:8px;height:8px;border-radius:50%;background:#292524;opacity:.3;border:0;cursor:pointer;padding:0;transition:opacity .2s;"></button>
+      <button data-dot="2" class="swatch-dot" aria-label="Step 3" style="width:8px;height:8px;border-radius:50%;background:#292524;opacity:.3;border:0;cursor:pointer;padding:0;transition:opacity .2s;"></button>
+      <button data-dot="3" class="swatch-dot" aria-label="Step 4" style="width:8px;height:8px;border-radius:50%;background:#292524;opacity:.3;border:0;cursor:pointer;padding:0;transition:opacity .2s;"></button>
+      <button data-dot="4" class="swatch-dot" aria-label="Step 5" style="width:8px;height:8px;border-radius:50%;background:#292524;opacity:.3;border:0;cursor:pointer;padding:0;transition:opacity .2s;"></button>
     </div>
   </div>
 </section>
