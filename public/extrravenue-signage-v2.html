@@ -265,30 +265,36 @@ body{margin:0;}
 .acc-section{background:var(--surface);border-top:1px solid var(--line);border-bottom:1px solid var(--line);}
 .acc-list{display:flex;margin-top:48px;}
 .acc-item{border-radius:20px;overflow:hidden;cursor:pointer;}
-.acc-tag{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;opacity:.55;}
+.acc-tag{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;opacity:.8;}
 .acc-info h3{font-family:'Magra',sans-serif;font-weight:700;font-size:clamp(19px,2vw,26px);line-height:1.15;letter-spacing:-.02em;text-wrap:balance;}
-.acc-info p{font-size:15px;line-height:1.6;opacity:.7;max-width:42ch;}
+.acc-info p{font-size:15px;line-height:1.6;opacity:.85;max-width:42ch;}
 
 /* ── DESKTOP: horizontal accordion ─────────────────── */
 @media(min-width:701px){
   .acc-list{flex-direction:row;height:500px;gap:10px;align-items:stretch;}
-  .acc-item{flex:0 0 66px;transition:flex .55s cubic-bezier(.4,0,.2,1);}
+  .acc-item{flex:0 0 66px;transition:flex .55s cubic-bezier(.4,0,.2,1),filter .2s;}
   .acc-item.open{flex:1;}
   /* Collapsed strip: full-height column, rotated title */
   .acc-hd{display:flex;flex-direction:column;align-items:center;justify-content:space-between;height:100%;padding:22px 0;user-select:none;}
-  .acc-num{font-family:'Magra',sans-serif;font-weight:700;font-size:12px;opacity:.5;writing-mode:vertical-lr;transform:rotate(180deg);}
+  .acc-num{font-family:'Magra',sans-serif;font-weight:700;font-size:12px;opacity:.75;writing-mode:vertical-lr;transform:rotate(180deg);}
   .acc-title{font-family:'Magra',sans-serif;font-weight:700;font-size:15px;letter-spacing:-.01em;writing-mode:vertical-lr;transform:rotate(180deg);}
-  .acc-icon{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:300;flex-shrink:0;transition:transform .35s var(--ease);}
+  .acc-icon{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:300;flex-shrink:0;transition:transform .35s var(--ease),background .25s;}
+  .acc-item:not(.open):hover .acc-icon{transform:rotate(90deg);}
+  .acc-item:not(.open):hover{filter:brightness(1.07);}
   /* Hide strip when open */
   .acc-item.open .acc-hd{display:none;}
   /* Body: hidden on collapsed desktop items, full height when open */
   .acc-body{display:none;height:100%;}
   .acc-item.open .acc-body{display:block;height:100%;}
-  .acc-inner{height:100%;}
-  /* Content: single column — vis fills top, info at bottom */
-  .acc-content{display:grid;grid-template-columns:1fr;grid-template-rows:1fr auto;height:100%;}
-  .acc-vis{overflow:hidden;height:100%;}
-  .acc-info{padding:24px 28px 28px;display:flex;flex-direction:column;gap:12px;}
+  .acc-inner{height:100%;position:relative;}
+  /* Content: vis fills full card, info overlaid at bottom with gradient */
+  .acc-content{height:100%;position:relative;overflow:hidden;}
+  .acc-vis{position:absolute;inset:0;overflow:hidden;}
+  .acc-vis>div{justify-content:flex-start!important;padding-top:28px!important;padding-bottom:160px!important;}
+  .acc-info{position:absolute;bottom:0;left:0;right:0;padding:60px 28px 28px;background:linear-gradient(to top,rgba(0,0,0,.92) 0%,rgba(0,0,0,.58) 45%,transparent 100%);display:flex;flex-direction:column;gap:10px;}
+  .acc-info h3{color:#fff;}
+  .acc-info p{color:rgba(255,255,255,.78);opacity:1;}
+  .acc-info .acc-tag{color:rgba(255,255,255,.75);opacity:1;}
 }
 
 /* ── MOBILE: vertical accordion ────────────────────── */
@@ -296,9 +302,10 @@ body{margin:0;}
   .acc-list{flex-direction:column;gap:10px;}
   .acc-item{transition:background .3s var(--ease);}
   .acc-hd{display:flex;align-items:center;gap:14px;padding:16px 18px;user-select:none;}
-  .acc-num{font-family:'Magra',sans-serif;font-weight:700;font-size:13px;opacity:.55;min-width:22px;}
+  .acc-num{font-family:'Magra',sans-serif;font-weight:700;font-size:13px;opacity:.75;min-width:22px;}
   .acc-title{font-family:'Magra',sans-serif;font-weight:700;font-size:clamp(16px,4vw,20px);flex:1;letter-spacing:-.01em;}
   .acc-icon{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:300;flex-shrink:0;transition:transform .35s var(--ease);}
+  .acc-item:not(.open):hover .acc-icon{transform:rotate(15deg);}
   .acc-item.open .acc-icon{transform:rotate(45deg);}
   .acc-body{display:grid;grid-template-rows:0fr;transition:grid-template-rows .45s cubic-bezier(.4,0,.2,1);}
   .acc-item.open .acc-body{grid-template-rows:1fr;}
@@ -853,16 +860,16 @@ body{margin:0;}
     <div class="acc-list" data-reveal>
 
       <!-- Step 01 -->
-      <div class="acc-item open" data-step="1" onclick="accOpen(1)" style="background:#f0ece4;color:#1e1e1e;">
+      <div class="acc-item open" data-step="1" onclick="accOpen(1)" style="background:#bcd2b8;color:#1a281a;">
         <div class="acc-hd">
           <span class="acc-num">01</span>
           <span class="acc-title">Account &amp; Creative Upload</span>
-          <span class="acc-icon" style="background:rgba(0,0,0,.09);">+</span>
+          <span class="acc-icon" style="background:rgba(0,0,0,.1);">+</span>
         </div>
         <div class="acc-body">
           <div class="acc-inner">
             <div class="acc-content">
-              <div class="acc-vis" style="background:#e5dfd4;">
+              <div class="acc-vis" style="background:linear-gradient(150deg,#4e7e56 0%,#2c5232 100%);">
                 <!-- Upload mockup -->
                 <div style="padding:28px;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:14px;">
                   <div style="width:100%;max-width:260px;background:#fff;border-radius:14px;padding:16px;box-shadow:0 8px 32px rgba(0,0,0,.1);">
@@ -897,16 +904,16 @@ body{margin:0;}
       </div>
 
       <!-- Step 02 -->
-      <div class="acc-item" data-step="2" onclick="accOpen(2)" style="background:#d4ece3;color:#0f2e22;">
+      <div class="acc-item" data-step="2" onclick="accOpen(2)" style="background:#f0c0c8;color:#2e101a;">
         <div class="acc-hd">
           <span class="acc-num">02</span>
           <span class="acc-title">Target Locations &amp; Dates</span>
-          <span class="acc-icon" style="background:rgba(0,0,0,.09);">+</span>
+          <span class="acc-icon" style="background:rgba(0,0,0,.1);">+</span>
         </div>
         <div class="acc-body">
           <div class="acc-inner">
             <div class="acc-content">
-              <div class="acc-vis" style="background:#c0e4d8;">
+              <div class="acc-vis" style="background:linear-gradient(150deg,#b04868 0%,#7a2840 100%);">
                 <div style="padding:28px;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;">
                   <div style="width:100%;max-width:260px;">
                     <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#2d6e52;margin-bottom:10px;">Ahmedabad Screens</div>
@@ -944,16 +951,16 @@ body{margin:0;}
       </div>
 
       <!-- Step 03 -->
-      <div class="acc-item" data-step="3" onclick="accOpen(3)" style="background:#fde3cc;color:#2e1a08;">
+      <div class="acc-item" data-step="3" onclick="accOpen(3)" style="background:#eedea0;color:#28200a;">
         <div class="acc-hd">
           <span class="acc-num">03</span>
           <span class="acc-title">Instant Payment &amp; Invoice</span>
-          <span class="acc-icon" style="background:rgba(0,0,0,.09);">+</span>
+          <span class="acc-icon" style="background:rgba(0,0,0,.1);">+</span>
         </div>
         <div class="acc-body">
           <div class="acc-inner">
             <div class="acc-content">
-              <div class="acc-vis" style="background:#f8d0ae;">
+              <div class="acc-vis" style="background:linear-gradient(150deg,#c08030 0%,#855520 100%);">
                 <div style="padding:28px;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;">
                   <div style="width:100%;max-width:240px;background:#fff;border-radius:16px;padding:18px;box-shadow:0 8px 32px rgba(0,0,0,.12);">
                     <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#888;margin-bottom:12px;">Order Summary</div>
@@ -987,16 +994,16 @@ body{margin:0;}
       </div>
 
       <!-- Step 04 -->
-      <div class="acc-item" data-step="4" onclick="accOpen(4)" style="background:#dce8f8;color:#0c1f3c;">
+      <div class="acc-item" data-step="4" onclick="accOpen(4)" style="background:#a8d4d6;color:#0a2028;">
         <div class="acc-hd">
           <span class="acc-num">04</span>
           <span class="acc-title">Live Broadcast &amp; Proof of Play</span>
-          <span class="acc-icon" style="background:rgba(0,0,0,.09);">+</span>
+          <span class="acc-icon" style="background:rgba(0,0,0,.1);">+</span>
         </div>
         <div class="acc-body">
           <div class="acc-inner">
             <div class="acc-content">
-              <div class="acc-vis" style="background:#c4d8f0;">
+              <div class="acc-vis" style="background:linear-gradient(150deg,#3a7a8c 0%,#1c5060 100%);">
                 <div style="padding:28px;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;">
                   <div style="width:100%;max-width:260px;">
                     <div style="background:#0f172a;border-radius:12px;padding:14px;margin-bottom:8px;">
@@ -1038,7 +1045,7 @@ body{margin:0;}
         <div class="acc-body">
           <div class="acc-inner">
             <div class="acc-content">
-              <div class="acc-vis" style="background:#12122a;">
+              <div class="acc-vis" style="background:linear-gradient(150deg,#252550 0%,#0e0e22 100%);">
                 <div style="padding:28px;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:10px;">
                   <div style="width:100%;max-width:240px;">
                     <div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:11px 14px;display:flex;align-items:center;gap:10px;margin-bottom:8px;">
@@ -1056,7 +1063,7 @@ body{margin:0;}
                 </div>
               </div>
               <div class="acc-info">
-                <div class="acc-tag" style="opacity:.6;">
+                <div class="acc-tag">
                   <span style="width:7px;height:7px;border-radius:50%;background:#22c55e;display:inline-block;box-shadow:0 0 6px #22c55e;"></span>
                   Omnichannel
                 </div>
