@@ -816,29 +816,47 @@ body{margin:0;}
       <div class="sim-left">
         <div style="font-size:10px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:rgba(30,30,30,.36);margin-bottom:16px;">CAMPAIGN PLANNER</div>
 
-        <div class="sim-sec-label">Screens</div>
-        <div id="screens-grid" style="display:flex;flex-direction:column;gap:5px;margin-bottom:4px;"></div>
-        <div style="font-size:10px;color:rgba(30,30,30,.36);margin-bottom:16px;" id="sel-count-label">2 screens selected</div>
+        <!-- Step 1: Screens -->
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+          <span style="width:18px;height:18px;border-radius:50%;background:var(--orange);color:#fff;font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;">1</span>
+          <div class="sim-sec-label" style="margin-bottom:0;">Screen Selection</div>
+        </div>
+        <div id="screens-grid" style="display:flex;flex-direction:column;gap:5px;margin-bottom:4px;margin-left:26px;"></div>
+        <div style="font-size:10px;color:rgba(30,30,30,.36);margin-bottom:18px;margin-left:26px;" id="sel-count-label">2 screens selected</div>
 
-        <div class="sim-sec-label">Package</div>
-        <div id="pkg-grid" style="display:flex;flex-direction:column;gap:5px;margin-bottom:16px;"></div>
-
-        <div class="sim-sec-label">Ad Creative <span style="font-weight:400;text-transform:none;letter-spacing:0;">(optional)</span></div>
-        <div id="creative-drop" onclick="document.getElementById('sim-file').click()" style="border:1.5px dashed rgba(30,30,30,.18);border-radius:10px;cursor:pointer;overflow:hidden;transition:.15s;background:#fafafa;position:relative;">
-          <input type="file" id="sim-file" accept="image/*" style="display:none" onchange="simUploadCreative(this)">
-          <div id="creative-placeholder" style="aspect-ratio:16/9;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;">
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="rgba(30,30,30,.25)" stroke-width="1.5"><rect x="3" y="3" width="18" height="14" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-            <div style="font-size:11px;color:rgba(30,30,30,.4);font-weight:600;">Click to upload creative</div>
-            <div style="font-size:9px;color:rgba(30,30,30,.28);">JPG · PNG · 16:9 recommended</div>
-          </div>
-          <div id="creative-preview" style="display:none;aspect-ratio:16/9;background-size:cover;background-position:center;position:relative;">
-            <button onclick="event.stopPropagation();simRemoveCreative()" style="position:absolute;top:7px;right:7px;background:rgba(0,0,0,.55);border:0;border-radius:999px;width:22px;height:22px;color:#fff;cursor:pointer;font-size:14px;line-height:22px;text-align:center;padding:0;">×</button>
+        <!-- Step 2: Creative Upload -->
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+          <span style="width:18px;height:18px;border-radius:50%;background:var(--orange);color:#fff;font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;">2</span>
+          <div class="sim-sec-label" style="margin-bottom:0;">Ad Creative <span style="font-weight:400;text-transform:none;letter-spacing:0;">(optional)</span></div>
+        </div>
+        <div style="margin-left:26px;margin-bottom:18px;">
+          <div id="creative-drop" onclick="document.getElementById('sim-file').click()" style="border:1.5px dashed rgba(30,30,30,.18);border-radius:10px;cursor:pointer;overflow:hidden;transition:.15s;background:#fafafa;position:relative;">
+            <input type="file" id="sim-file" accept="image/*" style="display:none" onchange="simUploadCreative(this)">
+            <div id="creative-placeholder" style="aspect-ratio:16/9;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="rgba(30,30,30,.25)" stroke-width="1.5"><rect x="3" y="3" width="18" height="14" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+              <div style="font-size:11px;color:rgba(30,30,30,.4);font-weight:600;">Click to upload creative</div>
+              <div style="font-size:9px;color:rgba(30,30,30,.28);">JPG · PNG · 16:9 recommended</div>
+            </div>
+            <div id="creative-preview" style="display:none;aspect-ratio:16/9;background-size:cover;background-position:center;position:relative;">
+              <button onclick="event.stopPropagation();simRemoveCreative()" style="position:absolute;top:7px;right:7px;background:rgba(0,0,0,.55);border:0;border-radius:999px;width:22px;height:22px;color:#fff;cursor:pointer;font-size:14px;line-height:22px;text-align:center;padding:0;">×</button>
+            </div>
           </div>
         </div>
+
+        <!-- Step 3: Schedule & Budget -->
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+          <span style="width:18px;height:18px;border-radius:50%;background:var(--orange);color:#fff;font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;">3</span>
+          <div class="sim-sec-label" style="margin-bottom:0;">Schedule &amp; Budget</div>
+        </div>
+        <div id="pkg-grid" style="display:flex;flex-direction:column;gap:5px;margin-left:26px;"></div>
       </div>
 
-      <!-- RIGHT: Live Result -->
+      <!-- RIGHT: Step 4 Result -->
       <div class="sim-right">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
+          <span style="width:18px;height:18px;border-radius:50%;background:var(--orange);color:#fff;font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;">4</span>
+          <div style="font-size:9px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:rgba(255,255,255,.4);">Campaign Preview</div>
+        </div>
         <div style="font-size:9px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:rgba(255,255,255,.26);margin-bottom:4px;">ESTIMATED REACH</div>
 
         <div id="res-big" style="font-size:clamp(38px,5vw,56px);font-weight:800;color:#fff;letter-spacing:-0.03em;line-height:1;font-variant-numeric:tabular-nums;margin-top:2px;">—</div>
@@ -908,8 +926,8 @@ body{margin:0;}
 /* Mobile */
 @media(max-width:700px){
   #sim-wrap{grid-template-columns:1fr;}
-  .sim-right{order:1;border-radius:0;}
-  .sim-left{order:2;border-radius:0;}
+  .sim-left{order:1;}
+  .sim-right{order:2;}
 }
 </style>
 
