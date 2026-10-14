@@ -261,29 +261,51 @@ body{margin:0;}
 .s3-right{flex:0 0 280px;}
 
 /* Steps */
-/* Accordion Steps */
+/* Accordion Steps — shared */
 .acc-section{background:var(--surface);border-top:1px solid var(--line);border-bottom:1px solid var(--line);}
-.acc-list{display:flex;flex-direction:column;gap:10px;margin-top:48px;}
-.acc-item{border-radius:20px;overflow:hidden;cursor:pointer;transition:background .3s var(--ease);}
-.acc-hd{display:flex;align-items:center;gap:16px;padding:18px 24px;user-select:none;}
-.acc-num{font-family:'Magra',sans-serif;font-weight:700;font-size:13px;opacity:.55;min-width:22px;}
-.acc-title{font-family:'Magra',sans-serif;font-weight:700;font-size:clamp(17px,2vw,22px);flex:1;letter-spacing:-.01em;}
-.acc-icon{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:300;flex-shrink:0;transition:transform .35s var(--ease),background .3s var(--ease);}
-.acc-item.open .acc-icon{transform:rotate(45deg);}
-.acc-body{display:grid;grid-template-rows:0fr;transition:grid-template-rows .45s cubic-bezier(.4,0,.2,1);}
-.acc-item.open .acc-body{grid-template-rows:1fr;}
-.acc-inner{overflow:hidden;}
-.acc-content{display:grid;grid-template-columns:1fr 1fr;gap:0;}
-.acc-vis{min-height:240px;overflow:hidden;}
-.acc-info{padding:28px 28px 32px;display:flex;flex-direction:column;gap:14px;justify-content:center;}
+.acc-list{display:flex;margin-top:48px;}
+.acc-item{border-radius:20px;overflow:hidden;cursor:pointer;}
 .acc-tag{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;opacity:.55;}
-.acc-info h3{font-family:'Magra',sans-serif;font-weight:700;font-size:clamp(20px,2.2vw,28px);line-height:1.15;letter-spacing:-.02em;text-wrap:balance;}
+.acc-info h3{font-family:'Magra',sans-serif;font-weight:700;font-size:clamp(19px,2vw,26px);line-height:1.15;letter-spacing:-.02em;text-wrap:balance;}
 .acc-info p{font-size:15px;line-height:1.6;opacity:.7;max-width:42ch;}
+
+/* ── DESKTOP: horizontal accordion ─────────────────── */
+@media(min-width:701px){
+  .acc-list{flex-direction:row;height:500px;gap:10px;align-items:stretch;}
+  .acc-item{flex:0 0 66px;transition:flex .55s cubic-bezier(.4,0,.2,1);}
+  .acc-item.open{flex:1;}
+  /* Collapsed strip: full-height column, rotated title */
+  .acc-hd{display:flex;flex-direction:column;align-items:center;justify-content:space-between;height:100%;padding:22px 0;user-select:none;}
+  .acc-num{font-family:'Magra',sans-serif;font-weight:700;font-size:12px;opacity:.5;writing-mode:vertical-lr;transform:rotate(180deg);}
+  .acc-title{font-family:'Magra',sans-serif;font-weight:700;font-size:15px;letter-spacing:-.01em;writing-mode:vertical-lr;transform:rotate(180deg);}
+  .acc-icon{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:300;flex-shrink:0;transition:transform .35s var(--ease);}
+  /* Hide strip when open */
+  .acc-item.open .acc-hd{display:none;}
+  /* Body: hidden on collapsed desktop items, full height when open */
+  .acc-body{display:none;height:100%;}
+  .acc-item.open .acc-body{display:block;height:100%;}
+  .acc-inner{height:100%;}
+  /* Content: single column — vis fills top, info at bottom */
+  .acc-content{display:grid;grid-template-columns:1fr;grid-template-rows:1fr auto;height:100%;}
+  .acc-vis{overflow:hidden;height:100%;}
+  .acc-info{padding:24px 28px 28px;display:flex;flex-direction:column;gap:12px;}
+}
+
+/* ── MOBILE: vertical accordion ────────────────────── */
 @media(max-width:700px){
-  .acc-content{grid-template-columns:1fr;}
-  .acc-vis{min-height:190px;}
-  .acc-info{padding:20px 20px 26px;}
-  .acc-hd{padding:16px 18px;}
+  .acc-list{flex-direction:column;gap:10px;}
+  .acc-item{transition:background .3s var(--ease);}
+  .acc-hd{display:flex;align-items:center;gap:14px;padding:16px 18px;user-select:none;}
+  .acc-num{font-family:'Magra',sans-serif;font-weight:700;font-size:13px;opacity:.55;min-width:22px;}
+  .acc-title{font-family:'Magra',sans-serif;font-weight:700;font-size:clamp(16px,4vw,20px);flex:1;letter-spacing:-.01em;}
+  .acc-icon{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:300;flex-shrink:0;transition:transform .35s var(--ease);}
+  .acc-item.open .acc-icon{transform:rotate(45deg);}
+  .acc-body{display:grid;grid-template-rows:0fr;transition:grid-template-rows .45s cubic-bezier(.4,0,.2,1);}
+  .acc-item.open .acc-body{grid-template-rows:1fr;}
+  .acc-inner{overflow:hidden;}
+  .acc-content{display:grid;grid-template-columns:1fr;}
+  .acc-vis{min-height:190px;overflow:hidden;}
+  .acc-info{padding:20px 20px 26px;display:flex;flex-direction:column;gap:12px;}
 }
 
 /* Benefits */
@@ -1769,10 +1791,13 @@ document.querySelectorAll('[data-reveal]').forEach(el => ro.observe(el));
 
 // Accordion Steps
 function accOpen(n) {
+  var isDesktop = window.innerWidth > 700;
   document.querySelectorAll('.acc-item').forEach(function(el) {
     var isTarget = el.dataset.step === String(n);
     if (isTarget) {
-      el.classList.toggle('open');
+      // On desktop always open (no toggle); on mobile toggle
+      if (isDesktop) { el.classList.add('open'); }
+      else { el.classList.toggle('open'); }
     } else {
       el.classList.remove('open');
     }
