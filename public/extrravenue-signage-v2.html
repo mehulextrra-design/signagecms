@@ -277,7 +277,13 @@ body{margin:0;}
 .sw-tag{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;}
 .sw-close{width:32px;height:32px;border-radius:50%;background:rgba(0,0,0,.06);display:flex;align-items:center;justify-content:center;cursor:pointer;border:0;font-size:inherit;flex-shrink:0;}
 .sw-close:hover{background:rgba(0,0,0,.1);}
-.sw-strip-btn{width:38px;height:38px;border-radius:50%;background:rgba(0,0,0,.06);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;line-height:1;flex-shrink:0;}
+.sw-strip-btn{width:38px;height:38px;border-radius:50%;background:rgba(0,0,0,.06);display:grid;place-items:center;font-size:20px;font-weight:300;line-height:0;flex-shrink:0;padding:0;border:0;cursor:pointer;}
+/* Auto-progress bar */
+.sw-progress-wrap{position:absolute;bottom:0;left:0;right:0;height:3px;background:rgba(0,0,0,.08);overflow:hidden;border-radius:0 0 24px 24px;}
+.sw-progress-bar{height:100%;width:0%;background:currentColor;opacity:.5;transition:none;}
+.swatch-item.expanded .sw-progress-bar{animation:swProgress 5s linear forwards;}
+.swatch-item.paused .sw-progress-bar{animation-play-state:paused;}
+@keyframes swProgress{from{width:0%}to{width:100%}}
 /* Collapsed/expanded show-hide */
 .desktop-collapsed-strip{display:none;}
 .mobile-collapsed-bar{display:none;}
@@ -1894,9 +1900,23 @@ const ro = new IntersectionObserver(entries => {
 }, {threshold:.08, rootMargin:'0px 0px -20px 0px'});
 document.querySelectorAll('[data-reveal]').forEach(el => ro.observe(el));
 
-// Accordion Steps
-function expandStep(idx) {
+// Accordion Steps — auto-advance with progress bar
+var swAutoTimer = null;
+var SW_DURATION = 5000; // ms per card
+
+function swResetProgress(items) {
+  items.forEach(function(el) {
+    var bar = el.querySelector('.sw-progress-bar');
+    if (bar) { bar.style.animation = 'none'; bar.offsetHeight; bar.style.animation = ''; }
+    el.classList.remove('paused');
+  });
+}
+
+function expandStep(idx, fromAuto) {
   var items = document.querySelectorAll('.swatch-item');
+  clearTimeout(swAutoTimer);
+  swResetProgress(items);
+
   items.forEach(function(el, i) {
     if (i === idx) {
       el.classList.remove('collapsed');
@@ -1909,12 +1929,43 @@ function expandStep(idx) {
   document.querySelectorAll('.swatch-dot').forEach(function(dot, i) {
     dot.style.opacity = (i === idx) ? '1' : '0.3';
   });
+
+  // Schedule next card
+  swAutoTimer = setTimeout(function() {
+    expandStep((idx + 1) % items.length, true);
+  }, SW_DURATION);
 }
 
 (function initSwatch() {
   var items = document.querySelectorAll('.swatch-item');
 
+  // Inject progress bar into every swatch-item
   items.forEach(function(el) {
+    var wrap = document.createElement('div');
+    wrap.className = 'sw-progress-wrap';
+    var bar = document.createElement('div');
+    bar.className = 'sw-progress-bar';
+    wrap.appendChild(bar);
+    el.appendChild(wrap);
+  });
+
+  items.forEach(function(el) {
+    // Pause auto-advance on hover
+    el.addEventListener('mouseenter', function() {
+      el.classList.add('paused');
+      clearTimeout(swAutoTimer);
+    });
+    el.addEventListener('mouseleave', function() {
+      el.classList.remove('paused');
+      var cur = document.querySelector('.swatch-item.expanded');
+      if (!cur) return;
+      var remaining = SW_DURATION * (1 - (parseFloat(el.querySelector('.sw-progress-bar').style.width || '0') / 100));
+      swAutoTimer = setTimeout(function() {
+        var idx = parseInt(document.querySelector('.swatch-item.expanded').dataset.step);
+        expandStep((idx + 1) % items.length, true);
+      }, SW_DURATION);
+    });
+
     // Desktop collapsed strip click
     var strip = el.querySelector('.desktop-collapsed-strip');
     if (strip) strip.addEventListener('click', function(e) {
@@ -1934,11 +1985,12 @@ function expandStep(idx) {
       var next = (parseInt(el.dataset.step) + 1) % items.length;
       expandStep(next);
     });
-    // Nav dot clicks
-    document.querySelectorAll('.swatch-dot').forEach(function(dot) {
-      dot.addEventListener('click', function() {
-        expandStep(parseInt(dot.dataset.dot));
-      });
+  });
+
+  // Nav dot clicks
+  document.querySelectorAll('.swatch-dot').forEach(function(dot) {
+    dot.addEventListener('click', function() {
+      expandStep(parseInt(dot.dataset.dot));
     });
   });
 
@@ -1955,6 +2007,11 @@ function expandStep(idx) {
       expandStep((idx - 1 + items.length) % items.length);
     }
   });
+
+  // Start auto-advance for first card
+  swAutoTimer = setTimeout(function() {
+    expandStep(1, true);
+  }, SW_DURATION);
 })();
 
 // Footer Brand Reveal
