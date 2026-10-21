@@ -362,11 +362,13 @@ body{margin:0;}
 
 /* Confidence */
 .conf-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:56px;}
-.conf-card{background:var(--bg);border:1px solid var(--line);border-radius:var(--r);padding:28px 26px;display:flex;flex-direction:column;gap:12px;transition:border-color .35s var(--ease),box-shadow .35s var(--ease),background-color .35s var(--ease);}
-.conf-card:hover{border-color:var(--orange);box-shadow:0 18px 40px -24px rgba(255,92,0,.2);}
-.conf-num{font-family:'Magra',sans-serif;font-weight:700;font-size:13px;color:var(--orange);letter-spacing:.06em;}
-.conf-card h3{font-size:19px;line-height:1.18;}
-.conf-card p{font-size:14.5px;color:var(--muted);line-height:1.6;}
+.conf-card{background:var(--surface);border:1px solid transparent;border-radius:var(--r);padding:22px 20px 20px;display:flex;flex-direction:column;transition:border-color .35s var(--ease),box-shadow .35s var(--ease);}
+.conf-card:hover{border-color:var(--orange);box-shadow:0 10px 28px -16px rgba(255,92,0,.22);}
+.conf-top{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:14px;}
+.conf-tag{font-family:'Magra',sans-serif;font-size:44px;font-weight:700;color:var(--orange);line-height:1;}
+.conf-num{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);}
+.conf-card h3{font-size:17px;line-height:1.22;border-top:1px solid var(--line);padding-top:12px;margin-bottom:8px;}
+.conf-card p{font-size:14px;color:var(--muted);line-height:1.6;}
 
 /* Pricing */
 .pricing-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:32px;}
@@ -469,6 +471,7 @@ body{margin:0;}
 }
 @media(max-width:768px){
   .conf-grid{grid-template-columns:1fr;}
+  .conf-tag{font-size:36px;}
   .sec{padding:64px 0;}
   .sec-tight{padding:40px 0;}
   .wrap{padding:0 16px;}
@@ -1705,34 +1708,34 @@ body{margin:0;}
     </div>
     <div class="conf-grid">
       <div class="conf-card" data-reveal style="transition-delay:.06s">
-        <div class="conf-num">01</div>
-        <h3>Captive &amp; Undivided Attention</h3>
-        <p>Social media ads 2 seconds mein scroll ho jaate hain. Malls aur elevators mein audience ambient displays ko naturally observe karti hai — ensuring 100% real eye contact.</p>
+        <div class="conf-top"><span class="conf-tag">Attention</span><span class="conf-num">01</span></div>
+        <h3>Log actually dekhte hain — scroll nahi hoti</h3>
+        <p>Lift, mall, gym — yahan log wait karte hain. Screen se nazrein nahi hatati, isliye aapka ad genuinely dekha jaata hai.</p>
       </div>
       <div class="conf-card" data-reveal style="transition-delay:.1s">
-        <div class="conf-num">02</div>
-        <h3>Frictionless WhatsApp Conversion</h3>
-        <p>Banners par phone numbers yaad nahi rehte. Direct dynamic QR code scan se consumer seedha aapke WhatsApp chat ya landing page par arrive hota hai.</p>
+        <div class="conf-top"><span class="conf-tag">Lead Gen</span><span class="conf-num">02</span></div>
+        <h3>QR scan se lead seedha aapke WhatsApp par</h3>
+        <p>Customer screen dekhta hai, QR scan karta hai — aur directly aapke WhatsApp pe aata hai. Koi extra step nahi.</p>
       </div>
       <div class="conf-card" data-reveal style="transition-delay:.14s">
-        <div class="conf-num">03</div>
-        <h3>Integrated Cross-Channel Campaign</h3>
-        <p>Ek hi budget mein physically screen par bhi display aur social profiles par bhi exposure. High recall across both real world and digital world.</p>
+        <div class="conf-top"><span class="conf-tag">Reach</span><span class="conf-num">03</span></div>
+        <h3>Ek ad — screen par bhi, Instagram par bhi</h3>
+        <p>Ek hi creative, do jagah kaam karta hai. Physical screen plus social media — ek saath brand recall double hota hai.</p>
       </div>
       <div class="conf-card" data-reveal style="transition-delay:.18s">
-        <div class="conf-num">04</div>
-        <h3>Flexible Commitments, Zero Lock-in</h3>
-        <p>Testing phase ke liye 7-day trial run karein. Results dekhne ke baad apni marzi se monthly scale karein bina kisi long-term mandatory contracts ke.</p>
+        <div class="conf-top"><span class="conf-tag">Flexible</span><span class="conf-num">04</span></div>
+        <h3>Sirf 7 din se shuru — koi contract nahi</h3>
+        <p>Trial karo, results dekho, phir decide karo. Koi lock-in nahi, koi penalty nahi — apni marzi se start aur stop karo.</p>
       </div>
       <div class="conf-card" data-reveal style="transition-delay:.22s">
-        <div class="conf-num">05</div>
-        <h3>Prime Neighborhood Locations</h3>
-        <p>High-spending residential societies, gyms aur busy business complexes mein strategic installations jahan target demographic daily visit karti hai.</p>
+        <div class="conf-top"><span class="conf-tag">Targeting</span><span class="conf-num">05</span></div>
+        <h3>Aapke area ke busy spots — malls, gyms, societies</h3>
+        <p>Sirf wahi screens choose karo jahan aapki target audience daily jaati hai. Wasted impressions nahi, sirf relevant eyeballs.</p>
       </div>
       <div class="conf-card" data-reveal style="transition-delay:.26s">
-        <div class="conf-num">06</div>
-        <h3>100% Verifiable Proof of Play</h3>
-        <p>No assumptions. Hardware telemetry har ad playback ko log karti hai jiska verified audit report aap direct dashboard se download kar sakte hain.</p>
+        <div class="conf-top"><span class="conf-tag">Analytics</span><span class="conf-num">06</span></div>
+        <h3>Proof milta hai — kab chala, kitni baar</h3>
+        <p>Har play ka timestamp record hota hai. Aapko exact pata rehta hai aapka ad kab aur kitni baar actually chala.</p>
       </div>
     </div>
   </div>
