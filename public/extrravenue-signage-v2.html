@@ -228,6 +228,12 @@ body{margin:0;}
 .hc-green{background:linear-gradient(155deg,#60d0a0 0%,#208060 50%,#084030 100%);}
 @keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.6;transform:scale(1.25);}}
 
+/* Venue partner card */
+.venue-card{background:var(--orange);border-radius:var(--r);padding:44px 48px;display:flex;flex-direction:row;align-items:center;justify-content:space-between;gap:32px;transition:background-color .35s var(--ease),box-shadow .35s var(--ease);}
+.venue-card:hover{background:#e95400;box-shadow:0 26px 54px -26px rgba(255,92,0,.7);}
+.venue-ring{flex:none;width:118px;height:118px;border-radius:50%;border:1.5px dashed rgba(255,255,255,.55);display:grid;place-items:center;animation:spin 16s linear infinite;}
+.venue-ring span{display:grid;place-items:center;width:62px;height:62px;border-radius:50%;background:#fff;color:var(--orange);animation:spin 16s linear infinite reverse;}
+
 /* Service cards */
 .svc-rows{display:flex;flex-direction:column;gap:18px;margin-top:56px;}
 .svc-r1{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
@@ -470,6 +476,8 @@ body{margin:0;}
   .hero-vis{border-radius:16px;}
   .scard-orange{flex-direction:column;padding:28px;}
   .so-ring{display:none;}
+  .venue-card{flex-direction:column;padding:28px;}
+  .venue-ring{display:none;}
   .scard-3in1{flex-direction:column;padding:28px;}
   .s3-right{flex:none;width:100%;}
   .f-top{grid-template-columns:1fr;}
@@ -1179,6 +1187,32 @@ body{margin:0;}
       <button data-dot="3" class="swatch-dot" aria-label="Step 4" style="width:8px;height:8px;border-radius:50%;background:#292524;opacity:.3;border:0;cursor:pointer;padding:0;transition:opacity .2s;"></button>
       <button data-dot="4" class="swatch-dot" aria-label="Step 5" style="width:8px;height:8px;border-radius:50%;background:#292524;opacity:.3;border:0;cursor:pointer;padding:0;transition:opacity .2s;"></button>
       <button data-dot="5" class="swatch-dot" aria-label="Step 6" style="width:8px;height:8px;border-radius:50%;background:#292524;opacity:.3;border:0;cursor:pointer;padding:0;transition:opacity .2s;"></button>
+    </div>
+  </div>
+</section>
+
+<!-- Venue Partner Card -->
+<section style="background:var(--surface);padding:0 0 64px;">
+  <div class="wrap">
+    <div class="venue-card" data-reveal>
+      <!-- Left content -->
+      <div style="display:flex;flex-direction:column;gap:14px;max-width:58ch;">
+        <div style="display:flex;align-items:center;gap:10px;font-size:12px;font-weight:600;letter-spacing:.14em;color:rgba(255,255,255,.8);text-transform:uppercase;">
+          <span>06</span>
+          <div style="width:8px;height:8px;border-radius:50%;background:#fff;flex-shrink:0;"></div>
+        </div>
+        <h3 style="font-family:'Magra',sans-serif;font-size:clamp(22px,2.4vw,34px);font-weight:700;color:#fff;line-height:1.15;margin:0;letter-spacing:-.02em;text-wrap:balance;">Aapke paas screen hai? Revenue generate karein.</h3>
+        <p style="font-size:15px;color:rgba(255,255,255,.82);margin:0;max-width:46ch;line-height:1.6;">Agar aapke venue — commercial complex, society lobby, gym ya cafe — mein display screens hain, to unhe extrravenue network par register karein. Advertisers ads chalayenge aur aapko monthly automated payouts milenge.</p>
+        <div>
+          <a href="https://signagecrm-production.up.railway.app" style="display:inline-flex;align-items:center;gap:8px;background:#fff;color:var(--dark);border-radius:999px;padding:11px 22px;font-size:14px;font-weight:600;text-decoration:none;transition:box-shadow .2s;" onmouseover="this.style.boxShadow='0 8px 24px rgba(0,0,0,.18)'" onmouseout="this.style.boxShadow='none'">Venue partner bano &rarr;</a>
+        </div>
+      </div>
+      <!-- Right: animated ring -->
+      <div class="venue-ring">
+        <span>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        </span>
+      </div>
     </div>
   </div>
 </section>
