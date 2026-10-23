@@ -378,8 +378,8 @@ body{margin:0;}
 .drift-head h2{font-size:clamp(28px,3.2vw,46px);color:#fff;margin:0;}
 .drift-rows{display:flex;flex-direction:column;gap:24px;}
 .drift-row{display:flex;will-change:transform;}
-.drift-card{flex-shrink:0;width:214px;height:380px;margin:0 16px;border-radius:8px;overflow:hidden;background:#1a1a1a;}
-.drift-card img,.drift-card video{width:100%;height:100%;object-fit:cover;display:block;}
+.drift-card{flex-shrink:0;width:260px;height:315px;margin:0 16px;border-radius:8px;overflow:hidden;background:#1a1a1a;}
+.drift-card img,.drift-card video{width:100%;height:100%;object-fit:contain;display:block;}
 .drift-card.ph{display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.1);font-family:'Magra',sans-serif;font-size:11px;font-weight:700;letter-spacing:.08em;border:1px solid rgba(255,255,255,.06);}
 
 /* Signage Showcase */
@@ -2078,7 +2078,7 @@ var DRIFT_ROW2 = [
     return card;
   }
 
-  var SLOT = 214 + 32;
+  var SLOT = 260 + 32; // card width + margins
 
   function buildRow(id, pool){
     var row = document.createElement('div');
