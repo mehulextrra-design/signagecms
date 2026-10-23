@@ -2096,16 +2096,16 @@ var DRIFT_ROW2 = [
   var half1 = DRIFT_ROW1.length * ITEM_W;
   var half2 = DRIFT_ROW2.length * ITEM_W;
 
-  var pos1 = 0;          // row1 starts at 0, moves LEFT
-  var pos2 = -half2;     // row2 starts at -half, moves RIGHT (toward 0)
-  var S1 = 0.65;         // px per frame
-  var S2 = 0.45;
+  var pos1 = 0;       // row1 — slower, LEFT
+  var pos2 = 0;       // row2 — faster, LEFT (offset start se alag dikhega)
+  var S1 = 0.5;       // px per frame (slower)
+  var S2 = 0.8;       // px per frame (faster)
 
   function tick(){
     pos1 -= S1;
-    pos2 += S2;
+    pos2 -= S2;
     if(pos1 <= -half1) pos1 = 0;
-    if(pos2 >= 0)       pos2 = -half2;
+    if(pos2 <= -half2) pos2 = 0;
     r1.style.transform = 'translateX('+pos1+'px)';
     r2.style.transform = 'translateX('+pos2+'px)';
     requestAnimationFrame(tick);
