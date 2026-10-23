@@ -376,10 +376,14 @@ body{margin:0;}
 .drift-head{text-align:center;padding:0 24px 52px;color:#fff;}
 .drift-head .eyebrow{margin:0 auto 16px;}
 .drift-head h2{font-size:clamp(28px,3.2vw,46px);color:#fff;margin:0;}
-.drift-rows{display:flex;flex-direction:column;gap:16px;}
-.drift-row{display:flex;gap:0;will-change:transform;}
-.drift-card{flex-shrink:0;width:214px;height:380px;margin-right:16px;border-radius:16px;overflow:hidden;background:#1a1a1a;}
+.drift-rows{display:flex;flex-direction:column;gap:24px;}
+.drift-row{display:flex;will-change:transform;}
+.drift-card{flex-shrink:0;width:214px;height:380px;margin:0 16px;border-radius:8px;overflow:hidden;background:#1a1a1a;}
 .drift-card img,.drift-card video{width:100%;height:100%;object-fit:cover;display:block;}
+@keyframes drift-right{from{transform:translateX(-50%)}to{transform:translateX(0)}}
+@keyframes drift-left{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.drift-row-r{animation:drift-right 12s linear infinite;}
+.drift-row-l{animation:drift-left 18s linear infinite;}
 .drift-card.ph{display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.1);font-family:'Magra',sans-serif;font-size:11px;font-weight:700;letter-spacing:.08em;border:1px solid rgba(255,255,255,.06);}
 
 /* Signage Showcase */
@@ -2061,7 +2065,6 @@ var DRIFT_ROW2 = [
   var wrap = document.getElementById('driftRows');
   if(!wrap) return;
   var VIDEO_EXT = /\.(mp4|webm|mov)$/i;
-  var CARD_W = 214, GAP = 16, ITEM_W = CARD_W + GAP;
 
   function makeCard(src){
     var card = document.createElement('div');
@@ -2079,38 +2082,19 @@ var DRIFT_ROW2 = [
     return card;
   }
 
-  function buildRow(id, pool){
+  function buildRow(id, pool, cls){
     var row = document.createElement('div');
-    row.className='drift-row'; row.id=id;
-    // 2 copies for seamless infinite loop
+    row.className='drift-row '+cls; row.id=id;
+    // 2 copies for seamless CSS -50% animation loop
     for(var c=0;c<2;c++)
       for(var i=0;i<pool.length;i++) row.appendChild(makeCard(pool[i]));
     wrap.appendChild(row);
     return row;
   }
 
-  var r1 = buildRow('driftR1', DRIFT_ROW1);
-  var r2 = buildRow('driftR2', DRIFT_ROW2);
-
-  // half-width = 1 full copy — when we shift by this, second copy shows = seamless
-  var half1 = DRIFT_ROW1.length * ITEM_W;
-  var half2 = DRIFT_ROW2.length * ITEM_W;
-
-  var pos1 = 0;       // row1 — slower, LEFT
-  var pos2 = 0;       // row2 — faster, LEFT (offset start se alag dikhega)
-  var S1 = 0.5;       // px per frame (slower)
-  var S2 = 0.8;       // px per frame (faster)
-
-  function tick(){
-    pos1 -= S1;
-    pos2 -= S2;
-    if(pos1 <= -half1) pos1 = 0;
-    if(pos2 <= -half2) pos2 = 0;
-    r1.style.transform = 'translateX('+pos1+'px)';
-    r2.style.transform = 'translateX('+pos2+'px)';
-    requestAnimationFrame(tick);
-  }
-  requestAnimationFrame(tick);
+  // Top row → RIGHT (drift-right), Bottom row → LEFT (drift-left)
+  buildRow('driftR1', DRIFT_ROW1, 'drift-row-r');
+  buildRow('driftR2', DRIFT_ROW2, 'drift-row-l');
 })();
 
 // Signage carousel
