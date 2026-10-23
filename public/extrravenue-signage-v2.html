@@ -371,6 +371,31 @@ body{margin:0;}
 .conf-card h3{font-size:17px;line-height:1.22;border-top:1px solid var(--line);padding-top:12px;margin-bottom:8px;}
 .conf-card p{font-size:14px;color:var(--muted);line-height:1.6;}
 
+/* Signage Showcase */
+.ss-layout{display:grid;grid-template-columns:1fr 1fr;gap:72px;align-items:center;}
+.ss-screen-wrap{position:relative;display:flex;flex-direction:column;align-items:center;}
+.ss-tv{width:100%;background:#0d0d0d;border-radius:20px;padding:14px;box-shadow:0 0 0 2px #252525,0 48px 96px -24px rgba(0,0,0,.45),0 8px 24px rgba(0,0,0,.25);position:relative;}
+.ss-inner{aspect-ratio:16/9;border-radius:10px;overflow:hidden;position:relative;background:#111;}
+.ss-slide{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .9s ease;}
+.ss-slide.on{opacity:1;}
+.ss-led{position:absolute;bottom:6px;left:50%;transform:translateX(-50%);width:6px;height:6px;border-radius:50%;background:#ff5c00;box-shadow:0 0 6px #ff5c00;}
+.ss-stand{width:32%;height:18px;background:#1a1a1a;margin:0 auto;clip-path:polygon(10% 0%,90% 0%,100% 100%,0% 100%);}
+.ss-base{width:54%;height:7px;background:#141414;border-radius:4px;margin:0 auto;}
+.ss-dots{display:flex;gap:6px;justify-content:center;margin-top:16px;}
+.ss-dot{width:6px;height:6px;border-radius:50%;background:var(--line-strong);cursor:pointer;transition:background .2s;}
+.ss-dot.on{background:var(--orange);}
+.ss-content{display:flex;flex-direction:column;gap:20px;}
+.ss-content h2{font-size:clamp(28px,3.2vw,46px);}
+.ss-points{display:flex;flex-direction:column;gap:14px;margin-top:4px;}
+.ss-point{display:flex;gap:14px;align-items:flex-start;}
+.ss-point-ic{width:36px;height:36px;border-radius:10px;background:var(--orange-light, rgba(255,92,0,.08));display:grid;place-items:center;font-size:17px;flex-shrink:0;}
+.ss-point-body h4{font-family:'Magra',sans-serif;font-size:15px;font-weight:700;margin:0 0 3px;}
+.ss-point-body p{font-size:13.5px;color:var(--muted);line-height:1.55;margin:0;}
+@media(max-width:900px){
+  .ss-layout{grid-template-columns:1fr;gap:40px;}
+  .ss-content{order:-1;}
+}
+
 /* Pricing */
 .pricing-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:32px;}
 .pric{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:32px;display:flex;flex-direction:column;gap:6px;transition:box-shadow .35s var(--ease),border-color .35s var(--ease);}
@@ -1195,6 +1220,64 @@ body{margin:0;}
   </div>
 </section>
 
+<!-- SIGNAGE SHOWCASE -->
+<section class="sec" id="signage-showcase">
+  <div class="wrap">
+    <div class="ss-layout">
+      <!-- Left: Screen mockup -->
+      <div class="ss-screen-wrap" data-reveal>
+        <div class="ss-tv">
+          <div class="ss-inner">
+            <img class="ss-slide on" src="img/carousel/1.jpg" alt="" onerror="this.style.display='none'">
+            <img class="ss-slide" src="img/carousel/2.jpg" alt="" onerror="this.style.display='none'">
+            <img class="ss-slide" src="img/carousel/3.jpg" alt="" onerror="this.style.display='none'">
+            <img class="ss-slide" src="img/carousel/4.jpg" alt="" onerror="this.style.display='none'">
+            <img class="ss-slide" src="img/carousel/5.jpg" alt="" onerror="this.style.display='none'">
+          </div>
+          <div class="ss-led"></div>
+        </div>
+        <div class="ss-stand"></div>
+        <div class="ss-base"></div>
+        <div class="ss-dots">
+          <span class="ss-dot on" data-i="0"></span>
+          <span class="ss-dot" data-i="1"></span>
+          <span class="ss-dot" data-i="2"></span>
+          <span class="ss-dot" data-i="3"></span>
+          <span class="ss-dot" data-i="4"></span>
+        </div>
+      </div>
+      <!-- Right: Content -->
+      <div class="ss-content" data-reveal style="transition-delay:.12s">
+        <div class="eyebrow"><i></i>Ye hai digital signage</div>
+        <h2>Aapka ad, ek bade screen pe — jo log actually dekhte hain</h2>
+        <div class="ss-points">
+          <div class="ss-point">
+            <div class="ss-point-ic">📍</div>
+            <div class="ss-point-body">
+              <h4>Sirf aapke area mein dikho</h4>
+              <p>Society lobby, mall, gym — jahan aapke potential customers daily aate hain, wahan aapka ad chalta hai.</p>
+            </div>
+          </div>
+          <div class="ss-point">
+            <div class="ss-point-ic">🔁</div>
+            <div class="ss-point-body">
+              <h4>Din mein 50–80 baar</h4>
+              <p>Ek hi din mein hazaron log dekhte hain. Repetition se brand yaad rehta hai — jab zarurat padegi, pehla naam tumhara aayega.</p>
+            </div>
+          </div>
+          <div class="ss-point">
+            <div class="ss-point-ic">📵</div>
+            <div class="ss-point-body">
+              <h4>Scroll nahi kar sakte yahan</h4>
+              <p>Lift mein 45 seconds — kuch nahi karna hota. Social media ki tarah skip ka option nahi hai.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- Venue Partner Card -->
 <section style="background:var(--surface);padding:0 0 64px;">
   <div class="wrap">
@@ -1601,7 +1684,7 @@ body{margin:0;}
 </script>
 
 <!-- BENEFITS -->
-<section class="sec" id="benefits">
+<section class="sec" id="benefits" style="display:none;">
   <div class="wrap">
     <div class="ben-layout">
       <div data-reveal>
@@ -1939,6 +2022,23 @@ const ro = new IntersectionObserver(entries => {
 document.querySelectorAll('[data-reveal]').forEach(el => ro.observe(el));
 
 // Accordion Steps — auto-advance with progress bar
+// Signage carousel
+(function(){
+  var slides = document.querySelectorAll('.ss-slide');
+  var dots = document.querySelectorAll('.ss-dot');
+  var cur = 0;
+  var total = slides.length;
+  function goTo(i){
+    slides[cur].classList.remove('on');
+    dots[cur] && dots[cur].classList.remove('on');
+    cur = (i + total) % total;
+    slides[cur].classList.add('on');
+    dots[cur] && dots[cur].classList.add('on');
+  }
+  dots.forEach(function(d){ d.addEventListener('click', function(){ goTo(+d.dataset.i); }); });
+  setInterval(function(){ goTo(cur + 1); }, 3500);
+})();
+
 var swAutoTimer = null;
 var SW_DURATION = 5000; // ms per card
 
