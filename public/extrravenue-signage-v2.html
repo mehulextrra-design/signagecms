@@ -378,7 +378,7 @@ body{margin:0;}
 .drift-head h2{font-size:clamp(28px,3.2vw,46px);color:#fff;margin:0;}
 .drift-rows{display:flex;flex-direction:column;gap:16px;}
 .drift-row{display:flex;gap:16px;will-change:transform;}
-.drift-card{flex-shrink:0;width:260px;aspect-ratio:9/16;border-radius:16px;overflow:hidden;background:#1a1a1a;}
+.drift-card{flex-shrink:0;width:calc(25vw - 12px);aspect-ratio:9/16;border-radius:16px;overflow:hidden;background:#1a1a1a;}
 .drift-card img,.drift-card video{width:100%;height:100%;object-fit:cover;display:block;}
 .drift-card.ph{display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.1);font-family:'Magra',sans-serif;font-size:11px;font-weight:700;letter-spacing:.08em;border:1px solid rgba(255,255,255,.06);}
 
@@ -2043,11 +2043,14 @@ const ro = new IntersectionObserver(entries => {
 document.querySelectorAll('[data-reveal]').forEach(el => ro.observe(el));
 
 // Accordion Steps — auto-advance with progress bar
-// Drift gallery — add your files here (jpg, png, mp4 — any order)
-var DRIFT_MEDIA = [
+// Drift gallery — Row 1 aur Row 2 ke liye ALAG files rakho
+// Har row mein minimum 4 files honi chahiye (4 visible cards hain)
+var DRIFT_ROW1 = [
   'img/carousel/916 Gold Palace.png',
   'img/carousel/Aavya Classes_5.jpg',
-  'img/carousel/Keystone_GSEB.mp4',
+  'img/carousel/Keystone_GSEB.mp4'
+];
+var DRIFT_ROW2 = [
   'img/carousel/lubdhi Tution Classes (1).mp4',
   'img/carousel/NIlesh Jewellers.jpeg',
   'img/carousel/Shreeji Enclave.jpg.jpeg'
@@ -2071,26 +2074,23 @@ var DRIFT_MEDIA = [
     }
     return card;
   }
-  // Build 2 rows, repeat media to fill width (min 10 cards per row)
-  var rows = [{id:'driftR1',offset:0,speed:-0.13},{id:'driftR2',offset:-100,speed:0.10}];
-  rows.forEach(function(cfg){
+  function buildRow(id, pool, startX){
     var row = document.createElement('div');
-    row.className = 'drift-row'; row.id = cfg.id;
-    row.style.transform = 'translateX('+cfg.offset+'px)';
-    // repeat until at least 10 cards
-    var pool = DRIFT_MEDIA.length ? DRIFT_MEDIA : [''];
-    var count = Math.max(10, Math.ceil(10 / pool.length) * pool.length);
+    row.className = 'drift-row'; row.id = id;
+    row.style.transform = 'translateX('+startX+'px)';
+    var count = Math.max(8, Math.ceil(8 / pool.length) * pool.length);
     for(var i=0;i<count;i++){ row.appendChild(makeCard(pool[i % pool.length])); }
     wrap.appendChild(row);
-  });
-  var r1 = document.getElementById('driftR1');
-  var r2 = document.getElementById('driftR2');
+    return row;
+  }
+  var r1 = buildRow('driftR1', DRIFT_ROW1, 0);
+  var r2 = buildRow('driftR2', DRIFT_ROW2, -80);
   var sec = document.getElementById('gallery');
   var ticking = false;
   function update(){
     var progress = -sec.getBoundingClientRect().top + window.innerHeight * 0.5;
-    r1.style.transform = 'translateX('+(0   + progress * -0.13)+'px)';
-    r2.style.transform = 'translateX('+(-100 + progress *  0.10)+'px)';
+    r1.style.transform = 'translateX('+(progress * -0.15)+'px)';
+    r2.style.transform = 'translateX('+(-80 + progress * 0.12)+'px)';
     ticking = false;
   }
   window.addEventListener('scroll',function(){if(!ticking){requestAnimationFrame(update);ticking=true;}},{passive:true});
