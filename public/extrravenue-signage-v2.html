@@ -378,8 +378,8 @@ body{margin:0;}
 .drift-head h2{font-size:clamp(28px,3.2vw,46px);color:#fff;margin:0;}
 .drift-rows{display:flex;flex-direction:column;gap:24px;}
 .drift-row{display:flex;will-change:transform;}
-.drift-card{flex-shrink:0;width:260px;height:315px;margin:0 16px;border-radius:8px;overflow:hidden;background:#1a1a1a;}
-.drift-card img,.drift-card video{width:100%;height:100%;object-fit:contain;display:block;}
+.drift-card{flex-shrink:0;width:180px;height:320px;margin:0 16px;border-radius:12px;overflow:hidden;background:#1a1a1a;}
+.drift-card img,.drift-card video{width:100%;height:100%;object-fit:cover;display:block;}
 .drift-card.ph{display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.1);font-family:'Magra',sans-serif;font-size:11px;font-weight:700;letter-spacing:.08em;border:1px solid rgba(255,255,255,.06);}
 
 /* Signage Showcase */
@@ -2078,7 +2078,7 @@ var DRIFT_ROW2 = [
     return card;
   }
 
-  var SLOT = 260 + 32; // card width + margins
+  var SLOT = 180 + 32; // 212px per card slot
 
   function buildRow(id, pool){
     var row = document.createElement('div');
@@ -2089,31 +2089,34 @@ var DRIFT_ROW2 = [
     return row;
   }
 
-  var r0 = buildRow('driftR1', DRIFT_ROW1);
-  var r1 = buildRow('driftR2', DRIFT_ROW2);
+  var r0 = buildRow('driftR1', DRIFT_ROW1); // top row → RIGHT
+  var r1 = buildRow('driftR2', DRIFT_ROW2); // bottom row → LEFT
   var half0 = DRIFT_ROW1.length * SLOT;
   var half1 = DRIFT_ROW2.length * SLOT;
-  var pos0 = 0, pos1 = 0;
-  var BASE0 = 0.6, BASE1 = 0.4;
+
+  // Row 0 starts mid-way (going right), Row 1 starts at 0 (going left)
+  var pos0 = -half0 * 0.5;
+  var pos1 = 0;
   var scrollVel = 0, lastY = window.scrollY;
 
   window.addEventListener('scroll', function(){
-    scrollVel += (window.scrollY - lastY) * 0.6;
+    scrollVel += (window.scrollY - lastY) * 0.5;
     lastY = window.scrollY;
   }, {passive:true});
 
-  function wrapPos(pos, half){
-    while(pos >= 0) pos -= half;
-    while(pos < -half) pos += half;
-    return pos;
-  }
-
   function tick(){
-    scrollVel *= 0.88;
-    pos0 -= BASE0 + scrollVel * 0.14;
-    pos1 -= BASE1 + scrollVel * 0.09;
-    pos0 = wrapPos(pos0, half0);
-    pos1 = wrapPos(pos1, half1);
+    scrollVel *= 0.90;
+
+    // Row 0: base RIGHT, scroll pushes LEFT
+    pos0 += 0.5 - scrollVel * 0.12;
+    if(pos0 >= 0)      pos0 -= half0;
+    if(pos0 < -half0)  pos0 += half0;
+
+    // Row 1: base LEFT, scroll also pushes LEFT
+    pos1 -= 0.35 + scrollVel * 0.08;
+    if(pos1 < -half1)  pos1 += half1;
+    if(pos1 > 0)       pos1 -= half1;
+
     r0.style.transform = 'translateX('+pos0+'px)';
     r1.style.transform = 'translateX('+pos1+'px)';
     requestAnimationFrame(tick);
