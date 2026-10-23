@@ -376,9 +376,9 @@ body{margin:0;}
 .drift-head{text-align:center;padding:0 24px 52px;color:#fff;}
 .drift-head .eyebrow{margin:0 auto 16px;}
 .drift-head h2{font-size:clamp(28px,3.2vw,46px);color:#fff;margin:0;}
-.drift-rows{display:flex;flex-direction:column;gap:14px;}
-.drift-row{display:flex;gap:14px;will-change:transform;}
-.drift-card{flex-shrink:0;height:72vh;aspect-ratio:9/16;border-radius:16px;overflow:hidden;background:#1a1a1a;}
+.drift-rows{display:flex;flex-direction:column;gap:16px;}
+.drift-row{display:flex;gap:0;will-change:transform;}
+.drift-card{flex-shrink:0;width:214px;height:380px;margin-right:16px;border-radius:16px;overflow:hidden;background:#1a1a1a;}
 .drift-card img,.drift-card video{width:100%;height:100%;object-fit:cover;display:block;}
 .drift-card.ph{display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.1);font-family:'Magra',sans-serif;font-size:11px;font-weight:700;letter-spacing:.08em;border:1px solid rgba(255,255,255,.06);}
 
@@ -2044,7 +2044,7 @@ document.querySelectorAll('[data-reveal]').forEach(el => ro.observe(el));
 
 // Accordion Steps — auto-advance with progress bar
 // Drift gallery — Row 1 aur Row 2 ke liye ALAG files rakho
-// Har row mein minimum 4 files honi chahiye (4 visible cards hain)
+// Nayi file add karni ho to: folder mein daalo + array mein naam likhao
 var DRIFT_ROW1 = [
   'img/carousel/916 Gold Palace.png',
   'img/carousel/Aavya Classes_5.jpg',
@@ -2061,42 +2061,56 @@ var DRIFT_ROW2 = [
   var wrap = document.getElementById('driftRows');
   if(!wrap) return;
   var VIDEO_EXT = /\.(mp4|webm|mov)$/i;
+  var CARD_W = 214, GAP = 16, ITEM_W = CARD_W + GAP;
+
   function makeCard(src){
     var card = document.createElement('div');
     card.className = 'drift-card';
     if(VIDEO_EXT.test(src)){
       var v = document.createElement('video');
-      v.src = src; v.autoplay = true; v.loop = true; v.muted = true; v.playsInline = true;
+      v.src=src; v.autoplay=true; v.loop=true; v.muted=true; v.playsInline=true;
       card.appendChild(v);
     } else {
       var img = document.createElement('img');
-      img.src = src; img.alt = '';
-      img.onerror = function(){ card.classList.add('ph'); card.textContent = 'AD SLOT'; };
+      img.src=src; img.alt='';
+      img.onerror=function(){ card.classList.add('ph'); card.textContent='AD SLOT'; };
       card.appendChild(img);
     }
     return card;
   }
-  function buildRow(id, pool, startX){
+
+  function buildRow(id, pool){
     var row = document.createElement('div');
-    row.className = 'drift-row'; row.id = id;
-    row.style.transform = 'translateX('+startX+'px)';
-    var count = Math.max(8, Math.ceil(8 / pool.length) * pool.length);
-    for(var i=0;i<count;i++){ row.appendChild(makeCard(pool[i % pool.length])); }
+    row.className='drift-row'; row.id=id;
+    // 2 copies for seamless infinite loop
+    for(var c=0;c<2;c++)
+      for(var i=0;i<pool.length;i++) row.appendChild(makeCard(pool[i]));
     wrap.appendChild(row);
     return row;
   }
-  var r1 = buildRow('driftR1', DRIFT_ROW1, 0);
-  var r2 = buildRow('driftR2', DRIFT_ROW2, -80);
-  var sec = document.getElementById('gallery');
-  var ticking = false;
-  function update(){
-    var progress = -sec.getBoundingClientRect().top + window.innerHeight * 0.5;
-    r1.style.transform = 'translateX('+(progress * -0.30)+'px)';
-    r2.style.transform = 'translateX('+(-80 + progress * 0.25)+'px)';
-    ticking = false;
+
+  var r1 = buildRow('driftR1', DRIFT_ROW1);
+  var r2 = buildRow('driftR2', DRIFT_ROW2);
+
+  // half-width = 1 full copy — when we shift by this, second copy shows = seamless
+  var half1 = DRIFT_ROW1.length * ITEM_W;
+  var half2 = DRIFT_ROW2.length * ITEM_W;
+
+  var pos1 = 0;          // row1 starts at 0, moves LEFT
+  var pos2 = -half2;     // row2 starts at -half, moves RIGHT (toward 0)
+  var S1 = 0.65;         // px per frame
+  var S2 = 0.45;
+
+  function tick(){
+    pos1 -= S1;
+    pos2 += S2;
+    if(pos1 <= -half1) pos1 = 0;
+    if(pos2 >= 0)       pos2 = -half2;
+    r1.style.transform = 'translateX('+pos1+'px)';
+    r2.style.transform = 'translateX('+pos2+'px)';
+    requestAnimationFrame(tick);
   }
-  window.addEventListener('scroll',function(){if(!ticking){requestAnimationFrame(update);ticking=true;}},{passive:true});
-  update();
+  requestAnimationFrame(tick);
 })();
 
 // Signage carousel
