@@ -371,6 +371,20 @@ body{margin:0;}
 .conf-card h3{font-size:17px;line-height:1.22;border-top:1px solid var(--line);padding-top:12px;margin-bottom:8px;}
 .conf-card p{font-size:14px;color:var(--muted);line-height:1.6;}
 
+/* Drift Gallery */
+.drift-section{background:#0d0d0d;padding:80px 0;overflow:hidden;}
+.drift-head{text-align:center;padding:0 24px 52px;color:#fff;}
+.drift-head .eyebrow{margin:0 auto 16px;}
+.drift-head h2{font-size:clamp(28px,3.2vw,46px);color:#fff;margin:0;}
+.drift-rows{display:flex;flex-direction:column;gap:12px;}
+.drift-row{display:flex;gap:12px;will-change:transform;}
+.drift-card{flex-shrink:0;border-radius:12px;overflow:hidden;background:#1a1a1a;}
+.drift-card img{width:100%;height:100%;object-fit:cover;display:block;}
+.drift-card.p{width:160px;aspect-ratio:9/16;}
+.drift-card.l{width:260px;aspect-ratio:4/3;}
+.drift-card.s{width:130px;aspect-ratio:9/16;}
+.drift-card.ph{background:#1e1e1e;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.12);font-family:'Magra',sans-serif;font-size:13px;font-weight:700;letter-spacing:.06em;}
+
 /* Signage Showcase */
 .ss-layout{display:grid;grid-template-columns:1fr 1fr;gap:72px;align-items:center;}
 .ss-screen-wrap{position:relative;display:flex;flex-direction:column;align-items:center;}
@@ -1220,6 +1234,49 @@ body{margin:0;}
   </div>
 </section>
 
+<!-- DRIFT GALLERY -->
+<section class="drift-section" id="gallery">
+  <div class="drift-head" data-reveal>
+    <div class="eyebrow on-dark"><i></i>Screens pe kya chal raha hai</div>
+    <h2>Yahi dikhta hai — aapke area ke logon ko</h2>
+  </div>
+  <div class="drift-rows">
+    <!-- Row 1: moves LEFT -->
+    <div class="drift-row" id="driftR1">
+      <div class="drift-card p"><img src="img/carousel/1.jpg" alt="" onerror="this.parentElement.classList.add('ph');this.parentElement.textContent='AD SLOT'"></div>
+      <div class="drift-card l"><img src="img/carousel/2.jpg" alt="" onerror="this.parentElement.classList.add('ph');this.parentElement.textContent='AD SLOT'"></div>
+      <div class="drift-card p"><img src="img/carousel/3.jpg" alt="" onerror="this.parentElement.classList.add('ph');this.parentElement.textContent='AD SLOT'"></div>
+      <div class="drift-card s"><img src="img/carousel/4.jpg" alt="" onerror="this.parentElement.classList.add('ph');this.parentElement.textContent='AD SLOT'"></div>
+      <div class="drift-card l"><img src="img/carousel/5.jpg" alt="" onerror="this.parentElement.classList.add('ph');this.parentElement.textContent='AD SLOT'"></div>
+      <div class="drift-card p"><img src="img/carousel/1.jpg" alt="" onerror="this.parentElement.classList.add('ph');this.parentElement.textContent='AD SLOT'"></div>
+      <div class="drift-card l"><img src="img/carousel/2.jpg" alt="" onerror="this.parentElement.classList.add('ph');this.parentElement.textContent='AD SLOT'"></div>
+      <div class="drift-card s"><img src="img/carousel/3.jpg" alt="" onerror="this.parentElement.classList.add('ph');this.parentElement.textContent='AD SLOT'"></div>
+    </div>
+    <!-- Row 2: moves RIGHT -->
+    <div class="drift-row" id="driftR2" style="transform:translateX(-120px)">
+      <div class="drift-card s"><img src="img/carousel/4.jpg" alt="" onerror="this.parentElement.classList.add('ph');this.parentElement.textContent='AD SLOT'"></div>
+      <div class="drift-card p"><img src="img/carousel/5.jpg" alt="" onerror="this.parentElement.classList.add('ph');this.parentElement.textContent='AD SLOT'"></div>
+      <div class="drift-card l"><img src="img/carousel/1.jpg" alt="" onerror="this.parentElement.classList.add('ph');this.parentElement.textContent='AD SLOT'"></div>
+      <div class="drift-card p"><img src="img/carousel/2.jpg" alt="" onerror="this.parentElement.classList.add('ph');this.parentElement.textContent='AD SLOT'"></div>
+      <div class="drift-card s"><img src="img/carousel/3.jpg" alt="" onerror="this.parentElement.classList.add('ph');this.parentElement.textContent='AD SLOT'"></div>
+      <div class="drift-card l"><img src="img/carousel/4.jpg" alt="" onerror="this.parentElement.classList.add('ph');this.parentElement.textContent='AD SLOT'"></div>
+      <div class="drift-card p"><img src="img/carousel/5.jpg" alt="" onerror="this.parentElement.classList.add('ph');this.parentElement.textContent='AD SLOT'"></div>
+      <div class="drift-card l"><img src="img/carousel/1.jpg" alt="" onerror="this.parentElement.classList.add('ph');this.parentElement.textContent='AD SLOT'"></div>
+    </div>
+    <!-- Row 3: moves LEFT faster -->
+    <div class="drift-row" id="driftR3" style="transform:translateX(-60px)">
+      <div class="drift-card l"><img src="img/carousel/2.jpg" alt="" onerror="this.parentElement.classList.add('ph');this.parentElement.textContent='AD SLOT'"></div>
+      <div class="drift-card p"><img src="img/carousel/3.jpg" alt="" onerror="this.parentElement.classList.add('ph');this.parentElement.textContent='AD SLOT'"></div>
+      <div class="drift-card s"><img src="img/carousel/4.jpg" alt="" onerror="this.parentElement.classList.add('ph');this.parentElement.textContent='AD SLOT'"></div>
+      <div class="drift-card p"><img src="img/carousel/5.jpg" alt="" onerror="this.parentElement.classList.add('ph');this.parentElement.textContent='AD SLOT'"></div>
+      <div class="drift-card l"><img src="img/carousel/1.jpg" alt="" onerror="this.parentElement.classList.add('ph');this.parentElement.textContent='AD SLOT'"></div>
+      <div class="drift-card s"><img src="img/carousel/2.jpg" alt="" onerror="this.parentElement.classList.add('ph');this.parentElement.textContent='AD SLOT'"></div>
+      <div class="drift-card p"><img src="img/carousel/3.jpg" alt="" onerror="this.parentElement.classList.add('ph');this.parentElement.textContent='AD SLOT'"></div>
+      <div class="drift-card l"><img src="img/carousel/4.jpg" alt="" onerror="this.parentElement.classList.add('ph');this.parentElement.textContent='AD SLOT'"></div>
+    </div>
+  </div>
+</section>
+
 <!-- SIGNAGE SHOWCASE -->
 <section class="sec" id="signage-showcase">
   <div class="wrap">
@@ -2023,6 +2080,28 @@ const ro = new IntersectionObserver(entries => {
 document.querySelectorAll('[data-reveal]').forEach(el => ro.observe(el));
 
 // Accordion Steps — auto-advance with progress bar
+// Drift gallery parallax
+(function(){
+  var r1 = document.getElementById('driftR1');
+  var r2 = document.getElementById('driftR2');
+  var r3 = document.getElementById('driftR3');
+  if(!r1) return;
+  var sec = document.getElementById('gallery');
+  var ticking = false;
+  function update(){
+    var rect = sec.getBoundingClientRect();
+    var progress = -rect.top + window.innerHeight * 0.5;
+    r1.style.transform = 'translateX(' + (-progress * 0.12) + 'px)';
+    r2.style.transform = 'translateX(' + (-120 + progress * 0.09) + 'px)';
+    r3.style.transform = 'translateX(' + (-60 - progress * 0.15) + 'px)';
+    ticking = false;
+  }
+  window.addEventListener('scroll', function(){
+    if(!ticking){ requestAnimationFrame(update); ticking = true; }
+  }, {passive:true});
+  update();
+})();
+
 // Signage carousel
 (function(){
   var slides = document.querySelectorAll('.ss-slide');
