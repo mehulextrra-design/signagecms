@@ -2058,8 +2058,8 @@ var DRIFT_ROW2 = [
   'img/carousel/Shreeji Enclave.jpg.jpeg'
 ];
 (function(){
-  var wrap = document.getElementById('driftRows');
-  if(!wrap) return;
+  var container = document.getElementById('driftRows');
+  if(!container) return;
   var VIDEO_EXT = /\.(mp4|webm|mov)$/i;
 
   function makeCard(src){
@@ -2085,7 +2085,7 @@ var DRIFT_ROW2 = [
     row.className='drift-row'; row.id=id;
     for(var c=0;c<2;c++)
       for(var i=0;i<pool.length;i++) row.appendChild(makeCard(pool[i]));
-    wrap.appendChild(row);
+    container.appendChild(row);
     return row;
   }
 
@@ -2102,7 +2102,7 @@ var DRIFT_ROW2 = [
     lastY = window.scrollY;
   }, {passive:true});
 
-  function wrap(pos, half){
+  function wrapPos(pos, half){
     while(pos >= 0) pos -= half;
     while(pos < -half) pos += half;
     return pos;
@@ -2112,8 +2112,8 @@ var DRIFT_ROW2 = [
     scrollVel *= 0.88;
     pos0 -= BASE0 + scrollVel * 0.14;
     pos1 -= BASE1 + scrollVel * 0.09;
-    pos0 = wrap(pos0, half0);
-    pos1 = wrap(pos1, half1);
+    pos0 = wrapPos(pos0, half0);
+    pos1 = wrapPos(pos1, half1);
     r0.style.transform = 'translateX('+pos0+'px)';
     r1.style.transform = 'translateX('+pos1+'px)';
     requestAnimationFrame(tick);
