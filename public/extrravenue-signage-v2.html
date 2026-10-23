@@ -380,10 +380,6 @@ body{margin:0;}
 .drift-row{display:flex;will-change:transform;}
 .drift-card{flex-shrink:0;width:214px;height:380px;margin:0 16px;border-radius:8px;overflow:hidden;background:#1a1a1a;}
 .drift-card img,.drift-card video{width:100%;height:100%;object-fit:cover;display:block;}
-@keyframes drift-right{from{transform:translateX(-50%)}to{transform:translateX(0)}}
-@keyframes drift-left{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-.drift-row-r{animation:drift-right 12s linear infinite;}
-.drift-row-l{animation:drift-left 18s linear infinite;}
 .drift-card.ph{display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.1);font-family:'Magra',sans-serif;font-size:11px;font-weight:700;letter-spacing:.08em;border:1px solid rgba(255,255,255,.06);}
 
 /* Signage Showcase */
@@ -2082,19 +2078,47 @@ var DRIFT_ROW2 = [
     return card;
   }
 
-  function buildRow(id, pool, cls){
+  var SLOT = 214 + 32;
+
+  function buildRow(id, pool){
     var row = document.createElement('div');
-    row.className='drift-row '+cls; row.id=id;
-    // 2 copies for seamless CSS -50% animation loop
+    row.className='drift-row'; row.id=id;
     for(var c=0;c<2;c++)
       for(var i=0;i<pool.length;i++) row.appendChild(makeCard(pool[i]));
     wrap.appendChild(row);
     return row;
   }
 
-  // Top row → RIGHT (drift-right), Bottom row → LEFT (drift-left)
-  buildRow('driftR1', DRIFT_ROW1, 'drift-row-r');
-  buildRow('driftR2', DRIFT_ROW2, 'drift-row-l');
+  var r0 = buildRow('driftR1', DRIFT_ROW1);
+  var r1 = buildRow('driftR2', DRIFT_ROW2);
+  var half0 = DRIFT_ROW1.length * SLOT;
+  var half1 = DRIFT_ROW2.length * SLOT;
+  var pos0 = 0, pos1 = 0;
+  var BASE0 = 0.6, BASE1 = 0.4;
+  var scrollVel = 0, lastY = window.scrollY;
+
+  window.addEventListener('scroll', function(){
+    scrollVel += (window.scrollY - lastY) * 0.6;
+    lastY = window.scrollY;
+  }, {passive:true});
+
+  function wrap(pos, half){
+    while(pos >= 0) pos -= half;
+    while(pos < -half) pos += half;
+    return pos;
+  }
+
+  function tick(){
+    scrollVel *= 0.88;
+    pos0 -= BASE0 + scrollVel * 0.14;
+    pos1 -= BASE1 + scrollVel * 0.09;
+    pos0 = wrap(pos0, half0);
+    pos1 = wrap(pos1, half1);
+    r0.style.transform = 'translateX('+pos0+'px)';
+    r1.style.transform = 'translateX('+pos1+'px)';
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
 })();
 
 // Signage carousel
