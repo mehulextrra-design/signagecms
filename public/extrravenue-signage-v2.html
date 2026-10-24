@@ -1405,10 +1405,13 @@ body{margin:0;}
 #ev-hero .uph{display:inline-block;cursor:pointer;font-size:12px;color:var(--mid);padding:5px 14px;border:1px solid rgba(0,0,0,.14);border-radius:18px;background:#fff;transition:color .15s,border-color .15s;}
 #ev-hero .uph:hover{color:var(--or);border-color:var(--or);}
 #ev-hero #pv-desc{font-size:13px;color:var(--mid);line-height:1.65;padding-top:8px;}
+#ev-hero .uph-ov{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);z-index:4;white-space:nowrap;background:rgba(255,255,255,.88);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);}
 @media(max-width:680px){
   #ev-hero .main-row{flex-direction:column;align-items:stretch;gap:24px;}
   #ev-hero .preview-col{width:100%;max-width:none;}
-  #ev-hero .mockup-wrap{height:360px;}
+  #ev-hero .mockup-wrap{height:460px;}
+  #ev-hero .ig-post-img-inner{aspect-ratio:unset!important;height:145px!important;}
+  #ev-hero .fb-pimg-inner{aspect-ratio:unset!important;height:110px!important;}
   #ev-hero .img-wrap{height:auto!important;}
   #ev-hero .hero-img{height:auto!important;object-fit:fill!important;}
 }
@@ -1432,15 +1435,13 @@ body{margin:0;}
       <div class="hs" id="hs1" data-idx="1"></div>
       <div class="hs" id="hs2" data-idx="2"></div>
       <div class="hs" id="hs3" data-idx="3"></div>
+      <label for="fi" class="uph uph-ov">&#8593; apna creative upload karo</label>
     </div>
   </div>
 
   <!-- RIGHT: Preview Panel -->
   <div class="preview-col" id="ev-preview">
-    <div style="margin-bottom:6px;">
-      <input type="file" id="fi" accept="image/*,video/*">
-      <label for="fi" class="uph">+ creative upload karo</label>
-    </div>
+    <input type="file" id="fi" accept="image/*,video/*">
     <div class="mockup-wrap">
 
       <!-- DIGITAL SIGNAGE -->
