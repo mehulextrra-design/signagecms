@@ -1446,7 +1446,13 @@ body{margin:0;}
   #ev-hero .img-wrap{height:auto!important;}
   #ev-hero .hero-img{height:auto!important;object-fit:fill!important;}
 }
-</style>
+#ev-hero .ph-frame{width:100%;height:100%;object-fit:contain;display:block;}
+#ev-hero .ph-screen{position:absolute;overflow:hidden;z-index:2;}
+#ev-hero .ph-screen .ad-fill{width:100%;height:100%;}
+#ev-hero .cp-fb{background:#0a0a0a!important;}
+#ev-hero .cp-ig{background:linear-gradient(135deg,#fdf497 0%,#fd5949 30%,#d6249f 60%,#285AEB 100%)!important;}
+#ev-hero .cp-sg{background:#1c1a19!important;}
+#ev-hero .media-fill{width:100%;height:100%;object-fit:cover;display:block;}</style>
 
 <div id="ev-hero">
 
@@ -1477,111 +1483,25 @@ body{margin:0;}
 
       <!-- DIGITAL SIGNAGE -->
       <div class="cp cp-sg" id="cp-sg">
-        <div class="sg-screen-wrap">
-          <div class="sg-screen">
-            <div class="sg-content" id="sg-content">
-              <div class="sg-brand">ExtrraVenue</div>
-              <div class="sg-tagline">more space = more revenue</div>
-            </div>
-            <div class="sg-scanline"></div>
-          </div>
+        <img class="ph-frame" src="/img/restaurant.jpg" alt="">
+        <div class="ph-screen" id="sg-content" style="left:20%;top:8%;width:52%;height:58%">
+          <div class="ad-fill"><div class="af-b">ExtrraVenue</div><div class="af-s">more space = more revenue</div></div>
         </div>
       </div>
 
       <!-- INSTAGRAM -->
       <div class="cp cp-ig" id="cp-ig">
-        <div class="ig-status"><span class="ig-st-t">9:41</span><div class="ig-st-r"><svg viewBox="0 0 24 24"><path d="M1 6s4.5-6 11-6 11 6 11 6"/><path d="M5 10s3-3.5 7-3.5 7 3.5 7 3.5"/><path d="M9 14s1.5-1.5 3-1.5 3 1.5 3 1.5"/><circle cx="12" cy="18" r="1" fill="currentColor"/></svg><svg viewBox="0 0 24 24"><rect x="1" y="6" width="18" height="12" rx="2"/><path d="M23 10v4"/></svg></div></div>
-        <div class="ig-nav"><svg class="ig-nav-cam" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg><span class="ig-logo">Instagram</span><div class="ig-nav-r"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></div></div>
-        <div class="ig-stories">
-          <div class="ig-story"><div class="ig-story-ring yours" style="position:relative"><div class="ig-story-av-inner" style="background:#c8c8c8;font-size:0"></div><div style="position:absolute;bottom:-1px;right:-1px;width:13px;height:13px;background:#1877f2;border-radius:50%;border:1.5px solid #fff;display:flex;align-items:center;justify-content:center;font-size:9px;color:#fff;font-weight:800;line-height:1">+</div></div><div class="ig-stn">Tumhari</div></div>
-          <div class="ig-story"><div class="ig-story-ring"><div class="ig-story-av-inner">KS</div></div><div class="ig-stn">kiran_s</div></div>
-          <div class="ig-story"><div class="ig-story-ring"><div class="ig-story-av-inner">RV</div></div><div class="ig-stn">rahulv</div></div>
-          <div class="ig-story"><div class="ig-story-ring"><div class="ig-story-av-inner">MA</div></div><div class="ig-stn">mansi_a</div></div>
-          <div class="ig-story"><div class="ig-story-ring"><div class="ig-story-av-inner">PS</div></div><div class="ig-stn">priya.s</div></div>
-        </div>
-        <div class="ig-divider"></div>
-        <div class="ig-phdr">
-          <div class="ig-av-outer"><div class="ig-av"><span>EV</span></div></div>
-          <div style="flex:1"><span class="ig-uname">extrravenue</span><span class="ig-spon">Sponsored</span></div>
-          <span class="ig-3dot">&middot;&middot;&middot;</span>
-        </div>
-        <div class="ig-post-img">
-          <div class="ig-post-img-inner" id="ig-img">
-            <div class="ad-fill"><div class="af-b" style="font-size:13px">ExtrraVenue</div><div class="af-s">more space = more revenue</div></div>
-          </div>
-        </div>
-        <div class="ig-actions">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-          <svg class="ig-bm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>
-        </div>
-        <div class="ig-foot">
-          <div class="ig-likes">1,247 likes</div>
-          <div class="ig-caption"><b>extrravenue</b> Ek upload, sab jagah live! &#10024; <span class="ig-tag">#extrravenue #digitalsignage</span></div>
-          <div class="ig-cmt-row"><div class="ig-cmt-av"></div><span class="ig-cmt-txt">Add a comment...</span></div>
-        </div>
-        <div class="ig-bot-nav">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <img class="ph-frame" src="/img/ig.jpg" alt="">
+        <div class="ph-screen" id="ig-img" style="left:29%;top:44%;width:42%;height:18%">
+          <div class="ad-fill"><div class="af-b">ExtrraVenue</div><div class="af-s">more space = more revenue</div></div>
         </div>
       </div>
 
       <!-- FACEBOOK -->
       <div class="cp cp-fb" id="cp-fb">
-        <div class="fb-hdr">
-          <div class="fb-hdr-top">
-            <div class="fb-logo-sm"><svg viewBox="0 0 24 24" width="14" height="14" fill="white"><path d="M14 13.5h2.5l1-4H14v-2c0-1.03 0-2 2-2h1.5V2.14C17.17 2.07 15.92 2 14.65 2 11.9 2 10 3.65 10 6.7v2.8H7v4h3V22h4v-8.5z"/></svg></div>
-            <div class="fb-search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><span class="fb-stxt">Search</span></div>
-            <div class="fb-bell"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg><span class="fb-badge">26</span></div>
-          </div>
-        </div>
-        <div class="fb-nav-row">
-          <div class="fb-ni active"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
-          <div class="fb-ni"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg><span class="fb-ni-badge">17</span></div>
-          <div class="fb-ni"><svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg></div>
-          <div class="fb-ni"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg><span class="fb-ni-badge">35</span></div>
-          <div class="fb-ni"><svg viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg></div>
-        </div>
-        <div class="fb-notif-lbl">Notifications</div>
-        <div class="fb-card">
-          <div class="fb-phdr">
-            <div class="fb-pav">EV</div>
-            <div class="fb-pmeta">
-              <div class="fb-pname">Extrravenue Digital</div>
-              <div class="fb-psp">1 h &middot; <svg viewBox="0 0 24 24" width="7" height="7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg></div>
-            </div>
-            <span class="fb-p3">&middot;&middot;&middot;</span>
-          </div>
-          <div class="fb-ptxt"><b>Extrravenue Digital</b> <span class="fb-hash">#digitalsignage #morespace #extrravenue</span><br>Ek upload, sab jagah live! &#128293; Same creative, 50+ screens.</div>
-          <div class="fb-pimg">
-            <div class="fb-pimg-inner" id="fb-img">
-              <div class="ad-fill"><div class="af-b" style="font-size:12px">ExtrraVenue</div><div class="af-s">more space = more revenue</div></div>
-            </div>
-            <div class="fb-reactions"><span>&#128077;</span><span>&#10084;</span><span>&#128518;</span><span>&#128562;</span><span>&#128546;</span><span>&#128545;</span></div>
-          </div>
-          <div class="fb-viewcnt">11,775 reproductions</div>
-          <div class="fb-peng">
-            <span>&#128518;&#10084;&#128077; 710</span>
-            <span>1,134 comments &middot; 1,232 shares</span>
-          </div>
-          <div class="fb-pacts">
-            <div class="fb-pa">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 00-3-3l-4 9v11h11.28a2 2 0 002-1.7l1.38-9a2 2 0 00-2-2.3H14z"/><path d="M7 22H4a2 2 0 01-2-2v-7a2 2 0 012-2h3"/></svg>
-              Like
-            </div>
-            <div class="fb-pa">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
-              Comment
-            </div>
-            <div class="fb-pa">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-              Share
-            </div>
-          </div>
+        <img class="ph-frame" src="/img/fb.png" alt="">
+        <div class="ph-screen" id="fb-img" style="left:33%;top:45%;width:37%;height:19%">
+          <div class="ad-fill"><div class="af-b">ExtrraVenue</div><div class="af-s">more space = more revenue</div></div>
         </div>
       </div>
 
