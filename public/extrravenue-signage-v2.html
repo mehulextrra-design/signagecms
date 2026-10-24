@@ -6,7 +6,7 @@
 <title>extrravenue — Digital Screen Advertising Network</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Magra:wght@400;700&family=Libre+Franklin:wght@300;400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Magra:wght@400;700&family=Libre+Franklin:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap">
 <style>
 /* ── Trendora Design System ── */
 body{margin:0;}
@@ -228,6 +228,12 @@ body{margin:0;}
 .hc-green{background:linear-gradient(155deg,#60d0a0 0%,#208060 50%,#084030 100%);}
 @keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.6;transform:scale(1.25);}}
 
+/* Venue partner card */
+.venue-card{background:var(--orange);border-radius:var(--r);padding:44px 48px;display:flex;flex-direction:row;align-items:center;justify-content:space-between;gap:32px;transition:background-color .35s var(--ease),box-shadow .35s var(--ease);}
+.venue-card:hover{background:#e95400;box-shadow:0 26px 54px -26px rgba(255,92,0,.7);}
+.venue-ring{flex:none;width:118px;height:118px;border-radius:50%;border:1.5px dashed rgba(255,255,255,.55);display:grid;place-items:center;animation:spin 16s linear infinite;}
+.venue-ring span{display:grid;place-items:center;width:62px;height:62px;border-radius:50%;background:#fff;color:var(--orange);animation:spin 16s linear infinite reverse;}
+
 /* Service cards */
 .svc-rows{display:flex;flex-direction:column;gap:18px;margin-top:56px;}
 .svc-r1{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
@@ -255,21 +261,61 @@ body{margin:0;}
 .so-ring{flex:none;width:118px;height:118px;border-radius:50%;border:1.5px dashed rgba(255,255,255,.55);display:grid;place-items:center;color:#fff;animation:spin 16s linear infinite;}
 .so-ring span{display:grid;place-items:center;width:62px;height:62px;border-radius:50%;background:#fff;color:var(--orange);animation:spin 16s linear infinite reverse;}
 @keyframes spin{to{transform:rotate(360deg);}}
+/* 3-in-1 card */
+.scard-3in1{background:var(--dark);border-radius:var(--r);padding:44px 48px;display:flex;flex-direction:row;align-items:center;gap:40px;position:relative;overflow:hidden;}
+.s3-left{display:flex;flex-direction:column;gap:16px;flex:1;}
+.s3-right{flex:0 0 280px;}
 
-/* Steps */
-.steps{background:var(--surface);border-top:1px solid var(--line);border-bottom:1px solid var(--line);}
-.steps-line{position:relative;height:2px;background:var(--line);margin-top:48px;overflow:hidden;}
-.steps-line i{position:absolute;inset:0;background:var(--orange);transform:scaleX(0);transform-origin:left;transition:transform 1.8s var(--ease) .2s;}
-.steps-line.in i{transform:scaleX(1);}
-.steps-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:32px;}
-.step{padding:0 26px;border-left:1px solid var(--line);display:flex;flex-direction:column;gap:14px;}
-.step:first-child{border-left:0;padding-left:0;}
-.step:last-child{padding-right:0;}
-.step-no{font-family:'Magra',sans-serif;font-weight:700;font-size:54px;line-height:1;color:transparent;-webkit-text-stroke:1.4px var(--line-strong);transition:-webkit-text-stroke-color .35s var(--ease),color .35s var(--ease);}
-.step:hover .step-no{color:var(--orange);-webkit-text-stroke-color:var(--orange);}
-.step h3{font-size:21px;}
-.step p{font-size:14.5px;color:var(--muted);}
-.step-tick{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;color:var(--orange);margin-top:4px;}
+/* ── Steps Swatch Accordion ── */
+.acc-section{background:var(--surface);border-top:1px solid var(--line);border-bottom:1px solid var(--line);}
+#swatchContainer{font-family:'Plus Jakarta Sans',-apple-system,sans-serif;margin-top:48px;display:flex;flex-direction:column;gap:12px;}
+.swatch-item{border-radius:28px;overflow:hidden;border:4px solid #fff;box-shadow:0 4px 16px rgba(0,0,0,.08);padding:20px;position:relative;}
+.vertical-title{writing-mode:vertical-rl;transform:rotate(180deg);white-space:nowrap;letter-spacing:.08em;word-spacing:.3em;}
+.sw-shadow{box-shadow:0 16px 36px -8px rgba(0,0,0,.08),0 4px 12px -2px rgba(0,0,0,.04);}
+/* Inner layout helpers */
+.sw-card{display:flex;flex-direction:column;justify-content:space-between;height:100%;width:100%;}
+.sw-hd{display:flex;align-items:center;justify-content:space-between;padding-bottom:12px;border-bottom:1px solid rgba(0,0,0,.05);flex-shrink:0;}
+.sw-hd-l{display:flex;align-items:center;gap:14px;}
+.sw-body{display:grid;grid-template-columns:1fr;gap:20px;align-items:center;padding:14px 0;}
+.sw-ft{display:flex;align-items:center;justify-content:space-between;padding-top:6px;border-top:1px solid rgba(0,0,0,.05);font-size:11px;font-weight:600;flex-shrink:0;}
+.sw-mockup{background:#fff;border-radius:16px;padding:16px;max-width:320px;width:100%;display:flex;flex-direction:column;gap:10px;box-shadow:0 16px 36px -8px rgba(0,0,0,.08);}
+.sw-desc{display:flex;flex-direction:column;gap:10px;}
+.sw-tag{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;}
+.sw-close{width:32px;height:32px;border-radius:50%;background:rgba(0,0,0,.06);display:flex;align-items:center;justify-content:center;cursor:pointer;border:0;font-size:inherit;flex-shrink:0;}
+.sw-close:hover{background:rgba(0,0,0,.1);}
+.sw-strip-btn{width:38px;height:38px;border-radius:50%;background:rgba(0,0,0,.06);display:grid;place-items:center;font-size:20px;font-weight:300;line-height:0;flex-shrink:0;padding:0;border:0;cursor:pointer;}
+/* Auto-progress bar */
+.sw-progress-wrap{position:absolute;bottom:0;left:0;right:0;height:3px;background:rgba(0,0,0,.08);overflow:hidden;border-radius:0 0 24px 24px;}
+.sw-progress-bar{height:100%;width:0%;background:currentColor;opacity:.5;transition:none;}
+.swatch-item.expanded .sw-progress-bar{animation:swProgress 5s linear forwards;}
+.swatch-item.paused .sw-progress-bar{animation-play-state:paused;}
+@keyframes swProgress{from{width:0%}to{width:100%}}
+/* Collapsed/expanded show-hide */
+.desktop-collapsed-strip{display:none;}
+.mobile-collapsed-bar{display:none;}
+.full-card-content{display:none;}
+.swatch-item.expanded .full-card-content{display:flex;flex-direction:column;justify-content:space-between;height:100%;animation:swFade .4s ease forwards;}
+/* ── MOBILE (default — stacked) ── */
+.swatch-item.collapsed .mobile-collapsed-bar{display:flex;align-items:center;justify-content:space-between;cursor:pointer;}
+.swatch-item.expanded .mobile-collapsed-bar{display:none;}
+/* ── DESKTOP ── */
+@media(min-width:1024px){
+  .acc-heading{white-space:nowrap;}
+  #swatchContainer{flex-direction:row;height:380px;align-items:stretch;padding:0;}
+  .swatch-item{transition:flex .55s cubic-bezier(.16,1,.3,1);padding:22px;}
+  .swatch-item.collapsed{flex:0 0 72px;cursor:pointer;overflow:hidden;}
+  .swatch-item.collapsed:hover{filter:brightness(.97);}
+  .swatch-item.expanded{flex:1 1 0%;cursor:default;}
+  .swatch-item.collapsed .desktop-collapsed-strip{display:flex;flex-direction:column;align-items:center;justify-content:space-between;height:100%;padding:14px 0;user-select:none;}
+  .swatch-item.expanded .desktop-collapsed-strip{display:none;}
+  .mobile-collapsed-bar{display:none!important;}
+  .sw-body{grid-template-columns:1fr 1fr;gap:24px;padding:10px 0;}
+  .sw-mockup{max-width:280px;}
+  .sw-hd{padding-bottom:10px;}
+  .sw-ft{padding-top:5px;}
+}
+@keyframes swFade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+@media(min-width:1024px){#swatchDots{display:flex!important;}}
 
 /* Benefits */
 .ben-layout{display:grid;grid-template-columns:.85fr 1.15fr;gap:56px;align-items:start;}
@@ -317,11 +363,49 @@ body{margin:0;}
 
 /* Confidence */
 .conf-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:56px;}
-.conf-card{background:var(--bg);border:1px solid var(--line);border-radius:var(--r);padding:28px 26px;display:flex;flex-direction:column;gap:12px;transition:border-color .35s var(--ease),box-shadow .35s var(--ease),background-color .35s var(--ease);}
-.conf-card:hover{border-color:var(--orange);box-shadow:0 18px 40px -24px rgba(255,92,0,.2);}
-.conf-num{font-family:'Magra',sans-serif;font-weight:700;font-size:13px;color:var(--orange);letter-spacing:.06em;}
-.conf-card h3{font-size:19px;line-height:1.18;}
-.conf-card p{font-size:14.5px;color:var(--muted);line-height:1.6;}
+.conf-card{background:var(--surface);border:1px solid transparent;border-radius:var(--r);padding:22px 20px 20px;display:flex;flex-direction:column;transition:border-color .35s var(--ease),box-shadow .35s var(--ease);}
+.conf-card:hover{border-color:var(--orange);box-shadow:0 10px 28px -16px rgba(255,92,0,.22);}
+.conf-top{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:14px;}
+.conf-tag{font-family:'Magra',sans-serif;font-size:44px;font-weight:700;color:var(--orange);line-height:1;}
+.conf-num{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);}
+.conf-card h3{font-size:17px;line-height:1.22;border-top:1px solid var(--line);padding-top:12px;margin-bottom:8px;}
+.conf-card p{font-size:14px;color:var(--muted);line-height:1.6;}
+
+/* Drift Gallery */
+.drift-section{background:#0d0d0d;padding:80px 0;overflow:hidden;}
+.drift-head{text-align:center;padding:0 24px 52px;color:#fff;}
+.drift-head .eyebrow{margin:0 auto 16px;}
+.drift-head h2{font-size:clamp(28px,3.2vw,46px);color:#fff;margin:0;}
+.drift-rows{display:flex;flex-direction:column;gap:24px;}
+.drift-row{display:flex;will-change:transform;}
+.drift-card{flex-shrink:0;width:180px;height:320px;margin:0 16px;border-radius:12px;overflow:hidden;background:#1a1a1a;}
+.drift-card img,.drift-card video{width:100%;height:100%;object-fit:cover;display:block;}
+.drift-card.ph{display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.1);font-family:'Magra',sans-serif;font-size:11px;font-weight:700;letter-spacing:.08em;border:1px solid rgba(255,255,255,.06);}
+
+/* Signage Showcase */
+.ss-layout{display:grid;grid-template-columns:1fr 1fr;gap:72px;align-items:center;}
+.ss-screen-wrap{position:relative;display:flex;flex-direction:column;align-items:center;}
+.ss-wall{background:#e8e3dc;border-radius:24px;padding:32px 48px 48px;display:flex;flex-direction:column;align-items:center;gap:0;box-shadow:inset 0 2px 8px rgba(0,0,0,.08);}
+.ss-bracket{width:24px;height:20px;background:#888;border-radius:3px 3px 0 0;margin-bottom:2px;box-shadow:0 2px 4px rgba(0,0,0,.2);}
+.ss-tv{width:220px;background:#0d0d0d;border-radius:10px;padding:8px;box-shadow:0 0 0 1.5px #1a1a1a,0 24px 48px -12px rgba(0,0,0,.5);position:relative;}
+.ss-inner{aspect-ratio:9/16;border-radius:5px;overflow:hidden;position:relative;background:#111;}
+.ss-slide{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .9s ease;}
+.ss-slide.on{opacity:1;}
+.ss-led{width:5px;height:5px;border-radius:50%;background:#ff5c00;box-shadow:0 0 5px #ff5c00;margin:5px auto 0;}
+.ss-dots{display:flex;gap:6px;justify-content:center;margin-top:20px;}
+.ss-dot{width:6px;height:6px;border-radius:50%;background:rgba(30,30,30,.2);cursor:pointer;transition:background .2s;}
+.ss-dot.on{background:var(--orange);}
+.ss-content{display:flex;flex-direction:column;gap:20px;}
+.ss-content h2{font-size:clamp(28px,3.2vw,46px);}
+.ss-points{display:flex;flex-direction:column;gap:14px;margin-top:4px;}
+.ss-point{display:flex;gap:14px;align-items:flex-start;}
+.ss-point-ic{width:36px;height:36px;border-radius:10px;background:var(--orange-light, rgba(255,92,0,.08));display:grid;place-items:center;font-size:17px;flex-shrink:0;}
+.ss-point-body h4{font-family:'Magra',sans-serif;font-size:15px;font-weight:700;margin:0 0 3px;}
+.ss-point-body p{font-size:13.5px;color:var(--muted);line-height:1.55;margin:0;}
+@media(max-width:900px){
+  .ss-layout{grid-template-columns:1fr;gap:40px;}
+  .ss-content{order:-1;}
+}
 
 /* Pricing */
 .pricing-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:32px;}
@@ -424,6 +508,7 @@ body{margin:0;}
 }
 @media(max-width:768px){
   .conf-grid{grid-template-columns:1fr;}
+  .conf-tag{font-size:36px;}
   .sec{padding:64px 0;}
   .sec-tight{padding:40px 0;}
   .wrap{padding:0 16px;}
@@ -431,6 +516,10 @@ body{margin:0;}
   .hero-vis{border-radius:16px;}
   .scard-orange{flex-direction:column;padding:28px;}
   .so-ring{display:none;}
+  .venue-card{flex-direction:column;padding:28px;}
+  .venue-ring{display:none;}
+  .scard-3in1{flex-direction:column;padding:28px;}
+  .s3-right{flex:none;width:100%;}
   .f-top{grid-template-columns:1fr;}
   .quote-card{padding:28px 20px;}
   .quote-mark{font-size:100px;top:22px;right:20px;}
@@ -459,14 +548,13 @@ body{margin:0;}
 <nav class="nav" id="nav">
   <div class="nav-pill">
     <a class="brand" href="#">
-      <div class="brand-mark">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><rect x="2" y="3" width="20" height="14" rx="2" stroke="currentColor" stroke-width="2"/><path d="M8 21h8M12 17v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-      </div>
+      <img src="logo.png" alt="extrravenue" style="height:32px;width:auto;">
       <span class="brand-name">extrravenue</span>
     </a>
     <nav class="nav-links">
       <a href="#services">Services</a>
       <a href="#steps">Process</a>
+      <a href="#demo" style="color:var(--orange);font-weight:600;">Try Demo</a>
       <a href="#benefits">Benefits</a>
       <a href="#results">Impact</a>
       <a href="#pricing">Pricing</a>
@@ -483,6 +571,7 @@ body{margin:0;}
 <div class="nav-sheet" id="msheet">
   <a href="#services" onclick="document.getElementById('msheet').classList.remove('open')">Services</a>
   <a href="#steps" onclick="document.getElementById('msheet').classList.remove('open')">Process</a>
+  <a href="#demo" onclick="document.getElementById('msheet').classList.remove('open')" style="color:var(--orange);font-weight:600;">Try Demo</a>
   <a href="#benefits" onclick="document.getElementById('msheet').classList.remove('open')">Benefits</a>
   <a href="#results" onclick="document.getElementById('msheet').classList.remove('open')">Impact</a>
   <a href="#pricing" onclick="document.getElementById('msheet').classList.remove('open')">Pricing</a>
@@ -550,7 +639,7 @@ body{margin:0;}
 </div>
 
 <!-- SERVICES -->
-<section class="sec" id="services">
+<section class="sec" id="services" style="display:none;">
   <div class="wrap">
     <div class="sec-head" data-reveal>
       <div class="eyebrow"><i></i>Kya milta hai aapko</div>
@@ -563,7 +652,33 @@ body{margin:0;}
           <div class="scard-idx"><span>01</span><div class="dot"></div></div>
           <h3 class="h-sm">Apni screen chuniye</h3>
           <p>City aur area ke hisaab se screens dekho. Mall ho, office ho ya busy commercial complexes — jo location chahiye book karo. Duration aap decide karte ho.</p>
-          <div class="scard-foot">
+          <!-- Step 01 Mockup: Screen Browser -->
+          <div style="background:#0f172a;border-radius:12px;padding:12px;margin-top:14px;font-family:'Libre Franklin',sans-serif;">
+            <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;">
+              <span style="background:#0d9488;color:#fff;padding:3px 10px;border-radius:999px;font-size:10px;font-weight:600;">● Vasna</span>
+              <span style="background:rgba(255,255,255,.1);color:rgba(255,255,255,.5);padding:3px 10px;border-radius:999px;font-size:10px;">Navrangpura</span>
+              <span style="background:rgba(255,255,255,.1);color:rgba(255,255,255,.5);padding:3px 10px;border-radius:999px;font-size:10px;">SG Highway</span>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+              <div style="background:rgba(13,148,136,.15);border:1.5px solid #0d9488;border-radius:8px;padding:8px;">
+                <div style="width:100%;aspect-ratio:16/9;background:linear-gradient(135deg,#1e3a5f,#0d4f6e);border-radius:5px;margin-bottom:7px;display:flex;align-items:center;justify-content:center;">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.4)" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4" stroke-linecap="round"/></svg>
+                </div>
+                <div style="color:#fff;font-weight:700;font-size:10px;margin-bottom:2px;">Tulsi Mall A</div>
+                <div style="color:#2dd4bf;font-size:9px;font-weight:600;">~2,700 plays/day</div>
+                <div style="color:rgba(255,255,255,.4);font-size:9px;">Regular · 15s</div>
+              </div>
+              <div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:8px;">
+                <div style="width:100%;aspect-ratio:16/9;background:linear-gradient(135deg,#2d1b69,#4c1d95);border-radius:5px;margin-bottom:7px;display:flex;align-items:center;justify-content:center;">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.4)" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4" stroke-linecap="round"/></svg>
+                </div>
+                <div style="color:#fff;font-weight:700;font-size:10px;margin-bottom:2px;">CG Road B</div>
+                <div style="color:#a78bfa;font-size:9px;font-weight:600;">~3,100 plays/day</div>
+                <div style="color:rgba(255,255,255,.4);font-size:9px;">Premium · 20s</div>
+              </div>
+            </div>
+          </div>
+          <div class="scard-foot" style="margin-top:10px;">
             <span class="stag">Location-wise search</span><span class="stag">Area filtering</span><span class="stag">Custom schedule</span>
           </div>
         </div>
@@ -571,8 +686,45 @@ body{margin:0;}
           <div class="scard-idx"><span>02</span><div class="dot"></div></div>
           <h3 class="h-sm">Apna ad upload karein</h3>
           <p>High-resolution creative ya video direct upload karein. Hamara automated quality check ensure karta hai ki display par ad crisp aur impactful dikhe.</p>
-          <div class="scard-foot">
-            <span class="stag">Photo &amp; Poster</span><span class="stag">1080p Video</span><span class="stag">Aspect check</span>
+          <!-- Step 02 Mockup: Creative Library -->
+          <div style="background:#fafaf9;border:1px solid #e5e0d8;border-radius:12px;padding:12px;margin-top:14px;">
+            <div style="display:flex;gap:6px;margin-bottom:10px;">
+              <span style="background:#0d9488;color:#fff;padding:3px 10px;border-radius:6px;font-size:10px;font-weight:600;">My Library</span>
+              <span style="background:#f1ede6;color:#888;padding:3px 10px;border-radius:6px;font-size:10px;">Upload New</span>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;">
+              <div style="aspect-ratio:1;border-radius:7px;background:linear-gradient(135deg,#ff5c00,#ff8c42);border:2px solid #ff5c00;position:relative;">
+                <div style="position:absolute;bottom:4px;left:4px;background:rgba(0,0,0,.5);color:#fff;font-size:8px;padding:1px 4px;border-radius:3px;">image</div>
+              </div>
+              <div style="aspect-ratio:1;border-radius:7px;background:linear-gradient(135deg,#0d9488,#14b8a6);">
+                <div style="position:relative;height:100%;display:flex;align-items:center;justify-content:center;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.7)" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                  <div style="position:absolute;bottom:4px;left:4px;background:rgba(0,0,0,.5);color:#fff;font-size:8px;padding:1px 4px;border-radius:3px;">video</div>
+                </div>
+              </div>
+              <div style="aspect-ratio:1;border-radius:7px;background:linear-gradient(135deg,#7c3aed,#a855f7);">
+                <div style="position:absolute;bottom:4px;left:4px;background:rgba(0,0,0,.5);color:#fff;font-size:8px;padding:1px 4px;border-radius:3px;">image</div>
+              </div>
+              <div style="aspect-ratio:1;border-radius:7px;background:linear-gradient(135deg,#0369a1,#0ea5e9);">
+                <div style="position:relative;height:100%;display:flex;align-items:center;justify-content:center;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.7)" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                  <div style="position:absolute;bottom:4px;left:4px;background:rgba(0,0,0,.5);color:#fff;font-size:8px;padding:1px 4px;border-radius:3px;">video</div>
+                </div>
+              </div>
+              <div style="aspect-ratio:1;border-radius:7px;background:linear-gradient(135deg,#b45309,#d97706);">
+                <div style="position:absolute;bottom:4px;left:4px;background:rgba(0,0,0,.5);color:#fff;font-size:8px;padding:1px 4px;border-radius:3px;">image</div>
+              </div>
+              <div style="aspect-ratio:1;border-radius:7px;background:linear-gradient(135deg,#065f46,#059669);">
+                <div style="position:absolute;bottom:4px;left:4px;background:rgba(0,0,0,.5);color:#fff;font-size:8px;padding:1px 4px;border-radius:3px;">image</div>
+              </div>
+            </div>
+            <div style="margin-top:8px;background:#ecfdf5;border:1px solid #6ee7b7;border-radius:6px;padding:5px 9px;display:flex;align-items:center;gap:6px;">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+              <span style="font-size:10px;color:#065f46;font-weight:600;">Quality check passed — 1080p ✓</span>
+            </div>
+          </div>
+          <div class="scard-foot" style="margin-top:10px;">
+            <span class="stag">Photo &amp; Poster</span><span class="stag">1080p Video</span><span class="stag">Auto slot check</span>
           </div>
         </div>
       </div>
@@ -581,73 +733,573 @@ body{margin:0;}
           <div class="scard-idx"><span>03</span><div class="dot"></div></div>
           <h3 class="h-sm">Aasan payment, pakki receipt</h3>
           <p>UPI, cards ya company wallet se secure checkout. Payment hote hi verified GST invoice aapke registered email par instant deliver ho jaati hai.</p>
-          <div class="scard-vis">
-            <div class="bars">
-              <span style="height:38%"></span><span style="height:56%"></span><span style="height:44%"></span><span style="height:78%"></span><span style="height:52%"></span><span style="height:94%"></span>
+          <!-- Step 03 Mockup: Payment Confirmation -->
+          <div style="background:#fafaf9;border:1px solid #e5e0d8;border-radius:12px;padding:12px;margin-top:14px;font-size:11px;">
+            <div style="background:#fff;border:1px solid #e5e0d8;border-radius:8px;padding:10px;margin-bottom:8px;">
+              <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+                <span style="color:#888;font-size:10px;">Campaign</span>
+                <span style="font-weight:700;color:#1e1e1e;font-size:10px;">CMP-0042 · Momai Parlor</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+                <span style="color:#888;font-size:10px;">Duration</span>
+                <span style="font-weight:600;color:#1e1e1e;font-size:10px;">30 Days · 4 Screens</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+                <span style="color:#888;font-size:10px;">Coupon</span>
+                <span style="font-weight:600;color:#0d9488;font-size:10px;">FIRST20 → −₹2,600</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;border-top:1px solid #f0ece6;padding-top:6px;">
+                <span style="font-weight:700;color:#1e1e1e;font-size:11px;">Total</span>
+                <span style="font-weight:800;color:#ff5c00;font-size:13px;">₹10,400</span>
+              </div>
             </div>
+            <div style="background:#ecfdf5;border:1.5px solid #6ee7b7;border-radius:8px;padding:10px;display:flex;align-items:center;gap:8px;">
+              <div style="width:28px;height:28px;background:#059669;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+              <div>
+                <div style="font-weight:700;color:#065f46;font-size:11px;">Payment Confirmed!</div>
+                <div style="color:#047857;font-size:9px;">GST Invoice email pe bhej di gayi ✓</div>
+              </div>
+            </div>
+          </div>
+          <div class="scard-foot" style="margin-top:10px;">
+            <span class="stag">UPI Payment</span><span class="stag">Coupon Code</span><span class="stag">GST Invoice</span>
           </div>
         </div>
         <div class="scard" data-reveal style="transition-delay:.24s">
           <div class="scard-idx"><span>04</span><div class="dot"></div></div>
           <h3 class="h-sm">Proof of Play &amp; Reports</h3>
           <p>Har display telecast ka timestamped proof record hota hai. Detail log download karke aap exact date, time aur frequency verify kar sakte hain.</p>
-          <div style="background:rgba(30,30,30,.05);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-top:4px;">
+          <!-- Step 04 Mockup: PoP Table -->
+          <div style="background:#0f172a;border-radius:12px;padding:12px;margin-top:14px;">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-              <span style="font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);">Plays this week</span>
-              <span style="font-size:13px;font-weight:700;color:var(--orange);">↑ 2,340</span>
+              <div>
+                <div style="color:rgba(255,255,255,.5);font-size:9px;text-transform:uppercase;letter-spacing:.1em;">Total Plays</div>
+                <div style="color:#2dd4bf;font-weight:800;font-size:18px;line-height:1.1;">5,240</div>
+              </div>
+              <div style="background:#0d9488;color:#fff;font-size:9px;font-weight:600;padding:5px 10px;border-radius:6px;cursor:pointer;">↓ Export CSV</div>
             </div>
-            <svg viewBox="0 0 220 60" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:60px;overflow:visible;">
-              <defs>
-                <linearGradient id="popGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stop-color="var(--orange)" stop-opacity="0.18"/>
-                  <stop offset="100%" stop-color="var(--orange)" stop-opacity="0"/>
-                </linearGradient>
-              </defs>
-              <!-- Area fill -->
-              <path d="M0,52 L28,44 L56,38 L84,30 L112,22 L140,16 L168,10 L196,4 L220,2 L220,60 L0,60 Z" fill="url(#popGrad)"/>
-              <!-- Line -->
-              <polyline points="0,52 28,44 56,38 84,30 112,22 140,16 168,10 196,4 220,2" fill="none" stroke="var(--orange)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              <!-- Dots -->
-              <circle cx="0" cy="52" r="3" fill="var(--orange)" opacity=".4"/>
-              <circle cx="56" cy="38" r="3" fill="var(--orange)" opacity=".5"/>
-              <circle cx="112" cy="22" r="3" fill="var(--orange)" opacity=".6"/>
-              <circle cx="168" cy="10" r="3" fill="var(--orange)" opacity=".8"/>
-              <circle cx="220" cy="2" r="3.5" fill="var(--orange)"/>
-              <!-- Day labels -->
-              <text x="0" y="60" font-size="8" fill="var(--muted)" font-family="sans-serif" opacity=".7">Mon</text>
-              <text x="52" y="60" font-size="8" fill="var(--muted)" font-family="sans-serif" opacity=".7">Wed</text>
-              <text x="107" y="60" font-size="8" fill="var(--muted)" font-family="sans-serif" opacity=".7">Fri</text>
-              <text x="163" y="60" font-size="8" fill="var(--muted)" font-family="sans-serif" opacity=".7">Sun</text>
-            </svg>
+            <div style="display:grid;grid-template-columns:1.4fr 1fr 0.7fr 0.6fr;gap:0;border-top:1px solid rgba(255,255,255,.08);">
+              <div style="color:rgba(255,255,255,.35);font-size:9px;padding:5px 4px;font-weight:600;text-transform:uppercase;">Played At</div>
+              <div style="color:rgba(255,255,255,.35);font-size:9px;padding:5px 4px;font-weight:600;text-transform:uppercase;">Screen</div>
+              <div style="color:rgba(255,255,255,.35);font-size:9px;padding:5px 4px;font-weight:600;text-transform:uppercase;">Plays</div>
+              <div style="color:rgba(255,255,255,.35);font-size:9px;padding:5px 4px;font-weight:600;text-transform:uppercase;">Status</div>
+            </div>
+            <div style="display:grid;grid-template-columns:1.4fr 1fr 0.7fr 0.6fr;border-top:1px solid rgba(255,255,255,.06);">
+              <div style="color:rgba(255,255,255,.7);font-size:9px;padding:5px 4px;">13 Oct, 08:22 pm</div>
+              <div style="color:rgba(255,255,255,.7);font-size:9px;padding:5px 4px;">Tulsi A</div>
+              <div style="color:#fff;font-size:9px;padding:5px 4px;font-weight:700;">12</div>
+              <div style="padding:5px 4px;"><span style="background:#064e3b;color:#34d399;font-size:8px;font-weight:700;padding:2px 6px;border-radius:999px;">live</span></div>
+            </div>
+            <div style="display:grid;grid-template-columns:1.4fr 1fr 0.7fr 0.6fr;border-top:1px solid rgba(255,255,255,.06);">
+              <div style="color:rgba(255,255,255,.7);font-size:9px;padding:5px 4px;">13 Oct, 06:15 pm</div>
+              <div style="color:rgba(255,255,255,.7);font-size:9px;padding:5px 4px;">CG Road B</div>
+              <div style="color:#fff;font-size:9px;padding:5px 4px;font-weight:700;">9</div>
+              <div style="padding:5px 4px;"><span style="background:#064e3b;color:#34d399;font-size:8px;font-weight:700;padding:2px 6px;border-radius:999px;">live</span></div>
+            </div>
+            <div style="display:grid;grid-template-columns:1.4fr 1fr 0.7fr 0.6fr;border-top:1px solid rgba(255,255,255,.06);">
+              <div style="color:rgba(255,255,255,.7);font-size:9px;padding:5px 4px;">13 Oct, 04:50 pm</div>
+              <div style="color:rgba(255,255,255,.7);font-size:9px;padding:5px 4px;">Tulsi A</div>
+              <div style="color:#fff;font-size:9px;padding:5px 4px;font-weight:700;">11</div>
+              <div style="padding:5px 4px;"><span style="background:#064e3b;color:#34d399;font-size:8px;font-weight:700;padding:2px 6px;border-radius:999px;">live</span></div>
+            </div>
+            <div style="display:grid;grid-template-columns:1.4fr 1fr 0.7fr 0.6fr;border-top:1px solid rgba(255,255,255,.06);">
+              <div style="color:rgba(255,255,255,.7);font-size:9px;padding:5px 4px;">13 Oct, 02:30 pm</div>
+              <div style="color:rgba(255,255,255,.7);font-size:9px;padding:5px 4px;">SG Highway</div>
+              <div style="color:#fff;font-size:9px;padding:5px 4px;font-weight:700;">7</div>
+              <div style="padding:5px 4px;"><span style="background:#064e3b;color:#34d399;font-size:8px;font-weight:700;padding:2px 6px;border-radius:999px;">live</span></div>
+            </div>
           </div>
-          <div class="scard-foot">
-            <span class="stag">Timestamp logs</span><span class="stag">Download CSV</span><span class="stag">QR interaction</span>
+          <div class="scard-foot" style="margin-top:10px;">
+            <span class="stag">Timestamp logs</span><span class="stag">Download CSV</span><span class="stag">WhatsApp Report</span>
           </div>
         </div>
       </div>
       
       <!-- 3-in-1 Synced Campaigns -->
-      <div style="background:var(--dark);border-radius:var(--r);padding:36px 40px;display:flex;flex-direction:column;gap:20px;position:relative;overflow:hidden;transition-delay:.28s" data-reveal>
-        <div style="position:absolute;right:-20px;bottom:-30px;opacity:.05;font-family:'Magra',sans-serif;font-weight:700;font-size:120px;line-height:1;color:#fff;pointer-events:none;white-space:nowrap;">3 IN 1</div>
-        <div style="font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.5);">Omnichannel Feature</div>
-        <h3 style="font-family:'Magra',sans-serif;font-weight:700;font-size:clamp(22px,2.4vw,32px);color:#fff;letter-spacing:-0.02em;line-height:1.1;max-width:28ch;">Ek campaign — Screen par, <span style="color:var(--orange);">Facebook par</span> aur <span style="color:var(--orange);">Instagram par</span> bhi</h3>
-        <p style="font-size:15px;color:rgba(255,255,255,.7);max-width:60ch;">Campaign live hote hi aapka creative extrravenue media channels par automatically syndicate ho jata hai. Screen footfall ke saath saath online social reach bhi milti hai.</p>
-        <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;">
-          <div style="display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:999px;padding:9px 16px;">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="#4267B2"><path d="M24 12.07C24 5.41 18.63 0 12 0S0 5.4 0 12.07C0 18.1 4.39 23.1 10.13 24v-8.44H7.08v-3.49h3.04V9.41c0-3.02 1.8-4.7 4.54-4.7 1.31 0 2.68.24 2.68.24v2.97h-1.51c-1.49 0-1.95.93-1.95 1.88v2.26h3.32l-.53 3.5h-2.8V24C19.62 23.1 24 18.1 24 12.07z"/></svg>
-            <span style="font-size:13px;font-weight:600;color:#fff;">Facebook auto-broadcast</span>
+      <div class="scard-3in1" data-reveal style="transition-delay:.28s">
+        <!-- LEFT: text -->
+        <div class="s3-left">
+          <div style="font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.5);">Omnichannel Feature</div>
+          <h3 style="font-family:'Magra',sans-serif;font-weight:700;font-size:clamp(22px,2.2vw,32px);color:#fff;letter-spacing:-0.02em;line-height:1.1;max-width:22ch;text-wrap:balance;">Ek campaign — Screen par, <span style="color:var(--orange);">Facebook par</span> aur <span style="color:var(--orange);">Instagram par</span> bhi</h3>
+          <p style="font-size:15px;color:rgba(255,255,255,.7);max-width:48ch;">Campaign live hote hi aapka creative extrravenue media channels par automatically syndicate ho jata hai. Screen footfall ke saath saath online social reach bhi milti hai.</p>
+          <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;">
+            <div style="display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:999px;padding:9px 16px;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="#4267B2"><path d="M24 12.07C24 5.41 18.63 0 12 0S0 5.4 0 12.07C0 18.1 4.39 23.1 10.13 24v-8.44H7.08v-3.49h3.04V9.41c0-3.02 1.8-4.7 4.54-4.7 1.31 0 2.68.24 2.68.24v2.97h-1.51c-1.49 0-1.95.93-1.95 1.88v2.26h3.32l-.53 3.5h-2.8V24C19.62 23.1 24 18.1 24 12.07z"/></svg>
+              <span style="font-size:13px;font-weight:600;color:#fff;">Facebook auto-broadcast</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:999px;padding:9px 16px;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="#E4405F"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
+              <span style="font-size:13px;font-weight:600;color:#fff;">Instagram auto-post</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;background:rgba(255,92,0,.18);border:1px solid rgba(255,92,0,.3);border-radius:999px;padding:9px 16px;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="2.5"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4" stroke-linecap="round"/></svg>
+              <span style="font-size:13px;font-weight:600;color:var(--orange);">Digital Screens Live</span>
+            </div>
           </div>
-          <div style="display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:999px;padding:9px 16px;">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="#E4405F"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
-            <span style="font-size:13px;font-weight:600;color:#fff;">Instagram auto-post</span>
+        </div>
+        <!-- RIGHT: visual flow -->
+        <div class="s3-right">
+          <!-- Upload source -->
+          <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+            <div style="width:34px;height:34px;border-radius:8px;background:linear-gradient(135deg,#ff5c00,#ff8c42);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><rect x="3" y="3" width="18" height="14" rx="2"/><circle cx="8.5" cy="8.5" r="1.5" fill="#fff" stroke="none"/><polyline points="21 15 16 10 5 21"/></svg>
+            </div>
+            <div>
+              <div style="font-size:11px;font-weight:700;color:#fff;">Aapka Creative</div>
+              <div style="font-size:10px;color:rgba(255,255,255,.45);">1 upload → everywhere</div>
+            </div>
+            <div style="margin-left:auto;background:#22c55e;border-radius:999px;padding:3px 9px;font-size:9px;font-weight:700;color:#fff;">LIVE</div>
           </div>
-          <div style="display:flex;align-items:center;gap:8px;background:rgba(255,92,0,.18);border:1px solid rgba(255,92,0,.3);border-radius:999px;padding:9px 16px;">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="2.5"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4" stroke-linecap="round"/></svg>
-            <span style="font-size:13px;font-weight:600;color:var(--orange);">Digital Screens Live</span>
+          <!-- Arrow -->
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:14px;padding-left:4px;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.3)" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            <div style="font-size:10px;color:rgba(255,255,255,.28);letter-spacing:.05em;">Auto-distributed to</div>
+          </div>
+          <!-- 3 platform rows -->
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <div style="background:rgba(24,119,242,.12);border:1px solid rgba(24,119,242,.25);border-radius:10px;padding:10px 13px;display:flex;align-items:center;gap:9px;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="#1877F2"><path d="M24 12.07C24 5.41 18.63 0 12 0S0 5.4 0 12.07C0 18.1 4.39 23.1 10.13 24v-8.44H7.08v-3.49h3.04V9.41c0-3.02 1.8-4.7 4.54-4.7 1.31 0 2.68.24 2.68.24v2.97h-1.51c-1.49 0-1.95.93-1.95 1.88v2.26h3.32l-.53 3.5h-2.8V24C19.62 23.1 24 18.1 24 12.07z"/></svg>
+              <span style="font-size:12px;font-weight:600;color:rgba(255,255,255,.8);">Facebook Page</span>
+              <span style="margin-left:auto;font-size:9px;color:#60a5fa;font-weight:600;">Posted ✓</span>
+            </div>
+            <div style="background:rgba(228,64,95,.12);border:1px solid rgba(228,64,95,.25);border-radius:10px;padding:10px 13px;display:flex;align-items:center;gap:9px;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="#E4405F"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
+              <span style="font-size:12px;font-weight:600;color:rgba(255,255,255,.8);">Instagram Profile</span>
+              <span style="margin-left:auto;font-size:9px;color:#f472b6;font-weight:600;">Posted ✓</span>
+            </div>
+            <div style="background:rgba(255,92,0,.1);border:1px solid rgba(255,92,0,.22);border-radius:10px;padding:10px 13px;display:flex;align-items:center;gap:9px;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="2.5"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4" stroke-linecap="round"/></svg>
+              <span style="font-size:12px;font-weight:600;color:rgba(255,255,255,.8);">Digital Screens</span>
+              <span style="margin-left:auto;font-size:9px;color:var(--orange);font-weight:600;">Live ●</span>
+            </div>
           </div>
         </div>
       </div>
 
+      <!-- Venue Partner Card -->
+      <div class="scard scard-orange" data-reveal style="transition-delay:.36s">
+        <div class="so-left">
+          <div class="scard-idx" style="justify-content:flex-start;gap:10px"><span>06</span><div class="dot"></div></div>
+          <h3 class="h-md">Aapke paas screen hai? Revenue generate karein.</h3>
+          <p>Agar aapke venue — commercial complex, society lobby, gym ya cafe — mein display screens hain, to unhe extrravenue network par register karein. Advertisers ads chalayenge aur aapko monthly automated payouts milenge.</p>
+          <a class="btn btn-sm" style="background:#fff;color:var(--dark);border-radius:999px;padding:11px 20px;font-size:13.5px;font-weight:600;" href="https://signagecrm-production.up.railway.app">Venue partner bano &rarr;</a>
+        </div>
+        <div class="so-ring"><span><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STEPS -->
+<section class="acc-section sec-tight" id="steps">
+  <div class="wrap">
+    <div class="sec-head center" data-reveal>
+      <div class="eyebrow"><i></i>Kaise kaam karta hai</div>
+      <h2 class="h-lg acc-heading">Sign up se ad live — sirf 5 simple steps</h2>
+    </div>
+
+    <div id="swatchContainer" data-reveal>
+
+      <!-- Step 01 -->
+      <section class="swatch-item expanded" data-step="0" tabindex="0" style="background:#EAE0D0;color:#1c1917;">
+        <div class="desktop-collapsed-strip" style="text-align:center;">
+          <span style="font-size:12px;font-weight:900;font-family:monospace;opacity:.5;">01</span>
+          <span class="vertical-title" style="font-size:14px;font-weight:800;">Account &amp; Creative Upload</span>
+          <div class="sw-strip-btn">+</div>
+        </div>
+        <div class="mobile-collapsed-bar">
+          <div style="display:flex;align-items:center;gap:10px;"><span style="font-size:11px;font-weight:900;font-family:monospace;opacity:.5;">01</span><span style="font-size:15px;font-weight:700;">Account &amp; Creative Upload</span></div>
+          <div class="sw-strip-btn" style="width:28px;height:28px;font-size:16px;">+</div>
+        </div>
+        <div class="full-card-content">
+          <div class="sw-hd">
+            <div class="sw-hd-l"><span style="font-size:15px;font-weight:900;font-family:monospace;opacity:.45;">01</span><h3 style="font-family:'Magra',sans-serif;font-size:22px;font-weight:700;margin:0;">Account &amp; Creative Upload</h3></div>
+            <button class="close-sw-btn sw-close">
+              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+          </div>
+          <div class="sw-body">
+            <div>
+              <div class="sw-mockup" style="border:1px solid #e7e0d5;">
+                <span style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#9d9087;">Drag and Drop Upload</span>
+                <div style="border:2px dashed #c8bfb5;border-radius:12px;padding:20px;display:flex;flex-direction:column;align-items:center;text-align:center;background:rgba(255,255,255,.5);">
+                  <div style="width:36px;height:36px;border-radius:10px;background:#ede8e0;display:flex;align-items:center;justify-content:center;margin-bottom:8px;">
+                    <svg width="20" height="20" fill="none" stroke="#7a6e64" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+                  </div>
+                  <p style="font-size:11px;font-weight:700;color:#3d3530;margin:0;">Creative drag karo ya click karo</p>
+                  <p style="font-size:10px;color:#9d9087;margin:4px 0 0;">1080×1920 · JPG / PNG / MP4</p>
+                </div>
+                <div style="background:#ecfdf5;border:1px solid #a7f3d0;border-radius:10px;padding:8px 12px;display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:#047857;">
+                  <svg width="12" height="12" fill="none" stroke="#059669" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                  Quality check passed — 1080p ✓
+                </div>
+              </div>
+            </div>
+            <div class="sw-desc">
+              <div class="sw-tag" style="color:#6b5e52;"><svg width="14" height="14" fill="none" stroke="#ff5c00" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>Fast Onboarding</div>
+              <h4 style="font-family:'Magra',sans-serif;font-size:clamp(22px,2vw,30px);font-weight:700;line-height:1.15;margin:0;color:#1c1917;">Account &amp; Creative Upload</h4>
+              <p style="font-size:15px;line-height:1.6;color:#4a3f37;margin:0;">Apna advertiser account banayein aur high-res creative upload karein. Automatic validation system aspect ratio, resolution aur file size check karta hai.</p>
+            </div>
+          </div>
+          <div class="sw-ft" style="color:#9d9087;">
+            <span>Step 01 of 06</span>
+            <span style="font-weight:700;color:#ff5c00;">Fast · ~60 seconds →</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Step 02 -->
+      <section class="swatch-item collapsed" data-step="1" tabindex="0" style="background:#B8E8D4;color:#064e3b;">
+        <div class="desktop-collapsed-strip" style="text-align:center;">
+          <span style="font-size:12px;font-weight:900;font-family:monospace;opacity:.5;">02</span>
+          <span class="vertical-title" style="font-size:14px;font-weight:800;">Target Locations &amp; Dates</span>
+          <div class="sw-strip-btn">+</div>
+        </div>
+        <div class="mobile-collapsed-bar">
+          <div style="display:flex;align-items:center;gap:10px;"><span style="font-size:11px;font-weight:900;font-family:monospace;opacity:.5;">02</span><span style="font-size:15px;font-weight:700;">Target Locations &amp; Dates</span></div>
+          <div class="sw-strip-btn" style="width:28px;height:28px;font-size:16px;">+</div>
+        </div>
+        <div class="full-card-content">
+          <div class="sw-hd">
+            <div class="sw-hd-l"><span style="font-size:15px;font-weight:900;font-family:monospace;opacity:.45;">02</span><h3 style="font-family:'Magra',sans-serif;font-size:22px;font-weight:700;margin:0;">Target Locations &amp; Dates</h3></div>
+            <button class="close-sw-btn sw-close"><svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg></button>
+          </div>
+          <div class="sw-body">
+            <div>
+              <div class="sw-mockup" style="border:1px solid #a7f3d0;">
+                <span style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#9d9087;">Ahmedabad Screens</span>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:10px;border-radius:10px;background:#f0fdf4;border:1px solid #bbf7d0;">
+                  <div style="display:flex;align-items:center;gap:8px;"><div style="width:8px;height:8px;border-radius:50%;background:#f59e0b;flex-shrink:0;"></div><div><p style="font-size:11px;font-weight:700;margin:0;color:#1c1917;">Tulsi Mall, Vasna</p><p style="font-size:10px;color:#9d9087;margin:0;">Vasna · 2,700 plays/day</p></div></div>
+                  <span style="width:20px;height:20px;border-radius:6px;background:#10b981;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">✓</span>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:10px;border-radius:10px;background:#f0fdf4;border:1px solid #bbf7d0;">
+                  <div style="display:flex;align-items:center;gap:8px;"><div style="width:8px;height:8px;border-radius:50%;background:#a855f7;flex-shrink:0;"></div><div><p style="font-size:11px;font-weight:700;margin:0;color:#1c1917;">CG Road Premium</p><p style="font-size:10px;color:#9d9087;margin:0;">CG Road · 3,100 plays/day</p></div></div>
+                  <span style="width:20px;height:20px;border-radius:6px;background:#10b981;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">✓</span>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:10px;border-radius:10px;background:#f8fafc;border:1px solid #e2e8f0;opacity:.6;">
+                  <div style="display:flex;align-items:center;gap:8px;"><div style="width:8px;height:8px;border-radius:50%;background:#38bdf8;flex-shrink:0;"></div><div><p style="font-size:11px;font-weight:700;margin:0;color:#3d3530;">SG Highway Hub</p><p style="font-size:10px;color:#9d9087;margin:0;">SG Highway · 2,400 plays/day</p></div></div>
+                  <span style="width:20px;height:20px;border-radius:6px;border:1px solid #cbd5e1;flex-shrink:0;"></span>
+                </div>
+              </div>
+            </div>
+            <div class="sw-desc">
+              <div class="sw-tag" style="color:#065f46;"><svg width="14" height="14" fill="none" stroke="#059669" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>Realtime Inventory</div>
+              <h4 style="font-family:'Magra',sans-serif;font-size:clamp(22px,2vw,30px);font-weight:700;line-height:1.15;margin:0;color:#022c22;">Target Locations &amp; Dates</h4>
+              <p style="font-size:15px;line-height:1.6;color:#065f46;margin:0;opacity:.85;">City complexes aur malls ke screens select karein. Dates aur duration chun kar transparent pricing dashboard mein live update dekho.</p>
+            </div>
+          </div>
+          <div class="sw-ft" style="color:#047857;opacity:.7;">
+            <span>Step 02 of 06</span><span style="font-weight:700;color:#022c22;">50+ Prime Locations →</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Step 03 -->
+      <section class="swatch-item collapsed" data-step="2" tabindex="0" style="background:#FCCFA0;color:#7c2d12;">
+        <div class="desktop-collapsed-strip" style="text-align:center;">
+          <span style="font-size:12px;font-weight:900;font-family:monospace;opacity:.5;">03</span>
+          <span class="vertical-title" style="font-size:14px;font-weight:800;">Instant Payment &amp; Invoice</span>
+          <div class="sw-strip-btn">+</div>
+        </div>
+        <div class="mobile-collapsed-bar">
+          <div style="display:flex;align-items:center;gap:10px;"><span style="font-size:11px;font-weight:900;font-family:monospace;opacity:.5;">03</span><span style="font-size:15px;font-weight:700;">Instant Payment &amp; Invoice</span></div>
+          <div class="sw-strip-btn" style="width:28px;height:28px;font-size:16px;">+</div>
+        </div>
+        <div class="full-card-content">
+          <div class="sw-hd">
+            <div class="sw-hd-l"><span style="font-size:15px;font-weight:900;font-family:monospace;opacity:.45;">03</span><h3 style="font-family:'Magra',sans-serif;font-size:22px;font-weight:700;margin:0;">Instant Payment &amp; Invoice</h3></div>
+            <button class="close-sw-btn sw-close"><svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg></button>
+          </div>
+          <div class="sw-body">
+            <div>
+              <div class="sw-mockup" style="border:1px solid #fed7aa;">
+                <span style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#9d9087;">Order Summary</span>
+                <div style="display:flex;flex-direction:column;gap:8px;font-size:11px;">
+                  <div style="display:flex;justify-content:space-between;color:#6b5e52;"><span>2 Screens · 30 days</span><span style="font-weight:700;color:#1c1917;">₹13,000</span></div>
+                  <div style="display:flex;justify-content:space-between;align-items:center;"><span style="padding:2px 8px;border-radius:6px;background:#ecfdf5;color:#047857;font-weight:600;">FIRST20 coupon</span><span style="color:#047857;font-weight:700;">−₹2,600</span></div>
+                </div>
+                <div style="padding-top:10px;border-top:1px solid #f5f5f5;display:flex;justify-content:space-between;align-items:center;">
+                  <span style="font-size:11px;font-weight:700;color:#3d3530;">Total</span>
+                  <span style="font-size:20px;font-weight:800;color:#ff5c00;">₹10,400</span>
+                </div>
+                <button style="width:100%;background:#1c1917;color:#fff;font-size:11px;font-weight:700;padding:10px 16px;border-radius:12px;display:flex;align-items:center;justify-content:space-between;border:0;cursor:pointer;"><span>Pay via UPI</span><span>→</span></button>
+                <div style="background:#ecfdf5;border:1px solid #a7f3d0;border-radius:10px;padding:8px 12px;display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:#047857;">
+                  <svg width="12" height="12" fill="none" stroke="#059669" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                  GST Invoice email pe ✓
+                </div>
+              </div>
+            </div>
+            <div class="sw-desc">
+              <div class="sw-tag" style="color:#92400e;"><svg width="14" height="14" fill="none" stroke="#d97706" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>Instant Billing</div>
+              <h4 style="font-family:'Magra',sans-serif;font-size:clamp(22px,2vw,30px);font-weight:700;line-height:1.15;margin:0;color:#431407;">Instant Payment &amp; Invoice</h4>
+              <p style="font-size:15px;line-height:1.6;color:#7c2d12;margin:0;opacity:.85;">UPI ya cards se secure checkout karein. Payment hote hi verified GST tax invoice direct email aur dashboard par instant generate ho jaati hai.</p>
+            </div>
+          </div>
+          <div class="sw-ft" style="color:#92400e;opacity:.7;">
+            <span>Step 03 of 06</span><span style="font-weight:700;color:#431407;">100% Tax Compliant →</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Step 04 -->
+      <section class="swatch-item collapsed" data-step="3" tabindex="0" style="background:#B8D4F0;color:#1e3a8a;">
+        <div class="desktop-collapsed-strip" style="text-align:center;">
+          <span style="font-size:12px;font-weight:900;font-family:monospace;opacity:.5;">04</span>
+          <span class="vertical-title" style="font-size:14px;font-weight:800;">Live Broadcast &amp; Proof of Play</span>
+          <div class="sw-strip-btn">+</div>
+        </div>
+        <div class="mobile-collapsed-bar">
+          <div style="display:flex;align-items:center;gap:10px;"><span style="font-size:11px;font-weight:900;font-family:monospace;opacity:.5;">04</span><span style="font-size:15px;font-weight:700;">Live Broadcast &amp; Proof of Play</span></div>
+          <div class="sw-strip-btn" style="width:28px;height:28px;font-size:16px;">+</div>
+        </div>
+        <div class="full-card-content">
+          <div class="sw-hd">
+            <div class="sw-hd-l"><span style="font-size:15px;font-weight:900;font-family:monospace;opacity:.45;">04</span><h3 style="font-family:'Magra',sans-serif;font-size:22px;font-weight:700;margin:0;">Live Broadcast &amp; Proof of Play</h3></div>
+            <button class="close-sw-btn sw-close"><svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg></button>
+          </div>
+          <div class="sw-body">
+            <div>
+              <div class="sw-mockup" style="background:#0f172a;border:none;">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+                  <div><span style="font-size:9px;letter-spacing:.12em;color:#94a3b8;text-transform:uppercase;font-weight:700;display:block;">Total Plays</span><div style="font-size:22px;font-weight:900;color:#fff;margin-top:4px;">5,240</div></div>
+                  <span style="padding:4px 10px;background:rgba(16,185,129,.15);color:#34d399;border:1px solid rgba(52,211,153,.25);border-radius:999px;font-size:10px;font-weight:700;display:flex;align-items:center;gap:5px;"><span style="width:6px;height:6px;border-radius:50%;background:#34d399;display:inline-block;"></span>LIVE</span>
+                </div>
+                <div style="background:rgba(0,0,0,.4);border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:6px;font-size:10px;">
+                  <div style="display:flex;justify-content:space-between;color:#64748b;border-bottom:1px solid rgba(255,255,255,.06);padding-bottom:5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;"><span>Played At</span><span>Screen</span><span>Plays</span></div>
+                  <div style="display:flex;justify-content:space-between;color:#e2e8f0;"><span>13 Oct 08:22</span><span style="color:#94a3b8;">Tulsi A</span><span style="font-weight:700;color:#fff;">12</span></div>
+                  <div style="display:flex;justify-content:space-between;color:#e2e8f0;"><span>13 Oct 06:15</span><span style="color:#94a3b8;">CG Road</span><span style="font-weight:700;color:#fff;">9</span></div>
+                  <div style="display:flex;justify-content:space-between;color:#e2e8f0;"><span>13 Oct 04:50</span><span style="color:#94a3b8;">SG Hwy</span><span style="font-weight:700;color:#fff;">11</span></div>
+                </div>
+                <div style="display:flex;justify-content:space-between;font-size:10px;color:#60a5fa;font-weight:600;"><span>↓ Download CSV</span><span>💬 WhatsApp</span></div>
+              </div>
+            </div>
+            <div class="sw-desc">
+              <div class="sw-tag" style="color:#1e40af;"><svg width="14" height="14" fill="none" stroke="#3b82f6" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>Guaranteed Verification</div>
+              <h4 style="font-family:'Magra',sans-serif;font-size:clamp(22px,2vw,30px);font-weight:700;line-height:1.15;margin:0;color:#1e3a8a;">Live Broadcast &amp; Proof of Play</h4>
+              <p style="font-size:15px;line-height:1.6;color:#1e3a8a;margin:0;opacity:.8;">Approval ke baad ad screens par live ho jata hai. Har display ka timestamped proof record hota hai — exact date, time aur frequency verify karein.</p>
+            </div>
+          </div>
+          <div class="sw-ft" style="color:#1e40af;opacity:.7;">
+            <span>Step 04 of 06</span><span style="font-weight:700;color:#1e3a8a;">100% Transparent Logs →</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Step 05 -->
+      <section class="swatch-item collapsed" data-step="4" tabindex="0" style="background:#2C3E58;color:#fff;border-color:#3d5270;">
+        <div class="desktop-collapsed-strip" style="text-align:center;">
+          <span style="font-size:12px;font-weight:900;font-family:monospace;opacity:.45;color:#fff;">05</span>
+          <span class="vertical-title" style="font-size:14px;font-weight:800;color:#fff;">Social Distribution — Automatic</span>
+          <div class="sw-strip-btn" style="background:rgba(255,255,255,.1);">+</div>
+        </div>
+        <div class="mobile-collapsed-bar">
+          <div style="display:flex;align-items:center;gap:10px;"><span style="font-size:15px;font-weight:900;font-family:monospace;opacity:.45;">05</span><span style="font-size:15px;font-weight:700;">Social Distribution — Automatic</span></div>
+          <div class="sw-strip-btn" style="width:28px;height:28px;font-size:16px;background:rgba(255,255,255,.1);">+</div>
+        </div>
+        <div class="full-card-content">
+          <div class="sw-hd" style="border-bottom-color:rgba(255,255,255,.1);">
+            <div class="sw-hd-l"><span style="font-size:11px;font-weight:900;font-family:monospace;opacity:.4;">05</span><h3 style="font-family:'Magra',sans-serif;font-size:22px;font-weight:700;margin:0;color:#fff;">Social Distribution — Automatic</h3></div>
+            <button class="close-sw-btn sw-close" style="background:rgba(255,255,255,.1);color:#fff;"><svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg></button>
+          </div>
+          <div class="sw-body">
+            <div>
+              <div class="sw-mockup" style="background:#1e293b;border:1px solid #334155;">
+                <div style="display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.04);padding:10px;border-radius:12px;border:1px solid rgba(255,255,255,.08);">
+                  <div style="display:flex;align-items:center;gap:10px;">
+                    <div style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#ff5c00,#ff8c42);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                      <svg width="16" height="16" fill="none" stroke="white" stroke-width="2.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="14" rx="2"/><circle cx="8.5" cy="8.5" r="1.5" fill="white" stroke="none"/><polyline points="21 15 16 10 5 21"/></svg>
+                    </div>
+                    <div><p style="font-size:11px;font-weight:700;color:#fff;margin:0;">Aapka Creative</p><p style="font-size:10px;color:#94a3b8;margin:0;">1 upload → everywhere</p></div>
+                  </div>
+                  <span style="font-size:10px;font-weight:700;color:#34d399;background:rgba(52,211,153,.1);padding:3px 8px;border-radius:999px;flex-shrink:0;">LIVE</span>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:6px;">
+                  <div style="display:flex;align-items:center;justify-content:space-between;padding:8px;border-radius:10px;background:rgba(30,64,175,.25);border:1px solid rgba(30,64,175,.35);font-size:10px;">
+                    <span style="color:#93c5fd;font-weight:600;display:flex;align-items:center;gap:6px;"><svg width="13" height="13" viewBox="0 0 24 24" fill="#1877F2"><path d="M24 12.07C24 5.41 18.63 0 12 0S0 5.4 0 12.07C0 18.1 4.39 23.1 10.13 24v-8.44H7.08v-3.49h3.04V9.41c0-3.02 1.8-4.7 4.54-4.7 1.31 0 2.68.24 2.68.24v2.97h-1.51c-1.49 0-1.95.93-1.95 1.88v2.26h3.32l-.53 3.5h-2.8V24C19.62 23.1 24 18.1 24 12.07z"/></svg>Facebook Page</span>
+                    <span style="color:#34d399;font-weight:700;">Posted ✓</span>
+                  </div>
+                  <div style="display:flex;align-items:center;justify-content:space-between;padding:8px;border-radius:10px;background:rgba(131,24,67,.25);border:1px solid rgba(131,24,67,.35);font-size:10px;">
+                    <span style="color:#f9a8d4;font-weight:600;display:flex;align-items:center;gap:6px;"><svg width="13" height="13" viewBox="0 0 24 24" fill="#E4405F"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>Instagram Profile</span>
+                    <span style="color:#34d399;font-weight:700;">Posted ✓</span>
+                  </div>
+                  <div style="display:flex;align-items:center;justify-content:space-between;padding:8px;border-radius:10px;background:rgba(255,92,0,.08);border:1px solid rgba(255,92,0,.2);font-size:10px;">
+                    <span style="color:#fdba74;font-weight:600;display:flex;align-items:center;gap:6px;"><svg width="13" height="13" fill="none" stroke="#ff5c00" stroke-width="2.5" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4" stroke-linecap="round"/></svg>Digital Screens</span>
+                    <span style="font-weight:700;color:#ff5c00;">● Live</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="sw-desc">
+              <div class="sw-tag" style="color:#94a3b8;"><span style="width:8px;height:8px;border-radius:50%;background:#34d399;display:inline-block;"></span>Omnichannel</div>
+              <h4 style="font-family:'Magra',sans-serif;font-size:clamp(22px,2vw,30px);font-weight:700;line-height:1.15;margin:0;color:#fff;">Social Distribution — Automatic</h4>
+              <p style="font-size:15px;line-height:1.6;color:#cbd5e1;margin:0;">Creative ek baar upload karo. Campaign live hote hi Facebook Page, Instagram Profile aur Digital Screens — teeno pe automatically broadcast ho jata hai. Zero extra effort.</p>
+            </div>
+          </div>
+          <div class="sw-ft" style="color:#64748b;border-top-color:rgba(255,255,255,.08);">
+            <span>Step 05 of 06</span><span style="font-weight:700;color:#fff;">Omnichannel Sync →</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Step 06 — Campaign Summary & Get Started -->
+      <section class="swatch-item collapsed" data-step="5" tabindex="0" style="background:linear-gradient(155deg,#ff5c00 0%,#c93f00 100%);color:#fff;border-color:#e04e00;">
+        <div class="desktop-collapsed-strip" style="text-align:center;">
+          <span style="font-size:12px;font-weight:900;font-family:monospace;opacity:.55;color:#fff;">06</span>
+          <span class="vertical-title" style="font-size:14px;font-weight:800;color:#fff;">Campaign Summary</span>
+          <div class="sw-strip-btn" style="background:rgba(255,255,255,.15);">+</div>
+        </div>
+        <div class="mobile-collapsed-bar">
+          <div style="display:flex;align-items:center;gap:10px;"><span style="font-size:11px;font-weight:900;font-family:monospace;opacity:.55;">06</span><span style="font-size:15px;font-weight:700;">Campaign Summary</span></div>
+          <div class="sw-strip-btn" style="width:28px;height:28px;font-size:16px;background:rgba(255,255,255,.15);">+</div>
+        </div>
+        <div class="full-card-content">
+          <div class="sw-hd" style="border-bottom-color:rgba(255,255,255,.15);">
+            <div class="sw-hd-l"><span style="font-size:15px;font-weight:900;font-family:monospace;opacity:.6;">06</span><h3 style="font-family:'Magra',sans-serif;font-size:22px;font-weight:700;margin:0;color:#fff;">Campaign Summary</h3></div>
+            <button class="close-sw-btn sw-close" style="background:rgba(255,255,255,.15);color:#fff;"><svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg></button>
+          </div>
+          <div class="sw-body">
+            <!-- Mockup: Estimated Impressions card -->
+            <div>
+              <div class="sw-mockup" style="background:rgba(0,0,0,.18);border:1px solid rgba(255,255,255,.15);gap:12px;">
+                <span style="font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.6);">Estimated Impressions</span>
+                <!-- Big number -->
+                <div style="display:flex;align-items:flex-end;gap:4px;line-height:1;">
+                  <span style="font-size:34px;font-weight:900;color:#fff;font-family:'Magra',sans-serif;">1,62,000</span>
+                  <span style="font-size:11px;font-weight:700;color:rgba(255,255,255,.6);padding-bottom:6px;">views</span>
+                </div>
+                <!-- Breakdown rows -->
+                <div style="display:flex;flex-direction:column;gap:4px;font-size:11px;">
+                  <div style="display:flex;justify-content:space-between;align-items:center;padding:4px 8px;background:rgba(255,255,255,.1);border-radius:7px;">
+                    <span style="color:rgba(255,255,255,.75);">2 Screens × 30 days</span>
+                    <span style="font-weight:700;color:#fff;">₹10,400</span>
+                  </div>
+                  <div style="display:flex;justify-content:space-between;align-items:center;padding:4px 8px;background:rgba(255,255,255,.1);border-radius:7px;">
+                    <span style="color:rgba(255,255,255,.75);">~2,700 plays/day</span>
+                    <span style="font-weight:700;color:#fff;">81,000 plays</span>
+                  </div>
+                  <div style="display:flex;justify-content:space-between;align-items:center;padding:4px 8px;background:rgba(255,255,255,.1);border-radius:7px;">
+                    <span style="color:rgba(255,255,255,.75);">Avg 2 viewers/play</span>
+                    <span style="font-weight:700;color:#fff;">1,62,000 eyes</span>
+                  </div>
+                </div>
+                <!-- CPM -->
+                <div style="background:rgba(255,255,255,.18);border-radius:9px;padding:6px 10px;display:flex;justify-content:space-between;align-items:center;border:1px solid rgba(255,255,255,.2);">
+                  <span style="font-size:10px;font-weight:700;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:.08em;">Effective CPM</span>
+                  <span style="font-size:15px;font-weight:900;color:#fff;">₹6.4</span>
+                </div>
+              </div>
+            </div>
+            <!-- Description + CTA -->
+            <div class="sw-desc" style="justify-content:space-between;height:100%;">
+              <div style="display:flex;flex-direction:column;gap:8px;">
+                <div class="sw-tag" style="color:rgba(255,255,255,.7);"><span style="width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.8);display:inline-block;"></span>Ready to Launch</div>
+                <h4 style="font-family:'Magra',sans-serif;font-size:clamp(20px,1.8vw,26px);font-weight:700;line-height:1.15;margin:0;color:#fff;">Aapka campaign<br>launch ke liye ready hai</h4>
+                <p style="font-size:13px;line-height:1.5;color:rgba(255,255,255,.8);margin:0;">Har step complete ho chuka hai — account se lekar social sync tak sab set hai.</p>
+                <!-- 2-col compact checklist -->
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 8px;font-size:11px;">
+                  <div style="display:flex;align-items:center;gap:5px;color:rgba(255,255,255,.85);"><span style="width:14px;height:14px;border-radius:50%;background:rgba(255,255,255,.2);display:grid;place-items:center;font-size:8px;flex-shrink:0;">✓</span>Creative upload</div>
+                  <div style="display:flex;align-items:center;gap:5px;color:rgba(255,255,255,.85);"><span style="width:14px;height:14px;border-radius:50%;background:rgba(255,255,255,.2);display:grid;place-items:center;font-size:8px;flex-shrink:0;">✓</span>Screens selected</div>
+                  <div style="display:flex;align-items:center;gap:5px;color:rgba(255,255,255,.85);"><span style="width:14px;height:14px;border-radius:50%;background:rgba(255,255,255,.2);display:grid;place-items:center;font-size:8px;flex-shrink:0;">✓</span>Payment &amp; GST</div>
+                  <div style="display:flex;align-items:center;gap:5px;color:rgba(255,255,255,.85);"><span style="width:14px;height:14px;border-radius:50%;background:rgba(255,255,255,.2);display:grid;place-items:center;font-size:8px;flex-shrink:0;">✓</span>Social sync</div>
+                </div>
+              </div>
+              <!-- Get Started Button -->
+              <a href="#contact" style="display:flex;align-items:center;justify-content:center;gap:10px;background:#fff;color:#c93f00;font-family:'Magra',sans-serif;font-size:15px;font-weight:700;padding:12px 20px;border-radius:14px;text-decoration:none;margin-top:10px;box-shadow:0 6px 20px rgba(0,0,0,.2);transition:transform .15s,box-shadow .15s;flex-shrink:0;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 10px 28px rgba(0,0,0,.28)'" onmouseout="this.style.transform='';this.style.boxShadow='0 6px 20px rgba(0,0,0,.2)'">
+                Get Started — Free Account
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+              </a>
+            </div>
+          </div>
+          <div class="sw-ft" style="color:rgba(255,255,255,.55);border-top-color:rgba(255,255,255,.15);">
+            <span>Step 06 of 06</span><span style="font-weight:700;color:#fff;">Launch Ready →</span>
+          </div>
+        </div>
+      </section>
+
+    </div>
+    <!-- Nav Dots (desktop only) -->
+    <div id="swatchDots" style="display:none;justify-content:center;gap:8px;margin-top:16px;">
+      <button data-dot="0" class="swatch-dot" aria-label="Step 1" style="width:8px;height:8px;border-radius:50%;background:#292524;opacity:1;border:0;cursor:pointer;padding:0;transition:opacity .2s;"></button>
+      <button data-dot="1" class="swatch-dot" aria-label="Step 2" style="width:8px;height:8px;border-radius:50%;background:#292524;opacity:.3;border:0;cursor:pointer;padding:0;transition:opacity .2s;"></button>
+      <button data-dot="2" class="swatch-dot" aria-label="Step 3" style="width:8px;height:8px;border-radius:50%;background:#292524;opacity:.3;border:0;cursor:pointer;padding:0;transition:opacity .2s;"></button>
+      <button data-dot="3" class="swatch-dot" aria-label="Step 4" style="width:8px;height:8px;border-radius:50%;background:#292524;opacity:.3;border:0;cursor:pointer;padding:0;transition:opacity .2s;"></button>
+      <button data-dot="4" class="swatch-dot" aria-label="Step 5" style="width:8px;height:8px;border-radius:50%;background:#292524;opacity:.3;border:0;cursor:pointer;padding:0;transition:opacity .2s;"></button>
+      <button data-dot="5" class="swatch-dot" aria-label="Step 6" style="width:8px;height:8px;border-radius:50%;background:#292524;opacity:.3;border:0;cursor:pointer;padding:0;transition:opacity .2s;"></button>
+    </div>
+  </div>
+</section>
+
+<!-- DRIFT GALLERY -->
+<section class="drift-section" id="gallery">
+  <div class="drift-head" data-reveal>
+    <div class="eyebrow on-dark"><i></i>Screens pe kya chal raha hai</div>
+    <h2>Yahi dikhta hai — aapke area ke logon ko</h2>
+  </div>
+  <div class="drift-rows" id="driftRows"></div>
+</section>
+
+<!-- SIGNAGE SHOWCASE -->
+<section class="sec" id="signage-showcase">
+  <div class="wrap">
+    <div class="ss-layout">
+      <!-- Left: Screen mockup -->
+      <div class="ss-screen-wrap" data-reveal>
+        <div class="ss-wall">
+          <div class="ss-bracket"></div>
+          <div class="ss-tv">
+            <div class="ss-inner">
+              <img class="ss-slide on" src="img/carousel/1.jpg" alt="" onerror="this.style.display='none'">
+              <img class="ss-slide" src="img/carousel/2.jpg" alt="" onerror="this.style.display='none'">
+              <img class="ss-slide" src="img/carousel/3.jpg" alt="" onerror="this.style.display='none'">
+              <img class="ss-slide" src="img/carousel/4.jpg" alt="" onerror="this.style.display='none'">
+              <img class="ss-slide" src="img/carousel/5.jpg" alt="" onerror="this.style.display='none'">
+            </div>
+            <div class="ss-led"></div>
+          </div>
+        </div>
+        <div class="ss-dots">
+          <span class="ss-dot on" data-i="0"></span>
+          <span class="ss-dot" data-i="1"></span>
+          <span class="ss-dot" data-i="2"></span>
+          <span class="ss-dot" data-i="3"></span>
+          <span class="ss-dot" data-i="4"></span>
+        </div>
+      </div>
+      <!-- Right: Content -->
+      <div class="ss-content" data-reveal style="transition-delay:.12s">
+        <div class="eyebrow"><i></i>Ye hai digital signage</div>
+        <h2>Aapka ad, ek bade screen pe — jo log actually dekhte hain</h2>
+        <div class="ss-points">
+          <div class="ss-point">
+            <div class="ss-point-ic">📍</div>
+            <div class="ss-point-body">
+              <h4>Sirf aapke area mein dikho</h4>
+              <p>Society lobby, mall, gym — jahan aapke potential customers daily aate hain, wahan aapka ad chalta hai.</p>
+            </div>
+          </div>
+          <div class="ss-point">
+            <div class="ss-point-ic">🔁</div>
+            <div class="ss-point-body">
+              <h4>Din mein 50–80 baar</h4>
+              <p>Ek hi din mein hazaron log dekhte hain. Repetition se brand yaad rehta hai — jab zarurat padegi, pehla naam tumhara aayega.</p>
+            </div>
+          </div>
+          <div class="ss-point">
+            <div class="ss-point-ic">📵</div>
+            <div class="ss-point-body">
+              <h4>Scroll nahi kar sakte yahan</h4>
+              <p>Lift mein 45 seconds — kuch nahi karna hota. Social media ki tarah skip ka option nahi hai.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ EK UPLOAD SAB JAGAH SECTION ═══════════ -->
 <!-- ═══════════ EK UPLOAD SAB JAGAH SECTION ═══════════ -->
 <style>
 #ev-hero{--or:#ff5c00;--gold:#c9a84c;--goldhi:#e8c471;--mid:#6b6460;}
@@ -1058,59 +1710,413 @@ function mk(el,url,isV){
 </div><!-- #ev-hero -->
 <!-- ═══════════ END EK UPLOAD SAB JAGAH SECTION ═══════════ -->
 
-      <!-- Venue Partner Card -->
-      <div class="scard scard-orange" data-reveal style="transition-delay:.36s">
-        <div class="so-left">
-          <div class="scard-idx" style="justify-content:flex-start;gap:10px"><span>06</span><div class="dot"></div></div>
-          <h3 class="h-md">Aapke paas screen hai? Revenue generate karein.</h3>
-          <p>Agar aapke venue — commercial complex, society lobby, gym ya cafe — mein display screens hain, to unhe extrravenue network par register karein. Advertisers ads chalayenge aur aapko monthly automated payouts milenge.</p>
-          <a class="btn btn-sm" style="background:#fff;color:var(--dark);border-radius:999px;padding:11px 20px;font-size:13.5px;font-weight:600;" href="https://signagecrm-production.up.railway.app">Venue partner bano &rarr;</a>
+<!-- Venue Partner Card -->
+<section style="background:var(--surface);padding:0 0 64px;">
+  <div class="wrap">
+    <div class="venue-card" data-reveal>
+      <!-- Left content -->
+      <div style="display:flex;flex-direction:column;gap:14px;max-width:58ch;">
+        <div style="display:flex;align-items:center;gap:10px;font-size:12px;font-weight:600;letter-spacing:.14em;color:rgba(255,255,255,.8);text-transform:uppercase;">
+          <span>06</span>
+          <div style="width:8px;height:8px;border-radius:50%;background:#fff;flex-shrink:0;"></div>
         </div>
-        <div class="so-ring"><span><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span></div>
+        <h3 style="font-family:'Magra',sans-serif;font-size:clamp(22px,2.4vw,34px);font-weight:700;color:#fff;line-height:1.15;margin:0;letter-spacing:-.02em;text-wrap:balance;">Aapke paas screen hai? Revenue generate karein.</h3>
+        <p style="font-size:15px;color:rgba(255,255,255,.82);margin:0;max-width:46ch;line-height:1.6;">Agar aapke venue — commercial complex, society lobby, gym ya cafe — mein display screens hain, to unhe extrravenue network par register karein. Advertisers ads chalayenge aur aapko monthly automated payouts milenge.</p>
+        <div>
+          <a href="https://signagecrm-production.up.railway.app" style="display:inline-flex;align-items:center;gap:8px;background:#fff;color:var(--dark);border-radius:999px;padding:11px 22px;font-size:14px;font-weight:600;text-decoration:none;transition:box-shadow .2s;" onmouseover="this.style.boxShadow='0 8px 24px rgba(0,0,0,.18)'" onmouseout="this.style.boxShadow='none'">Venue partner bano &rarr;</a>
+        </div>
+      </div>
+      <!-- Right: animated ring -->
+      <div class="venue-ring">
+        <span>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        </span>
       </div>
     </div>
   </div>
 </section>
 
-<!-- STEPS -->
-<section class="steps sec-tight" id="steps">
+<!-- DEMO SIMULATOR REMOVED -->
+<section id="demo" style="display:none;">
   <div class="wrap">
-    <div class="sec-head center" data-reveal>
-      <div class="eyebrow"><i></i>Kaise kaam karta hai</div>
-      <h2 class="h-lg">Sign up se ad live<br>— sirf 4 simple steps</h2>
+    <div style="text-align:center;margin-bottom:40px;" data-reveal>
+      <div class="eyebrow on-dark"><i></i>Campaign Simulator</div>
+      <h2 class="h-lg" style="color:#fff;margin-top:16px;">Plan karo, instantly<br><span style="color:var(--orange);">result dekho</span></h2>
+      <p style="color:rgba(255,255,255,.55);max-width:46ch;margin:14px auto 0;font-size:17px;line-height:1.55;">Screens aur package choose karo — har click pe result live update hoga.</p>
     </div>
-    <div class="steps-line" id="sline"><i></i></div>
-    <div class="steps-grid">
-      <div class="step" data-reveal style="transition-delay:.06s">
-        <div class="step-no">01</div>
-        <h3>Account &amp; Creative Upload</h3>
-        <p>Apna advertiser account banayein aur high-res creative upload karein. Automatic validation system aspect ratio check karta hai.</p>
-        <span class="step-tick">✓ Fast onboarding</span>
+
+    <div id="sim-wrap">
+
+      <!-- LEFT: Inputs -->
+      <div class="sim-left">
+        <div style="font-size:10px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:rgba(30,30,30,.36);margin-bottom:16px;">CAMPAIGN PLANNER</div>
+
+        <!-- Step 1: Screens -->
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+          <span style="width:18px;height:18px;border-radius:50%;background:var(--orange);color:#fff;font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;">1</span>
+          <div class="sim-sec-label" style="margin-bottom:0;">Screen Selection</div>
+        </div>
+        <div id="screens-grid" style="display:flex;flex-direction:column;gap:5px;margin-bottom:4px;margin-left:26px;"></div>
+        <div style="font-size:10px;color:rgba(30,30,30,.36);margin-bottom:18px;margin-left:26px;" id="sel-count-label">2 screens selected</div>
+
+        <!-- Step 2: Creative Upload -->
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+          <span style="width:18px;height:18px;border-radius:50%;background:var(--orange);color:#fff;font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;">2</span>
+          <div class="sim-sec-label" style="margin-bottom:0;">Ad Creative <span style="font-weight:400;text-transform:none;letter-spacing:0;">(optional)</span></div>
+        </div>
+        <div style="margin-left:26px;margin-bottom:18px;">
+          <div id="creative-drop" onclick="document.getElementById('sim-file').click()" style="border:1.5px dashed rgba(30,30,30,.18);border-radius:10px;cursor:pointer;overflow:hidden;transition:.15s;background:#fafafa;position:relative;">
+            <input type="file" id="sim-file" accept="image/*" style="display:none" onchange="simUploadCreative(this)">
+            <div id="creative-placeholder" style="aspect-ratio:16/9;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="rgba(30,30,30,.25)" stroke-width="1.5"><rect x="3" y="3" width="18" height="14" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+              <div style="font-size:11px;color:rgba(30,30,30,.4);font-weight:600;">Click to upload creative</div>
+              <div style="font-size:9px;color:rgba(30,30,30,.28);">JPG · PNG · 16:9 recommended</div>
+            </div>
+            <div id="creative-preview" style="display:none;aspect-ratio:16/9;background-size:cover;background-position:center;position:relative;">
+              <button onclick="event.stopPropagation();simRemoveCreative()" style="position:absolute;top:7px;right:7px;background:rgba(0,0,0,.55);border:0;border-radius:999px;width:22px;height:22px;color:#fff;cursor:pointer;font-size:14px;line-height:22px;text-align:center;padding:0;">×</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 3: Schedule & Budget -->
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+          <span style="width:18px;height:18px;border-radius:50%;background:var(--orange);color:#fff;font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;">3</span>
+          <div class="sim-sec-label" style="margin-bottom:0;">Schedule &amp; Budget</div>
+        </div>
+        <div id="pkg-grid" style="display:flex;flex-direction:column;gap:5px;margin-left:26px;"></div>
       </div>
-      <div class="step" data-reveal style="transition-delay:.14s">
-        <div class="step-no">02</div>
-        <h3>Target Locations &amp; Dates</h3>
-        <p>City complexes aur malls ke screens select karein. Dates aur duration chun kar transparent pricing dashboard mein dekhein.</p>
-        <span class="step-tick">✓ Realtime inventory</span>
-      </div>
-      <div class="step" data-reveal style="transition-delay:.22s">
-        <div class="step-no">03</div>
-        <h3>Instant Payment &amp; Invoice</h3>
-        <p>UPI ya cards se checkout karein. Payment hote hi GST tax invoice direct email aur dashboard par generate ho jaati hai.</p>
-        <span class="step-tick">✓ Instant billing</span>
-      </div>
-      <div class="step" data-reveal style="transition-delay:.3s">
-        <div class="step-no">04</div>
-        <h3>Broadcast &amp; Proof of Play</h3>
-        <p>Approval ke baad ad screens par live ho jata hai aur social feeds par post hota hai. Detailed playback analytics monitor karein.</p>
-        <span class="step-tick">✓ Guaranteed verification</span>
+
+      <!-- RIGHT: Step 4 Result -->
+      <div class="sim-right">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
+          <span style="width:18px;height:18px;border-radius:50%;background:var(--orange);color:#fff;font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;">4</span>
+          <div style="font-size:9px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:rgba(255,255,255,.4);">Campaign Preview</div>
+        </div>
+        <div style="font-size:9px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:rgba(255,255,255,.26);margin-bottom:4px;">ESTIMATED REACH</div>
+
+        <div id="res-big" style="font-size:clamp(38px,5vw,56px);font-weight:800;color:#fff;letter-spacing:-0.03em;line-height:1;font-variant-numeric:tabular-nums;margin-top:2px;">—</div>
+        <div style="font-size:12px;color:rgba(255,255,255,.3);margin-top:4px;margin-bottom:14px;">plays per month</div>
+
+        <div id="res-badges" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;min-height:28px;"></div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;border-top:1px solid rgba(255,255,255,.07);padding-top:14px;margin-bottom:16px;">
+          <div>
+            <div style="font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.26);margin-bottom:4px;">Screens</div>
+            <div id="r-screens" style="font-size:clamp(14px,2vw,18px);font-weight:700;color:#fff;">—</div>
+          </div>
+          <div>
+            <div style="font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.26);margin-bottom:4px;">Daily</div>
+            <div id="r-daily" style="font-size:clamp(14px,2vw,18px);font-weight:700;color:#22d3ee;">—</div>
+          </div>
+          <div>
+            <div style="font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.26);margin-bottom:4px;">Cost</div>
+            <div id="r-cost" style="font-size:clamp(14px,2vw,18px);font-weight:700;color:var(--orange);">—</div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:4px;margin-bottom:12px;">
+          <button class="res-tab active" data-tab="summary" onclick="simTab(this)">Summary</button>
+          <button class="res-tab" data-tab="screens" onclick="simTab(this)">Per Screen</button>
+          <button class="res-tab" data-tab="cost" onclick="simTab(this)">Cost</button>
+        </div>
+
+        <div id="rt-summary" class="rt-panel" style="flex:1;"></div>
+        <div id="rt-screens" class="rt-panel" style="flex:1;display:none;"></div>
+        <div id="rt-cost" class="rt-panel" style="flex:1;display:none;"></div>
+
+        <!-- Social Distribution Card -->
+        <div style="border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:14px 16px;margin-top:16px;background:rgba(255,255,255,.03);">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+            <span style="width:6px;height:6px;border-radius:50%;background:#22c55e;display:inline-block;flex-shrink:0;box-shadow:0 0 6px #22c55e;"></span>
+            <span style="font-size:10px;font-weight:700;color:rgba(255,255,255,.7);letter-spacing:.04em;">Also distributed on</span>
+          </div>
+          <div style="display:flex;gap:10px;align-items:center;">
+            <!-- Facebook -->
+            <div style="display:flex;align-items:center;gap:7px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:7px 12px;flex:1;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="#1877F2"><path d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.41c0-3.025 1.792-4.697 4.533-4.697 1.312 0 2.686.236 2.686.236v2.971h-1.514c-1.491 0-1.956.93-1.956 1.883v2.272h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z"/></svg>
+              <span style="font-size:11px;font-weight:600;color:rgba(255,255,255,.65);">Facebook</span>
+            </div>
+            <!-- Instagram -->
+            <div style="display:flex;align-items:center;gap:7px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:7px 12px;flex:1;">
+              <svg width="16" height="16" viewBox="0 0 24 24"><defs><linearGradient id="ig" x1="0%" y1="100%" x2="100%" y2="0%"><stop offset="0%" stop-color="#FFDC80"/><stop offset="26%" stop-color="#FCAF45"/><stop offset="50%" stop-color="#F77737"/><stop offset="70%" stop-color="#F56040"/><stop offset="85%" stop-color="#FD1D1D"/><stop offset="100%" stop-color="#C13584"/></linearGradient></defs><path fill="url(#ig)" d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+              <span style="font-size:11px;font-weight:600;color:rgba(255,255,255,.65);">Instagram</span>
+            </div>
+            <!-- Google -->
+            <div style="display:flex;align-items:center;gap:7px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:7px 12px;flex:1;">
+              <svg width="16" height="16" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+              <span style="font-size:11px;font-weight:600;color:rgba(255,255,255,.65);">Google</span>
+            </div>
+          </div>
+          <div style="font-size:10px;color:rgba(255,255,255,.28);margin-top:10px;line-height:1.5;">Creative ek baar upload karo — screens + social media dono pe automatically distribute hoga.</div>
+        </div>
+
+        <a href="https://signagecrm-production.up.railway.app"
+           style="background:var(--orange);color:#fff;text-decoration:none;padding:13px 20px;border-radius:999px;font-size:13px;font-weight:700;text-align:center;margin-top:16px;display:block;">
+          Abhi Book Karo →
+        </a>
       </div>
     </div>
   </div>
 </section>
+
+<style>
+/* Simulator layout */
+#sim-wrap{display:grid;grid-template-columns:1fr 1fr;border-radius:20px;overflow:hidden;border:1px solid rgba(255,255,255,.1);box-shadow:0 24px 64px rgba(0,0,0,.45);}
+.sim-left{background:#fff;padding:28px 26px;display:flex;flex-direction:column;}
+.sim-right{background:#0a0e1a;padding:28px 26px;display:flex;flex-direction:column;}
+.sim-sec-label{font-size:10px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:rgba(30,30,30,.36);margin-bottom:8px;}
+/* Screen row */
+.sc-row{display:flex;align-items:center;gap:10px;padding:9px 12px;border:1.5px solid rgba(30,30,30,.1);border-radius:10px;cursor:pointer;transition:.15s;background:#fafafa;}
+.sc-row:hover{border-color:rgba(255,92,0,.4);background:#fff8f4;}
+.sc-row.selected{border-color:var(--orange);background:#fff4ef;}
+.sc-check{width:17px;height:17px;border-radius:4px;border:1.5px solid rgba(30,30,30,.22);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:.15s;}
+.sc-row.selected .sc-check{background:var(--orange);border-color:var(--orange);}
+/* Package row */
+.pk-row{display:flex;align-items:center;padding:10px 12px;border:1.5px solid rgba(30,30,30,.1);border-radius:10px;cursor:pointer;transition:.15s;gap:10px;background:#fafafa;}
+.pk-row:hover{border-color:rgba(255,92,0,.4);background:#fff8f4;}
+.pk-row.selected{border-color:var(--orange);background:#fff4ef;}
+.pk-dot{width:14px;height:14px;border-radius:50%;border:1.5px solid rgba(30,30,30,.22);flex-shrink:0;transition:.15s;display:flex;align-items:center;justify-content:center;}
+.pk-row.selected .pk-dot{background:var(--orange);border-color:var(--orange);}
+/* Creative drop hover */
+#creative-drop:hover{border-color:rgba(255,92,0,.4);background:#fff8f4;}
+/* Result tabs */
+.res-tab{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.4);font:600 10px/1 'Libre Franklin',sans-serif;letter-spacing:.05em;padding:6px 12px;border-radius:999px;cursor:pointer;transition:.15s;}
+.res-tab:hover{background:rgba(255,255,255,.1);}
+.res-tab.active{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.22);color:#fff;}
+.res-badge{display:inline-flex;align-items:center;padding:5px 10px;border-radius:999px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);font-size:11px;font-weight:600;color:rgba(255,255,255,.65);}
+/* Mobile */
+@media(max-width:700px){
+  #sim-wrap{grid-template-columns:1fr;}
+  .sim-left{order:1;}
+  .sim-right{order:2;}
+}
+</style>
+
+<script>
+(function(){
+  var SCREENS=[
+    {id:1,name:'Tulsi Mall',area:'Vasna, Ahmedabad',plays:2700,zone:'B'},
+    {id:2,name:'CG Road Premium',area:'CG Road, Ahmedabad',plays:3100,zone:'A'},
+    {id:3,name:'SG Highway Hub',area:'SG Highway, Ahmedabad',plays:2400,zone:'B'},
+    {id:4,name:'Navrangpura Gate',area:'Navrangpura, Ahmedabad',plays:2900,zone:'A'},
+  ];
+  var PKGS=[
+    {id:'trial',name:'Trial',days:7,slot:'10s',price:1999},
+    {id:'regular',name:'Regular',days:30,slot:'15s',price:13000,pop:true},
+    {id:'premium',name:'Premium',days:30,slot:'20s',price:18000},
+  ];
+  var COLORS=['#ff5c00','#22d3ee','#a855f7','#6ee7b7'];
+  var selScreens=[1,2],selPkg='regular',curTab='summary',uploadedCreative=null;
+
+  function fmt(n){return n.toLocaleString('en-IN');}
+  function fmtRs(n){return '₹'+fmt(n);}
+  function chk(){return '<svg width="10" height="8" viewBox="0 0 10 8" fill="none"><polyline points="1 4 3.8 7 9 1" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';}
+  function radioFill(){return '<svg width="6" height="6" viewBox="0 0 6 6"><circle cx="3" cy="3" r="3" fill="#fff"/></svg>';}
+
+  function buildScreens(){
+    var g=document.getElementById('screens-grid'); if(!g)return;
+    g.innerHTML=SCREENS.map(function(s){
+      var sel=selScreens.indexOf(s.id)>-1;
+      return '<div class="sc-row'+(sel?' selected':'')+'" onclick="simToggle('+s.id+')">'
+        +'<div class="sc-check">'+(sel?chk():'')+'</div>'
+        +'<div style="flex:1;min-width:0;">'
+          +'<div style="font-size:13px;font-weight:700;color:#1e1e1e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+s.name+'</div>'
+          +'<div style="font-size:10px;color:rgba(30,30,30,.4);margin-top:1px;">'+s.area+'</div>'
+        +'</div>'
+        +'<div style="text-align:right;flex-shrink:0;">'
+          +'<div style="font-size:12px;font-weight:700;color:var(--orange);">'+fmt(s.plays)+'/day</div>'
+          +'<div style="font-size:9px;color:rgba(30,30,30,.32);margin-top:1px;">'+s.zone+' Zone</div>'
+        +'</div>'
+      +'</div>';
+    }).join('');
+    var c=selScreens.length;
+    var lbl=document.getElementById('sel-count-label');
+    if(lbl)lbl.textContent=c===0?'Select at least 1 screen':c+' screen'+(c!==1?'s':'')+' selected';
+  }
+
+  function buildPkgs(){
+    var g=document.getElementById('pkg-grid'); if(!g)return;
+    g.innerHTML=PKGS.map(function(p){
+      var sel=selPkg===p.id;
+      return '<div class="pk-row'+(sel?' selected':'')+'" onclick="simPickPkg(\''+p.id+'\')">'
+        +'<div class="pk-dot">'+(sel?radioFill():'')+'</div>'
+        +'<div style="flex:1;">'
+          +'<div style="display:flex;align-items:center;gap:6px;">'
+            +'<span style="font-size:13px;font-weight:700;color:#1e1e1e;">'+p.name+'</span>'
+            +(p.pop?'<span style="font-size:9px;font-weight:700;background:#fff0eb;color:var(--orange);padding:1px 6px;border-radius:999px;">Popular</span>':'')
+          +'</div>'
+          +'<div style="font-size:10px;color:rgba(30,30,30,.4);margin-top:1px;">'+p.slot+' slot · '+(p.days===7?'7 days':'Monthly')+'</div>'
+        +'</div>'
+        +'<div style="font-size:13px;font-weight:800;color:#1e1e1e;">'+fmtRs(p.price)+'</div>'
+      +'</div>';
+    }).join('');
+  }
+
+  function calcTotals(){
+    var d=selScreens.reduce(function(s,id){var sc=SCREENS.find(function(x){return x.id===id;});return s+(sc?sc.plays:0);},0);
+    var pkg=PKGS.find(function(p){return p.id===selPkg;})||PKGS[1];
+    return {totalDaily:d,totalMonthly:d*pkg.days,pkg:pkg};
+  }
+
+  function updateResult(){
+    var t=calcTotals();
+    var big=document.getElementById('res-big'); if(big)big.textContent=t.totalMonthly>0?fmt(t.totalMonthly):'—';
+    var rd=document.getElementById('r-daily'); if(rd)rd.textContent=t.totalDaily>0?fmt(t.totalDaily):'—';
+    var rs=document.getElementById('r-screens'); if(rs)rs.textContent=selScreens.length||'—';
+    var rc=document.getElementById('r-cost'); if(rc)rc.textContent=selPkg?fmtRs(t.pkg.price):'—';
+    var bdg=document.getElementById('res-badges');
+    if(bdg){
+      var b=[];
+      if(selScreens.length>0)b.push(selScreens.length+' screen'+(selScreens.length!==1?'s':''));
+      if(selPkg)b.push(t.pkg.days===7?'7 days':'Monthly');
+      if(selPkg)b.push(t.pkg.slot+' slot');
+      bdg.innerHTML=b.map(function(x){return '<span class="res-badge">'+x+'</span>';}).join('');
+    }
+    buildTab(curTab);
+  }
+
+  function buildTab(tab){
+    var t=calcTotals();
+
+    if(tab==='summary'){
+      var panel=document.getElementById('rt-summary'); if(!panel)return;
+      if(selScreens.length===0||!selPkg){
+        panel.innerHTML='<div style="color:rgba(255,255,255,.2);font-size:12px;text-align:center;padding:20px 0;">Screens aur package choose karo</div>';
+        return;
+      }
+      /* Creative preview strip */
+      var creativeHtml='';
+      if(uploadedCreative){
+        creativeHtml='<div style="border-radius:8px;overflow:hidden;margin-bottom:12px;border:2px solid rgba(255,255,255,.12);aspect-ratio:16/9;background:url(\''+uploadedCreative+'\') center/cover;position:relative;">'
+          +'<div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.5) 0%,transparent 50%);display:flex;align-items:flex-end;padding:8px 10px;">'
+            +'<span style="font-size:9px;font-weight:700;color:rgba(255,255,255,.7);letter-spacing:.08em;text-transform:uppercase;">Your Ad Preview</span>'
+          +'</div>'
+        +'</div>';
+      }
+      /* Donut chart */
+      var total=t.totalDaily;
+      var cx=58,cy=58,r=42,sw=11,circ=2*Math.PI*r,segs='',off=0;
+      selScreens.forEach(function(id,i){
+        var sc=SCREENS.find(function(x){return x.id===id;}); if(!sc)return;
+        var pct=sc.plays/total,dl=pct*circ,col=COLORS[i%COLORS.length];
+        segs+='<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="'+col+'" stroke-width="'+sw+'" stroke-dasharray="'+dl+' '+(circ-dl)+'" stroke-dashoffset="'+(-(off*circ))+'" transform="rotate(-90 '+cx+' '+cy+')" stroke-linecap="butt"/>';
+        off+=pct;
+      });
+      var legend=selScreens.map(function(id,i){
+        var sc=SCREENS.find(function(x){return x.id===id;}); if(!sc)return '';
+        var col=COLORS[i%COLORS.length],pct=Math.round(sc.plays/total*100);
+        return '<div style="display:flex;align-items:center;gap:6px;margin-bottom:7px;">'
+          +'<span style="width:7px;height:7px;border-radius:2px;background:'+col+';flex-shrink:0;display:inline-block;"></span>'
+          +'<span style="font-size:11px;color:rgba(255,255,255,.5);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+sc.name+'</span>'
+          +'<span style="font-size:11px;font-weight:700;color:#fff;font-variant-numeric:tabular-nums;margin-left:4px;">'+fmt(sc.plays)+'</span>'
+          +'<span style="font-size:10px;color:rgba(255,255,255,.28);width:28px;text-align:right;flex-shrink:0;">'+pct+'%</span>'
+        +'</div>';
+      }).join('');
+      panel.innerHTML=creativeHtml
+        +'<div style="display:flex;align-items:center;gap:14px;">'
+          +'<div style="flex-shrink:0;">'
+            +'<svg width="116" height="116" viewBox="0 0 116 116">'
+              +'<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="rgba(255,255,255,.05)" stroke-width="'+sw+'"/>'
+              +segs
+              +'<text x="'+cx+'" y="'+(cy-6)+'" text-anchor="middle" fill="#fff" font-size="11" font-weight="800" font-family="Libre Franklin,sans-serif" dominant-baseline="middle">'+fmt(total)+'</text>'
+              +'<text x="'+cx+'" y="'+(cy+9)+'" text-anchor="middle" fill="rgba(255,255,255,.32)" font-size="8" font-family="Libre Franklin,sans-serif">per day</text>'
+            +'</svg>'
+          +'</div>'
+          +'<div style="flex:1;min-width:0;">'+legend+'</div>'
+        +'</div>';
+
+    } else if(tab==='screens'){
+      var panel2=document.getElementById('rt-screens'); if(!panel2)return;
+      if(selScreens.length===0){
+        panel2.innerHTML='<div style="color:rgba(255,255,255,.2);font-size:12px;text-align:center;padding:20px 0;">Koi screen select nahi ki</div>';
+        return;
+      }
+      var mx=Math.max.apply(null,selScreens.map(function(id){var sc=SCREENS.find(function(x){return x.id===id;});return sc?sc.plays:0;}));
+      var t2=calcTotals();
+      panel2.innerHTML=selScreens.map(function(id,i){
+        var sc=SCREENS.find(function(x){return x.id===id;}); if(!sc)return '';
+        var pct=sc.plays/mx*100,col=COLORS[i%COLORS.length];
+        var monthlyThis=sc.plays*t2.pkg.days;
+        return '<div style="margin-bottom:14px;">'
+          +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">'
+            +'<div style="font-size:12px;font-weight:600;color:#fff;">'+sc.name+'</div>'
+            +'<div style="font-size:11px;font-weight:700;color:'+col+';font-variant-numeric:tabular-nums;">'+fmt(sc.plays)+'/day</div>'
+          +'</div>'
+          +'<div style="background:rgba(255,255,255,.06);border-radius:4px;height:6px;overflow:hidden;margin-bottom:3px;">'
+            +'<div style="width:'+pct+'%;height:6px;background:'+col+';border-radius:4px;transition:.4s;"></div>'
+          +'</div>'
+          +'<div style="font-size:9px;color:rgba(255,255,255,.28);">'+fmt(monthlyThis)+' plays in '+t2.pkg.days+' days</div>'
+        +'</div>';
+      }).join('');
+
+    } else if(tab==='cost'){
+      var panel3=document.getElementById('rt-cost'); if(!panel3)return;
+      if(!selPkg){
+        panel3.innerHTML='<div style="color:rgba(255,255,255,.2);font-size:12px;text-align:center;padding:20px 0;">Package choose karo</div>';
+        return;
+      }
+      var pkg=t.pkg;
+      var cpm=t.totalMonthly>0?Math.round(pkg.price/(t.totalMonthly/1000)):0;
+      var perScr=selScreens.length>0?Math.round(pkg.price/selScreens.length):0;
+      function cRow(label,val){
+        return '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.06);">'
+          +'<span style="font-size:11px;color:rgba(255,255,255,.42);">'+label+'</span>'
+          +'<span style="font-size:12px;font-weight:700;">'+val+'</span>'
+        +'</div>';
+      }
+      panel3.innerHTML=''
+        +cRow('Package','<span style="color:#fff">'+pkg.name+' ('+pkg.slot+')</span>')
+        +cRow('Duration','<span style="color:#fff">'+(pkg.days===7?'7 days':'30 days')+'</span>')
+        +cRow('Total Cost','<span style="color:var(--orange)">'+fmtRs(pkg.price)+'</span>')
+        +cRow('Per Screen','<span style="color:#fff">'+fmtRs(perScr)+'</span>')
+        +(t.totalMonthly>0?cRow('CPM (per 1K plays)','<span style="color:#22d3ee">'+fmtRs(cpm)+'</span>'):'');
+    }
+  }
+
+  window.simToggle=function(id){
+    var i=selScreens.indexOf(id);
+    if(i>-1)selScreens.splice(i,1); else selScreens.push(id);
+    buildScreens(); updateResult();
+  };
+  window.simPickPkg=function(id){selPkg=id;buildPkgs();updateResult();};
+  window.simTab=function(btn){
+    curTab=btn.dataset.tab;
+    document.querySelectorAll('.res-tab').forEach(function(b){b.classList.remove('active');});
+    btn.classList.add('active');
+    document.querySelectorAll('.rt-panel').forEach(function(p){p.style.display='none';});
+    var p=document.getElementById('rt-'+curTab); if(p)p.style.display='';
+    buildTab(curTab);
+  };
+  window.simUploadCreative=function(input){
+    var file=input.files&&input.files[0]; if(!file)return;
+    var reader=new FileReader();
+    reader.onload=function(ev){
+      uploadedCreative=ev.target.result;
+      var ph=document.getElementById('creative-placeholder');
+      var pv=document.getElementById('creative-preview');
+      if(ph)ph.style.display='none';
+      if(pv){pv.style.display='block';pv.style.backgroundImage='url('+ev.target.result+')';}
+      if(curTab==='summary')buildTab('summary');
+    };
+    reader.readAsDataURL(file);
+  };
+  window.simRemoveCreative=function(){
+    uploadedCreative=null;
+    var ph=document.getElementById('creative-placeholder');
+    var pv=document.getElementById('creative-preview');
+    var fi=document.getElementById('sim-file');
+    if(ph)ph.style.display='';
+    if(pv){pv.style.display='none';pv.style.backgroundImage='';}
+    if(fi)fi.value='';
+    if(curTab==='summary')buildTab('summary');
+  };
+
+  document.addEventListener('DOMContentLoaded',function(){buildScreens();buildPkgs();updateResult();});
+})();
+</script>
 
 <!-- BENEFITS -->
-<section class="sec" id="benefits">
+<section class="sec" id="benefits" style="display:none;">
   <div class="wrap">
     <div class="ben-layout">
       <div data-reveal>
@@ -1213,39 +2219,39 @@ function mk(el,url,isV){
   <div class="wrap">
     <div class="sec-head center" data-reveal>
       <div class="eyebrow"><i></i>Smart Advertising</div>
-      <h2 class="h-lg">Kyun digital screens<br>sabse zyada convert karti hain</h2>
-      <p class="lead">Traditional outdoor banners aur standard online ads ke mukable digital screens ka actual advantage.</p>
+      <h2 class="h-lg">Apna ad ek baar nahi,<br>hazaar baar dikhao</h2>
+      <p class="lead">Pamphlets fade ho jaate hain, flex ek baar lag ke bhool jaata hai — digital screens baar baar, sahi jagah, sahi waqt dikhti hain.</p>
     </div>
     <div class="conf-grid">
       <div class="conf-card" data-reveal style="transition-delay:.06s">
-        <div class="conf-num">01</div>
-        <h3>Captive &amp; Undivided Attention</h3>
-        <p>Social media ads 2 seconds mein scroll ho jaate hain. Malls aur elevators mein audience ambient displays ko naturally observe karti hai — ensuring 100% real eye contact.</p>
+        <div class="conf-top"><span class="conf-tag">Attention</span><span class="conf-num">01</span></div>
+        <h3>Log actually dekhte hain — scroll nahi hoti</h3>
+        <p>Lift, mall, gym — yahan log wait karte hain. Screen se nazrein nahi hatati, isliye aapka ad genuinely dekha jaata hai.</p>
       </div>
       <div class="conf-card" data-reveal style="transition-delay:.1s">
-        <div class="conf-num">02</div>
-        <h3>Frictionless WhatsApp Conversion</h3>
-        <p>Banners par phone numbers yaad nahi rehte. Direct dynamic QR code scan se consumer seedha aapke WhatsApp chat ya landing page par arrive hota hai.</p>
+        <div class="conf-top"><span class="conf-tag">Lead Gen</span><span class="conf-num">02</span></div>
+        <h3>QR scan se lead seedha aapke WhatsApp par</h3>
+        <p>Customer screen dekhta hai, QR scan karta hai — aur directly aapke WhatsApp pe aata hai. Koi extra step nahi.</p>
       </div>
       <div class="conf-card" data-reveal style="transition-delay:.14s">
-        <div class="conf-num">03</div>
-        <h3>Integrated Cross-Channel Campaign</h3>
-        <p>Ek hi budget mein physically screen par bhi display aur social profiles par bhi exposure. High recall across both real world and digital world.</p>
+        <div class="conf-top"><span class="conf-tag">Reach</span><span class="conf-num">03</span></div>
+        <h3>Ek ad — screen par bhi, Instagram par bhi</h3>
+        <p>Ek hi creative, do jagah kaam karta hai. Physical screen plus social media — ek saath brand recall double hota hai.</p>
       </div>
       <div class="conf-card" data-reveal style="transition-delay:.18s">
-        <div class="conf-num">04</div>
-        <h3>Flexible Commitments, Zero Lock-in</h3>
-        <p>Testing phase ke liye 7-day trial run karein. Results dekhne ke baad apni marzi se monthly scale karein bina kisi long-term mandatory contracts ke.</p>
+        <div class="conf-top"><span class="conf-tag">Flexible</span><span class="conf-num">04</span></div>
+        <h3>Sirf 7 din se shuru — koi contract nahi</h3>
+        <p>Trial karo, results dekho, phir decide karo. Koi lock-in nahi, koi penalty nahi — apni marzi se start aur stop karo.</p>
       </div>
       <div class="conf-card" data-reveal style="transition-delay:.22s">
-        <div class="conf-num">05</div>
-        <h3>Prime Neighborhood Locations</h3>
-        <p>High-spending residential societies, gyms aur busy business complexes mein strategic installations jahan target demographic daily visit karti hai.</p>
+        <div class="conf-top"><span class="conf-tag">Targeting</span><span class="conf-num">05</span></div>
+        <h3>Aapke area ke busy spots — malls, gyms, societies</h3>
+        <p>Sirf wahi screens choose karo jahan aapki target audience daily jaati hai. Wasted impressions nahi, sirf relevant eyeballs.</p>
       </div>
       <div class="conf-card" data-reveal style="transition-delay:.26s">
-        <div class="conf-num">06</div>
-        <h3>100% Verifiable Proof of Play</h3>
-        <p>No assumptions. Hardware telemetry har ad playback ko log karti hai jiska verified audit report aap direct dashboard se download kar sakte hain.</p>
+        <div class="conf-top"><span class="conf-tag">Analytics</span><span class="conf-num">06</span></div>
+        <h3>Proof milta hai — kab chala, kitni baar</h3>
+        <p>Har play ka timestamp record hota hai. Aapko exact pata rehta hai aapka ad kab aur kitni baar actually chala.</p>
       </div>
     </div>
   </div>
@@ -1401,7 +2407,7 @@ function mk(el,url,isV){
     <div class="f-top">
       <div>
         <div style="display:flex;align-items:center;gap:10px;">
-          <div class="brand-mark"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><rect x="2" y="3" width="20" height="14" rx="2" stroke="currentColor" stroke-width="2"/><path d="M8 21h8M12 17v4" stroke-linecap="round"/></svg></div>
+          <img src="logo.png" alt="extrravenue" style="height:32px;width:auto;">
           <span style="font-family:'Magra',sans-serif;font-weight:700;font-size:17.5px;color:#fff;">extrravenue</span>
         </div>
         <p class="f-blurb">India's leading transparent programmatic digital signage network. Bridging outdoor physical displays with social channels.</p>
@@ -1447,12 +2453,217 @@ const ro = new IntersectionObserver(entries => {
 }, {threshold:.08, rootMargin:'0px 0px -20px 0px'});
 document.querySelectorAll('[data-reveal]').forEach(el => ro.observe(el));
 
-// Steps Line Fill
-const sl = document.getElementById('sline');
-if(sl) {
-  const slo = new IntersectionObserver(e => { if(e[0].isIntersecting){sl.classList.add('in');slo.disconnect();}},{threshold:.5});
-  slo.observe(sl);
+// Accordion Steps — auto-advance with progress bar
+// Drift gallery — Row 1 aur Row 2 ke liye ALAG files rakho
+// Nayi file add karni ho to: folder mein daalo + array mein naam likhao
+var DRIFT_ROW1 = [
+  'img/carousel/916 Gold Palace.png',
+  'img/carousel/Aavya Classes_5.jpg',
+  'img/carousel/Keystone_GSEB.mp4',
+  'img/carousel/Ami_Kothari_2.jpeg'
+];
+var DRIFT_ROW2 = [
+  'img/carousel/lubdhi Tution Classes (1).mp4',
+  'img/carousel/NIlesh Jewellers.jpeg',
+  'img/carousel/Navkar Handicrafts.jpg',
+  'img/carousel/Shreeji Enclave.jpg.jpeg'
+];
+(function(){
+  var container = document.getElementById('driftRows');
+  if(!container) return;
+  var VIDEO_EXT = /\.(mp4|webm|mov)$/i;
+
+  function makeCard(src){
+    var card = document.createElement('div');
+    card.className = 'drift-card';
+    if(VIDEO_EXT.test(src)){
+      var v = document.createElement('video');
+      v.src=src; v.autoplay=true; v.loop=true; v.muted=true; v.playsInline=true;
+      card.appendChild(v);
+    } else {
+      var img = document.createElement('img');
+      img.src=src; img.alt='';
+      img.onerror=function(){ card.classList.add('ph'); card.textContent='AD SLOT'; };
+      card.appendChild(img);
+    }
+    return card;
+  }
+
+  var SLOT = 180 + 32; // 212px per card slot
+
+  function buildRow(id, pool){
+    var row = document.createElement('div');
+    row.className='drift-row'; row.id=id;
+    for(var c=0;c<2;c++)
+      for(var i=0;i<pool.length;i++) row.appendChild(makeCard(pool[i]));
+    container.appendChild(row);
+    return row;
+  }
+
+  var r0 = buildRow('driftR1', DRIFT_ROW1); // top row → RIGHT
+  var r1 = buildRow('driftR2', DRIFT_ROW2); // bottom row → LEFT
+  var half0 = DRIFT_ROW1.length * SLOT;
+  var half1 = DRIFT_ROW2.length * SLOT;
+
+  // Row 0 starts mid-way (going right), Row 1 starts at 0 (going left)
+  var pos0 = -half0 * 0.5;
+  var pos1 = 0;
+  var scrollVel = 0, lastY = window.scrollY;
+
+  window.addEventListener('scroll', function(){
+    scrollVel += (window.scrollY - lastY) * 0.5;
+    lastY = window.scrollY;
+  }, {passive:true});
+
+  function tick(){
+    scrollVel *= 0.90;
+
+    // Row 0: base RIGHT, scroll pushes LEFT
+    pos0 += 0.5 - scrollVel * 0.12;
+    if(pos0 >= 0)      pos0 -= half0;
+    if(pos0 < -half0)  pos0 += half0;
+
+    // Row 1: base LEFT, scroll also pushes LEFT
+    pos1 -= 0.35 + scrollVel * 0.08;
+    if(pos1 < -half1)  pos1 += half1;
+    if(pos1 > 0)       pos1 -= half1;
+
+    r0.style.transform = 'translateX('+pos0+'px)';
+    r1.style.transform = 'translateX('+pos1+'px)';
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+})();
+
+// Signage carousel
+(function(){
+  var slides = document.querySelectorAll('.ss-slide');
+  var dots = document.querySelectorAll('.ss-dot');
+  var cur = 0;
+  var total = slides.length;
+  function goTo(i){
+    slides[cur].classList.remove('on');
+    dots[cur] && dots[cur].classList.remove('on');
+    cur = (i + total) % total;
+    slides[cur].classList.add('on');
+    dots[cur] && dots[cur].classList.add('on');
+  }
+  dots.forEach(function(d){ d.addEventListener('click', function(){ goTo(+d.dataset.i); }); });
+  setInterval(function(){ goTo(cur + 1); }, 3500);
+})();
+
+var swAutoTimer = null;
+var SW_DURATION = 5000; // ms per card
+
+function swResetProgress(items) {
+  items.forEach(function(el) {
+    var bar = el.querySelector('.sw-progress-bar');
+    if (bar) { bar.style.animation = 'none'; bar.offsetHeight; bar.style.animation = ''; }
+    el.classList.remove('paused');
+  });
 }
+
+function expandStep(idx, fromAuto) {
+  var items = document.querySelectorAll('.swatch-item');
+  clearTimeout(swAutoTimer);
+  swResetProgress(items);
+
+  items.forEach(function(el, i) {
+    if (i === idx) {
+      el.classList.remove('collapsed');
+      el.classList.add('expanded');
+    } else {
+      el.classList.remove('expanded');
+      el.classList.add('collapsed');
+    }
+  });
+  document.querySelectorAll('.swatch-dot').forEach(function(dot, i) {
+    dot.style.opacity = (i === idx) ? '1' : '0.3';
+  });
+
+  // Schedule next card
+  swAutoTimer = setTimeout(function() {
+    expandStep((idx + 1) % items.length, true);
+  }, SW_DURATION);
+}
+
+(function initSwatch() {
+  var items = document.querySelectorAll('.swatch-item');
+
+  // Inject progress bar into every swatch-item
+  items.forEach(function(el) {
+    var wrap = document.createElement('div');
+    wrap.className = 'sw-progress-wrap';
+    var bar = document.createElement('div');
+    bar.className = 'sw-progress-bar';
+    wrap.appendChild(bar);
+    el.appendChild(wrap);
+  });
+
+  items.forEach(function(el) {
+    // Pause auto-advance on hover
+    el.addEventListener('mouseenter', function() {
+      el.classList.add('paused');
+      clearTimeout(swAutoTimer);
+    });
+    el.addEventListener('mouseleave', function() {
+      el.classList.remove('paused');
+      var cur = document.querySelector('.swatch-item.expanded');
+      if (!cur) return;
+      var remaining = SW_DURATION * (1 - (parseFloat(el.querySelector('.sw-progress-bar').style.width || '0') / 100));
+      swAutoTimer = setTimeout(function() {
+        var idx = parseInt(document.querySelector('.swatch-item.expanded').dataset.step);
+        expandStep((idx + 1) % items.length, true);
+      }, SW_DURATION);
+    });
+
+    // Desktop collapsed strip click
+    var strip = el.querySelector('.desktop-collapsed-strip');
+    if (strip) strip.addEventListener('click', function(e) {
+      e.stopPropagation();
+      expandStep(parseInt(el.dataset.step));
+    });
+    // Mobile collapsed bar click
+    var bar = el.querySelector('.mobile-collapsed-bar');
+    if (bar) bar.addEventListener('click', function(e) {
+      e.stopPropagation();
+      expandStep(parseInt(el.dataset.step));
+    });
+    // Close button cycles to next
+    var closeBtn = el.querySelector('.close-sw-btn');
+    if (closeBtn) closeBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      var next = (parseInt(el.dataset.step) + 1) % items.length;
+      expandStep(next);
+    });
+  });
+
+  // Nav dot clicks
+  document.querySelectorAll('.swatch-dot').forEach(function(dot) {
+    dot.addEventListener('click', function() {
+      expandStep(parseInt(dot.dataset.dot));
+    });
+  });
+
+  // Keyboard navigation
+  document.addEventListener('keydown', function(e) {
+    var cur = document.querySelector('.swatch-item.expanded');
+    if (!cur) return;
+    var idx = parseInt(cur.dataset.step);
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+      e.preventDefault();
+      expandStep((idx + 1) % items.length);
+    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      expandStep((idx - 1 + items.length) % items.length);
+    }
+  });
+
+  // Start auto-advance for first card
+  swAutoTimer = setTimeout(function() {
+    expandStep(1, true);
+  }, SW_DURATION);
+})();
 
 // Footer Brand Reveal
 const fw = document.getElementById('fword');
@@ -1521,3 +2732,6 @@ document.querySelectorAll('.counter').forEach(el => co.observe(el));
 
 </body>
 </html>
+
+
+
