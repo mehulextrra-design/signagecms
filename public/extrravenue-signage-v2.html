@@ -1663,6 +1663,8 @@ function activate(idx){
   });
   var d=DATA[idx];
   var _ed=document.getElementById('pv-desc');if(_ed)_ed.innerHTML=d.desc;
+  var _gm=['signage','facebook','instagram','google'];
+  if(typeof gmTab==='function'&&_gm[idx])gmTab(_gm[idx]);
 }
 
 activate(0);
