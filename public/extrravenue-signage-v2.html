@@ -539,6 +539,8 @@ body{margin:0;}
   .nav-pill{padding:8px 8px 8px 16px;}
 }
 </style>
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>
 
@@ -1481,86 +1483,142 @@ body{margin:0;}
 
   <!-- RIGHT: Preview Panel -->
   <div class="preview-col" id="ev-preview">
-    <input type="file" id="fi" accept="image/*,video/*">
-    <div class="mockup-wrap">
+  <!-- hidden legacy upload for JS compatibility -->
+  <input type="file" id="fi" accept="image/*,video/*" style="display:none">
 
-      <!-- DIGITAL SIGNAGE -->
-      <div class="cp cp-sg" id="cp-sg">
-        <div class="ph-wrap">
-          <img class="ph-frame" src="/img/restaurant.jpg" alt="">
-          <div class="ph-screen" id="sg-content" style="left:17%;top:3%;width:58%;height:64%">
-            <div class="ad-fill"><div class="af-b">ExtrraVenue</div><div class="af-s">more space = more revenue</div></div>
-          </div>
+  <!-- OMNICHANNEL MOCKUP CARD -->
+  <div style="width:100%;display:flex;flex-direction:column;gap:0;border-radius:18px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,.08),0 10px 32px rgba(0,0,0,.1);background:#fff;">
+
+    <!-- Card Header -->
+    <div style="padding:12px 14px;border-bottom:1px solid #e2e8f0;display:flex;flex-direction:column;gap:10px;background:#fff;">
+
+      <!-- Title + Upload -->
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+        <div style="display:flex;align-items:center;gap:6px;">
+          <div style="width:8px;height:8px;border-radius:50%;background:#10b981;animation:subtle-pulse 2s infinite ease-in-out;"></div>
+          <span style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#1e293b;">Live Preview</span>
+        </div>
+        <label for="gm-upload" style="display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:8px;background:#ff5c00;color:#fff;font-size:10px;font-weight:700;cursor:pointer;transition:background .2s;" onmouseover="this.style.background='#e04e00'" onmouseout="this.style.background='#ff5c00'">
+          <i class="fa-solid fa-cloud-arrow-up" style="font-size:10px;"></i> Upload
+          <input type="file" id="gm-upload" accept="image/*" style="display:none;">
+        </label>
+      </div>
+
+      <!-- Preset Buttons -->
+      <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+        <span style="font-size:10px;font-weight:600;color:#64748b;">Preset:</span>
+        <button onclick="gmPreset('grocery')" style="padding:4px 10px;border-radius:7px;border:1.5px solid #e2e8f0;background:#f8fafc;font-size:10px;font-weight:600;color:#334155;cursor:pointer;" onmouseover="this.style.borderColor='#ff5c00'" onmouseout="this.style.borderColor='#e2e8f0'">🛒 Grocery</button>
+        <button onclick="gmPreset('medical')" style="padding:4px 10px;border-radius:7px;border:1.5px solid #e2e8f0;background:#f8fafc;font-size:10px;font-weight:600;color:#334155;cursor:pointer;" onmouseover="this.style.borderColor='#ff5c00'" onmouseout="this.style.borderColor='#e2e8f0'">💊 Medical</button>
+        <button onclick="gmPreset('jewellers')" style="padding:4px 10px;border-radius:7px;border:1.5px solid #e2e8f0;background:#f8fafc;font-size:10px;font-weight:600;color:#334155;cursor:pointer;" onmouseover="this.style.borderColor='#ff5c00'" onmouseout="this.style.borderColor='#e2e8f0'">💍 Jewellers</button>
+      </div>
+
+      <!-- Platform Tabs -->
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:5px;padding:4px;border-radius:12px;background:#f1f5f9;">
+        <button id="gm-tab-facebook"  onclick="gmTab('facebook')"  style="display:flex;align-items:center;justify-content:center;gap:4px;padding:6px 4px;border-radius:9px;font-size:10px;font-weight:700;border:none;cursor:pointer;background:#fff;color:#2563eb;box-shadow:0 1px 3px rgba(0,0,0,.1);transition:all .2s;"><i class="fa-brands fa-facebook"></i> FB</button>
+        <button id="gm-tab-instagram" onclick="gmTab('instagram')" style="display:flex;align-items:center;justify-content:center;gap:4px;padding:6px 4px;border-radius:9px;font-size:10px;font-weight:500;border:none;cursor:pointer;background:transparent;color:#64748b;transition:all .2s;"><i class="fa-brands fa-instagram"></i> IG</button>
+        <button id="gm-tab-signage"   onclick="gmTab('signage')"   style="display:flex;align-items:center;justify-content:center;gap:4px;padding:6px 4px;border-radius:9px;font-size:10px;font-weight:500;border:none;cursor:pointer;background:transparent;color:#64748b;transition:all .2s;"><i class="fa-solid fa-tv"></i> Sign</button>
+        <button id="gm-tab-google"    onclick="gmTab('google')"    style="display:flex;align-items:center;justify-content:center;gap:4px;padding:6px 4px;border-radius:9px;font-size:10px;font-weight:500;border:none;cursor:pointer;background:transparent;color:#64748b;transition:all .2s;"><i class="fa-brands fa-google"></i> G</button>
+      </div>
+    </div>
+
+    <!-- Mockup Views (280px wide, height auto) -->
+    <div style="width:100%;position:relative;min-height:360px;">
+
+      <!-- FACEBOOK -->
+      <div id="gm-view-facebook" class="gm-view" style="display:block;">
+        <div style="padding:10px 12px;display:flex;align-items:center;gap:8px;border-bottom:1px solid #f1f5f9;">
+          <div style="width:32px;height:32px;border-radius:50%;background:#2563eb;color:#fff;font-weight:800;font-size:11px;display:flex;align-items:center;justify-content:center;">EV</div>
+          <div><div style="font-size:11px;font-weight:700;color:#0f172a;">ExtrraVenue Partner <i class="fa-solid fa-circle-check" style="color:#3b82f6;font-size:10px;"></i></div><div style="font-size:10px;color:#94a3b8;">Sponsored · <i class="fa-solid fa-earth-americas"></i></div></div>
+        </div>
+        <div style="padding:8px 12px;font-size:11px;color:#1e293b;line-height:1.5;">🛍️ <strong>Maha Bachat Dhamaka!</strong> Daily items par <strong>20% off</strong> — WhatsApp pe order karo! 👇</div>
+        <div style="width:100%;aspect-ratio:4/3;background:#f1f5f9;overflow:hidden;position:relative;">
+          <img id="img-target-facebook" src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=800&q=80" style="width:100%;height:100%;object-fit:cover;" alt="">
+        </div>
+        <div style="background:#f8fafc;padding:8px 12px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid #e2e8f0;">
+          <div><div style="font-size:9px;text-transform:uppercase;color:#94a3b8;font-weight:600;letter-spacing:.05em;">EXTRAVENUE.IN</div><div style="font-size:11px;font-weight:700;color:#0f172a;">Flat 20% on Orders</div></div>
+          <button style="padding:4px 10px;background:#e2e8f0;border:none;border-radius:6px;font-size:10px;font-weight:700;color:#1e293b;cursor:pointer;">Shop Now</button>
+        </div>
+        <div style="padding:8px 12px;display:flex;align-items:center;justify-content:space-between;font-size:10px;color:#64748b;border-top:1px solid #f1f5f9;">
+          <div style="display:flex;align-items:center;gap:4px;"><span style="width:14px;height:14px;border-radius:50%;background:#3b82f6;color:#fff;font-size:7px;display:flex;align-items:center;justify-content:center;"><i class="fa-solid fa-thumbs-up"></i></span><span style="width:14px;height:14px;border-radius:50%;background:#ef4444;color:#fff;font-size:7px;display:flex;align-items:center;justify-content:center;"><i class="fa-solid fa-heart"></i></span><span style="margin-left:3px;font-weight:600;color:#334155;">218</span></div>
+          <div style="display:flex;gap:8px;"><span>34 comments</span><span>19 shares</span></div>
+        </div>
+        <div style="padding:6px 8px;border-top:1px solid #f1f5f9;display:flex;justify-content:space-around;font-size:10px;font-weight:600;color:#475569;">
+          <button style="background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:4px;padding:4px 8px;border-radius:5px;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='none'"><i class="fa-regular fa-thumbs-up"></i> Like</button>
+          <button style="background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:4px;padding:4px 8px;border-radius:5px;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='none'"><i class="fa-regular fa-comment"></i> Comment</button>
+          <button style="background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:4px;padding:4px 8px;border-radius:5px;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='none'"><i class="fa-solid fa-share"></i> Share</button>
         </div>
       </div>
 
       <!-- INSTAGRAM -->
-      <div class="cp cp-ig" id="cp-ig">
-        <div class="ph-wrap">
-          <img class="ph-frame" src="/img/ig.png" alt="">
-          <div class="ph-screen" id="ig-img" style="left:19%;top:38%;width:62%;height:29%">
-            <div class="ad-fill"><div class="af-b">ExtrraVenue</div><div class="af-s">more space = more revenue</div></div>
+      <div id="gm-view-instagram" class="gm-view" style="display:none;">
+        <div style="padding:8px 12px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #f1f5f9;">
+          <div style="display:flex;align-items:center;gap:7px;">
+            <div style="padding:1.5px;border-radius:50%;background:linear-gradient(135deg,#f59e0b,#ec4899,#8b5cf6);"><div style="width:28px;height:28px;border-radius:50%;background:#fff;padding:2px;"><div style="width:100%;height:100%;border-radius:50%;background:#0f172a;color:#fff;font-weight:800;font-size:9px;display:flex;align-items:center;justify-content:center;">EV</div></div></div>
+            <div><div style="font-size:11px;font-weight:700;color:#0f172a;">extravenue_live <i class="fa-solid fa-circle-check" style="color:#3b82f6;font-size:9px;"></i></div><div style="font-size:9px;color:#94a3b8;">India</div></div>
           </div>
+          <i class="fa-solid fa-ellipsis" style="color:#64748b;font-size:13px;"></i>
         </div>
-      </div>
-      <!-- GOOGLE BUSINESS -->
-
-      <!-- GOOGLE BUSINESS -->
-      <div class="cp cp-gb" id="cp-gb">
-        <div class="gb-maparea">
-          <div class="gb-mg"></div>
-          <div class="gb-mr1"></div>
-          <div class="gb-mr2"></div>
-          <div class="gb-mpin"></div>
+        <div style="width:100%;aspect-ratio:1/1;background:#f1f5f9;overflow:hidden;">
+          <img id="img-target-instagram" src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=800&q=80" style="width:100%;height:100%;object-fit:cover;" alt="">
         </div>
-        <div class="gb-body">
-          <div class="gb-bname">ExtrraVenue</div>
-          <div class="gb-bcat">Digital Signage · more space = more revenue</div>
-          <div class="gb-bst">
-            <span class="gb-bsc">4.8</span>
-            <span class="gb-bstars">★★★★<span style="opacity:.4">★</span></span>
-            <span class="gb-brv">(312)</span>
-          </div>
-          <div class="gb-bopen"><span class="gb-green">Open</span> <span class="gb-grey">· Closes 9 PM</span></div>
+        <div style="padding:8px 12px;display:flex;align-items:center;justify-content:space-between;font-size:16px;color:#0f172a;">
+          <div style="display:flex;gap:14px;"><i class="fa-regular fa-heart"></i><i class="fa-regular fa-comment"></i><i class="fa-regular fa-paper-plane"></i></div>
+          <i class="fa-regular fa-bookmark"></i>
         </div>
-        <div class="gb-btns">
-          <div class="gb-btn">
-            <svg viewBox="0 0 24 24"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
-            Directions
-          </div>
-          <div class="gb-btn">
-            <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2A19.79 19.79 0 0111.19 19a19.5 19.5 0 01-6-6A2 2 0 013.69.67h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l.91-.91a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 17z"/></svg>
-            Call
-          </div>
-          <div class="gb-btn">
-            <svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>
-            Reviews
-          </div>
-        </div>
-        <div class="gb-tabs">
-          <div class="gb-tab">Overview</div>
-          <div class="gb-tab">Reviews</div>
-          <div class="gb-tab on">Photos</div>
-        </div>
-        <div class="gb-photos">
-          <div class="gb-phi" id="gb-ph1"><div class="ad-fill"><div class="af-b" style="font-size:8px">EV</div></div></div>
-          <div class="gb-phi" id="gb-ph2"><div class="ad-fill"><div class="af-b" style="font-size:8px">EV</div></div></div>
-          <div class="gb-phi" id="gb-ph3"><div class="ad-fill"><div class="af-b" style="font-size:9px">✦</div></div></div>
+        <div style="padding:0 12px 10px;font-size:11px;color:#0f172a;">
+          <div style="font-weight:700;margin-bottom:2px;">514 likes</div>
+          <div><span style="font-weight:700;">extravenue_live</span> Bachat hi bachat! 20% off daily items ✨ #StoreSale #ExtrraVenue</div>
+          <div style="font-size:9px;color:#94a3b8;text-transform:uppercase;letter-spacing:.05em;margin-top:4px;">2 hours ago</div>
         </div>
       </div>
 
-    </div><!-- .mockup-wrap -->
-    <div id="pv-desc" style="font-size:13px;color:var(--mid);line-height:1.65;padding-top:8px;"></div>
-    <!-- Stock Image Presets -->
-  <div id="ev-presets" style="display:flex;flex-direction:column;gap:8px;padding-top:4px;">
-    <p style="font-size:11px;font-weight:600;color:var(--mid);letter-spacing:.05em;text-transform:uppercase;margin:0;">Ya preset chunein:</p>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;">
-      <button onclick="loadPreset('grocery')" style="flex:1;min-width:70px;padding:8px 6px;border-radius:10px;border:1.5px solid var(--line);background:#fff;cursor:pointer;font-size:11px;font-weight:600;color:var(--dark);transition:all .2s;" onmouseover="this.style.borderColor='var(--or)'" onmouseout="this.style.borderColor='var(--line)'">🛒<br>Grocery</button>
-      <button onclick="loadPreset('medical')" style="flex:1;min-width:70px;padding:8px 6px;border-radius:10px;border:1.5px solid var(--line);background:#fff;cursor:pointer;font-size:11px;font-weight:600;color:var(--dark);transition:all .2s;" onmouseover="this.style.borderColor='var(--or)'" onmouseout="this.style.borderColor='var(--line)'">💊<br>Medical</button>
-      <button onclick="loadPreset('jewellers')" style="flex:1;min-width:70px;padding:8px 6px;border-radius:10px;border:1.5px solid var(--line);background:#fff;cursor:pointer;font-size:11px;font-weight:600;color:var(--dark);transition:all .2s;" onmouseover="this.style.borderColor='var(--or)'" onmouseout="this.style.borderColor='var(--line)'">💍<br>Jewellers</button>
-    </div>
-  </div>
-</div><!-- .preview-col -->
+      <!-- SIGNAGE -->
+      <div id="gm-view-signage" class="gm-view" style="display:none;padding:14px;background:#1a1a1a;">
+        <div style="border-radius:12px;overflow:hidden;border:2px solid #404040;box-shadow:0 0 24px rgba(0,0,0,.5);">
+          <div style="background:#000;padding:5px 10px;display:flex;align-items:center;justify-content:space-between;font-size:9px;font-weight:700;font-family:monospace;">
+            <div style="color:#10b981;display:flex;align-items:center;gap:4px;"><span style="width:5px;height:5px;border-radius:50%;background:#10b981;animation:subtle-pulse 2s infinite ease-in-out;display:inline-block;"></span>IN-STORE DISPLAY</div>
+            <span style="color:#64748b;">ExtrraVenue</span>
+          </div>
+          <div style="position:relative;width:100%;aspect-ratio:9/16;background:#0f172a;overflow:hidden;">
+            <div style="position:absolute;inset:0;z-index:1;padding:8px;background:linear-gradient(to bottom,rgba(0,0,0,.7) 0%,transparent 35%);display:flex;align-items:flex-start;justify-content:space-between;">
+              <div style="display:flex;align-items:center;gap:5px;color:#fff;"><div style="width:18px;height:18px;border-radius:4px;background:#ff5c00;color:#000;font-weight:900;font-size:9px;display:flex;align-items:center;justify-content:center;">E</div><span style="font-size:10px;font-weight:700;">ExtrraVenue</span></div>
+              <span style="font-size:8px;background:#dc2626;color:#fff;font-weight:800;padding:2px 5px;border-radius:3px;text-transform:uppercase;">Live</span>
+            </div>
+            <img id="img-target-signage" src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=800&q=80" style="width:100%;height:100%;object-fit:cover;" alt="">
+            <div style="position:absolute;bottom:0;left:0;right:0;z-index:1;background:rgba(30,27,75,.9);padding:6px 8px;overflow:hidden;">
+              <div style="font-size:9px;font-weight:700;color:#fbbf24;white-space:nowrap;animation:marquee-scroll 12s linear infinite;display:inline-block;">⚡ MAHA BACHAT: FLAT 20% OFF ALL ITEMS &nbsp;&nbsp;&nbsp; ⭐ FREE DELIVERY ORDERS ₹500+</div>
+            </div>
+          </div>
+        </div>
+        <div style="width:50px;height:16px;background:linear-gradient(to bottom,#404040,#1a1a1a);margin:0 auto;border:0 solid #404040;border-width:0 1px 1px;"></div>
+        <div style="width:90px;height:6px;background:linear-gradient(to right,#404040,#1a1a1a,#404040);border-radius:99px;margin:0 auto;"></div>
+      </div>
+
+      <!-- GOOGLE -->
+      <div id="gm-view-google" class="gm-view" style="display:none;">
+        <div style="padding:10px 12px;background:#f8fafc;border-bottom:1px solid #e2e8f0;">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+            <div><div style="font-size:11px;font-weight:700;color:#0f172a;">ExtrraVenue Partner Store</div><div style="font-size:10px;color:#64748b;">Local Business · India</div>
+              <div style="display:flex;align-items:center;gap:4px;margin-top:3px;"><span style="font-size:10px;font-weight:700;color:#d97706;">4.8</span><span style="color:#f59e0b;font-size:10px;">★★★★½</span><span style="font-size:9px;color:#94a3b8;">(210+)</span></div>
+            </div>
+            <div style="width:28px;height:28px;border-radius:50%;background:#eff6ff;color:#2563eb;display:flex;align-items:center;justify-content:center;font-size:13px;"><i class="fa-brands fa-google"></i></div>
+          </div>
+        </div>
+        <div style="padding:10px 12px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;font-size:11px;margin-bottom:6px;"><span style="font-weight:700;color:#0f172a;"><i class="fa-solid fa-bullhorn" style="color:#2563eb;margin-right:3px;"></i>Latest Offer</span><span style="font-size:9px;color:#94a3b8;">Today</span></div>
+          <div style="width:100%;aspect-ratio:16/9;border-radius:10px;overflow:hidden;background:#f1f5f9;border:1px solid #e2e8f0;margin-bottom:8px;">
+            <img id="img-target-google" src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=800&q=80" style="width:100%;height:100%;object-fit:cover;" alt="">
+          </div>
+          <div style="font-size:10px;color:#334155;line-height:1.5;margin-bottom:8px;">20% discount live hai. Visit karein ya call karein instant delivery ke liye.</div>
+          <button style="width:100%;padding:7px;background:#2563eb;color:#fff;border:none;border-radius:9px;font-size:11px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;">Call Now / Claim Offer <i class="fa-solid fa-arrow-right" style="font-size:9px;"></i></button>
+        </div>
+      </div>
+
+    </div><!-- end mockup views -->
+  </div><!-- end card -->
+
+  <div id="pv-desc" style="font-size:13px;color:var(--mid);line-height:1.65;padding-top:8px;"></div>
+</div><!-- .preview-col -->>
 </div><!-- .main-row -->
 
 <script>
@@ -2657,6 +2715,39 @@ function loadPreset(key){
 #ev-hero .cp-fb{background:#0a0a0a!important;}
 #ev-hero .cp-ig{background:#ebe6dd!important;}
 </style>
+<style>
+@keyframes marquee-scroll{0%{transform:translateX(100%)}100%{transform:translateX(-100%)}}
+@keyframes subtle-pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.6;transform:scale(1.15)}}
+</style>
+<script>
+var GM_PRESETS={
+  grocery:'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=800&q=80',
+  medical:'https://images.unsplash.com/photo-1631549916768-4119b2e5f926?auto=format&fit=crop&w=800&q=80',
+  jewellers:'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&w=800&q=80'
+};
+function gmSyncImg(url){
+  ['img-target-facebook','img-target-instagram','img-target-signage','img-target-google'].forEach(function(id){
+    var el=document.getElementById(id);if(el)el.src=url;
+  });
+}
+function gmPreset(key){if(GM_PRESETS[key])gmSyncImg(GM_PRESETS[key]);}
+function gmTab(key){
+  document.querySelectorAll('.gm-view').forEach(function(el){el.style.display='none';});
+  var v=document.getElementById('gm-view-'+key);if(v)v.style.display='block';
+  var colors={facebook:'#2563eb',instagram:'#db2777',signage:'#0891b2',google:'#16a34a'};
+  document.querySelectorAll('#gm-tab-facebook,#gm-tab-instagram,#gm-tab-signage,#gm-tab-google').forEach(function(b){
+    b.style.background='transparent';b.style.color='#64748b';b.style.fontWeight='500';b.style.boxShadow='none';
+  });
+  var tb=document.getElementById('gm-tab-'+key);
+  if(tb){tb.style.background='#fff';tb.style.color=colors[key]||'#2563eb';tb.style.fontWeight='700';tb.style.boxShadow='0 1px 3px rgba(0,0,0,.1)';}
+}
+var gmUp=document.getElementById('gm-upload');
+if(gmUp){gmUp.addEventListener('change',function(e){
+  var f=e.target.files&&e.target.files[0];
+  if(f){var r=new FileReader();r.onload=function(ev){gmSyncImg(ev.target.result);};r.readAsDataURL(f);}
+});}
+window.addEventListener('load',function(){gmTab('facebook');gmPreset('grocery');});
+</script>
 </body>
 </html>
 
