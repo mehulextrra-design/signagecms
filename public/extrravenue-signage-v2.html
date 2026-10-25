@@ -1551,7 +1551,16 @@ body{margin:0;}
 
     </div><!-- .mockup-wrap -->
     <div id="pv-desc" style="font-size:13px;color:var(--mid);line-height:1.65;padding-top:8px;"></div>
-  </div><!-- .preview-col -->
+    <!-- Stock Image Presets -->
+  <div id="ev-presets" style="display:flex;flex-direction:column;gap:8px;padding-top:4px;">
+    <p style="font-size:11px;font-weight:600;color:var(--mid);letter-spacing:.05em;text-transform:uppercase;margin:0;">Ya preset chunein:</p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <button onclick="loadPreset('grocery')" style="flex:1;min-width:70px;padding:8px 6px;border-radius:10px;border:1.5px solid var(--line);background:#fff;cursor:pointer;font-size:11px;font-weight:600;color:var(--dark);transition:all .2s;" onmouseover="this.style.borderColor='var(--or)'" onmouseout="this.style.borderColor='var(--line)'">🛒<br>Grocery</button>
+      <button onclick="loadPreset('medical')" style="flex:1;min-width:70px;padding:8px 6px;border-radius:10px;border:1.5px solid var(--line);background:#fff;cursor:pointer;font-size:11px;font-weight:600;color:var(--dark);transition:all .2s;" onmouseover="this.style.borderColor='var(--or)'" onmouseout="this.style.borderColor='var(--line)'">💊<br>Medical</button>
+      <button onclick="loadPreset('jewellers')" style="flex:1;min-width:70px;padding:8px 6px;border-radius:10px;border:1.5px solid var(--line);background:#fff;cursor:pointer;font-size:11px;font-weight:600;color:var(--dark);transition:all .2s;" onmouseover="this.style.borderColor='var(--or)'" onmouseout="this.style.borderColor='var(--line)'">💍<br>Jewellers</button>
+    </div>
+  </div>
+</div><!-- .preview-col -->
 </div><!-- .main-row -->
 
 <script>
@@ -1670,7 +1679,26 @@ function mk(el,url,isV){
   if(isV){m.autoplay=true;m.loop=true;m.muted=true;m.playsInline=true;}
   el.appendChild(m);
 }
-})();
+
+// Stock image presets
+var PRESETS={
+  grocery:'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=800&q=80',
+  medical:'https://images.unsplash.com/photo-1631549916768-4119b2e5f926?auto=format&fit=crop&w=800&q=80',
+  jewellers:'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&w=800&q=80'
+};
+function loadPreset(key){
+  var url=PRESETS[key];if(!url)return;
+  ['ig-img','fb-img','gb-ph1','gb-ph2','gb-ph3'].forEach(function(id){
+    var el=document.getElementById(id);if(!el)return;
+    el.innerHTML='';mk(el,url,false);
+  });
+  var sg=document.getElementById('sg-content');
+  if(sg){sg.innerHTML='';sg.style.background='#000';mk(sg,url,false);}
+  // also sync Gemini mockup targets
+  ['img-target-facebook','img-target-instagram','img-target-signage','img-target-google'].forEach(function(id){
+    var el=document.getElementById(id);if(el)el.src=url;
+  });
+}})();
 </script>
 
 </div><!-- #ev-hero -->
@@ -1702,128 +1730,194 @@ function mk(el,url,isV){
   </div>
 </section>
 
-<!-- DEMO SIMULATOR REMOVED -->
-<section id="demo" style="display:none;">
-  <div class="wrap">
-    <div style="text-align:center;margin-bottom:40px;" data-reveal>
-      <div class="eyebrow on-dark"><i></i>Campaign Simulator</div>
-      <h2 class="h-lg" style="color:#fff;margin-top:16px;">Plan karo, instantly<br><span style="color:var(--orange);">result dekho</span></h2>
-      <p style="color:rgba(255,255,255,.55);max-width:46ch;margin:14px auto 0;font-size:17px;line-height:1.55;">Screens aur package choose karo — har click pe result live update hoga.</p>
+<!-- OMNICHANNEL MOCKUP HUB -->
+<section id="demo" class="sec" style="background:var(--surface);">
+  <div class="wrap" style="max-width:680px;margin:0 auto;padding:0 24px;">
+    <div style="text-align:center;margin-bottom:32px;" data-reveal>
+      <div class="eyebrow" style="margin-bottom:12px;">Live Preview</div>
+      <h2 class="sec-h2">Apna Creative Yahan Preview Karo</h2>
+      <p class="sec-sub">Koi bhi image upload karo — ek second mein sab platforms pe live dikhega</p>
     </div>
 
-    <div id="sim-wrap">
+    <!-- Gemini Mockup Card -->
+    <div class="w-full mx-auto bg-white/60 backdrop-blur-xl border border-white/60 shadow-[0_20px_50px_rgba(0,0,0,0.12)] rounded-3xl p-4 sm:p-6 transition-all duration-300">
 
-      <!-- LEFT: Inputs -->
-      <div class="sim-left">
-        <div style="font-size:10px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:rgba(30,30,30,.36);margin-bottom:16px;">CAMPAIGN PLANNER</div>
+      <!-- Header: Upload + Presets + Platform Tabs -->
+      <header class="flex flex-col gap-3.5 pb-4 border-b border-slate-200/60">
 
-        <!-- Step 1: Screens -->
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
-          <span style="width:18px;height:18px;border-radius:50%;background:var(--orange);color:#fff;font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;">1</span>
-          <div class="sim-sec-label" style="margin-bottom:0;">Screen Selection</div>
+        <div class="flex flex-wrap items-center justify-between gap-2.5">
+          <div class="flex items-center gap-2">
+            <div class="w-2.5 h-2.5 rounded-full bg-emerald-500" style="animation:subtle-pulse 2s infinite ease-in-out"></div>
+            <h2 class="text-xs sm:text-sm font-extrabold uppercase tracking-wider text-slate-800">Multi-Platform Preview</h2>
+          </div>
+          <div class="flex items-center gap-2">
+            <label for="mockup-file-uploader" class="cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-orange-500 hover:bg-orange-600 active:scale-95 text-white text-xs font-semibold shadow-md transition-all">
+              <i class="fa-solid fa-cloud-arrow-up text-xs"></i><span>Upload Image</span>
+              <input type="file" id="mockup-file-uploader" accept="image/*" class="hidden">
+            </label>
+            <button id="reset-image-btn" type="button" class="px-2.5 py-1.5 rounded-xl bg-white/80 hover:bg-white text-slate-700 text-xs font-semibold border border-slate-200 shadow-sm transition active:scale-95">
+              <i class="fa-solid fa-rotate-right"></i>
+            </button>
+          </div>
         </div>
-        <div id="screens-grid" style="display:flex;flex-direction:column;gap:5px;margin-bottom:4px;margin-left:26px;"></div>
-        <div style="font-size:10px;color:rgba(30,30,30,.36);margin-bottom:18px;margin-left:26px;" id="sel-count-label">2 screens selected</div>
 
-        <!-- Step 2: Creative Upload -->
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
-          <span style="width:18px;height:18px;border-radius:50%;background:var(--orange);color:#fff;font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;">2</span>
-          <div class="sim-sec-label" style="margin-bottom:0;">Ad Creative <span style="font-weight:400;text-transform:none;letter-spacing:0;">(optional)</span></div>
+        <!-- Preset Buttons -->
+        <div class="flex items-center gap-1.5 flex-wrap">
+          <span class="text-[11px] font-semibold text-slate-500 mr-1">Preset chunein:</span>
+          <button type="button" onclick="gmPreset('grocery')" class="px-2.5 py-1 rounded-lg bg-white/70 hover:bg-white text-slate-700 text-[11px] font-medium border border-slate-200/80 shadow-xs transition">🛒 Grocery Store</button>
+          <button type="button" onclick="gmPreset('medical')" class="px-2.5 py-1 rounded-lg bg-white/70 hover:bg-white text-slate-700 text-[11px] font-medium border border-slate-200/80 shadow-xs transition">💊 Medical Shop</button>
+          <button type="button" onclick="gmPreset('jewellers')" class="px-2.5 py-1 rounded-lg bg-white/70 hover:bg-white text-slate-700 text-[11px] font-medium border border-slate-200/80 shadow-xs transition">💍 Jewellers</button>
         </div>
-        <div style="margin-left:26px;margin-bottom:18px;">
-          <div id="creative-drop" onclick="document.getElementById('sim-file').click()" style="border:1.5px dashed rgba(30,30,30,.18);border-radius:10px;cursor:pointer;overflow:hidden;transition:.15s;background:#fafafa;position:relative;">
-            <input type="file" id="sim-file" accept="image/*" style="display:none" onchange="simUploadCreative(this)">
-            <div id="creative-placeholder" style="aspect-ratio:16/9;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;">
-              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="rgba(30,30,30,.25)" stroke-width="1.5"><rect x="3" y="3" width="18" height="14" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-              <div style="font-size:11px;color:rgba(30,30,30,.4);font-weight:600;">Click to upload creative</div>
-              <div style="font-size:9px;color:rgba(30,30,30,.28);">JPG · PNG · 16:9 recommended</div>
+
+        <!-- Platform Tabs -->
+        <nav class="grid grid-cols-2 sm:grid-cols-4 gap-1.5 p-1 rounded-2xl bg-slate-200/50 backdrop-blur-md border border-slate-300/40">
+          <button type="button" id="gm-tab-facebook" onclick="gmTab('facebook')" class="gm-tab flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-xl font-bold text-xs shadow-sm bg-white text-blue-600 transition-all"><i class="fa-brands fa-facebook text-sm"></i><span>Facebook</span></button>
+          <button type="button" id="gm-tab-instagram" onclick="gmTab('instagram')" class="gm-tab flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-xl font-medium text-xs text-slate-600 hover:bg-white/60 transition-all"><i class="fa-brands fa-instagram text-sm"></i><span>Instagram</span></button>
+          <button type="button" id="gm-tab-signage"   onclick="gmTab('signage')"   class="gm-tab flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-xl font-medium text-xs text-slate-600 hover:bg-white/60 transition-all"><i class="fa-solid fa-tv text-sm"></i><span>Signage</span></button>
+          <button type="button" id="gm-tab-google"    onclick="gmTab('google')"    class="gm-tab flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-xl font-medium text-xs text-slate-600 hover:bg-white/60 transition-all"><i class="fa-brands fa-google text-sm"></i><span>Google</span></button>
+        </nav>
+      </header>
+
+      <!-- Mockup Stage -->
+      <main class="w-full flex items-center justify-center pt-5 pb-2 min-h-[480px]">
+
+        <!-- Facebook -->
+        <article id="gm-view-facebook" class="gm-view w-full max-w-[380px] bg-white rounded-2xl border border-slate-200 shadow-xl overflow-hidden">
+          <div class="p-3.5 flex items-center justify-between border-b border-slate-100">
+            <div class="flex items-center gap-2.5">
+              <div class="w-9 h-9 rounded-full bg-blue-600 text-white font-bold text-xs flex items-center justify-center">EV</div>
+              <div><div class="flex items-center gap-1"><h3 class="text-xs font-bold text-slate-900">ExtrraVenue Partner</h3><i class="fa-solid fa-circle-check text-blue-500 text-[11px]"></i></div><div class="text-[11px] text-slate-400">Sponsored · <i class="fa-solid fa-earth-americas text-[10px]"></i></div></div>
             </div>
-            <div id="creative-preview" style="display:none;aspect-ratio:16/9;background-size:cover;background-position:center;position:relative;">
-              <button onclick="event.stopPropagation();simRemoveCreative()" style="position:absolute;top:7px;right:7px;background:rgba(0,0,0,.55);border:0;border-radius:999px;width:22px;height:22px;color:#fff;cursor:pointer;font-size:14px;line-height:22px;text-align:center;padding:0;">×</button>
-            </div>
+            <button class="text-slate-400 p-1"><i class="fa-solid fa-ellipsis"></i></button>
           </div>
-        </div>
-
-        <!-- Step 3: Schedule & Budget -->
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
-          <span style="width:18px;height:18px;border-radius:50%;background:var(--orange);color:#fff;font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;">3</span>
-          <div class="sim-sec-label" style="margin-bottom:0;">Schedule &amp; Budget</div>
-        </div>
-        <div id="pkg-grid" style="display:flex;flex-direction:column;gap:5px;margin-left:26px;"></div>
-      </div>
-
-      <!-- RIGHT: Step 4 Result -->
-      <div class="sim-right">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
-          <span style="width:18px;height:18px;border-radius:50%;background:var(--orange);color:#fff;font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;">4</span>
-          <div style="font-size:9px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:rgba(255,255,255,.4);">Campaign Preview</div>
-        </div>
-        <div style="font-size:9px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:rgba(255,255,255,.26);margin-bottom:4px;">ESTIMATED REACH</div>
-
-        <div id="res-big" style="font-size:clamp(38px,5vw,56px);font-weight:800;color:#fff;letter-spacing:-0.03em;line-height:1;font-variant-numeric:tabular-nums;margin-top:2px;">—</div>
-        <div style="font-size:12px;color:rgba(255,255,255,.3);margin-top:4px;margin-bottom:14px;">plays per month</div>
-
-        <div id="res-badges" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;min-height:28px;"></div>
-
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;border-top:1px solid rgba(255,255,255,.07);padding-top:14px;margin-bottom:16px;">
-          <div>
-            <div style="font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.26);margin-bottom:4px;">Screens</div>
-            <div id="r-screens" style="font-size:clamp(14px,2vw,18px);font-weight:700;color:#fff;">—</div>
+          <p class="px-3.5 py-2.5 text-xs text-slate-800 leading-relaxed">🛍️ <strong>Maha Bachat Dhamaka!</strong> Aaj store visit karein aur payein daily items par <strong>20% off</strong>. WhatsApp pe order karein! 👇</p>
+          <div class="relative w-full aspect-[4/3] bg-slate-100 overflow-hidden">
+            <img id="img-target-facebook" src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover" alt="">
           </div>
-          <div>
-            <div style="font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.26);margin-bottom:4px;">Daily</div>
-            <div id="r-daily" style="font-size:clamp(14px,2vw,18px);font-weight:700;color:#22d3ee;">—</div>
+          <div class="bg-slate-50 px-3.5 py-2 flex items-center justify-between border-t border-slate-200 text-xs">
+            <div><span class="text-[9px] uppercase text-slate-400 font-semibold block">EXTRAVENUE.IN</span><span class="font-bold text-slate-900">Flat 20% on Orders</span></div>
+            <button class="px-3 py-1 bg-slate-200 font-semibold text-slate-800 rounded-md text-[11px]">Shop Now</button>
           </div>
-          <div>
-            <div style="font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.26);margin-bottom:4px;">Cost</div>
-            <div id="r-cost" style="font-size:clamp(14px,2vw,18px);font-weight:700;color:var(--orange);">—</div>
+          <div class="px-3.5 py-2 flex items-center justify-between text-[11px] text-slate-500 border-t border-slate-100">
+            <div class="flex items-center gap-1.5"><span class="w-4 h-4 rounded-full bg-blue-500 flex items-center justify-center text-white text-[8px]"><i class="fa-solid fa-thumbs-up"></i></span><span class="w-4 h-4 rounded-full bg-red-500 flex items-center justify-center text-white text-[8px]"><i class="fa-solid fa-heart"></i></span><span class="font-medium text-slate-700 ml-1">218</span></div>
+            <div class="flex gap-2"><span>34 comments</span><span>19 shares</span></div>
           </div>
-        </div>
-
-        <div style="display:flex;gap:4px;margin-bottom:12px;">
-          <button class="res-tab active" data-tab="summary" onclick="simTab(this)">Summary</button>
-          <button class="res-tab" data-tab="screens" onclick="simTab(this)">Per Screen</button>
-          <button class="res-tab" data-tab="cost" onclick="simTab(this)">Cost</button>
-        </div>
-
-        <div id="rt-summary" class="rt-panel" style="flex:1;"></div>
-        <div id="rt-screens" class="rt-panel" style="flex:1;display:none;"></div>
-        <div id="rt-cost" class="rt-panel" style="flex:1;display:none;"></div>
-
-        <!-- Social Distribution Card -->
-        <div style="border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:14px 16px;margin-top:16px;background:rgba(255,255,255,.03);">
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
-            <span style="width:6px;height:6px;border-radius:50%;background:#22c55e;display:inline-block;flex-shrink:0;box-shadow:0 0 6px #22c55e;"></span>
-            <span style="font-size:10px;font-weight:700;color:rgba(255,255,255,.7);letter-spacing:.04em;">Also distributed on</span>
+          <div class="px-2 py-1.5 border-t border-slate-100 flex items-center justify-around text-slate-600 text-xs font-semibold">
+            <button class="flex items-center gap-1.5 hover:text-blue-600 py-1 px-3 rounded hover:bg-slate-50"><i class="fa-regular fa-thumbs-up"></i> Like</button>
+            <button class="flex items-center gap-1.5 hover:text-blue-600 py-1 px-3 rounded hover:bg-slate-50"><i class="fa-regular fa-comment"></i> Comment</button>
+            <button class="flex items-center gap-1.5 hover:text-blue-600 py-1 px-3 rounded hover:bg-slate-50"><i class="fa-solid fa-share"></i> Share</button>
           </div>
-          <div style="display:flex;gap:10px;align-items:center;">
-            <!-- Facebook -->
-            <div style="display:flex;align-items:center;gap:7px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:7px 12px;flex:1;">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="#1877F2"><path d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.41c0-3.025 1.792-4.697 4.533-4.697 1.312 0 2.686.236 2.686.236v2.971h-1.514c-1.491 0-1.956.93-1.956 1.883v2.272h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z"/></svg>
-              <span style="font-size:11px;font-weight:600;color:rgba(255,255,255,.65);">Facebook</span>
-            </div>
-            <!-- Instagram -->
-            <div style="display:flex;align-items:center;gap:7px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:7px 12px;flex:1;">
-              <svg width="16" height="16" viewBox="0 0 24 24"><defs><linearGradient id="ig" x1="0%" y1="100%" x2="100%" y2="0%"><stop offset="0%" stop-color="#FFDC80"/><stop offset="26%" stop-color="#FCAF45"/><stop offset="50%" stop-color="#F77737"/><stop offset="70%" stop-color="#F56040"/><stop offset="85%" stop-color="#FD1D1D"/><stop offset="100%" stop-color="#C13584"/></linearGradient></defs><path fill="url(#ig)" d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
-              <span style="font-size:11px;font-weight:600;color:rgba(255,255,255,.65);">Instagram</span>
-            </div>
-            <!-- Google -->
-            <div style="display:flex;align-items:center;gap:7px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:7px 12px;flex:1;">
-              <svg width="16" height="16" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-              <span style="font-size:11px;font-weight:600;color:rgba(255,255,255,.65);">Google</span>
+        </article>
+
+        <!-- Instagram -->
+        <article id="gm-view-instagram" class="gm-view hidden w-full max-w-[360px] bg-white rounded-2xl border border-slate-200 shadow-xl overflow-hidden">
+          <div class="px-3.5 py-2.5 flex items-center justify-between border-b border-slate-100">
+            <div class="flex items-center gap-2">
+              <div class="p-[1.5px] rounded-full bg-gradient-to-tr from-amber-500 via-pink-600 to-purple-600"><div class="w-7 h-7 rounded-full bg-white p-[2px]"><div class="w-full h-full rounded-full bg-slate-900 text-white font-bold text-[10px] flex items-center justify-center">EV</div></div></div>
+              <div><span class="text-xs font-bold text-slate-900">extravenue_live</span><i class="fa-solid fa-circle-check text-blue-500 text-[10px] ml-1"></i><span class="text-[10px] text-slate-400 block -mt-0.5">India</span></div>
             </div>
           </div>
-          <div style="font-size:10px;color:rgba(255,255,255,.28);margin-top:10px;line-height:1.5;">Creative ek baar upload karo — screens + social media dono pe automatically distribute hoga.</div>
-        </div>
+          <div class="relative w-full aspect-square bg-slate-100 overflow-hidden">
+            <img id="img-target-instagram" src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover" alt="">
+          </div>
+          <div class="px-3.5 pt-2.5 pb-1 flex items-center justify-between text-lg text-slate-800">
+            <div class="flex items-center gap-4"><button class="hover:text-red-500"><i class="fa-regular fa-heart"></i></button><button class="hover:text-blue-500"><i class="fa-regular fa-comment"></i></button><button class="hover:text-emerald-500"><i class="fa-regular fa-paper-plane"></i></button></div>
+            <button class="hover:text-amber-500"><i class="fa-regular fa-bookmark"></i></button>
+          </div>
+          <div class="px-3.5 pb-3 text-xs text-slate-900 space-y-1">
+            <p class="font-bold">514 likes</p>
+            <p class="leading-relaxed"><span class="font-bold">extravenue_live</span> Har khareedari par bachat! Flat 20% discount on daily items ✨ #StoreSale #ExtrraVenue</p>
+          </div>
+        </article>
 
-        <a href="https://signagecrm-production.up.railway.app"
-           style="background:var(--orange);color:#fff;text-decoration:none;padding:13px 20px;border-radius:999px;font-size:13px;font-weight:700;text-align:center;margin-top:16px;display:block;">
-          Abhi Book Karo →
-        </a>
-      </div>
+        <!-- Signage -->
+        <article id="gm-view-signage" class="gm-view hidden w-full max-w-[240px] flex flex-col items-center">
+          <div class="w-full bg-gradient-to-b from-neutral-800 via-neutral-900 to-black p-2.5 rounded-2xl shadow-2xl border-2 border-neutral-700/80">
+            <div class="w-full flex items-center justify-between px-2 py-1 bg-black/95 rounded-t-lg text-[9px] text-emerald-400 font-mono font-bold border-b border-neutral-800">
+              <div class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400" style="animation:subtle-pulse 2s infinite ease-in-out"></span><span>IN-STORE DISPLAY</span></div>
+              <span class="text-neutral-400">ExtrraVenue</span>
+            </div>
+            <div class="relative w-full aspect-[9/16] bg-slate-950 overflow-hidden rounded-b-lg border border-neutral-800 flex flex-col justify-between">
+              <div class="z-10 p-2 bg-gradient-to-b from-black/80 to-transparent flex items-center justify-between text-white">
+                <div class="flex items-center gap-1.5"><div class="w-5 h-5 rounded bg-orange-500 text-black font-extrabold text-[10px] flex items-center justify-center">E</div><span class="text-[11px] font-bold">ExtrraVenue</span></div>
+                <span class="text-[9px] bg-red-600 text-white font-extrabold uppercase px-1.5 py-0.5 rounded">Live</span>
+              </div>
+              <div class="absolute inset-0"><img id="img-target-signage" src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover" alt=""></div>
+              <div class="z-10 bg-indigo-900/90 text-white py-1.5 px-2 border-t border-indigo-500/30 overflow-hidden">
+                <div class="text-[10px] font-bold text-amber-300 animate-marquee-scroll">⚡ MAHA BACHAT SALE: FLAT 20% DISCOUNT &nbsp;&nbsp;&nbsp; ⭐ FREE HOME DELIVERY ON ORDERS ₹500+</div>
+              </div>
+            </div>
+          </div>
+          <div class="w-16 h-5 bg-gradient-to-b from-neutral-800 to-neutral-900 border-x border-b border-neutral-700"></div>
+          <div class="w-28 h-2 bg-gradient-to-r from-neutral-700 via-neutral-900 to-neutral-700 rounded-full shadow-lg border border-neutral-600"></div>
+        </article>
+
+        <!-- Google -->
+        <article id="gm-view-google" class="gm-view hidden w-full max-w-[380px] bg-white rounded-2xl border border-slate-200 shadow-xl overflow-hidden">
+          <div class="p-3.5 bg-slate-50/70 border-b border-slate-100">
+            <div class="flex items-start justify-between">
+              <div><h3 class="text-xs font-bold text-slate-900">ExtrraVenue Partner Store</h3><p class="text-[11px] text-slate-500">Local Business · India</p>
+                <div class="flex items-center gap-1.5 mt-1"><span class="text-xs font-bold text-amber-600">4.8</span><div class="text-amber-400 text-[11px] flex gap-0.5"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star-half-stroke"></i></div><span class="text-[11px] text-slate-400">(210+)</span></div>
+              </div>
+              <div class="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-sm"><i class="fa-brands fa-google"></i></div>
+            </div>
+          </div>
+          <div class="p-3.5 space-y-2">
+            <div class="flex items-center justify-between text-xs"><span class="font-bold text-slate-800 flex items-center gap-1.5"><i class="fa-solid fa-bullhorn text-blue-600"></i> Latest Offer</span><span class="text-[10px] text-slate-400">Today</span></div>
+            <div class="w-full aspect-[16/9] rounded-xl overflow-hidden bg-slate-100 border border-slate-200">
+              <img id="img-target-google" src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover" alt="">
+            </div>
+            <p class="text-xs text-slate-700">20% discount sale live hai. Visit karein ya call karein instant delivery ke liye.</p>
+            <button class="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs transition flex items-center justify-center gap-1.5"><span>Call Now / Claim Offer</span><i class="fa-solid fa-arrow-right text-[10px]"></i></button>
+          </div>
+        </article>
+
+      </main>
+
+      <footer class="pt-3 border-t border-slate-200/50 text-center">
+        <p class="text-[11px] text-slate-500 font-medium">✨ Ek upload — Facebook, Instagram, Signage aur Google Business pe ek saath live.</p>
+      </footer>
     </div>
   </div>
 </section>
+
+<style>
+@keyframes marquee-scroll{0%{transform:translateX(100%)}100%{transform:translateX(-100%)}}
+@keyframes subtle-pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.6;transform:scale(1.15)}}
+.animate-marquee-scroll{display:inline-block;white-space:nowrap;animation:marquee-scroll 13s linear infinite}
+</style>
+<script>
+var GM_PRESETS={
+  grocery:'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=800&q=80',
+  medical:'https://images.unsplash.com/photo-1631549916768-4119b2e5f926?auto=format&fit=crop&w=800&q=80',
+  jewellers:'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&w=800&q=80'
+};
+function gmSyncImg(url){
+  ['img-target-facebook','img-target-instagram','img-target-signage','img-target-google'].forEach(function(id){
+    var el=document.getElementById(id);if(el)el.src=url;
+  });
+}
+function gmPreset(key){if(GM_PRESETS[key])gmSyncImg(GM_PRESETS[key]);}
+function gmTab(key){
+  document.querySelectorAll('.gm-view').forEach(function(el){el.classList.add('hidden');});
+  var v=document.getElementById('gm-view-'+key);if(v)v.classList.remove('hidden');
+  document.querySelectorAll('.gm-tab').forEach(function(b){
+    b.className='gm-tab flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-xl font-medium text-xs text-slate-600 hover:bg-white/60 transition-all';
+  });
+  var tb=document.getElementById('gm-tab-'+key);
+  var colors={facebook:'text-blue-600',instagram:'text-pink-600',signage:'text-cyan-600',google:'text-emerald-600'};
+  if(tb)tb.className='gm-tab flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-xl font-bold text-xs shadow-sm bg-white '+(colors[key]||'text-blue-600')+' transition-all';
+}
+var gmUploader=document.getElementById('mockup-file-uploader');
+if(gmUploader){gmUploader.addEventListener('change',function(e){
+  var f=e.target.files&&e.target.files[0];
+  if(f){var r=new FileReader();r.onload=function(ev){gmSyncImg(ev.target.result);};r.readAsDataURL(f);}
+});}
+var gmReset=document.getElementById('reset-image-btn');
+if(gmReset){gmReset.addEventListener('click',function(){gmPreset('grocery');});}
+window.addEventListener('load',function(){gmTab('facebook');gmPreset('grocery');});
+</script>
+
 
 <style>
 /* Simulator layout */
@@ -2078,7 +2172,26 @@ function mk(el,url,isV){
   };
 
   document.addEventListener('DOMContentLoaded',function(){buildScreens();buildPkgs();updateResult();});
-})();
+
+// Stock image presets
+var PRESETS={
+  grocery:'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=800&q=80',
+  medical:'https://images.unsplash.com/photo-1631549916768-4119b2e5f926?auto=format&fit=crop&w=800&q=80',
+  jewellers:'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&w=800&q=80'
+};
+function loadPreset(key){
+  var url=PRESETS[key];if(!url)return;
+  ['ig-img','fb-img','gb-ph1','gb-ph2','gb-ph3'].forEach(function(id){
+    var el=document.getElementById(id);if(!el)return;
+    el.innerHTML='';mk(el,url,false);
+  });
+  var sg=document.getElementById('sg-content');
+  if(sg){sg.innerHTML='';sg.style.background='#000';mk(sg,url,false);}
+  // also sync Gemini mockup targets
+  ['img-target-facebook','img-target-instagram','img-target-signage','img-target-google'].forEach(function(id){
+    var el=document.getElementById(id);if(el)el.src=url;
+  });
+}})();
 </script>
 
 <!-- BENEFITS -->
@@ -2693,7 +2806,26 @@ document.querySelectorAll('.counter').forEach(el => co.observe(el));
     cur = (cur + 1) % slides.length;
     slides[cur].classList.add('active');
   }, 3500);
-})();
+
+// Stock image presets
+var PRESETS={
+  grocery:'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=800&q=80',
+  medical:'https://images.unsplash.com/photo-1631549916768-4119b2e5f926?auto=format&fit=crop&w=800&q=80',
+  jewellers:'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&w=800&q=80'
+};
+function loadPreset(key){
+  var url=PRESETS[key];if(!url)return;
+  ['ig-img','fb-img','gb-ph1','gb-ph2','gb-ph3'].forEach(function(id){
+    var el=document.getElementById(id);if(!el)return;
+    el.innerHTML='';mk(el,url,false);
+  });
+  var sg=document.getElementById('sg-content');
+  if(sg){sg.innerHTML='';sg.style.background='#000';mk(sg,url,false);}
+  // also sync Gemini mockup targets
+  ['img-target-facebook','img-target-instagram','img-target-signage','img-target-google'].forEach(function(id){
+    var el=document.getElementById(id);if(el)el.src=url;
+  });
+}})();
 </script>
 
 <style>
@@ -2707,7 +2839,10 @@ document.querySelectorAll('.counter').forEach(el => co.observe(el));
 #ev-hero .cp-sg{background:#1c1a19!important;}
 #ev-hero .cp-fb{background:#0a0a0a!important;}
 #ev-hero .cp-ig{background:#ebe6dd!important;}
-</style></body>
+</style>
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</body>
 </html>
 
 
