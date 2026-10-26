@@ -2336,8 +2336,8 @@ function loadPreset(key){
         <h4>Connect</h4>
         <ul>
           <li><a href="#">Support Desk</a></li>
-          <li><a href="#">Privacy Policy</a></li>
-          <li><a href="#">Terms &amp; Conditions</a></li>
+          <li><a href="privacy-policy.html">Privacy Policy</a></li>
+          <li><a href="terms-of-service.html">Terms &amp; Conditions</a></li>
         </ul>
       </div>
     </div>
@@ -2345,13 +2345,47 @@ function loadPreset(key){
     <div class="f-bar">
       <span>© 2026 extrravenue &middot; All Rights Reserved.</span>
       <div class="f-legal">
-        <a href="#">Privacy</a><a href="#">Terms</a><a href="#">Security</a>
+        <a href="privacy-policy.html">Privacy</a><a href="terms-of-service.html">Terms</a><a id="ev-cookie-settings" href="#" onclick="evShowCookieBanner();return false;">Cookie Settings</a>
       </div>
     </div>
   </div>
 </footer>
 
 </div>
+
+<!-- Cookie Consent Banner -->
+<div id="ev-cookie-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:9999;background:#1a1a1a;color:#f0ede8;padding:18px 24px;display:flex;flex-wrap:wrap;align-items:center;gap:14px;font-size:14px;font-family:'Inter',sans-serif;box-shadow:0 -4px 24px rgba(0,0,0,.3);">
+  <div style="flex:1;min-width:220px;line-height:1.6;">We use Google Analytics to understand how this site is used. No remarketing or ad personalisation. See our <a href="privacy-policy.html" style="color:#D44A9A;text-decoration:none;">Privacy Policy</a>.</div>
+  <div style="display:flex;gap:10px;flex-shrink:0;">
+    <button onclick="evSetConsent('denied')" style="background:transparent;border:1px solid #555;color:#aaa;padding:8px 18px;border-radius:8px;cursor:pointer;font-size:13px;font-family:inherit;">Opt out</button>
+    <button onclick="evSetConsent('granted')" style="background:linear-gradient(135deg,#D44A9A,#1D91D3);border:none;color:#fff;padding:8px 20px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;font-family:inherit;">Got it</button>
+  </div>
+</div>
+<script>
+(function(){
+  var CONSENT_KEY = 'ev-consent';
+  var GA_ID = 'G-XXXXXXXXXX';
+  function evGetConsent(){ try{ return localStorage.getItem(CONSENT_KEY); }catch(e){ return null; } }
+  function evSetConsent(val){
+    try{ localStorage.setItem(CONSENT_KEY, val); }catch(e){}
+    document.getElementById('ev-cookie-banner').style.display='none';
+    if(val==='granted'){ evLoadGA(); }
+  }
+  function evLoadGA(){
+    if(window._evGALoaded) return; window._evGALoaded = true;
+    var s = document.createElement('script'); s.async = true;
+    s.src = 'https://www.googletagmanager.com/gtag/js?id=' + GA_ID;
+    document.head.appendChild(s);
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);} window.gtag = gtag;
+    gtag('js', new Date()); gtag('config', GA_ID, {anonymize_ip:true});
+  }
+  window.evShowCookieBanner = function(){ document.getElementById('ev-cookie-banner').style.display='flex'; };
+  var consent = evGetConsent();
+  if(consent === null){ document.getElementById('ev-cookie-banner').style.display='flex'; }
+  else if(consent === 'granted'){ evLoadGA(); }
+})();
+</script>
 
 <script>
 // Navbar scroll toggle
