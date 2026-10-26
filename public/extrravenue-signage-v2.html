@@ -2369,7 +2369,7 @@ function loadPreset(key){
   var CONSENT_KEY = 'ev-consent';
   var GA_ID = 'G-XXXXXXXXXX';
   function evGetConsent(){ try{ return localStorage.getItem(CONSENT_KEY); }catch(e){ return null; } }
-  function evSetConsent(val){
+  window.evSetConsent = function(val){
     try{ localStorage.setItem(CONSENT_KEY, val); }catch(e){}
     document.getElementById('ev-cookie-banner').style.display='none';
     if(val==='granted'){ evLoadGA(); }
