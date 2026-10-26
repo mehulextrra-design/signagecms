@@ -1,4 +1,4 @@
-﻿OCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -28,16 +28,27 @@
 *{box-sizing:border-box;margin:0;padding:0;}
 body{background:var(--bg);color:var(--fg);font-family:'Inter',system-ui,sans-serif;font-size:16px;line-height:1.7;}
 
-/* Nav */
-.nav{position:sticky;top:0;z-index:100;background:var(--bg);border-bottom:1px solid var(--border);padding:14px max(24px,env(safe-area-inset-left,0px));}
-.nav-inner{max-width:900px;margin:0 auto;display:flex;align-items:center;gap:12px;}
-.nav-logo{display:flex;align-items:center;gap:8px;text-decoration:none;}
-.nav-logo-name{font-family:'Magra',sans-serif;font-weight:700;font-size:17px;background:linear-gradient(135deg,#D44A9A,#1D91D3);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
-.nav-back{margin-left:auto;font-size:13px;color:var(--muted);text-decoration:none;}
-.nav-back:hover{color:var(--accent);}
+.nav{position:fixed;inset:0 0 auto 0;z-index:60;padding:18px 24px;display:flex;justify-content:center;animation:navIn .9s cubic-bezier(.25,.46,.45,.94) both;}
+@keyframes navIn{from{transform:translateY(-130%);opacity:0;}to{transform:none;opacity:1;}}
+.nav-pill{width:100%;max-width:1140px;display:flex;align-items:center;gap:24px;background:rgba(242,239,233,.92);backdrop-filter:blur(14px);border:1px solid rgba(30,30,30,.1);border-radius:999px;padding:10px 10px 10px 20px;transition:box-shadow .35s,max-width .45s;color:#1e1e1e;}
+.nav.scrolled .nav-pill{box-shadow:0 18px 44px -24px rgba(30,30,30,.22);max-width:1040px;}
+.brand{display:flex;align-items:center;gap:10px;color:#1e1e1e;text-decoration:none;}
+.brand-name{font-family:'Magra',sans-serif;font-weight:700;font-size:17.5px;letter-spacing:.01em;}
+.nav-links{display:flex;align-items:center;gap:4px;margin-left:auto;}
+.nav-links a{font-size:13.5px;font-weight:500;color:rgba(30,30,30,.55);padding:9px 14px;border-radius:999px;text-decoration:none;transition:color .22s,background-color .22s;}
+.nav-links a:hover,.nav-links a.active{color:#1e1e1e;background:rgba(30,30,30,.06);}
+.nav-cta{display:flex;align-items:center;gap:8px;}
+.btn-sm{font-size:13px;font-weight:600;padding:9px 18px;border-radius:999px;text-decoration:none;white-space:nowrap;}
+.btn-orange{background:#ff5c00;color:#fff;}
+.nav-burger{display:none;width:42px;height:42px;border-radius:999px;color:#1e1e1e;place-items:center;background:rgba(30,30,30,.08);border:none;cursor:pointer;}
+.nav-sheet{position:fixed;inset:86px 24px auto 24px;z-index:59;background:#1e1e1e;border-radius:26px;padding:14px;display:none;flex-direction:column;gap:2px;box-shadow:0 30px 60px -30px rgba(30,30,30,.9);}
+.nav-sheet.open{display:flex;}
+.nav-sheet a{color:#f2efe9;padding:14px 16px;border-radius:16px;font-size:16px;font-weight:500;text-decoration:none;}
+.nav-sheet a:hover{background:rgba(242,239,233,.08);color:#ff5c00;}
+@media(max-width:860px){.nav-links{display:none;}.nav-burger{display:grid;}}
 
 /* Hero */
-.hero{padding:36px max(24px,env(safe-area-inset-left,0px)) 32px;max-width:900px;margin:0 auto;}
+.hero{padding:110px max(24px,env(safe-area-inset-left,0px)) 32px;max-width:900px;margin:0 auto;}
 .eyebrow{font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:14px;}
 .hero h1{font-family:'Magra',sans-serif;font-size:clamp(24px,4vw,36px);font-weight:700;line-height:1.15;text-wrap:balance;margin-bottom:10px;}
 .hero h1 span{background:linear-gradient(135deg,#D44A9A,#1D91D3);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
@@ -96,15 +107,31 @@ body{background:var(--bg);color:var(--fg);font-family:'Inter',system-ui,sans-ser
 </head>
 <body>
 
-<nav class="nav">
-  <div class="nav-inner">
-    <a href="extrravenue-signage-v2.html" class="nav-logo">
-      <svg width="37" height="40" viewBox="0 0 37 40" fill="none" xmlns="http://www.w3.org/2000/svg" style="height:28px;width:auto;display:block;"><path d="M22.7902 23.8891L22.7891 23.8881L22.495 23.8939L24.8744 27.9076C29.9747 27.1687 33.9869 23.3658 34.8234 18.571L29.891 18.6711C29.0116 21.6254 26.1874 23.8199 22.7902 23.8891Z" fill="url(#c0)"/><path d="M19.3377 22.6215L19.331 22.6082C22.1529 22.3409 24.6852 21.1377 26.5791 19.3297C28.7264 17.2805 30.0539 14.4535 30.0539 11.3315C30.0539 11.1356 30.0489 10.9476 30.0406 10.7682H30.0378C29.7292 4.77186 24.5189 0 18.1352 0H0L2.34425 4.15641H17.6988C21.8661 4.15641 25.2449 7.36889 25.2449 11.3315C25.2449 15.2941 21.8655 18.5066 17.6977 18.5066L10.3714 18.6008L12.6057 22.6646L22.2322 39.8881H28.9591L19.3377 22.6215Z" fill="url(#c1)"/><path d="M22.736 14.3246C23.0898 13.3184 23.2985 12.2488 23.3404 11.1388C23.3454 11.0025 23.3488 10.8662 23.3488 10.7288C23.3488 10.575 23.3454 10.4259 23.3404 10.2822V10.1666H5.67788L7.99701 14.3241L22.736 14.3246Z" fill="url(#c2)"/><path d="M32.5528 10.1672C32.5544 10.205 32.5561 10.2438 32.5572 10.2827V11.1393C32.5159 12.2494 32.3067 13.3189 31.9529 14.3252H36.2619V10.1677L32.5528 10.1672Z" fill="url(#c3)"/><defs><linearGradient id="c0" x1="0" y1="0" x2="20.6412" y2="41.2828" gradientUnits="userSpaceOnUse"><stop stop-color="#D44A9A"/><stop offset="1" stop-color="#1D91D3"/></linearGradient><linearGradient id="c1" x1="0" y1="0" x2="20.6412" y2="41.2828" gradientUnits="userSpaceOnUse"><stop stop-color="#D44A9A"/><stop offset="1" stop-color="#1D91D3"/></linearGradient><linearGradient id="c2" x1="0" y1="0" x2="20.6412" y2="41.2828" gradientUnits="userSpaceOnUse"><stop stop-color="#D44A9A"/><stop offset="1" stop-color="#1D91D3"/></linearGradient><linearGradient id="c3" x1="0" y1="0" x2="20.6412" y2="41.2828" gradientUnits="userSpaceOnUse"><stop stop-color="#D44A9A"/><stop offset="1" stop-color="#1D91D3"/></linearGradient></defs></svg>
-      <span class="nav-logo-name">extrravenue</span>
+<nav class="nav" id="nav">
+  <div class="nav-pill">
+    <a class="brand" href="extrravenue-signage-v2.html">
+      <svg width="37" height="40" viewBox="0 0 37 40" fill="none" xmlns="http://www.w3.org/2000/svg" style="height:32px;width:auto;display:block;"><path d="M22.7902 23.8891L22.7891 23.8881L22.495 23.8939L24.8744 27.9076C29.9747 27.1687 33.9869 23.3658 34.8234 18.571L29.891 18.6711C29.0116 21.6254 26.1874 23.8199 22.7902 23.8891Z" fill="url(#paint0_linear_1992_7)"/><path d="M19.3377 22.6215L19.331 22.6082C22.1529 22.3409 24.6852 21.1377 26.5791 19.3297C28.7264 17.2805 30.0539 14.4535 30.0539 11.3315C30.0539 11.1356 30.0489 10.9476 30.0406 10.7682H30.0378C29.7292 4.77186 24.5189 0 18.1352 0H0L2.34425 4.15641H17.6988C21.8661 4.15641 25.2449 7.36889 25.2449 11.3315C25.2449 15.2941 21.8655 18.5066 17.6977 18.5066L10.3714 18.6008L12.6057 22.6646L22.2322 39.8881H28.9591L19.3377 22.6215Z" fill="url(#paint1_linear_1992_7)"/><path d="M22.736 14.3246C23.0898 13.3184 23.2985 12.2488 23.3404 11.1388C23.3454 11.0025 23.3488 10.8662 23.3488 10.7288C23.3488 10.575 23.3454 10.4259 23.3404 10.2822V10.1666H5.67788L7.99701 14.3241L22.736 14.3246Z" fill="url(#paint2_linear_1992_7)"/><path d="M32.5528 10.1672C32.5544 10.205 32.5561 10.2438 32.5572 10.2827V11.1393C32.5159 12.2494 32.3067 13.3189 31.9529 14.3252H36.2619V10.1677L32.5528 10.1672Z" fill="url(#paint3_linear_1992_7)"/><defs><linearGradient id="paint0_linear_1992_7" x1="0" y1="0" x2="20.6412" y2="41.2828" gradientUnits="userSpaceOnUse"><stop stop-color="#D44A9A"/><stop offset="1" stop-color="#1D91D3"/></linearGradient><linearGradient id="paint1_linear_1992_7" x1="0" y1="0" x2="20.6412" y2="41.2828" gradientUnits="userSpaceOnUse"><stop stop-color="#D44A9A"/><stop offset="1" stop-color="#1D91D3"/></linearGradient><linearGradient id="paint2_linear_1992_7" x1="0" y1="0" x2="20.6412" y2="41.2828" gradientUnits="userSpaceOnUse"><stop stop-color="#D44A9A"/><stop offset="1" stop-color="#1D91D3"/></linearGradient><linearGradient id="paint3_linear_1992_7" x1="0" y1="0" x2="20.6412" y2="41.2828" gradientUnits="userSpaceOnUse"><stop stop-color="#D44A9A"/><stop offset="1" stop-color="#1D91D3"/></linearGradient></defs></svg>
+      <span class="brand-name">extrravenue</span>
     </a>
-    <a href="extrravenue-signage-v2.html" class="nav-back">← Back to home</a>
+    <nav class="nav-links">
+      <a href="extrravenue-signage-v2.html">Home</a>
+      <a href="extrravenue-signage-v2.html#pricing">Pricing</a>
+      <a href="careers.html" class="active">Careers</a>
+    </nav>
+    <div class="nav-cta">
+      <a class="btn-sm btn-orange" href="https://signagecrm-production.up.railway.app">Get Started</a>
+      <button class="nav-burger" onclick="document.getElementById('msheet').classList.toggle('open')" aria-label="Menu">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+      </button>
+    </div>
   </div>
 </nav>
+<div class="nav-sheet" id="msheet">
+  <a href="extrravenue-signage-v2.html" onclick="document.getElementById('msheet').classList.remove('open')">Home</a>
+  <a href="extrravenue-signage-v2.html#pricing" onclick="document.getElementById('msheet').classList.remove('open')">Pricing</a>
+  <a href="careers.html" onclick="document.getElementById('msheet').classList.remove('open')">Careers</a>
+  <a href="https://signagecrm-production.up.railway.app">Get Started</a>
+</div>
 
 <div class="hero">
   <div class="eyebrow">We're hiring</div>
@@ -220,5 +247,9 @@ var WA_NUMBER = '919274744022';
 })();
 </script>
 
+
+<script>
+const _cnav=document.getElementById('nav');window.addEventListener('scroll',()=>{_cnav.classList.toggle('scrolled',window.scrollY>60);},{passive:true});
+</script>
 </body>
 </html>
