@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Careers — ExtrraVenue</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Magra:wght@700&display=swap">
+<style>
+:root{
+  --bg:#f2efe9;
+  --bg2:#fff;
+  --fg:#1a1a1a;
+  --mid:#555;
+  --muted:#888;
+  --accent:#D44A9A;
+  --accent2:#1D91D3;
+  --border:#e0ddd6;
+  --radius:14px;
+  --wa:#25D366;
+}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#141414;--bg2:#1e1e1e;--fg:#f0ede8;--mid:#bbb;--muted:#777;--border:#2a2a2a;color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --bg:#141414;--bg2:#1e1e1e;--fg:#f0ede8;--mid:#bbb;--muted:#777;--border:#2a2a2a;color-scheme:dark;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--fg);font-family:'Inter',system-ui,sans-serif;font-size:16px;line-height:1.7;}
+
+/* Nav */
+.nav{position:sticky;top:0;z-index:100;background:var(--bg);border-bottom:1px solid var(--border);padding:14px max(24px,env(safe-area-inset-left,0px));}
+.nav-inner{max-width:900px;margin:0 auto;display:flex;align-items:center;gap:12px;}
+.nav-logo{display:flex;align-items:center;gap:8px;text-decoration:none;}
+.nav-logo-name{font-family:'Magra',sans-serif;font-weight:700;font-size:17px;background:linear-gradient(135deg,#D44A9A,#1D91D3);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.nav-back{margin-left:auto;font-size:13px;color:var(--muted);text-decoration:none;}
+.nav-back:hover{color:var(--accent);}
+
+/* Hero */
+.hero{padding:64px max(24px,env(safe-area-inset-left,0px)) 56px;max-width:900px;margin:0 auto;}
+.eyebrow{font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:14px;}
+.hero h1{font-family:'Magra',sans-serif;font-size:clamp(32px,6vw,52px);font-weight:700;line-height:1.1;text-wrap:balance;margin-bottom:16px;}
+.hero h1 span{background:linear-gradient(135deg,#D44A9A,#1D91D3);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.hero p{font-size:17px;color:var(--mid);max-width:560px;margin-bottom:32px;}
+.hero-stats{display:flex;gap:32px;flex-wrap:wrap;}
+.stat{display:flex;flex-direction:column;gap:2px;}
+.stat-num{font-family:'Magra',sans-serif;font-size:28px;font-weight:700;background:linear-gradient(135deg,#D44A9A,#1D91D3);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.stat-label{font-size:12px;color:var(--muted);letter-spacing:.04em;}
+
+/* Divider */
+.section-divider{border:none;border-top:1px solid var(--border);margin:0;}
+
+/* Jobs section */
+.jobs-section{max-width:900px;margin:0 auto;padding:48px max(24px,env(safe-area-inset-left,0px)) 80px;}
+.jobs-header{display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:32px;}
+.jobs-header h2{font-family:'Magra',sans-serif;font-size:22px;font-weight:700;}
+.jobs-count{font-size:13px;color:var(--muted);}
+
+/* Job card */
+.job-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:24px 28px;margin-bottom:16px;display:flex;align-items:center;gap:20px;flex-wrap:wrap;transition:box-shadow .2s,border-color .2s;}
+.job-card:hover{border-color:var(--accent);box-shadow:0 4px 20px rgba(212,74,154,.1);}
+.job-info{flex:1;min-width:0;}
+.job-title{font-family:'Magra',sans-serif;font-size:18px;font-weight:700;margin-bottom:8px;}
+.job-meta{display:flex;flex-wrap:wrap;gap:10px;}
+.tag{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:500;padding:4px 10px;border-radius:20px;background:var(--bg);border:1px solid var(--border);color:var(--mid);}
+.tag.location::before{content:'📍';}
+.tag.type::before{content:'⏱️';}
+.tag.dept::before{content:'🏷️';}
+.wa-btn{display:inline-flex;align-items:center;gap:8px;background:var(--wa);color:#fff;font-size:14px;font-weight:600;padding:10px 20px;border-radius:10px;text-decoration:none;white-space:nowrap;flex-shrink:0;transition:opacity .15s;}
+.wa-btn:hover{opacity:.88;}
+.wa-btn svg{width:18px;height:18px;fill:#fff;flex-shrink:0;}
+
+/* No openings */
+.no-jobs{text-align:center;padding:60px 20px;color:var(--muted);}
+.no-jobs p{margin-top:8px;font-size:15px;}
+
+/* Culture strip */
+.culture{background:linear-gradient(135deg,#D44A9A12,#1D91D312);border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+.culture-inner{max-width:900px;margin:0 auto;padding:48px max(24px,env(safe-area-inset-left,0px));display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:28px;}
+.culture-item{display:flex;flex-direction:column;gap:6px;}
+.culture-icon{font-size:24px;margin-bottom:4px;}
+.culture-item strong{font-size:15px;font-weight:600;}
+.culture-item span{font-size:13px;color:var(--mid);}
+
+/* Footer */
+.foot{border-top:1px solid var(--border);padding:24px max(24px,env(safe-area-inset-left,0px));text-align:center;font-size:13px;color:var(--muted);}
+.foot a{color:var(--muted);text-decoration:none;margin:0 10px;}
+.foot a:hover{color:var(--accent);}
+
+@media(max-width:600px){
+  .job-card{flex-direction:column;align-items:flex-start;}
+  .wa-btn{width:100%;justify-content:center;}
+  .hero-stats{gap:20px;}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="extrravenue-signage-v2.html" class="nav-logo">
+      <svg width="37" height="40" viewBox="0 0 37 40" fill="none" xmlns="http://www.w3.org/2000/svg" style="height:28px;width:auto;display:block;"><path d="M22.7902 23.8891L22.7891 23.8881L22.495 23.8939L24.8744 27.9076C29.9747 27.1687 33.9869 23.3658 34.8234 18.571L29.891 18.6711C29.0116 21.6254 26.1874 23.8199 22.7902 23.8891Z" fill="url(#c0)"/><path d="M19.3377 22.6215L19.331 22.6082C22.1529 22.3409 24.6852 21.1377 26.5791 19.3297C28.7264 17.2805 30.0539 14.4535 30.0539 11.3315C30.0539 11.1356 30.0489 10.9476 30.0406 10.7682H30.0378C29.7292 4.77186 24.5189 0 18.1352 0H0L2.34425 4.15641H17.6988C21.8661 4.15641 25.2449 7.36889 25.2449 11.3315C25.2449 15.2941 21.8655 18.5066 17.6977 18.5066L10.3714 18.6008L12.6057 22.6646L22.2322 39.8881H28.9591L19.3377 22.6215Z" fill="url(#c1)"/><path d="M22.736 14.3246C23.0898 13.3184 23.2985 12.2488 23.3404 11.1388C23.3454 11.0025 23.3488 10.8662 23.3488 10.7288C23.3488 10.575 23.3454 10.4259 23.3404 10.2822V10.1666H5.67788L7.99701 14.3241L22.736 14.3246Z" fill="url(#c2)"/><path d="M32.5528 10.1672C32.5544 10.205 32.5561 10.2438 32.5572 10.2827V11.1393C32.5159 12.2494 32.3067 13.3189 31.9529 14.3252H36.2619V10.1677L32.5528 10.1672Z" fill="url(#c3)"/><defs><linearGradient id="c0" x1="0" y1="0" x2="20.6412" y2="41.2828" gradientUnits="userSpaceOnUse"><stop stop-color="#D44A9A"/><stop offset="1" stop-color="#1D91D3"/></linearGradient><linearGradient id="c1" x1="0" y1="0" x2="20.6412" y2="41.2828" gradientUnits="userSpaceOnUse"><stop stop-color="#D44A9A"/><stop offset="1" stop-color="#1D91D3"/></linearGradient><linearGradient id="c2" x1="0" y1="0" x2="20.6412" y2="41.2828" gradientUnits="userSpaceOnUse"><stop stop-color="#D44A9A"/><stop offset="1" stop-color="#1D91D3"/></linearGradient><linearGradient id="c3" x1="0" y1="0" x2="20.6412" y2="41.2828" gradientUnits="userSpaceOnUse"><stop stop-color="#D44A9A"/><stop offset="1" stop-color="#1D91D3"/></linearGradient></defs></svg>
+      <span class="nav-logo-name">extrravenue</span>
+    </a>
+    <a href="extrravenue-signage-v2.html" class="nav-back">← Back to home</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="eyebrow">We're hiring</div>
+  <h1>Build the future of<br><span>digital signage</span> with us</h1>
+  <p>ExtrraVenue ek fast-growing startup hai jo India ke venues ko smart digital screens se connect kar raha hai. Agar tum impact chahte ho — yahan aao.</p>
+  <div class="hero-stats">
+    <div class="stat"><span class="stat-num">50+</span><span class="stat-label">Screens live</span></div>
+    <div class="stat"><span class="stat-num">10+</span><span class="stat-label">Venue partners</span></div>
+    <div class="stat"><span class="stat-num">🚀</span><span class="stat-label">Early stage, big impact</span></div>
+  </div>
+</div>
+
+<hr class="section-divider">
+
+<div class="culture">
+  <div class="culture-inner">
+    <div class="culture-item"><span class="culture-icon">⚡</span><strong>Move fast</strong><span>Decisions same day, ships same week</span></div>
+    <div class="culture-item"><span class="culture-icon">🎯</span><strong>Ownership</strong><span>Tum jo banate ho woh tumhara hai</span></div>
+    <div class="culture-item"><span class="culture-icon">🌍</span><strong>Real impact</strong><span>Har screen pe tumhara kaam dikhta hai</span></div>
+    <div class="culture-item"><span class="culture-icon">📈</span><strong>Grow with us</strong><span>Early joiners = leadership roles</span></div>
+  </div>
+</div>
+
+<div class="jobs-section">
+  <div class="jobs-header">
+    <h2>Open Positions</h2>
+    <span class="jobs-count" id="jobsCount"></span>
+  </div>
+  <div id="jobsList"></div>
+</div>
+
+<footer class="foot">
+  <a href="extrravenue-signage-v2.html">Home</a>
+  <a href="careers.html">Careers</a>
+  <a href="privacy-policy.html">Privacy</a>
+  <a href="terms-of-service.html">Terms</a>
+  <br><br>
+  © 2026 ExtrraVenue · All Rights Reserved.
+</footer>
+
+<script>
+// ============================================================
+//  JOBS CONFIG — sirf yahan edit karo naye openings ke liye
+//  active: false karo to wo position hide ho jayegi
+// ============================================================
+var JOBS = [
+  {
+    title: "Field Sales Executive",
+    location: "Ahmedabad",
+    type: "Full-time",
+    dept: "Sales",
+    active: true
+  },
+  {
+    title: "Venue Relationship Manager",
+    location: "Ahmedabad",
+    type: "Full-time",
+    dept: "Partnerships",
+    active: true
+  },
+  {
+    title: "Social Media & Content Creator",
+    location: "Remote / Ahmedabad",
+    type: "Part-time",
+    dept: "Marketing",
+    active: true
+  },
+  {
+    title: "Android App Developer",
+    location: "Remote",
+    type: "Freelance / Contract",
+    dept: "Tech",
+    active: true
+  }
+];
+// ============================================================
+
+var WA_NUMBER = '919274744022';
+
+(function(){
+  var list = document.getElementById('jobsList');
+  var countEl = document.getElementById('jobsCount');
+  var active = JOBS.filter(function(j){ return j.active; });
+
+  countEl.textContent = active.length + ' opening' + (active.length !== 1 ? 's' : '');
+
+  if(active.length === 0){
+    list.innerHTML = '<div class="no-jobs"><div style="font-size:40px;">🔍</div><p>Abhi koi opening nahi hai — baad mein check karo ya WhatsApp karo.</p></div>';
+    return;
+  }
+
+  active.forEach(function(job){
+    var msg = encodeURIComponent('Hi ExtrraVenue! I want to apply for the ' + job.title + ' role.');
+    var waLink = 'https://wa.me/' + WA_NUMBER + '?text=' + msg;
+
+    var card = document.createElement('div');
+    card.className = 'job-card';
+    card.innerHTML =
+      '<div class="job-info">' +
+        '<div class="job-title">' + job.title + '</div>' +
+        '<div class="job-meta">' +
+          '<span class="tag location">' + job.location + '</span>' +
+          '<span class="tag type">' + job.type + '</span>' +
+          '<span class="tag dept">' + job.dept + '</span>' +
+        '</div>' +
+      '</div>' +
+      '<a class="wa-btn" href="' + waLink + '" target="_blank" rel="noopener">' +
+        '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>' +
+        'Apply on WhatsApp' +
+      '</a>';
+    list.appendChild(card);
+  });
+})();
+</script>
+
+</body>
+</html>
