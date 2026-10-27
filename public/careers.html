@@ -3,32 +3,26 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <title>Careers — extrravenue</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Magra:wght@700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Magra:wght@400;700&family=Libre+Franklin:wght@300;400;500;600;700&display=swap">
 <style>
 :root{
   --bg:#f2efe9;
   --bg2:#fff;
-  --fg:#1a1a1a;
+  --fg:#1e1e1e;
   --mid:#555;
   --muted:#888;
-  --accent:#D44A9A;
-  --accent2:#1D91D3;
-  --border:#e0ddd6;
+  --accent:#ff5c00;
+  --border:#e0dbd3;
   --radius:14px;
   --wa:#25D366;
 }
-@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --bg:#141414;--bg2:#1e1e1e;--fg:#f0ede8;--mid:#bbb;--muted:#777;--border:#2a2a2a;color-scheme:dark;
-}}
-:root[data-theme="dark"]{
-  --bg:#141414;--bg2:#1e1e1e;--fg:#f0ede8;--mid:#bbb;--muted:#777;--border:#2a2a2a;color-scheme:dark;
-}
 *{box-sizing:border-box;margin:0;padding:0;}
-body{background:var(--bg);color:var(--fg);font-family:'Inter',system-ui,sans-serif;font-size:16px;line-height:1.7;}
+body{background:var(--bg);color:var(--fg);font-family:'Libre Franklin',system-ui,sans-serif;font-size:15px;line-height:1.65;}
 
+/* NAV */
 .nav{position:fixed;inset:0 0 auto 0;z-index:60;padding:18px 24px;display:flex;justify-content:center;animation:navIn .9s cubic-bezier(.25,.46,.45,.94) both;}
 @keyframes navIn{from{transform:translateY(-130%);opacity:0;}to{transform:none;opacity:1;}}
 .nav-pill{width:100%;max-width:1140px;display:flex;align-items:center;gap:24px;background:rgba(242,239,233,.92);backdrop-filter:blur(14px);border:1px solid rgba(30,30,30,.1);border-radius:999px;padding:10px 10px 10px 20px;transition:box-shadow .35s,max-width .45s;color:#1e1e1e;}
@@ -48,74 +42,57 @@ body{background:var(--bg);color:var(--fg);font-family:'Inter',system-ui,sans-ser
 .nav-sheet a:hover{background:rgba(242,239,233,.08);color:#ff5c00;}
 @media(max-width:860px){.nav-links{display:none;}.nav-cta .btn-sm{display:none;}.nav-cta{margin-left:auto;padding-right:4px;}.nav-burger{display:grid;}}
 
-/* Hero */
-.hero{padding:110px max(24px,env(safe-area-inset-left,0px)) 32px;max-width:900px;margin:0 auto;}
-.eyebrow{font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:14px;}
-.hero h1{font-family:'Magra',sans-serif;font-size:clamp(24px,4vw,36px);font-weight:700;line-height:1.15;text-wrap:balance;margin-bottom:10px;}
-.hero h1 span{background:linear-gradient(135deg,#D44A9A,#1D91D3);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
-.hero p{font-size:15px;color:var(--mid);max-width:560px;margin-bottom:20px;}
-.hero-stats{display:flex;gap:24px;flex-wrap:wrap;}
+/* HERO */
+.hero{padding:100px max(24px,env(safe-area-inset-left,0px)) 28px;max-width:900px;margin:0 auto;}
+.eyebrow{display:inline-flex;align-items:center;gap:6px;font-family:'Libre Franklin',sans-serif;font-size:11px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--accent);margin-bottom:12px;}
+.eyebrow-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0;}
+.hero h1{font-family:'Magra',sans-serif;font-size:clamp(26px,4vw,40px);font-weight:700;line-height:1.1;letter-spacing:-.02em;text-wrap:balance;margin-bottom:10px;}
+.hero h1 .orange{color:#ff5c00;}
+.hero p{font-size:15px;color:var(--mid);max-width:540px;margin-bottom:22px;line-height:1.6;}
+.hero-stats{display:flex;gap:28px;flex-wrap:wrap;align-items:flex-start;}
 .stat{display:flex;flex-direction:column;gap:2px;}
-.stat-num{font-family:'Magra',sans-serif;font-size:22px;font-weight:700;background:linear-gradient(135deg,#D44A9A,#1D91D3);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
-.stat-label{font-size:12px;color:var(--muted);letter-spacing:.04em;}
+.stat-num{font-family:'Magra',sans-serif;font-size:24px;font-weight:700;color:#ff5c00;}
+.stat-label{font-size:11.5px;color:var(--muted);letter-spacing:.03em;font-weight:500;}
 
-/* Divider */
+/* DIVIDER */
 .section-divider{border:none;border-top:1px solid var(--border);margin:0;}
 
-/* Jobs section */
-.jobs-section{max-width:900px;margin:0 auto;padding:32px max(24px,env(safe-area-inset-left,0px)) 48px;}
-.jobs-header{display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:20px;}
-.jobs-header h2{font-family:'Magra',sans-serif;font-size:22px;font-weight:700;}
-.jobs-count{font-size:13px;color:var(--muted);}
+/* JOBS */
+.jobs-section{max-width:900px;margin:0 auto;padding:28px max(24px,env(safe-area-inset-left,0px)) 52px;}
+.jobs-header{display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:16px;}
+.jobs-header h2{font-family:'Magra',sans-serif;font-size:20px;font-weight:700;letter-spacing:-.01em;}
+.jobs-count{font-size:13px;color:var(--muted);font-weight:500;}
 
-/* Job card */
-.job-card{background:transparent;border:1px solid var(--border);border-radius:var(--radius);padding:16px 20px;margin-bottom:12px;display:flex;align-items:center;gap:20px;flex-wrap:wrap;transition:box-shadow .2s,border-color .2s;}
-.job-card:hover{border-color:var(--accent);box-shadow:0 4px 20px rgba(212,74,154,.1);}
+/* JOB CARD */
+.job-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:16px 20px;margin-bottom:10px;display:flex;align-items:center;gap:20px;flex-wrap:wrap;transition:box-shadow .2s,border-color .2s;}
+.job-card:hover{border-color:rgba(255,92,0,.35);box-shadow:0 4px 20px rgba(255,92,0,.09);}
 .job-info{flex:1;min-width:0;}
-.job-title{font-family:'Magra',sans-serif;font-size:16px;font-weight:700;margin-bottom:6px;}
-.job-meta{display:flex;flex-wrap:wrap;gap:10px;}
-.tag{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:500;padding:4px 10px;border-radius:20px;background:var(--bg);border:1px solid var(--border);color:var(--mid);}
-.tag.location::before{content:'📍';}
-.tag.type::before{content:'⏱️';}
-.tag.dept::before{content:'🏷️';}
-.wa-btn{display:inline-flex;align-items:center;gap:6px;background:var(--wa);color:#fff;font-size:13px;font-weight:600;padding:7px 13px;border-radius:8px;text-decoration:none;white-space:nowrap;flex-shrink:0;transition:opacity .15s;}
+.job-title{font-family:'Magra',sans-serif;font-size:15.5px;font-weight:700;margin-bottom:7px;color:#1e1e1e;}
+.job-meta{display:flex;flex-wrap:wrap;gap:8px;}
+.tag{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;font-weight:500;padding:3px 10px;border-radius:20px;background:var(--bg);border:1px solid var(--border);color:var(--mid);}
+.tag svg{width:11px;height:11px;opacity:.65;flex-shrink:0;}
+.wa-btn{display:inline-flex;align-items:center;gap:6px;background:var(--wa);color:#fff;font-size:13px;font-weight:600;padding:8px 14px;border-radius:10px;text-decoration:none;white-space:nowrap;flex-shrink:0;transition:opacity .15s;}
 .wa-btn:hover{opacity:.88;}
 .wa-btn svg{width:15px;height:15px;fill:#fff;flex-shrink:0;}
 
-/* No openings */
-.no-jobs{text-align:center;padding:60px 20px;color:var(--muted);}
+/* NO JOBS */
+.no-jobs{text-align:center;padding:52px 20px;color:var(--muted);}
 .no-jobs p{margin-top:8px;font-size:15px;}
 
-/* Culture strip */
-.culture{border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
-.culture-inner{max-width:900px;margin:0 auto;padding:28px max(24px,env(safe-area-inset-left,0px));display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px;}
-.culture-item{display:flex;flex-direction:column;gap:6px;}
-.culture-icon{font-size:24px;margin-bottom:4px;}
-.culture-item strong{font-size:15px;font-weight:600;}
-.culture-item span{font-size:13px;color:var(--mid);}
-
-/* Footer */
-.foot{border-top:1px solid var(--border);padding:24px max(24px,env(safe-area-inset-left,0px));text-align:center;font-size:13px;color:var(--muted);}
+/* FOOTER */
+.foot{border-top:1px solid var(--border);padding:22px max(24px,env(safe-area-inset-left,0px));text-align:center;font-size:13px;color:var(--muted);}
 .foot a{color:var(--muted);text-decoration:none;margin:0 10px;}
 .foot a:hover{color:var(--accent);}
 
 @media(max-width:600px){
   .job-card{flex-direction:column;align-items:flex-start;padding:14px 16px;}
-  .job-title{font-size:15px;}
   .wa-btn{width:100%;justify-content:center;}
-  .hero-stats{gap:16px;}
+  .hero-stats{gap:18px;}
   .stat-num{font-size:20px;}
-  .culture-inner{grid-template-columns:1fr 1fr;gap:16px;padding:20px max(16px,env(safe-area-inset-left,0px));}
-  .culture-icon{font-size:20px;margin-bottom:2px;}
-  .culture-item strong{font-size:13px;}
-  .culture-item span{font-size:12px;}
-  .hero{padding:90px max(16px,env(safe-area-inset-left,0px)) 24px;}
-  .hero h1{font-size:26px;margin-bottom:8px;}
-  .hero p{font-size:14px;margin-bottom:16px;}
-  .eyebrow{font-size:10px;}
-  .jobs-section{padding:24px max(16px,env(safe-area-inset-left,0px)) 40px;}
-  .jobs-header{margin-bottom:16px;}
-  .jobs-header h2{font-size:18px;}
+  .hero{padding:86px max(16px,env(safe-area-inset-left,0px)) 22px;}
+  .hero h1{font-size:26px;}
+  .hero p{font-size:14px;margin-bottom:18px;}
+  .jobs-section{padding:22px max(16px,env(safe-area-inset-left,0px)) 40px;}
 }
 </style>
 </head>
@@ -148,26 +125,17 @@ body{background:var(--bg);color:var(--fg);font-family:'Inter',system-ui,sans-ser
 </div>
 
 <div class="hero">
-  <div class="eyebrow">We're hiring</div>
-  <h1>Build the future of<br><span>digital signage</span> with us</h1>
+  <div class="eyebrow"><span class="eyebrow-dot"></span>We're hiring</div>
+  <h1>Build the future of<br><span class="orange">digital signage</span> with us</h1>
   <p>extrravenue ek fast-growing startup hai jo India ke venues ko smart digital screens se connect kar raha hai. Agar tum impact chahte ho — yahan aao.</p>
   <div class="hero-stats">
     <div class="stat"><span class="stat-num">50+</span><span class="stat-label">Screens live</span></div>
     <div class="stat"><span class="stat-num">10+</span><span class="stat-label">Venue partners</span></div>
-    <div class="stat"><span class="stat-num">🚀</span><span class="stat-label">Early stage, big impact</span></div>
+    <div class="stat"><span class="stat-num">Early stage</span><span class="stat-label">Big impact</span></div>
   </div>
 </div>
 
 <hr class="section-divider">
-
-<div class="culture">
-  <div class="culture-inner">
-    <div class="culture-item"><span class="culture-icon">⚡</span><strong>Move fast</strong><span>Decisions same day, ships same week</span></div>
-    <div class="culture-item"><span class="culture-icon">🎯</span><strong>Ownership</strong><span>Tum jo banate ho woh tumhara hai</span></div>
-    <div class="culture-item"><span class="culture-icon">🌍</span><strong>Real impact</strong><span>Har screen pe tumhara kaam dikhta hai</span></div>
-    <div class="culture-item"><span class="culture-icon">📈</span><strong>Grow with us</strong><span>Early joiners = leadership roles</span></div>
-  </div>
-</div>
 
 <div class="jobs-section">
   <div class="jobs-header">
@@ -187,69 +155,43 @@ body{background:var(--bg);color:var(--fg);font-family:'Inter',system-ui,sans-ser
 </footer>
 
 <script>
-// ============================================================
-//  JOBS CONFIG — sirf yahan edit karo naye openings ke liye
-//  active: false karo to wo position hide ho jayegi
-// ============================================================
 var JOBS = [
-  {
-    title: "Field Sales Executive",
-    location: "Ahmedabad",
-    type: "Full-time",
-    dept: "Sales",
-    active: true
-  },
-  {
-    title: "Venue Relationship Manager",
-    location: "Ahmedabad",
-    type: "Full-time",
-    dept: "Partnerships",
-    active: true
-  },
-  {
-    title: "Social Media & Content Creator",
-    location: "Remote / Ahmedabad",
-    type: "Part-time",
-    dept: "Marketing",
-    active: true
-  },
-  {
-    title: "Android App Developer",
-    location: "Remote",
-    type: "Freelance / Contract",
-    dept: "Tech",
-    active: true
-  }
+  { title: "Field Sales Executive",          location: "Ahmedabad",          type: "Full-time",         dept: "Sales",         active: true },
+  { title: "Venue Relationship Manager",     location: "Ahmedabad",          type: "Full-time",         dept: "Partnerships",  active: true },
+  { title: "Social Media & Content Creator", location: "Remote / Ahmedabad", type: "Part-time",         dept: "Marketing",     active: true },
+  { title: "Android App Developer",          location: "Remote",             type: "Freelance / Contract", dept: "Tech",       active: true }
 ];
-// ============================================================
 
 var WA_NUMBER = '919274744022';
 
+var PIN_SVG  = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>';
+var TIME_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>';
+var DEPT_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>';
+
 (function(){
-  var list = document.getElementById('jobsList');
+  var list    = document.getElementById('jobsList');
   var countEl = document.getElementById('jobsCount');
-  var active = JOBS.filter(function(j){ return j.active; });
+  var active  = JOBS.filter(function(j){ return j.active; });
 
   countEl.textContent = active.length + ' opening' + (active.length !== 1 ? 's' : '');
 
   if(active.length === 0){
-    list.innerHTML = '<div class="no-jobs"><div style="font-size:40px;">🔍</div><p>Abhi koi opening nahi hai — baad mein check karo ya WhatsApp karo.</p></div>';
+    list.innerHTML = '<div class="no-jobs"><p>Abhi koi opening nahi hai — baad mein check karo ya WhatsApp karo.</p></div>';
     return;
   }
 
   active.forEach(function(job){
-    var msg = encodeURIComponent('Hi extrravenue! I want to apply for the ' + job.title + ' role.');
+    var msg    = encodeURIComponent('Hi extrravenue! I want to apply for the ' + job.title + ' role.');
     var waLink = 'https://wa.me/' + WA_NUMBER + '?text=' + msg;
-
-    var card = document.createElement('div');
+    var card   = document.createElement('div');
     card.className = 'job-card';
     card.innerHTML =
       '<div class="job-info">' +
         '<div class="job-title">' + job.title + '</div>' +
         '<div class="job-meta">' +
-          '<span class="tag location">' + job.location + '</span>' +
-          '<span class="tag type">' + job.type + '</span>' +
-          '<span class="tag dept">' + job.dept + '</span>' +
+          '<span class="tag">' + PIN_SVG  + job.location + '</span>' +
+          '<span class="tag">' + TIME_SVG + job.type + '</span>' +
+          '<span class="tag">' + DEPT_SVG + job.dept + '</span>' +
         '</div>' +
       '</div>' +
       '<a class="wa-btn" href="' + waLink + '" target="_blank" rel="noopener">' +
@@ -260,7 +202,6 @@ var WA_NUMBER = '919274744022';
   });
 })();
 </script>
-
 
 <script>
 const _cnav=document.getElementById('nav');window.addEventListener('scroll',()=>{_cnav.classList.toggle('scrolled',window.scrollY>60);},{passive:true});
