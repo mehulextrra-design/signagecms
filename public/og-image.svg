@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e1e1e"/>
+      <stop offset="100%" stop-color="#221510"/>
+    </linearGradient>
+    <linearGradient id="logoGrad" x1="0" y1="0" x2="20.6412" y2="41.2828" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#D44A9A"/>
+      <stop offset="1" stop-color="#1D91D3"/>
+    </linearGradient>
+    <linearGradient id="accentLine" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ff5c00"/>
+      <stop offset="100%" stop-color="#d44a9a"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bgGrad)"/>
+
+  <!-- Subtle grid dots -->
+  <g opacity="0.05" fill="#fff">
+    <circle cx="100" cy="80" r="3"/><circle cx="160" cy="80" r="3"/><circle cx="220" cy="80" r="3"/>
+    <circle cx="100" cy="140" r="3"/><circle cx="160" cy="140" r="3"/><circle cx="220" cy="140" r="3"/>
+    <circle cx="100" cy="200" r="3"/><circle cx="160" cy="200" r="3"/>
+    <circle cx="1000" cy="460" r="3"/><circle cx="1060" cy="460" r="3"/><circle cx="1120" cy="460" r="3"/>
+    <circle cx="1000" cy="520" r="3"/><circle cx="1060" cy="520" r="3"/><circle cx="1120" cy="520" r="3"/>
+    <circle cx="1000" cy="580" r="3"/><circle cx="1060" cy="580" r="3"/>
+  </g>
+
+  <!-- Top accent bar -->
+  <rect x="0" y="0" width="1200" height="5" fill="url(#accentLine)"/>
+
+  <!-- Glow circles -->
+  <circle cx="970" cy="315" r="380" fill="#ff5c00" opacity="0.055"/>
+  <circle cx="970" cy="315" r="220" fill="#ff5c00" opacity="0.055"/>
+  <circle cx="80" cy="590" r="180" fill="#d44a9a" opacity="0.055"/>
+
+  <!-- Logo mark — real SVG with gradient (scaled 4x, translated to left) -->
+  <g transform="translate(78, 120) scale(4.4)">
+    <defs>
+      <linearGradient id="logoGradInner" x1="0" y1="0" x2="20.6412" y2="41.2828" gradientUnits="userSpaceOnUse">
+        <stop stop-color="#D44A9A"/>
+        <stop offset="1" stop-color="#1D91D3"/>
+      </linearGradient>
+    </defs>
+    <path d="M22.7902 23.8891L22.7891 23.8881L22.495 23.8939L24.8744 27.9076C29.9747 27.1687 33.9869 23.3658 34.8234 18.571L29.891 18.6711C29.0116 21.6254 26.1874 23.8199 22.7902 23.8891Z" fill="url(#logoGradInner)"/>
+    <path d="M19.3377 22.6215L19.331 22.6082C22.1529 22.3409 24.6852 21.1377 26.5791 19.3297C28.7264 17.2805 30.0539 14.4535 30.0539 11.3315C30.0539 11.1356 30.0489 10.9476 30.0406 10.7682H30.0378C29.7292 4.77186 24.5189 0 18.1352 0H0L2.34425 4.15641H17.6988C21.8661 4.15641 25.2449 7.36889 25.2449 11.3315C25.2449 15.2941 21.8655 18.5066 17.6977 18.5066L10.3714 18.6008L12.6057 22.6646L22.2322 39.8881H28.9591L19.3377 22.6215Z" fill="url(#logoGradInner)"/>
+    <path d="M22.736 14.3246C23.0898 13.3184 23.2985 12.2488 23.3404 11.1388C23.3454 11.0025 23.3488 10.8662 23.3488 10.7288C23.3488 10.575 23.3454 10.4259 23.3404 10.2822V10.1666H5.67788L7.99701 14.3241L22.736 14.3246Z" fill="url(#logoGradInner)"/>
+    <path d="M32.5528 10.1672C32.5544 10.205 32.5561 10.2438 32.5572 10.2827V11.1393C32.5159 12.2494 32.3067 13.3189 31.9529 14.3252H36.2619V10.1677L32.5528 10.1672Z" fill="url(#logoGradInner)"/>
+  </g>
+
+  <!-- Brand wordmark -->
+  <text x="80" y="350" font-family="'Helvetica Neue',Helvetica,Arial,sans-serif" font-weight="700" font-size="76" fill="#ffffff" letter-spacing="-2">extrravenue</text>
+
+  <!-- Tagline -->
+  <text x="83" y="408" font-family="'Helvetica Neue',Helvetica,Arial,sans-serif" font-weight="400" font-size="26" fill="rgba(255,255,255,0.6)">India Ka Hyperlocal DOOH Advertising Network</text>
+
+  <!-- Divider -->
+  <rect x="80" y="444" width="440" height="2" rx="1" fill="url(#accentLine)"/>
+
+  <!-- Feature tags -->
+  <rect x="80" y="468" width="184" height="40" rx="20" fill="rgba(255,92,0,0.15)" stroke="#ff5c00" stroke-width="1.5"/>
+  <text x="172" y="493" font-family="'Helvetica Neue',Helvetica,Arial,sans-serif" font-weight="600" font-size="14" fill="#ff9a6c" text-anchor="middle">Gym · Salon · Cafe · Clinic</text>
+
+  <rect x="278" y="468" width="148" height="40" rx="20" fill="rgba(255,92,0,0.15)" stroke="#ff5c00" stroke-width="1.5"/>
+  <text x="352" y="493" font-family="'Helvetica Neue',Helvetica,Arial,sans-serif" font-weight="600" font-size="14" fill="#ff9a6c" text-anchor="middle">From ₹1,999</text>
+
+  <rect x="440" y="468" width="192" height="40" rx="20" fill="rgba(255,92,0,0.15)" stroke="#ff5c00" stroke-width="1.5"/>
+  <text x="536" y="493" font-family="'Helvetica Neue',Helvetica,Arial,sans-serif" font-weight="600" font-size="14" fill="#ff9a6c" text-anchor="middle">Proof of Play Included</text>
+
+  <!-- Right side: screen mockups -->
+  <rect x="730" y="70" width="175" height="310" rx="14" fill="#252525" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+  <rect x="742" y="82" width="151" height="94" rx="8" fill="rgba(255,92,0,0.22)"/>
+  <rect x="742" y="188" width="151" height="12" rx="6" fill="rgba(255,255,255,0.12)"/>
+  <rect x="742" y="210" width="110" height="10" rx="5" fill="rgba(255,255,255,0.08)"/>
+  <rect x="742" y="238" width="92" height="30" rx="15" fill="#ff5c00" opacity="0.8"/>
+  <text x="788" y="258" font-family="Arial" font-size="12" fill="#fff" font-weight="600" text-anchor="middle">Ad Live</text>
+  <rect x="742" y="280" width="151" height="10" rx="5" fill="rgba(255,255,255,0.06)"/>
+  <rect x="742" y="298" width="120" height="10" rx="5" fill="rgba(255,255,255,0.06)"/>
+  <rect x="742" y="316" width="151" height="28" rx="8" fill="rgba(255,255,255,0.04)"/>
+  <text x="750" y="335" font-family="Arial" font-size="10" fill="rgba(255,255,255,0.3)">5,400 plays · 1.8L impressions</text>
+
+  <rect x="930" y="110" width="175" height="310" rx="14" fill="#252525" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+  <rect x="942" y="122" width="151" height="94" rx="8" fill="rgba(212,74,154,0.22)"/>
+  <rect x="942" y="228" width="151" height="12" rx="6" fill="rgba(255,255,255,0.12)"/>
+  <rect x="942" y="250" width="110" height="10" rx="5" fill="rgba(255,255,255,0.08)"/>
+  <rect x="942" y="278" width="92" height="30" rx="15" fill="#d44a9a" opacity="0.8"/>
+  <text x="988" y="298" font-family="Arial" font-size="12" fill="#fff" font-weight="600" text-anchor="middle">340 Leads</text>
+  <rect x="942" y="320" width="151" height="10" rx="5" fill="rgba(255,255,255,0.06)"/>
+  <rect x="942" y="338" width="120" height="10" rx="5" fill="rgba(255,255,255,0.06)"/>
+  <rect x="942" y="356" width="151" height="28" rx="8" fill="rgba(255,255,255,0.04)"/>
+  <text x="950" y="375" font-family="Arial" font-size="10" fill="rgba(255,255,255,0.3)">52x ROAS · ₹12k budget</text>
+
+  <!-- URL -->
+  <text x="80" y="596" font-family="'Helvetica Neue',Helvetica,Arial,sans-serif" font-size="16" fill="rgba(255,255,255,0.28)">signagecrm-production.up.railway.app</text>
+</svg>
