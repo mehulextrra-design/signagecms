@@ -97,7 +97,7 @@ router.post('/register-admin', authenticate, [
   mobileField(),
   body('password').isLength({ min: 8 }),
 ], async (req, res, next) => {
-  if (req.user.role !== 'admin') return res.status(403).json({ error: 'Admin only' });
+  if (!['admin', 'superadmin'].includes(req.user.role)) return res.status(403).json({ error: 'Admin only' });
   const errors = validationResult(req);
   if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
 
