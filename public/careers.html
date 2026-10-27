@@ -47,7 +47,7 @@ body{background:var(--bg);color:var(--fg);font-family:'Libre Franklin',system-ui
 .hero{padding:100px max(24px,env(safe-area-inset-left,0px)) 28px;max-width:900px;margin:0 auto;}
 .eyebrow{display:inline-flex;align-items:center;gap:6px;font-family:'Libre Franklin',sans-serif;font-size:11px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--accent);margin-bottom:12px;}
 .eyebrow-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0;}
-.hero h1{font-family:'Magra',sans-serif;font-size:clamp(26px,4vw,40px);font-weight:700;line-height:1.1;letter-spacing:-.02em;text-wrap:balance;margin-bottom:10px;}
+.hero h1{font-family:'Magra',sans-serif;font-size:clamp(36px,6vw,64px);font-weight:700;line-height:1.05;letter-spacing:-.03em;text-wrap:balance;margin-bottom:12px;}
 .hero h1 .orange{color:#ff5c00;}
 .hero p{font-size:15px;color:var(--mid);max-width:540px;margin-bottom:22px;line-height:1.6;}
 .hero-stats{display:flex;gap:28px;flex-wrap:wrap;align-items:flex-start;}
@@ -87,7 +87,7 @@ body{background:var(--bg);color:var(--fg);font-family:'Libre Franklin',system-ui
 
 @media(max-width:600px){
   .job-card{flex-direction:column;align-items:flex-start;padding:14px 16px;}
-  .wa-btn{width:100%;justify-content:center;}
+  .wa-btn{align-self:flex-start;}
   .hero-stats{gap:18px;}
   .stat-num{font-size:20px;}
   .hero{padding:86px max(16px,env(safe-area-inset-left,0px)) 22px;}
