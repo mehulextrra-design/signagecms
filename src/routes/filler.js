@@ -39,11 +39,19 @@ const upload = multer({
   },
 });
 
-// GET /api/filler — list all filler content
+// GET /api/filler — list all filler content with assigned screen ids
 router.get('/', authenticate, requireAdmin, async (req, res, next) => {
   try {
     const result = await query(
-      `SELECT * FROM filler_content ORDER BY created_at DESC`
+      `SELECT f.*,
+              COALESCE(
+                array_agg(fsa.screen_id::text) FILTER (WHERE fsa.screen_id IS NOT NULL),
+                '{}'
+              ) AS screen_ids
+       FROM filler_content f
+       LEFT JOIN filler_screen_assignments fsa ON fsa.filler_id = f.id
+       GROUP BY f.id
+       ORDER BY f.created_at DESC`
     );
     res.json(result.rows);
   } catch (err) { next(err); }
@@ -63,6 +71,19 @@ router.post('/upload', authenticate, requireAdmin, upload.single('file'), async 
        VALUES ($1,$2,$3,$4,TRUE) RETURNING *`,
       [title, fileUrl, isVideo ? 'video' : 'image', duration]
     );
+    const filler = result.rows[0];
+
+    // Save screen assignments (empty array = all screens)
+    let screenIds = [];
+    try { screenIds = JSON.parse(req.body.screen_ids || '[]'); } catch (_) {}
+    if (Array.isArray(screenIds) && screenIds.length) {
+      for (const sid of screenIds) {
+        await query(
+          `INSERT INTO filler_screen_assignments (filler_id, screen_id) VALUES ($1,$2) ON CONFLICT DO NOTHING`,
+          [filler.id, sid]
+        );
+      }
+    }
 
     // Notify all online screens to reload their schedule
     await query(
@@ -71,24 +92,36 @@ router.post('/upload', authenticate, requireAdmin, upload.single('file'), async 
        FROM screens WHERE status = 'online'`
     ).catch(() => {});
 
-    res.status(201).json(result.rows[0]);
+    res.status(201).json({ ...filler, screen_ids: screenIds });
   } catch (err) { next(err); }
 });
 
-// PATCH /api/filler/:id — update title / duration / active state
+// PATCH /api/filler/:id — update title / duration / active state / screen assignments
 router.patch('/:id', authenticate, requireAdmin, async (req, res, next) => {
-  const { title, duration_sec, is_active } = req.body;
+  const { title, duration_sec, is_active, screen_ids } = req.body;
   try {
     const result = await query(
       `UPDATE filler_content
-       SET title       = COALESCE($1, title),
+       SET title        = COALESCE($1, title),
            duration_sec = COALESCE($2, duration_sec),
-           is_active   = COALESCE($3, is_active)
+           is_active    = COALESCE($3, is_active)
        WHERE id = $4 RETURNING *`,
       [title || null, duration_sec || null, is_active ?? null, req.params.id]
     );
     if (!result.rows.length) return res.status(404).json({ error: 'Not found' });
-    res.json(result.rows[0]);
+
+    // Replace screen assignments if provided
+    if (Array.isArray(screen_ids)) {
+      await query(`DELETE FROM filler_screen_assignments WHERE filler_id=$1`, [req.params.id]);
+      for (const sid of screen_ids) {
+        await query(
+          `INSERT INTO filler_screen_assignments (filler_id, screen_id) VALUES ($1,$2) ON CONFLICT DO NOTHING`,
+          [req.params.id, sid]
+        );
+      }
+    }
+
+    res.json({ ...result.rows[0], screen_ids: screen_ids ?? [] });
   } catch (err) { next(err); }
 });
 

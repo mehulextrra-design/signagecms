@@ -153,8 +153,15 @@ router.get('/schedule', authenticatePlayer, async (req, res, next) => {
 
     // ── TIER 4: FILLER ──────────────────────────────────────────────────────
     const fillerRes = await query(
-      `SELECT id AS content_id, file_url, type AS content_type, duration_sec, title
-       FROM filler_content WHERE is_active=TRUE ORDER BY created_at DESC`
+      `SELECT f.id AS content_id, f.file_url, f.type AS content_type, f.duration_sec, f.title
+       FROM filler_content f
+       WHERE f.is_active = TRUE
+         AND (
+           NOT EXISTS (SELECT 1 FROM filler_screen_assignments WHERE filler_id = f.id)
+           OR EXISTS  (SELECT 1 FROM filler_screen_assignments WHERE filler_id = f.id AND screen_id = $1)
+         )
+       ORDER BY f.created_at DESC`,
+      [screenId]
     );
     const fillerItems = fillerRes.rows;
     const nFiller = fillerItems.length || 1;
