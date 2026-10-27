@@ -47,6 +47,13 @@ app.use(cors({ origin: process.env.CMS_ORIGIN || '*', credentials: true }));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
+// Favicon — browsers auto-request /favicon.ico before reading <link> tags
+app.get('/favicon.ico', (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/favicon.svg'), {
+    headers: { 'Content-Type': 'image/svg+xml', 'Cache-Control': 'public, max-age=86400' }
+  });
+});
+
 // CMS frontend — HTML files never cached, assets cached 1 day
 app.use(express.static(path.join(__dirname, '../public'), {
   setHeaders(res, filePath) {
