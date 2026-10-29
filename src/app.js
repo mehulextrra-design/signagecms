@@ -22,6 +22,7 @@ const venuePartnerRoutes = require('./routes/venuePartners');
 const fillerRoutes = require('./routes/filler');
 const facebookRoutes = require('./routes/facebook');
 const contactRoutes = require('./routes/contact');
+const googleRoutes  = require('./routes/google');
 
 const { startScheduler } = require('./services/scheduler');
 
@@ -88,6 +89,7 @@ app.use('/api/venue-partners', venuePartnerRoutes);
 app.use('/api/filler', fillerRoutes);
 app.use('/api/auth/facebook', facebookRoutes);
 app.use('/api/contact', contactRoutes);
+app.use('/api/auth/google', googleRoutes);
 
 // Privacy Policy — required by Meta app review
 app.get('/privacy', (req, res) => {
