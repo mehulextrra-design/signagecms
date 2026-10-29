@@ -1021,33 +1021,76 @@
           <!-- Social Accounts -->
           <div class="profile-section" id="social-accounts-section">
             <div class="profile-section-title">Social Accounts</div>
-            <div id="fb-connect-status" style="margin-bottom:12px;">
-              <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--border);border-radius:8px;background:var(--bg);">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="#1877F2"><path d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.41c0-3.025 1.792-4.697 4.533-4.697 1.312 0 2.686.236 2.686.236v2.97h-1.514c-1.491 0-1.956.93-1.956 1.886v2.269h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z"/></svg>
-                <div style="flex:1;">
-                  <div style="font-size:13px;font-weight:600;color:var(--text);" id="fb-page-name">Facebook Page</div>
-                  <div style="font-size:11px;color:var(--text2);" id="fb-ig-name">Not connected</div>
+            <div style="font-size:12px;color:var(--text2);margin-bottom:14px;line-height:1.5;">
+              Connect your social accounts to automatically post your campaign creative when it goes live on screen.
+            </div>
+
+            <!-- Facebook -->
+            <div style="border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:10px;">
+              <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect width="24" height="24" rx="6" fill="#1877F2"/>
+                  <path d="M16.5 8H14.5C13.948 8 13.5 8.448 13.5 9V11H16.5L16 14H13.5V22H10.5V14H8.5V11H10.5V9C10.5 7.343 11.843 6 13.5 6H16.5V8Z" fill="white"/>
+                </svg>
+                <div style="flex:1;min-width:0;">
+                  <div style="font-size:13px;font-weight:600;color:var(--text);line-height:1.3;" id="fb-page-name">Facebook Page</div>
+                  <div style="font-size:11px;color:var(--text2);margin-top:1px;" id="fb-ig-name">Not connected</div>
                 </div>
-                <button id="fb-connect-btn" onclick="connectFacebook()" style="padding:6px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:none;background:#1877F2;color:#fff;">Connect</button>
+                <button id="fb-connect-btn" onclick="connectFacebook()" style="padding:6px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:none;background:#1877F2;color:#fff;white-space:nowrap;flex-shrink:0;">Connect</button>
+              </div>
+              <div style="padding:8px 14px 10px;background:var(--bg);border-top:1px solid var(--border);font-size:11px;color:var(--text2);line-height:1.5;">
+                Posts to your Facebook Page + linked Instagram Business account when campaign goes live.
               </div>
             </div>
-            <div style="font-size:11px;color:var(--text2);line-height:1.5;">
-              Connect your Facebook Page to automatically post campaigns to Facebook &amp; Instagram when they go live.
+
+            <!-- Instagram -->
+            <div style="border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:10px;">
+              <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;">
+                <svg width="22" height="22" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <defs>
+                    <radialGradient id="ig-g1" cx="30%" cy="110%" r="150%">
+                      <stop offset="0%" stop-color="#fdf497"/>
+                      <stop offset="10%" stop-color="#fdf497"/>
+                      <stop offset="50%" stop-color="#fd5949"/>
+                      <stop offset="68%" stop-color="#d6249f"/>
+                      <stop offset="100%" stop-color="#285AEB"/>
+                    </radialGradient>
+                  </defs>
+                  <rect width="24" height="24" rx="6" fill="url(#ig-g1)"/>
+                  <rect x="6" y="6" width="12" height="12" rx="3.5" stroke="white" stroke-width="1.5" fill="none"/>
+                  <circle cx="12" cy="12" r="3" stroke="white" stroke-width="1.5" fill="none"/>
+                  <circle cx="16.2" cy="7.8" r="0.9" fill="white"/>
+                </svg>
+                <div style="flex:1;min-width:0;">
+                  <div style="font-size:13px;font-weight:600;color:var(--text);line-height:1.3;" id="ig-username-label">Instagram Business</div>
+                  <div style="font-size:11px;color:var(--text2);margin-top:1px;" id="ig-status-label">Not connected</div>
+                </div>
+                <button id="ig-connect-btn" onclick="connectInstagram()" style="padding:6px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:none;background:linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);color:#fff;white-space:nowrap;flex-shrink:0;">Connect</button>
+              </div>
+              <div style="padding:8px 14px 10px;background:var(--bg);border-top:1px solid var(--border);font-size:11px;color:var(--text2);line-height:1.5;">
+                For Instagram Business accounts — works even without a Facebook Page. Requires a Business or Creator account.
+              </div>
             </div>
 
             <!-- Google Business Profile -->
-            <div id="gbp-connect-status" style="margin-top:12px;margin-bottom:12px;">
-              <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--border);border-radius:8px;background:var(--bg);">
-                <svg width="20" height="20" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-                <div style="flex:1;">
-                  <div style="font-size:13px;font-weight:600;color:var(--text);" id="gbp-name">Google Business Profile</div>
-                  <div style="font-size:11px;color:var(--text2);" id="gbp-location">Not connected</div>
+            <div style="border:1px solid var(--border);border-radius:10px;overflow:hidden;">
+              <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;">
+                <svg width="22" height="22" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <rect width="24" height="24" rx="6" fill="#fff" stroke="#e0e0e0" stroke-width="0.5"/>
+                  <path d="M21.35 11.1H12v3.2h5.35c-.5 2.4-2.55 4.15-5.35 4.15A6.45 6.45 0 0 1 5.55 12 6.45 6.45 0 0 1 12 5.55c1.6 0 3.05.6 4.15 1.55L18.6 4.6A10.85 10.85 0 0 0 12 2 10 10 0 0 0 2 12a10 10 0 0 0 10 10c5.52 0 9.8-3.9 9.8-9.65 0-.65-.07-1.28-.18-1.88h-.27z" fill="#4285F4"/>
+                  <path d="M3.15 7.35l3.3 2.4A6.45 6.45 0 0 1 12 5.55c1.6 0 3.05.6 4.15 1.55L18.6 4.6A10.85 10.85 0 0 0 12 2a10 10 0 0 0-8.85 5.35z" fill="#EA4335"/>
+                  <path d="M12 22c2.85 0 5.25-.95 7-2.55l-3.25-2.65c-.95.65-2.2 1.05-3.75 1.05a6.45 6.45 0 0 1-6.1-4.4L2.3 16.1A10 10 0 0 0 12 22z" fill="#34A853"/>
+                  <path d="M2.3 16.1l3.3-2.65c-.2-.6-.3-1.25-.3-1.95s.1-1.35.3-1.95L2.15 7.1A10 10 0 0 0 2 12c0 1.75.45 3.4 1.25 4.85l-.95-.75z" fill="#FBBC05"/>
+                </svg>
+                <div style="flex:1;min-width:0;">
+                  <div style="font-size:13px;font-weight:600;color:var(--text);line-height:1.3;" id="gbp-name">Google Business Profile</div>
+                  <div style="font-size:11px;color:var(--text2);margin-top:1px;" id="gbp-location">Not connected</div>
                 </div>
-                <button id="gbp-connect-btn" onclick="connectGoogle()" style="padding:6px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:none;background:#4285F4;color:#fff;">Connect</button>
+                <button id="gbp-connect-btn" onclick="connectGoogle()" style="padding:6px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:none;background:#4285F4;color:#fff;white-space:nowrap;flex-shrink:0;">Connect</button>
               </div>
-            </div>
-            <div style="font-size:11px;color:var(--text2);line-height:1.5;">
-              Connect your Google Business Profile to automatically post campaigns as local posts when they go live.
+              <div style="padding:8px 14px 10px;background:var(--bg);border-top:1px solid var(--border);font-size:11px;color:var(--text2);line-height:1.5;">
+                Posts campaign creative as a local post on your Google Business Profile when campaign goes live.
+              </div>
             </div>
           </div>
 
@@ -1150,12 +1193,16 @@ window.addEventListener('DOMContentLoaded',()=>{
   const _fbError=new URLSearchParams(location.search).get('fb_error');
   const _gbpConnected=new URLSearchParams(location.search).get('gbp_connected');
   const _gbpError=new URLSearchParams(location.search).get('gbp_error');
-  if(_fbConnected||_fbError||_gbpConnected||_gbpError) history.replaceState({},'','/#profile');
+  const _igConnected=new URLSearchParams(location.search).get('ig_connected');
+  const _igError=new URLSearchParams(location.search).get('ig_error');
+  if(_fbConnected||_fbError||_gbpConnected||_gbpError||_igConnected||_igError) history.replaceState({},'','/#profile');
   if(token) loadUserInfo().then(()=>{
     if(_fbConnected){showPage('profile');toast('Facebook connected successfully!','success');}
     if(_fbError){toast('Facebook error: '+decodeURIComponent(_fbError),'error');}
     if(_gbpConnected){showPage('profile');toast('Google Business Profile connected!','success');}
     if(_gbpError){toast('Google error: '+decodeURIComponent(_gbpError),'error');}
+    if(_igConnected){showPage('profile');toast('Instagram connected successfully!','success');}
+    if(_igError){toast('Instagram error: '+decodeURIComponent(_igError),'error');}
   }).catch(()=>{clearToken();showAuthScreen();});
   else showAuthScreen();
   const d=s=>s.toISOString().slice(0,10);
@@ -1365,7 +1412,7 @@ function navigate(page, fromPopstate){
   if(page==='invoices')loadInvoices();
   if(page==='analytics')loadAnalytics();
   if(page==='pop')initPop();
-  if(page==='profile'){loadProfile();loadFbStatus();loadGoogleStatus();}
+  if(page==='profile'){loadProfile();loadFbStatus();loadIgStatus();loadGoogleStatus();}
   if(page==='screens'){ loadScreens().then(()=>{ renderScreensList(); if(_screensView==='map') renderScreensMap(); }); }
   if(page==='new-campaign')initWizard();
   if(page==='wallet')loadWallet();
@@ -2037,6 +2084,45 @@ async function disconnectFacebook(){
     await api('/auth/facebook/disconnect',{method:'POST'});
     toast('Facebook disconnected','success');
     loadFbStatus();
+  }catch(e){toast('Could not disconnect','error');}
+}
+
+async function loadIgStatus(){
+  try{
+    const s=await api('/auth/instagram/status');
+    const btn=document.getElementById('ig-connect-btn');
+    const label=document.getElementById('ig-username-label');
+    const sub=document.getElementById('ig-status-label');
+    if(!btn)return;
+    if(s.connected){
+      label.textContent=s.ig_username?`@${s.ig_username}`:'Instagram Business';
+      sub.textContent=s.via_facebook?'Connected via Facebook':'Connected directly';
+      btn.textContent='Disconnect';
+      btn.style.background='#e53e3e';
+      btn.onclick=disconnectInstagram;
+    }else{
+      label.textContent='Instagram Business';
+      sub.textContent='Not connected';
+      btn.textContent='Connect';
+      btn.style.background='linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888)';
+      btn.onclick=connectInstagram;
+    }
+  }catch(_){}
+}
+
+async function connectInstagram(){
+  try{
+    const data=await api('/auth/instagram/connect');
+    window.location.href=data.url;
+  }catch(e){toast('Could not start Instagram login','error');}
+}
+
+async function disconnectInstagram(){
+  if(!confirm('Disconnect Instagram? Auto-posting will stop.'))return;
+  try{
+    await api('/auth/instagram/disconnect',{method:'POST'});
+    toast('Instagram disconnected','success');
+    loadIgStatus();
   }catch(e){toast('Could not disconnect','error');}
 }
 

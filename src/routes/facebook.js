@@ -144,6 +144,7 @@ async function postCampaignToSocial(campaignId) {
   const result = await query(
     `SELECT c.id, c.title, c.campaign_code, c.start_date, c.end_date,
             u.fb_page_id, u.fb_page_name, u.fb_page_access_token, u.ig_user_id,
+            u.ig_direct_user_id, u.ig_access_token,
             ct.file_url, ct.type AS content_type
      FROM campaigns c
      JOIN users u ON u.id = c.user_id
@@ -183,8 +184,8 @@ async function postCampaignToSocial(campaignId) {
     console.error(`[Social] FB post failed for campaign ${row.campaign_code}:`, err.message);
   }
 
-  // Instagram with image
-  if (row.ig_user_id && row.file_url && row.content_type === 'image') {
+  // Instagram via Facebook Page (existing path)
+  if (row.ig_user_id && row.fb_page_access_token && row.file_url && row.content_type === 'image') {
     try {
       const container = await fbApiPost(`/${row.ig_user_id}/media`, {
         image_url: row.file_url,
@@ -196,9 +197,28 @@ async function postCampaignToSocial(campaignId) {
         access_token: row.fb_page_access_token
       });
       if (publish.error) throw new Error(publish.error.message);
-      console.log(`[Social] Posted to Instagram for campaign ${row.campaign_code}: media_id=${publish.id}`);
+      console.log(`[Social] Posted to Instagram (via FB page) for campaign ${row.campaign_code}: media_id=${publish.id}`);
     } catch (err) {
-      console.error(`[Social] IG post failed for campaign ${row.campaign_code}:`, err.message);
+      console.error(`[Social] IG (via FB page) post failed for campaign ${row.campaign_code}:`, err.message);
+    }
+  }
+
+  // Instagram via standalone connect (no FB page required)
+  if (row.ig_direct_user_id && row.ig_access_token && !row.fb_page_access_token && row.file_url && row.content_type === 'image') {
+    try {
+      const container = await fbApiPost(`/${row.ig_direct_user_id}/media`, {
+        image_url: row.file_url,
+        access_token: row.ig_access_token
+      });
+      if (container.error) throw new Error(container.error.message);
+      const publish = await fbApiPost(`/${row.ig_direct_user_id}/media_publish`, {
+        creation_id: container.id,
+        access_token: row.ig_access_token
+      });
+      if (publish.error) throw new Error(publish.error.message);
+      console.log(`[Social] Posted to Instagram (direct) for campaign ${row.campaign_code}: media_id=${publish.id}`);
+    } catch (err) {
+      console.error(`[Social] IG (direct) post failed for campaign ${row.campaign_code}:`, err.message);
     }
   }
 }
