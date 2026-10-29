@@ -137,6 +137,10 @@ router.get('/callback', async (req, res) => {
 
     // Get Google Business accounts
     const accounts = await googleGet('https://mybusinessaccountmanagement.googleapis.com/v1/accounts', accessToken);
+    console.log('[Google OAuth] accounts response:', JSON.stringify(accounts).slice(0, 500));
+    if (accounts.error) {
+      return res.redirect('/?gbp_error=' + encodeURIComponent(accounts.error.message || accounts.error.status || 'api_error'));
+    }
     if (!accounts.accounts || !accounts.accounts.length) {
       return res.redirect('/?gbp_error=no_business_account');
     }
