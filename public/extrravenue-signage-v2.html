@@ -984,7 +984,7 @@ body{margin:0;background:#f2efe9;}
           <div class="scard-idx" style="justify-content:flex-start;gap:10px"><span>06</span><div class="dot"></div></div>
           <h3 class="h-md">Aapke paas screen hai? Revenue generate karein.</h3>
           <p>Agar aapke venue — commercial complex, society lobby, gym ya cafe — mein display screens hain, to unhe extrravenue network par register karein. Advertisers ads chalayenge aur aapko monthly automated payouts milenge.</p>
-          <a class="btn btn-sm" style="background:#fff;color:var(--dark);border-radius:999px;padding:11px 20px;font-size:13.5px;font-weight:600;" href="https://signagecrm-production.up.railway.app">Venue partner bano &rarr;</a>
+          <a class="btn btn-sm" style="background:#fff;color:var(--dark);border-radius:999px;padding:11px 20px;font-size:13.5px;font-weight:600;cursor:pointer;" href="#" onclick="openVenuePartner();return false;">Venue partner bano &rarr;</a>
         </div>
         <div class="so-ring"><span><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span></div>
       </div>
@@ -1814,7 +1814,7 @@ function loadPreset(key){
         <h3 style="font-family:'Magra',sans-serif;font-size:clamp(22px,2.4vw,34px);font-weight:700;color:#fff;line-height:1.15;margin:0;letter-spacing:-.02em;text-wrap:balance;">Aapke paas screen hai? Revenue generate karein.</h3>
         <p style="font-size:15px;color:rgba(255,255,255,.82);margin:0;max-width:46ch;line-height:1.6;">Agar aapke venue — commercial complex, society lobby, gym ya cafe — mein display screens hain, to unhe extrravenue network par register karein. Advertisers ads chalayenge aur aapko monthly automated payouts milenge.</p>
         <div>
-          <a href="https://signagecrm-production.up.railway.app" style="display:inline-flex;align-items:center;gap:8px;background:#fff;color:var(--dark);border-radius:999px;padding:11px 22px;font-size:14px;font-weight:600;text-decoration:none;transition:box-shadow .2s;" onmouseover="this.style.boxShadow='0 8px 24px rgba(0,0,0,.18)'" onmouseout="this.style.boxShadow='none'">Venue partner bano &rarr;</a>
+          <a href="#" onclick="openVenuePartner();return false;" style="display:inline-flex;align-items:center;gap:8px;background:#fff;color:var(--dark);border-radius:999px;padding:11px 22px;font-size:14px;font-weight:600;text-decoration:none;transition:box-shadow .2s;cursor:pointer;" onmouseover="this.style.boxShadow='0 8px 24px rgba(0,0,0,.18)'" onmouseout="this.style.boxShadow='none'">Venue partner bano &rarr;</a>
         </div>
       </div>
       <!-- Right: animated ring -->
@@ -3121,6 +3121,290 @@ window.addEventListener('load',function(){gmTab('facebook');gmPreset('grocery');
     </div>
   </div>
 </div>
+
+<!-- Venue Partner Overlay -->
+<style>
+#vp-overlay{position:fixed;inset:0;z-index:9995;background:#f2efe9;overflow-y:auto;overflow-x:hidden;transform:translateX(100%);transition:transform .45s cubic-bezier(.22,.61,.36,1);}
+#vp-overlay.vp-open{transform:translateX(0);}
+body.vp-locked{overflow:hidden;}
+#vp-back{position:sticky;top:0;z-index:10;background:#f2efe9;border-bottom:1px solid rgba(26,23,20,.1);padding:13px max(20px,env(safe-area-inset-left,0px));display:flex;align-items:center;justify-content:space-between;gap:16px;}
+#vp-back-btn{display:inline-flex;align-items:center;gap:8px;background:none;border:none;font-family:'Libre Franklin',sans-serif;font-size:14px;font-weight:600;color:#1a1714;cursor:pointer;padding:6px 0;}
+#vp-back-btn svg{transition:transform .18s;}
+#vp-back-btn:hover svg{transform:translateX(-3px);}
+#vp-portal-btn{background:#ff5c00;color:#fff;border:none;padding:9px 18px;border-radius:99px;font-family:'Libre Franklin',sans-serif;font-size:13px;font-weight:600;cursor:pointer;text-decoration:none;white-space:nowrap;transition:background .18s;}
+#vp-portal-btn:hover{background:#e04f00;}
+.vp-wrap{max-width:1120px;margin:0 auto;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px));}
+/* hero */
+.vp-hero{padding-block:72px 64px;}
+.vp-hero-inner{display:grid;grid-template-columns:1fr 380px;gap:52px;align-items:center;}
+.vp-eyebrow{display:inline-flex;align-items:center;gap:7px;font-size:10.5px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#ff5c00;margin-bottom:18px;}
+.vp-eyebrow-dot{width:5px;height:5px;border-radius:50%;background:#ff5c00;}
+.vp-h1{font-family:'Magra',sans-serif;font-size:clamp(30px,4vw,52px);font-weight:700;line-height:1.1;letter-spacing:-.02em;text-wrap:balance;margin-bottom:18px;color:#1a1714;}
+.vp-h1 em{color:#ff5c00;font-style:normal;}
+.vp-sub{font-size:16px;color:rgba(26,23,20,.58);max-width:52ch;line-height:1.65;margin-bottom:28px;}
+.vp-ctas{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.vp-btn{background:#ff5c00;color:#fff;padding:13px 26px;border-radius:12px;font-weight:600;font-size:15px;text-decoration:none;display:inline-block;transition:background .18s,transform .18s;}
+.vp-btn:hover{background:#e04f00;transform:translateY(-2px);}
+.vp-link{color:rgba(26,23,20,.58);font-size:14px;text-decoration:none;border-bottom:1px solid rgba(26,23,20,.25);padding-bottom:1px;transition:color .18s;}
+.vp-link:hover{color:#1a1714;}
+/* network card */
+.vp-vis{background:#1a1714;border-radius:20px;padding:26px 22px;display:flex;flex-direction:column;gap:14px;}
+.vp-vis-lbl{font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:rgba(242,239,233,.4);margin-bottom:2px;}
+.vp-vis-tag{display:inline-flex;align-items:center;gap:6px;background:rgba(255,92,0,.18);color:#ff5c00;border:1px solid rgba(255,92,0,.35);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;border-radius:99px;padding:4px 12px;margin-bottom:10px;}
+.vp-vis-row{display:flex;align-items:center;justify-content:space-between;padding:11px 13px;background:rgba(255,255,255,.06);border-radius:10px;gap:10px;}
+.vp-vis-scr{display:flex;align-items:center;gap:9px;}
+.vp-dot{width:7px;height:7px;border-radius:50%;background:#2ecc71;flex-shrink:0;}
+.vp-dot-o{background:#ff5c00;}
+.vp-vis-name{font-size:13px;font-weight:500;color:rgba(242,239,233,.85);}
+.vp-vis-loc{font-size:11px;color:rgba(242,239,233,.38);}
+.vp-live{font-size:11px;font-weight:600;color:#2ecc71;}
+.vp-yours{color:#ff5c00;}
+.vp-vis-hr{border:none;border-top:1px solid rgba(255,255,255,.08);margin:2px 0;}
+.vp-vis-foot{font-size:11px;color:rgba(242,239,233,.45);text-align:center;}
+.vp-vis-foot strong{color:#ff5c00;}
+/* stats */
+.vp-stats{background:#ff5c00;color:#fff;padding-block:44px;}
+.vp-stats-row{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;}
+.vp-stat{text-align:center;padding:14px 44px;border-right:1px solid rgba(255,255,255,.25);}
+.vp-stat:last-child{border-right:none;}
+.vp-stat-n{font-family:'Magra',sans-serif;font-size:clamp(30px,4vw,46px);font-weight:700;line-height:1;letter-spacing:-.03em;}
+.vp-stat-l{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;opacity:.75;margin-top:4px;}
+/* benefits */
+.vp-sec{padding-block:72px;}
+.vp-sec-head{text-align:center;margin-bottom:48px;}
+.vp-eyebrow2{display:inline-flex;align-items:center;gap:7px;font-size:10.5px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#ff5c00;margin-bottom:12px;}
+.vp-eyebrow2 i{display:block;width:22px;height:2px;background:#ff5c00;}
+.vp-h2{font-family:'Magra',sans-serif;font-size:clamp(24px,3vw,38px);font-weight:700;letter-spacing:-.02em;text-wrap:balance;color:#1a1714;}
+.vp-sub2{font-size:15px;color:rgba(26,23,20,.58);margin-top:8px;max-width:52ch;margin-inline:auto;}
+.vp-bgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+.vp-bcard{background:#ebe6dd;border-radius:20px;padding:26px 22px;border:2px solid transparent;transition:border-color .25s,transform .25s,box-shadow .25s;}
+.vp-bcard:hover{border-color:rgba(255,92,0,.3);transform:translateY(-4px);box-shadow:0 14px 32px -10px rgba(26,23,20,.14);}
+.vp-bcard.vp-main{background:#1a1714;color:#fff;border-color:#ff5c00;}
+.vp-bico{width:42px;height:42px;border-radius:11px;background:rgba(255,92,0,.12);display:grid;place-items:center;margin-bottom:16px;}
+.vp-bcard.vp-main .vp-bico{background:rgba(255,92,0,.2);}
+.vp-bico svg{color:#ff5c00;}
+.vp-bcard h3{font-family:'Magra',sans-serif;font-size:17px;font-weight:700;margin-bottom:7px;color:#1a1714;}
+.vp-bcard.vp-main h3{color:#fff;}
+.vp-bcard p{font-size:13.5px;color:rgba(26,23,20,.58);line-height:1.65;}
+.vp-bcard.vp-main p{color:rgba(242,239,233,.65);}
+.vp-badge{display:inline-block;margin-top:12px;font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#ff5c00;background:rgba(255,92,0,.12);border-radius:99px;padding:3px 10px;}
+.vp-bcard.vp-main .vp-badge{background:rgba(255,92,0,.25);}
+/* steps */
+.vp-steps{background:#1a1714;color:#fff;padding-block:64px;}
+.vp-sgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-top:40px;}
+.vp-step{padding:28px 24px;background:rgba(255,255,255,.04);border-radius:20px;position:relative;}
+.vp-step-n{font-family:'Magra',sans-serif;font-size:48px;font-weight:700;line-height:1;color:rgba(255,92,0,.18);margin-bottom:14px;letter-spacing:-.04em;}
+.vp-step h3{font-family:'Magra',sans-serif;font-size:17px;font-weight:700;margin-bottom:7px;color:#fff;}
+.vp-step p{font-size:13px;color:rgba(242,239,233,.6);line-height:1.65;}
+.vp-arr{position:absolute;right:-13px;top:50%;transform:translateY(-50%);color:rgba(255,92,0,.4);font-size:18px;z-index:1;}
+/* req */
+.vp-rgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:36px;}
+.vp-rcard{background:#ebe6dd;border-radius:20px;padding:22px;display:flex;gap:14px;align-items:flex-start;}
+.vp-rico{width:38px;height:38px;border-radius:10px;background:rgba(255,92,0,.1);display:grid;place-items:center;flex-shrink:0;}
+.vp-rico svg{color:#ff5c00;}
+.vp-rcard h4{font-family:'Magra',sans-serif;font-size:14px;font-weight:700;margin-bottom:3px;color:#1a1714;}
+.vp-rcard p{font-size:12.5px;color:rgba(26,23,20,.58);line-height:1.55;}
+/* cta band */
+.vp-cta{background:#1a1714;color:#fff;padding-block:72px;text-align:center;}
+.vp-cta h2{font-family:'Magra',sans-serif;font-size:clamp(26px,3.5vw,44px);font-weight:700;letter-spacing:-.02em;text-wrap:balance;margin-bottom:14px;}
+.vp-cta p{font-size:15px;color:rgba(242,239,233,.62);margin-bottom:28px;}
+.vp-cta-note{margin-top:16px;font-size:11.5px;color:rgba(242,239,233,.35);}
+/* footer */
+.vp-foot{background:#ff5c00;color:#fff;padding-block:18px;text-align:center;font-size:12px;font-weight:500;}
+/* responsive */
+@media(max-width:900px){
+  .vp-hero-inner{grid-template-columns:1fr;}
+  .vp-vis{display:none;}
+  .vp-bgrid{grid-template-columns:1fr;}
+  .vp-sgrid{grid-template-columns:1fr;gap:8px;}
+  .vp-arr{display:none;}
+  .vp-rgrid{grid-template-columns:1fr;}
+  .vp-stat{padding:12px 24px;border-right:none;border-bottom:1px solid rgba(255,255,255,.2);}
+  .vp-stat:last-child{border-bottom:none;}
+}
+@media(max-width:600px){.vp-hero{padding-block:52px 44px;}.vp-sec{padding-block:52px;}}
+</style>
+
+<div id="vp-overlay">
+  <!-- Back bar -->
+  <div id="vp-back">
+    <button id="vp-back-btn" onclick="closeVenuePartner()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+      Wapas
+    </button>
+    <a href="https://signagecrm-production.up.railway.app" id="vp-portal-btn">Venue Portal →</a>
+  </div>
+
+  <!-- Hero -->
+  <div class="vp-hero">
+    <div class="vp-wrap">
+      <div class="vp-hero-inner">
+        <div>
+          <div class="vp-eyebrow"><span class="vp-eyebrow-dot"></span>Venue Partner Program</div>
+          <h1 class="vp-h1">Apni screen register karo —<br>apna ad puri network pe <em>FREE</em></h1>
+          <p class="vp-sub">ExtrraVenue ke Ahmedabad network ka hissa bano. Koi rent nahi, koi fees nahi — sirf apne venue ki screen register karo aur apna promotion puri city mein chalao.</p>
+          <div class="vp-ctas">
+            <a href="https://signagecrm-production.up.railway.app" class="vp-btn">Partner bano →</a>
+            <a href="#vp-how" class="vp-link">Kaise kaam karta hai?</a>
+          </div>
+        </div>
+        <div class="vp-vis">
+          <div>
+            <div class="vp-vis-lbl">Live Network — Ahmedabad</div>
+            <span class="vp-vis-tag">● 36 Screens Active</span>
+          </div>
+          <div class="vp-vis-row">
+            <div class="vp-vis-scr"><span class="vp-dot vp-dot-o"></span><div><div class="vp-vis-name">Aapka Venue</div><div class="vp-vis-loc">Aapki screen — aapka ad</div></div></div>
+            <span class="vp-live vp-yours">YOUR AD ●</span>
+          </div>
+          <hr class="vp-vis-hr">
+          <div class="vp-vis-row">
+            <div class="vp-vis-scr"><span class="vp-dot"></span><div><div class="vp-vis-name">CG Road Cafe</div><div class="vp-vis-loc">CG Road, Ahmedabad</div></div></div>
+            <span class="vp-live">Live ●</span>
+          </div>
+          <div class="vp-vis-row">
+            <div class="vp-vis-scr"><span class="vp-dot"></span><div><div class="vp-vis-name">SG Highway Gym</div><div class="vp-vis-loc">SG Highway, Ahmedabad</div></div></div>
+            <span class="vp-live">Live ●</span>
+          </div>
+          <div class="vp-vis-row">
+            <div class="vp-vis-scr"><span class="vp-dot"></span><div><div class="vp-vis-name">Navrangpura Salon</div><div class="vp-vis-loc">Navrangpura, Ahmedabad</div></div></div>
+            <span class="vp-live">Live ●</span>
+          </div>
+          <p class="vp-vis-foot">+32 more screens — <strong>sab pe aapka ad chalega</strong></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="vp-stats">
+    <div class="vp-wrap">
+      <div class="vp-stats-row">
+        <div class="vp-stat"><div class="vp-stat-n">36</div><div class="vp-stat-l">Active Screens</div></div>
+        <div class="vp-stat"><div class="vp-stat-n">15h</div><div class="vp-stat-l">Daily Runtime</div></div>
+        <div class="vp-stat"><div class="vp-stat-n">1.08L+</div><div class="vp-stat-l">Monthly Impressions</div></div>
+        <div class="vp-stat"><div class="vp-stat-n">₹0</div><div class="vp-stat-l">Partner Ko Cost</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Benefits -->
+  <div class="vp-sec">
+    <div class="vp-wrap">
+      <div class="vp-sec-head">
+        <div class="vp-eyebrow2"><i></i>Partner Benefits</div>
+        <h2 class="vp-h2">Register karo, promote karo — bilkul free</h2>
+        <p class="vp-sub2">Sirf screen register karo — baaki sab ExtrraVenue sambhalta hai.</p>
+      </div>
+      <div class="vp-bgrid">
+        <div class="vp-bcard vp-main">
+          <div class="vp-bico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
+          <h3>Puri Network Pe Free Advertising</h3>
+          <p>Apna offer, event ya promotion upload karo — aur woh Ahmedabad ke sabhi 36 screens pe automatically chalega. Yeh wahi reach hai jo advertisers ₹1,499–₹5,999/month mein khareedte hain — aapko bilkul free.</p>
+          <span class="vp-badge">Worth ₹3,499/mo — FREE</span>
+        </div>
+        <div class="vp-bcard">
+          <div class="vp-bico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><polyline points="8 21 12 17 16 21"/></svg></div>
+          <h3>Screen Kabhi Blank Nahi</h3>
+          <p>Professional filler content aur network ads se aapki screen hamesha live aur engaging rehti hai — 8 AM se 11 PM tak. Blank ya boring screen se better customer experience milta hai.</p>
+          <span class="vp-badge">Always-On Content</span>
+        </div>
+        <div class="vp-bcard">
+          <div class="vp-bico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+          <h3>Zero Management</h3>
+          <p>Content scheduling, rotation, filler — sab kuch ExtrraVenue handle karta hai. Aapko sirf ek baar screen register karni hai. Uske baad kuch nahi karna.</p>
+          <span class="vp-badge">Set &amp; Forget</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- How it works -->
+  <div class="vp-steps" id="vp-how">
+    <div class="vp-wrap">
+      <div class="vp-sec-head" style="text-align:center;margin-bottom:0;">
+        <div class="vp-eyebrow2" style="color:rgba(242,239,233,.45);"><i style="background:rgba(242,239,233,.35);"></i>Process</div>
+        <h2 class="vp-h2" style="color:#fff;">Teen steps — bas</h2>
+      </div>
+      <div class="vp-sgrid">
+        <div class="vp-step">
+          <div class="vp-step-n">01</div>
+          <h3>Screen Register Karo</h3>
+          <p>Venue portal pe apna account banao aur apni screen ki details add karo — device model, location, aur display size.</p>
+          <span class="vp-arr">→</span>
+        </div>
+        <div class="vp-step">
+          <div class="vp-step-n">02</div>
+          <h3>Apna Ad Upload Karo</h3>
+          <p>Offer, event announcement ya brand image upload karo. Humari team 24 ghante mein approve karti hai aur schedule set karti hai.</p>
+          <span class="vp-arr">→</span>
+        </div>
+        <div class="vp-step">
+          <div class="vp-step-n">03</div>
+          <h3>Puri City Mein Live</h3>
+          <p>Aapka ad automatically puri 36-screen network pe rotate hone lagta hai — koi extra kaam nahi, koi fees nahi.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Requirements -->
+  <div class="vp-sec">
+    <div class="vp-wrap">
+      <div class="vp-sec-head">
+        <div class="vp-eyebrow2"><i></i>Requirements</div>
+        <h2 class="vp-h2">Aapki screen qualify karti hai?</h2>
+        <p class="vp-sub2">Bas yeh check karo — agar haan, toh aap ready hain.</p>
+      </div>
+      <div class="vp-rgrid">
+        <div class="vp-rcard">
+          <div class="vp-rico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><polyline points="8 21 12 17 16 21"/></svg></div>
+          <div><h4>Display Size</h4><p>32 inch ya usse bada screen — wall-mounted ya standing display, dono chalenge.</p></div>
+        </div>
+        <div class="vp-rcard">
+          <div class="vp-rico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg></div>
+          <div><h4>Android Device</h4><p>Android TV ya Android media player connected hona chahiye. Windows/Mac bhi consider karte hain.</p></div>
+        </div>
+        <div class="vp-rcard">
+          <div class="vp-rico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg></div>
+          <div><h4>Internet Connection</h4><p>WiFi ya 4G connection zaroori hai — screen ko content receive karne ke liye.</p></div>
+        </div>
+        <div class="vp-rcard">
+          <div class="vp-rico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+          <div><h4>Commercial Venue</h4><p>Restaurant, cafe, gym, salon, society lobby, office — footfall wali koi bhi commercial jagah.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Final CTA -->
+  <div class="vp-cta">
+    <div class="vp-wrap">
+      <h2>Apni screen ko kaam pe lagao — aaj se</h2>
+      <p>Register karo — partner approval 24 ghante mein hoti hai.</p>
+      <a href="https://signagecrm-production.up.railway.app" class="vp-btn" style="font-size:15px;padding:14px 32px;">Venue Portal pe Register Karo →</a>
+      <p class="vp-cta-note">Koi contract nahi · Koi fees nahi · Kabhi bhi exit</p>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="vp-foot">
+    <div class="vp-wrap">© 2026 extrravenue · Ahmedabad ka Digital Advertising Network</div>
+  </div>
+</div>
+
+<script>
+function openVenuePartner(){
+  document.getElementById('vp-overlay').classList.add('vp-open');
+  document.body.classList.add('vp-locked');
+  document.getElementById('vp-overlay').scrollTop=0;
+}
+function closeVenuePartner(){
+  document.getElementById('vp-overlay').classList.remove('vp-open');
+  document.body.classList.remove('vp-locked');
+}
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeVenuePartner();});
+</script>
 
 <!-- WhatsApp FAB -->
 <a id="wa-fab" href="https://wa.me/919274744022" target="_blank" rel="noopener" aria-label="Chat on WhatsApp">
