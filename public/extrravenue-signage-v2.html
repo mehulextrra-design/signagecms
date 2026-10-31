@@ -490,25 +490,21 @@ body{margin:0;background:#f2efe9;}
 .plan-feats li.off::before{content:"✗";color:var(--muted);font-weight:400;text-decoration:none;display:inline-block;}
 .featured .plan-feats li.off{color:rgba(242,239,233,.3);text-decoration-color:rgba(242,239,233,.2);}
 .featured .plan-feats li.off::before{color:rgba(242,239,233,.25);}
-.pcta{display:block;text-align:center;padding:11px 16px;border-radius:11px;font-weight:600;font-size:13.5px;background:var(--surface2);color:var(--fg);text-decoration:none;transition:background .15s;}
-.pcta:hover{background:var(--orange);color:#fff;}
+.pcta{display:block;text-align:center;padding:11px 16px;border-radius:11px;font-weight:600;font-size:13.5px;text-decoration:none;transition:background .2s,color .2s,box-shadow .2s;}
+.pcta-free{background:#1a8a4a;color:#fff;}
+.pcta-free:hover{background:#156e3b;box-shadow:0 4px 14px -4px rgba(26,138,74,.45);}
+.pcta-dark{background:var(--dark);color:var(--bg);}
+.pcta-dark:hover{background:#333;box-shadow:0 4px 14px -4px rgba(26,23,20,.35);}
+.pcta-outline{background:transparent;color:var(--orange);border:1.5px solid var(--orange);}
+.pcta-outline:hover{background:var(--orange);color:#fff;box-shadow:0 4px 14px -4px rgba(255,92,0,.4);}
 .featured .pcta{background:var(--orange);color:#fff;}
-.featured .pcta:hover{background:#e04f00;}
-.pcta-free{background:#1a8a4a!important;color:#fff!important;}
-.pcta-free:hover{opacity:.88;}
+.featured .pcta:hover{background:#e04f00;box-shadow:0 4px 14px -4px rgba(255,92,0,.5);}
 .plans-footnote{text-align:center;margin-top:28px;font-size:12px;color:var(--muted);}
 
-/* Plan collapse */
-.plan{cursor:pointer;}
-.plan-body{max-height:0;overflow:hidden;transition:max-height .45s cubic-bezier(.4,0,.2,1),opacity .35s ease;}
-.plan.open .plan-body{max-height:900px;}
-.plan-toggle{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:14px;font-size:10.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);transition:color .2s;}
-.featured .plan-toggle{color:rgba(242,239,233,.4);}
-.plan-toggle-icon{width:20px;height:20px;border-radius:50%;border:1.5px solid var(--line);display:grid;place-items:center;font-size:14px;line-height:1;transition:transform .35s,border-color .2s;flex-shrink:0;}
-.featured .plan-toggle-icon{border-color:rgba(242,239,233,.2);}
-.plan.open .plan-toggle-icon{transform:rotate(45deg);}
-.plan.open .plan-toggle{color:var(--orange);}
-.plan.open.featured .plan-toggle{color:#ff9060;}
+/* Card hover lift */
+.plan{transition:transform .25s ease,box-shadow .25s ease,border-color .25s;}
+.plan:hover{transform:translateY(-5px);box-shadow:0 18px 40px -14px rgba(26,23,20,.18);border-color:rgba(26,23,20,.15);}
+.plan.featured:hover{box-shadow:0 18px 40px -14px rgba(255,92,0,.35);}
 
 /* FAQ */
 .faq-layout{display:grid;grid-template-columns:.8fr 1.2fr;gap:56px;align-items:start;}
@@ -2315,36 +2311,33 @@ function loadPreset(key){
         <div class="plan-label">Trial</div>
         <div class="price-free">FREE</div>
         <div class="plan-slot">3 din only · 10-second slot · Ek baar</div>
-        <div class="plan-toggle"><span class="plan-toggle-icon">+</span></div>
-        <div class="plan-body">
-          <hr class="plan-div" style="margin-top:14px;">
-          <div class="plan-stats">
-            <div class="plan-stat">
-              <div class="plan-stat-num">24,300</div>
-              <div class="plan-stat-lbl">plays/day (10s)</div>
-            </div>
-            <div class="plan-stat">
-              <div class="plan-stat-num">72,900</div>
-              <div class="plan-stat-lbl">total plays (3 din)</div>
-            </div>
-            <div class="plan-stat">
-              <div class="plan-stat-num">~10,800</div>
-              <div class="plan-stat-lbl">viewer impressions (3 din)</div>
-            </div>
+        <hr class="plan-div">
+        <div class="plan-stats">
+          <div class="plan-stat">
+            <div class="plan-stat-num">24,300</div>
+            <div class="plan-stat-lbl">plays/day (10s)</div>
           </div>
-          <div class="channels">
-            <span class="ch-pill ch-screen"><svg width="20" height="20"><use href="#ico-screen"/></svg></span>
+          <div class="plan-stat">
+            <div class="plan-stat-num">72,900</div>
+            <div class="plan-stat-lbl">total plays (3 din)</div>
           </div>
-          <ul class="plan-feats">
-            <li>All Digital Network, 3 din</li>
-            <li>10-second ad slot</li>
-            <li>Proof of Play report</li>
-            <li class="off">Facebook + Instagram</li>
-            <li class="off">Google Business Profile</li>
-            <li class="off">Digital Card</li>
-          </ul>
-          <a class="pcta pcta-free" href="https://signagecrm-production.up.railway.app" onclick="event.stopPropagation()">Free mein try karo &rarr;</a>
+          <div class="plan-stat">
+            <div class="plan-stat-num">~10,800</div>
+            <div class="plan-stat-lbl">viewer impressions (3 din)</div>
+          </div>
         </div>
+        <div class="channels">
+          <span class="ch-pill ch-screen"><svg width="20" height="20"><use href="#ico-screen"/></svg></span>
+        </div>
+        <ul class="plan-feats">
+          <li>All Digital Network, 3 din</li>
+          <li>10-second ad slot</li>
+          <li>Proof of Play report</li>
+          <li class="off">Facebook + Instagram</li>
+          <li class="off">Google Business Profile</li>
+          <li class="off">Digital Card</li>
+        </ul>
+        <a class="pcta pcta-free" href="https://signagecrm-production.up.railway.app">Free mein try karo &rarr;</a>
       </div>
 
       <!-- Starter -->
@@ -2352,77 +2345,71 @@ function loadPreset(key){
         <div class="plan-label">Starter</div>
         <div class="price-amt">&#8377;1,499<span class="price-mo">/mo</span></div>
         <div class="plan-slot">Monthly · 10-second slot</div>
-        <div class="plan-toggle"><span class="plan-toggle-icon">+</span></div>
-        <div class="plan-body">
-          <hr class="plan-div" style="margin-top:14px;">
-          <div class="plan-stats">
-            <div class="plan-stat">
-              <div class="plan-stat-num">24,300</div>
-              <div class="plan-stat-lbl">plays/day (10s)</div>
-            </div>
-            <div class="plan-stat">
-              <div class="plan-stat-num">7,29,000</div>
-              <div class="plan-stat-lbl">plays/month</div>
-            </div>
-            <div class="plan-stat">
-              <div class="plan-stat-num">54,000+</div>
-              <div class="plan-stat-lbl">viewer impressions/month</div>
-            </div>
+        <hr class="plan-div">
+        <div class="plan-stats">
+          <div class="plan-stat">
+            <div class="plan-stat-num">24,300</div>
+            <div class="plan-stat-lbl">plays/day (10s)</div>
           </div>
-          <div class="channels">
-            <span class="ch-pill ch-screen"><svg width="20" height="20"><use href="#ico-screen"/></svg></span>
+          <div class="plan-stat">
+            <div class="plan-stat-num">7,29,000</div>
+            <div class="plan-stat-lbl">plays/month</div>
           </div>
-          <ul class="plan-feats">
-            <li>All Digital Network coverage</li>
-            <li>10-second ad slot</li>
-            <li>Proof of Play CSV report</li>
-            <li class="off">Facebook + Instagram</li>
-            <li class="off">Google Business Profile</li>
-            <li class="off">Digital Card</li>
-          </ul>
-          <a class="pcta" href="https://signagecrm-production.up.railway.app" onclick="event.stopPropagation()">Shuru karo &rarr;</a>
+          <div class="plan-stat">
+            <div class="plan-stat-num">54,000+</div>
+            <div class="plan-stat-lbl">viewer impressions/month</div>
+          </div>
         </div>
+        <div class="channels">
+          <span class="ch-pill ch-screen"><svg width="20" height="20"><use href="#ico-screen"/></svg></span>
+        </div>
+        <ul class="plan-feats">
+          <li>All Digital Network coverage</li>
+          <li>10-second ad slot</li>
+          <li>Proof of Play CSV report</li>
+          <li class="off">Facebook + Instagram</li>
+          <li class="off">Google Business Profile</li>
+          <li class="off">Digital Card</li>
+        </ul>
+        <a class="pcta pcta-dark" href="https://signagecrm-production.up.railway.app">Shuru karo &rarr;</a>
       </div>
 
       <!-- Complete -->
-      <div class="plan featured open">
+      <div class="plan featured">
         <div class="plan-badge">Most Popular</div>
         <div class="plan-label">Complete</div>
         <div class="price-amt">&#8377;3,499<span class="price-mo">/mo</span></div>
         <div class="plan-slot">Monthly · 15-second slot + Social</div>
-        <div class="plan-toggle"><span class="plan-toggle-icon">+</span></div>
-        <div class="plan-body">
-          <hr class="plan-div" style="margin-top:14px;">
-          <div class="plan-stats">
-            <div class="plan-stat">
-              <div class="plan-stat-num">16,200</div>
-              <div class="plan-stat-lbl">plays/day (15s)</div>
-            </div>
-            <div class="plan-stat">
-              <div class="plan-stat-num">4,86,000</div>
-              <div class="plan-stat-lbl">plays/month</div>
-            </div>
-            <div class="plan-stat">
-              <div class="plan-stat-num">1,08,000+</div>
-              <div class="plan-stat-lbl">viewer impressions/month</div>
-            </div>
+        <hr class="plan-div">
+        <div class="plan-stats">
+          <div class="plan-stat">
+            <div class="plan-stat-num">16,200</div>
+            <div class="plan-stat-lbl">plays/day (15s)</div>
           </div>
-          <div class="channels">
-            <span class="ch-pill ch-screen"><svg width="20" height="20"><use href="#ico-screen"/></svg></span>
-            <span class="ch-pill ch-fb"><svg width="20" height="20"><use href="#ico-fb"/></svg></span>
-            <span class="ch-pill ch-ig"><svg width="20" height="20"><use href="#ico-ig"/></svg></span>
-            <span class="ch-pill ch-gbp"><svg width="20" height="20"><use href="#ico-gbp"/></svg></span>
+          <div class="plan-stat">
+            <div class="plan-stat-num">4,86,000</div>
+            <div class="plan-stat-lbl">plays/month</div>
           </div>
-          <ul class="plan-feats">
-            <li>All Digital Network coverage</li>
-            <li>15-second ad slot</li>
-            <li>Proof of Play CSV report</li>
-            <li>Facebook + Instagram auto-post</li>
-            <li>Google Business Profile post</li>
-            <li class="off">Digital Card</li>
-          </ul>
-          <a class="pcta" href="https://signagecrm-production.up.railway.app" onclick="event.stopPropagation()">Book karo &rarr;</a>
+          <div class="plan-stat">
+            <div class="plan-stat-num">1,08,000+</div>
+            <div class="plan-stat-lbl">viewer impressions/month</div>
+          </div>
         </div>
+        <div class="channels">
+          <span class="ch-pill ch-screen"><svg width="20" height="20"><use href="#ico-screen"/></svg></span>
+          <span class="ch-pill ch-fb"><svg width="20" height="20"><use href="#ico-fb"/></svg></span>
+          <span class="ch-pill ch-ig"><svg width="20" height="20"><use href="#ico-ig"/></svg></span>
+          <span class="ch-pill ch-gbp"><svg width="20" height="20"><use href="#ico-gbp"/></svg></span>
+        </div>
+        <ul class="plan-feats">
+          <li>All Digital Network coverage</li>
+          <li>15-second ad slot</li>
+          <li>Proof of Play CSV report</li>
+          <li>Facebook + Instagram auto-post</li>
+          <li>Google Business Profile post</li>
+          <li class="off">Digital Card</li>
+        </ul>
+        <a class="pcta" href="https://signagecrm-production.up.railway.app">Book karo &rarr;</a>
       </div>
 
       <!-- Growth -->
@@ -2430,52 +2417,41 @@ function loadPreset(key){
         <div class="plan-label">Growth</div>
         <div class="price-amt">&#8377;5,999<span class="price-mo">/mo</span></div>
         <div class="plan-slot">Monthly · 20-second priority slot + All channels</div>
-        <div class="plan-toggle"><span class="plan-toggle-icon">+</span></div>
-        <div class="plan-body">
-          <hr class="plan-div" style="margin-top:14px;">
-          <div class="plan-stats">
-            <div class="plan-stat">
-              <div class="plan-stat-num">12,150</div>
-              <div class="plan-stat-lbl">plays/day (20s)</div>
-            </div>
-            <div class="plan-stat">
-              <div class="plan-stat-num">3,64,500</div>
-              <div class="plan-stat-lbl">plays/month</div>
-            </div>
-            <div class="plan-stat">
-              <div class="plan-stat-num">1,35,000+</div>
-              <div class="plan-stat-lbl">viewer impressions/month</div>
-            </div>
+        <hr class="plan-div">
+        <div class="plan-stats">
+          <div class="plan-stat">
+            <div class="plan-stat-num">12,150</div>
+            <div class="plan-stat-lbl">plays/day (20s)</div>
           </div>
-          <div class="channels">
-            <span class="ch-pill ch-screen"><svg width="20" height="20"><use href="#ico-screen"/></svg></span>
-            <span class="ch-pill ch-fb"><svg width="20" height="20"><use href="#ico-fb"/></svg></span>
-            <span class="ch-pill ch-ig"><svg width="20" height="20"><use href="#ico-ig"/></svg></span>
-            <span class="ch-pill ch-gbp"><svg width="20" height="20"><use href="#ico-gbp"/></svg></span>
-            <span class="ch-pill ch-card"><svg width="20" height="20"><use href="#ico-card"/></svg></span>
+          <div class="plan-stat">
+            <div class="plan-stat-num">3,64,500</div>
+            <div class="plan-stat-lbl">plays/month</div>
           </div>
-          <ul class="plan-feats">
-            <li>All Digital Network coverage</li>
-            <li>20-second priority slot (1st in loop)</li>
-            <li>Proof of Play CSV report</li>
-            <li>Facebook + Instagram auto-post</li>
-            <li>Google Business Profile post</li>
-            <li>Digital Card (shareable profile)</li>
-          </ul>
-          <a class="pcta" href="https://signagecrm-production.up.railway.app" onclick="event.stopPropagation()">Book karo &rarr;</a>
+          <div class="plan-stat">
+            <div class="plan-stat-num">1,35,000+</div>
+            <div class="plan-stat-lbl">viewer impressions/month</div>
+          </div>
         </div>
+        <div class="channels">
+          <span class="ch-pill ch-screen"><svg width="20" height="20"><use href="#ico-screen"/></svg></span>
+          <span class="ch-pill ch-fb"><svg width="20" height="20"><use href="#ico-fb"/></svg></span>
+          <span class="ch-pill ch-ig"><svg width="20" height="20"><use href="#ico-ig"/></svg></span>
+          <span class="ch-pill ch-gbp"><svg width="20" height="20"><use href="#ico-gbp"/></svg></span>
+          <span class="ch-pill ch-card"><svg width="20" height="20"><use href="#ico-card"/></svg></span>
+        </div>
+        <ul class="plan-feats">
+          <li>All Digital Network coverage</li>
+          <li>20-second priority slot (1st in loop)</li>
+          <li>Proof of Play CSV report</li>
+          <li>Facebook + Instagram auto-post</li>
+          <li>Google Business Profile post</li>
+          <li>Digital Card (shareable profile)</li>
+        </ul>
+        <a class="pcta pcta-outline" href="https://signagecrm-production.up.railway.app">Book karo &rarr;</a>
       </div>
 
     </div>
     <p class="plans-footnote" data-reveal>Sabhi prices + 18% GST &nbsp;&middot;&nbsp; Minimum 1 month &nbsp;&middot;&nbsp; Cancel anytime &nbsp;&middot;&nbsp; Creative upload included</p>
-
-    <script>
-      document.querySelectorAll('.plan').forEach(function(card){
-        card.addEventListener('click', function(){
-          this.classList.toggle('open');
-        });
-      });
-    </script>
   </div>
 </section>
 
