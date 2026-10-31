@@ -502,10 +502,21 @@ body{margin:0;background:#f2efe9;}
 .featured .pcta:hover{background:#e04f00;box-shadow:0 4px 14px -4px rgba(255,92,0,.5);}
 .plans-footnote{text-align:center;margin-top:28px;font-size:13.5px;color:rgba(26,23,20,.72);font-weight:500;line-height:2;}
 @media(max-width:600px){
-  .comic-split{display:flex;flex-direction:column;gap:3px;}
-  .comic-split img{width:100%!important;height:190px!important;min-height:unset!important;object-fit:cover!important;}
-  .comic-split img:first-child{object-position:left center;}
-  .comic-split .comic-p2{object-position:right center;}
+  .comic-wrap{
+    overflow-x:auto;
+    overflow-y:hidden;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+    border-radius:var(--r);
+  }
+  .comic-wrap::-webkit-scrollbar{display:none;}
+  .comic-wrap img{
+    width:auto!important;
+    max-width:none!important;
+    height:240px!important;
+    min-height:unset!important;
+    display:block;
+  }
 }
 
 /* Card hover lift */
@@ -2272,22 +2283,6 @@ function loadPreset(key){
     </div>
 
     <!-- Trial Banner -->
-    <script>
-      (function(){
-        if(window.innerWidth > 600) return;
-        var wrap = document.querySelector('.comic-wrap');
-        if(!wrap) return;
-        var img = wrap.querySelector('img');
-        if(!img) return;
-        var clone = new Image();
-        clone.src = img.src;
-        clone.alt = img.alt || '';
-        clone.className = 'comic-p2';
-        wrap.appendChild(clone);
-        wrap.classList.add('comic-split');
-      })();
-    </script>
-
     <!-- SVG icon defs -->
     <svg width="0" height="0" style="position:absolute">
       <defs>
