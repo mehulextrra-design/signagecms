@@ -502,11 +502,10 @@ body{margin:0;background:#f2efe9;}
 .featured .pcta:hover{background:#e04f00;box-shadow:0 4px 14px -4px rgba(255,92,0,.5);}
 .plans-footnote{text-align:center;margin-top:28px;font-size:13.5px;color:rgba(26,23,20,.72);font-weight:500;line-height:2;}
 @media(max-width:600px){
-  .comic-wrap{
-    margin-left:calc(-1 * max(16px,env(safe-area-inset-left,0px)));
-    margin-right:calc(-1 * max(16px,env(safe-area-inset-right,0px)));
-    border-radius:0!important;
-    margin-top:28px;
+  .comic-wrap img{
+    min-height:220px;
+    object-fit:cover;
+    object-position:center top;
   }
 }
 
