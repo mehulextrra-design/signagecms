@@ -1,0 +1,6 @@
+ALTER TABLE users ADD COLUMN IF NOT EXISTS google_account_id TEXT;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS google_location_id TEXT;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS google_business_name TEXT;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS google_access_token TEXT;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS google_refresh_token TEXT;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS google_connected_at TIMESTAMPTZ;

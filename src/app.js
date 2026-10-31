@@ -21,6 +21,9 @@ const walletRoutes = require('./routes/wallet');
 const venuePartnerRoutes = require('./routes/venuePartners');
 const fillerRoutes = require('./routes/filler');
 const facebookRoutes = require('./routes/facebook');
+const contactRoutes = require('./routes/contact');
+const googleRoutes    = require('./routes/google');
+const instagramRoutes = require('./routes/instagram');
 
 const { startScheduler } = require('./services/scheduler');
 
@@ -46,6 +49,13 @@ app.use(helmet({
 app.use(cors({ origin: process.env.CMS_ORIGIN || '*', credentials: true }));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
+
+// Favicon — browsers auto-request /favicon.ico before reading <link> tags
+app.get('/favicon.ico', (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/favicon.svg'), {
+    headers: { 'Content-Type': 'image/svg+xml', 'Cache-Control': 'public, max-age=86400' }
+  });
+});
 
 // CMS frontend — HTML files never cached, assets cached 1 day
 app.use(express.static(path.join(__dirname, '../public'), {
@@ -79,6 +89,9 @@ app.use('/api/wallet', walletRoutes);
 app.use('/api/venue-partners', venuePartnerRoutes);
 app.use('/api/filler', fillerRoutes);
 app.use('/api/auth/facebook', facebookRoutes);
+app.use('/api/contact', contactRoutes);
+app.use('/api/auth/google',     googleRoutes);
+app.use('/api/auth/instagram', instagramRoutes);
 
 // Privacy Policy — required by Meta app review
 app.get('/privacy', (req, res) => {
