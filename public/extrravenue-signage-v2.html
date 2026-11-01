@@ -2658,20 +2658,20 @@ var DRIFT_ROW2 = [
   var scrollVel = 0, lastY = window.scrollY;
 
   window.addEventListener('scroll', function(){
-    scrollVel += (window.scrollY - lastY) * 0.5;
+    scrollVel += (window.scrollY - lastY) * 0.12;
     lastY = window.scrollY;
   }, {passive:true});
 
   function tick(){
-    scrollVel *= 0.90;
+    scrollVel *= 0.82;
 
     // Row 0: base RIGHT, scroll pushes LEFT
-    pos0 += 0.5 - scrollVel * 0.12;
+    pos0 += 0.5 - scrollVel * 0.04;
     if(pos0 >= 0)      pos0 -= half0;
     if(pos0 < -half0)  pos0 += half0;
 
     // Row 1: base LEFT, scroll also pushes LEFT
-    pos1 -= 0.35 + scrollVel * 0.08;
+    pos1 -= 0.35 + scrollVel * 0.03;
     if(pos1 < -half1)  pos1 += half1;
     if(pos1 > 0)       pos1 -= half1;
 
