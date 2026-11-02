@@ -172,14 +172,14 @@ router.post('/', authenticate, async (req, res, next) => {
     // Resolve package → slot duration
     const pkg = PACKAGES[(package_name || 'complete').toLowerCase()] || PACKAGES.complete;
 
-    // Trial plan: one per user, non-cancelled campaigns only
-    if (pkg.fixedDays) {
-      const existing = await client.query(
-        `SELECT id FROM campaigns WHERE user_id=$1 AND package_name='trial' AND status NOT IN ('cancelled')`,
-        [req.user.id]
-      );
-      if (existing.rows.length) throw { status: 400, message: 'Trial already used. Each advertiser gets one free trial campaign.' };
-    }
+    // TEMP: Trial lock disabled for testing
+    // if (pkg.fixedDays) {
+    //   const existing = await client.query(
+    //     `SELECT id FROM campaigns WHERE user_id=$1 AND package_name='trial' AND status NOT IN ('cancelled')`,
+    //     [req.user.id]
+    //   );
+    //   if (existing.rows.length) throw { status: 400, message: 'Trial already used. Each advertiser gets one free trial campaign.' };
+    // }
     const slot_duration_sec = pkg.slot_duration_sec;
 
     // Validate video content duration against slot
