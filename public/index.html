@@ -164,6 +164,8 @@
   .pkg-opt .pkg-ppd { font-size:11px;color:var(--text3);margin-top:2px; }
   .pkg-opt .pkg-desc { font-size:11px;color:var(--text2);margin-top:6px;line-height:1.4; }
   .pkg-opt .pkg-imp { font-size:11px;color:var(--success,#16a34a);font-weight:600;margin-top:4px; }
+  .pkg-opt-disabled { opacity:0.45;cursor:not-allowed!important;pointer-events:none;filter:grayscale(0.5); }
+  .pkg-opt-disabled .pkg-trial-badge { background:#6b7280!important; }
   .pkg-trial-badge { font-size:10px;background:#fef3c7;color:#92400e;border-radius:4px;padding:1px 5px;font-weight:700;display:inline-block;margin-left:4px; }
   @media(max-width:600px){
     .pkg-selector { grid-template-columns:1fr !important; gap:8px; }
@@ -2179,6 +2181,32 @@ function initWizard(){
   document.getElementById('coupon-input').value='';
   document.getElementById('coupon-msg').innerHTML='';
   document.getElementById('selected-count').textContent='';
+  checkTrialUsed();
+}
+
+async function checkTrialUsed(){
+  // Load campaigns if not yet loaded
+  if(!allCampaigns.length){
+    try{ const d=await api('/campaigns?limit=100'); allCampaigns=Array.isArray(d)?d:(d.campaigns||d.data||[]); }catch(e){}
+  }
+  const trialCard=document.querySelector('.pkg-opt[data-pkg="trial"]');
+  if(!trialCard)return;
+  const used=allCampaigns.some(c=>c.package_name==='trial'&&c.status!=='cancelled');
+  if(used){
+    trialCard.classList.add('pkg-opt-disabled');
+    trialCard.onclick=null;
+    const badge=trialCard.querySelector('.pkg-trial-badge');
+    if(badge)badge.textContent='USED';
+    trialCard.querySelector('.pkg-ppd').textContent='Already claimed';
+    // If Trial was somehow still selected, reset to complete
+    if(selectedPkg==='trial') selectPkg('complete');
+  } else {
+    trialCard.classList.remove('pkg-opt-disabled');
+    trialCard.onclick=()=>selectPkg('trial');
+    const badge=trialCard.querySelector('.pkg-trial-badge');
+    if(badge)badge.textContent='3 DAYS';
+    trialCard.querySelector('.pkg-ppd').textContent='3 days · filler network';
+  }
 }
 
 let allScreenGroups=[];
