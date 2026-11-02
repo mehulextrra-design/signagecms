@@ -2390,7 +2390,7 @@ function calcCost(){
   const start=document.getElementById('sch-start').value;const end=document.getElementById('sch-end').value;
   const days=Math.max(1,Math.round((new Date(end)-new Date(start))/(1000*60*60*24))+1);
   const rate=PKG_RATES[selectedPkg]||PKG_RATES.complete;
-  const base=rate.fixedDays?rate.flat:rate.ppd*days;
+  const base=rate.fixedDays?rate.flat:(days>=28&&rate.monthly?rate.monthly:rate.ppd*days);
   const gst=Math.round(base*0.18);
   campaignCost={base,gst,total:base+gst,discount:0};
 }
@@ -2405,7 +2405,7 @@ function renderReview(){
     <div class="review-row"><span class="review-key">Duration</span><span class="review-val">${days} days</span></div>
     <div class="review-row"><span class="review-key">Period</span><span class="review-val">${fmtDate(start)} – ${fmtDate(end)}</span></div>
     <div class="review-row"><span class="review-key">Time Window</span><span class="review-val">${document.getElementById('sch-time-start').value} – ${document.getElementById('sch-time-end').value}</span></div>
-    <div class="review-row"><span class="review-key">Rate</span><span class="review-val">${rate.fixedDays?'FREE (₹0 · 3 days)':'₹'+rate.ppd.toLocaleString('en-IN')+'/day × '+days+' days'}</span></div>`;
+    <div class="review-row"><span class="review-key">Rate</span><span class="review-val">${rate.fixedDays?'FREE (₹0 · 3 days)':days>=28&&rate.monthly?'₹'+rate.monthly.toLocaleString('en-IN')+'/mo (monthly flat)':'₹'+rate.ppd.toLocaleString('en-IN')+'/day × '+days+' days'}</span></div>`;
   renderPricing();
 }
 

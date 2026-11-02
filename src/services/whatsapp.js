@@ -194,7 +194,7 @@ async function buildWeeklyReport(userId) {
   const totalScreens = Math.max(...result.rows.map(r => r.screen_count || 0));
 
   const campaignLines = result.rows.map(r =>
-    `  • ${r.campaign_title} (${r.package_name || 'regular'}, ${r.slot_duration_sec || 15}s): ${(r.total_plays || 0).toLocaleString('en-IN')} plays`
+    `  • ${r.campaign_title} (${r.package_name || 'complete'}, ${r.slot_duration_sec || 15}s): ${(r.total_plays || 0).toLocaleString('en-IN')} plays`
   ).join('\n');
 
   const message =
