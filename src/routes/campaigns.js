@@ -151,13 +151,13 @@ router.get('/:id', authenticate, async (req, res, next) => {
   } catch (err) { next(err); }
 });
 
-// Slot duration + flat-rate pricing (entire network, not per-screen)
+// Slot duration + pricing — 1:2:3 plays ratio via loop_multiplier
+// Trial = filler bucket (separate from paid loop), 3 days free
 const PACKAGES = {
-  trial:     { slot_duration_sec: 10, name: 'trial',     ppd: 285,  flat: 1999, fixedDays: 7 },
-  spot:      { slot_duration_sec: 10, name: 'spot',      ppd: 267,  monthly: 8000 },
-  regular:   { slot_duration_sec: 15, name: 'regular',   ppd: 433,  monthly: 13000 },
-  premium:   { slot_duration_sec: 20, name: 'premium',   ppd: 600,  monthly: 18000 },
-  exclusive: { slot_duration_sec: 30, name: 'exclusive', ppd: 833,  monthly: 25000 },
+  trial:    { slot_duration_sec: 8,  loop_multiplier: 1, name: 'trial',    flat: 0,    fixedDays: 3, bucket: 'filler' },
+  starter:  { slot_duration_sec: 10, loop_multiplier: 1, name: 'starter',  monthly: 1499, ppd: 50 },
+  complete: { slot_duration_sec: 15, loop_multiplier: 2, name: 'complete', monthly: 3499, ppd: 117 },
+  growth:   { slot_duration_sec: 20, loop_multiplier: 3, name: 'growth',   monthly: 5999, ppd: 200 },
 };
 
 // POST /api/campaigns — create + pay
@@ -179,13 +179,8 @@ router.post('/', authenticate, async (req, res, next) => {
       if (contentRow.rows.length) {
         const { type, duration_sec } = contentRow.rows[0];
         if (type === 'video' && duration_sec != null) {
-          const minSec = slot_duration_sec * 0.8;
-          const maxSec = slot_duration_sec * 1.2;
-          if (duration_sec > maxSec) {
-            throw { status: 400, message: `Video too long for ${pkg.name} package (${slot_duration_sec}s slot). Your video is ${duration_sec}s — max allowed: ${maxSec}s. Please trim or choose a longer slot package.` };
-          }
-          if (duration_sec < minSec) {
-            throw { status: 400, message: `Video too short for ${pkg.name} package (${slot_duration_sec}s slot). Your video is ${duration_sec}s — min allowed: ${minSec}s.` };
+          if (duration_sec > slot_duration_sec) {
+            throw { status: 400, message: `Video too long for ${pkg.name} plan (${slot_duration_sec}s slot). Your video is ${duration_sec}s. Please trim or upgrade to a longer slot plan.` };
           }
         }
       }
@@ -197,9 +192,16 @@ router.post('/', authenticate, async (req, res, next) => {
     );
     if (screenResult.rows.length !== screen_ids.length) throw { status: 400, message: 'Invalid screen IDs' };
 
-    // Package flat-rate pricing (entire network — not per screen)
+    // Package pricing — monthly flat or per-day
     const days = Math.ceil((new Date(end_date) - new Date(start_date)) / 86400000) + 1;
-    let amount_base = pkg.fixedDays ? pkg.flat : pkg.ppd * days;
+    let amount_base;
+    if (pkg.fixedDays) {
+      amount_base = pkg.flat; // trial = 0
+    } else if (days >= 28 && pkg.monthly) {
+      amount_base = pkg.monthly; // monthly flat rate for ~30-day bookings
+    } else {
+      amount_base = pkg.ppd * days; // pro-rated per day
+    }
     let discount = 0;
 
     // Apply coupon

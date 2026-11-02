@@ -1924,7 +1924,7 @@ async function openCampaignDetail(id) {
     const inner = document.getElementById('cdm-creative-inner');
     if (c.creative_url) {
       if (c.creative_type === 'video') {
-        inner.innerHTML = `<video src="${c.creative_url}" controls autoplay playsinline style="max-width:100%;max-height:340px;display:block;background:#000;"></video>`;
+        inner.innerHTML = `<video src="${c.creative_url}" controls autoplay muted playsinline style="max-width:100%;max-height:340px;display:block;background:#000;" oncanplay="this.muted=false"></video>`;
       } else {
         inner.innerHTML = `<img src="${c.creative_url}" style="max-width:100%;max-height:340px;object-fit:contain;display:block;">`;
       }
