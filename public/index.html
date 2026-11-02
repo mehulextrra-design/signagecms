@@ -265,7 +265,7 @@
   .lib-item { position:relative;border:2px solid var(--border);border-radius:var(--radius-sm);padding:8px;cursor:pointer;transition:all 0.15s;text-align:center; }
   .lib-item:hover,.lib-item.selected { border-color:var(--primary);background:var(--primary-light); }
   .lib-thumb { width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:4px;background:var(--surface2);margin-bottom:5px;display:block; }
-  .lib-thumb-vid { width:100%;aspect-ratio:16/9;border-radius:4px;background:#1a1f2e;margin-bottom:5px;display:flex;align-items:center;justify-content:center; }
+  .lib-thumb-vid { width:100%;aspect-ratio:16/9;border-radius:4px;background:#1a1f2e;margin-bottom:5px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden; }
   .lib-name { font-size:11px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
   .lib-del-btn { position:absolute;top:4px;right:4px;width:20px;height:20px;border-radius:4px;border:none;background:rgba(220,38,38,0.85);color:#fff;cursor:pointer;display:none;align-items:center;justify-content:center;padding:0; }
   .lib-item:hover .lib-del-btn { display:flex; }
@@ -2514,6 +2514,10 @@ async function loadStorageBar(){
 }
 
 async function loadLibraryGrid(){
+  function _vidThumb(url){
+    if(!url||!url.includes('cloudinary')) return '';
+    return url.replace('/video/upload/','/video/upload/so_0,w_320,c_fill/').replace(/\.(mp4|webm|mov|avi|mkv|m4v)$/i,'.jpg');
+  }
   const grid=document.getElementById('library-grid');
   grid.innerHTML='<div style="color:var(--text2);font-size:13px;padding:20px;text-align:center;">Loading…</div>';
   loadStorageBar();
@@ -2523,7 +2527,7 @@ async function loadLibraryGrid(){
     if(!userLibrary.length){grid.innerHTML='<div style="color:var(--text2);font-size:13px;padding:20px;text-align:center;">No uploads yet — use "Upload New" tab.</div>';return;}
     grid.innerHTML=userLibrary.map(c=>`
       <div class="lib-item${uploadedContentId===c.id?' selected':''}" id="lib-item-${c.id}" onclick="selectFromLibrary('${c.id}','${c.original_name.replace(/'/g,"\\'")}','${c.type}','${(c.file_url||'').replace(/'/g,"%27")}')">
-        ${c.type==='image'?`<img class="lib-thumb" src="${c.file_url}" onerror="this.style.display='none'">`:`<div class="lib-thumb-vid"><svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="rgba(255,255,255,0.5)" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>`}
+        ${c.type==='image'?`<img class="lib-thumb" src="${c.file_url}" onerror="this.style.display='none'">`:`<div class="lib-thumb-vid"><img src="${_vidThumb(c.file_url)}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" onerror="this.remove()"><svg style="position:relative;z-index:1;filter:drop-shadow(0 1px 3px rgba(0,0,0,.6))" width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="rgba(255,255,255,0.9)" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>`}
         <div class="lib-name" title="${c.original_name}">${c.original_name}</div>
         <div class="lib-type">${c.type}${c.file_size?' · '+(c.file_size/1048576).toFixed(1)+' MB':''}</div>
         <button class="lib-del-btn" title="Delete from library" onclick="deleteLibraryItem('${c.id}',event)"><svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
