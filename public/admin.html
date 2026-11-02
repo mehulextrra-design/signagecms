@@ -1943,7 +1943,11 @@ async function openCampaignDetail(id) {
         const poster = c.creative_url.includes('cloudinary')
           ? c.creative_url.replace('/video/upload/','/video/upload/so_0,w_640,c_fill/').replace(/\.(mp4|webm|mov|avi|mkv|m4v)$/i,'.jpg')
           : '';
-        inner.innerHTML = `<video src="${c.creative_url}" controls autoplay muted playsinline poster="${poster}" style="max-width:100%;max-height:340px;display:block;background:#000;" oncanplay="this.muted=false"></video>`;
+        inner.innerHTML = `
+          <div style="position:relative;width:100%;">
+            <video src="${c.creative_url}" controls muted playsinline poster="${poster}" style="width:100%;max-height:320px;display:block;background:#000;"></video>
+            <a href="${c.creative_url}" target="_blank" download style="position:absolute;top:8px;right:8px;background:rgba(0,0,0,0.65);color:#fff;font-size:11px;padding:4px 10px;border-radius:5px;text-decoration:none;backdrop-filter:blur(4px);">⬇ Download</a>
+          </div>`;
       } else {
         inner.innerHTML = `<img src="${c.creative_url}" style="max-width:100%;max-height:340px;object-fit:contain;display:block;">`;
       }
