@@ -2343,7 +2343,7 @@ function updateEndFromDuration(){
   const dur=parseInt(document.getElementById('sch-duration').value)||30;
   if(!start)return;
   // end = start + dur full days (campaign started at 17:00, ends 7 days later at 16:59)
-  const end=new Date(start);end.setDate(end.getDate()+dur);
+  const end=new Date(start);end.setDate(end.getDate()+dur-1);
   const endStr=end.toISOString().split('T')[0];
   document.getElementById('sch-end').value=endStr;
   // Show end time in display
@@ -2434,6 +2434,13 @@ async function submitCampaign(){
   try{
     const body={title:document.getElementById('cmp-name').value.trim(),screen_ids:selectedScreenIds,content_id:uploadedContentId,start_date:document.getElementById('sch-start').value,end_date:document.getElementById('sch-end').value,start_time:document.getElementById('sch-time-start').value+':00',end_time:document.getElementById('sch-time-end').value+':00',package_name:selectedPkg,coupon_code:document.getElementById('coupon-input').value.trim()||undefined};
     const campaign=await api('/campaigns',{method:'POST',body:JSON.stringify(body)});
+    // Free campaigns (Trial) skip Razorpay entirely
+    if(parseFloat(campaign.amount_total)===0){
+      await api(`/campaigns/${campaign.id}/confirm-payment`,{method:'POST',body:JSON.stringify({payment_method:'free'})});
+      toast('Trial campaign submitted for approval!','success');
+      setTimeout(()=>navigate('campaigns'),1500);
+      return;
+    }
     const result=await openRazorpay(campaign,btn,'Confirm & Pay →',()=>{setTimeout(()=>navigate('campaigns'),1500);});
     if(result&&result.dismissed){
       toast('Campaign saved! Complete payment from My Campaigns.','info');
