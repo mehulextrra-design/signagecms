@@ -2290,7 +2290,7 @@ let selectedPkg='complete';
 function selectPkg(pkg){
   selectedPkg=pkg;
   document.querySelectorAll('.pkg-opt').forEach(el=>el.classList.toggle('selected',el.dataset.pkg===pkg));
-  // Trial locks duration to 7 days
+  // Trial locks duration to 3 days
   const durEl=document.getElementById('sch-duration');
   if(pkg==='trial'){durEl.value='3';durEl.disabled=true;}
   else{durEl.disabled=false;}

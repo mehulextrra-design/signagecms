@@ -170,7 +170,7 @@ router.post('/', authenticate, async (req, res, next) => {
     if (!screen_ids?.length) throw { status: 400, message: 'At least one screen required' };
 
     // Resolve package → slot duration
-    const pkg = PACKAGES[(package_name || 'regular').toLowerCase()] || PACKAGES.regular;
+    const pkg = PACKAGES[(package_name || 'complete').toLowerCase()] || PACKAGES.complete;
     const slot_duration_sec = pkg.slot_duration_sec;
 
     // Validate video content duration against slot
