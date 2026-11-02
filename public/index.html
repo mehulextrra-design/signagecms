@@ -892,6 +892,15 @@
               <div class="card card-body">
                 <div style="font-size:12px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:12px;">Order Summary</div>
                 <div id="review-pricing"></div>
+                <div id="wallet-apply-row" style="display:none;background:rgba(13,148,136,0.07);border:1px solid rgba(13,148,136,0.2);border-radius:8px;padding:10px 12px;margin-bottom:10px;">
+                  <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+                    <div>
+                      <div style="font-size:12px;font-weight:600;color:var(--primary);">💰 Wallet Balance: <span id="wallet-avail-lbl">₹0</span></div>
+                      <div style="font-size:11px;color:var(--text2);margin-top:2px;" id="wallet-apply-hint"></div>
+                    </div>
+                    <button class="btn btn-ghost" id="wallet-apply-btn" onclick="toggleWalletApply()" style="font-size:12px;padding:4px 12px;">Apply</button>
+                  </div>
+                </div>
                 <div class="coupon-row"><input type="text" class="form-input" id="coupon-input" placeholder="Coupon code" style="flex:1;"><button class="btn btn-ghost" onclick="applyCoupon()">Apply</button></div>
                 <div id="coupon-msg" style="font-size:12px;margin-top:6px;"></div>
               </div>
@@ -1708,6 +1717,8 @@ async function loadDashboard(){
 async function loadCampaigns(){
   try{const data=await api('/campaigns?limit=100');allCampaigns=Array.isArray(data)?data:(data.campaigns||data.data||[]);renderCampaignsTable(allCampaigns);}
   catch(e){toast('Could not load campaigns','error');}
+  // Refresh wallet balance — a rejected campaign may have triggered a refund
+  loadWallet().catch(()=>{});
 }
 
 function filterCampaigns(filter,el){
@@ -2414,6 +2425,8 @@ function updateNetworkSummary(){
   });
 }
 
+let walletApplied = false;
+
 function calcCost(){
   const start=document.getElementById('sch-start').value;const end=document.getElementById('sch-end').value;
   const days=Math.max(1,Math.round((new Date(end)-new Date(start))/(1000*60*60*24))+1);
@@ -2421,6 +2434,7 @@ function calcCost(){
   const base=rate.fixedDays?rate.flat:(days>=28&&rate.monthly?rate.monthly:rate.ppd*days);
   const gst=Math.round(base*0.18);
   campaignCost={base,gst,total:base+gst,discount:0};
+  walletApplied=false; // reset wallet on cost recalc
 }
 
 function renderReview(){
@@ -2438,12 +2452,37 @@ function renderReview(){
 }
 
 function renderPricing(){
-  const disc=campaignCost.discount||0;const total=campaignCost.total-disc;
+  const disc=campaignCost.discount||0;
+  const afterDisc=campaignCost.total-disc;
+  const walletUse=walletApplied?Math.min(walletBalance,afterDisc):0;
+  const due=Math.max(0,afterDisc-walletUse);
+  // Show/hide wallet row
+  const walletRow=document.getElementById('wallet-apply-row');
+  const availLbl=document.getElementById('wallet-avail-lbl');
+  const hintEl=document.getElementById('wallet-apply-hint');
+  const applyBtn=document.getElementById('wallet-apply-btn');
+  if(walletBalance>0&&campaignCost.total>0){
+    walletRow.style.display='block';
+    availLbl.textContent='₹'+walletBalance.toLocaleString('en-IN',{minimumFractionDigits:2});
+    if(walletApplied){
+      hintEl.textContent=walletUse===afterDisc?'Full amount covered by wallet — no payment needed!':`₹${walletUse.toLocaleString('en-IN')} from wallet, ₹${due.toLocaleString('en-IN')} via Razorpay`;
+      applyBtn.textContent='Remove';applyBtn.style.color='var(--danger)';
+    } else {
+      hintEl.textContent=`Apply ₹${Math.min(walletBalance,afterDisc).toLocaleString('en-IN')} from wallet to reduce payment`;
+      applyBtn.textContent='Apply';applyBtn.style.color='';
+    }
+  } else { walletRow.style.display='none'; }
   document.getElementById('review-pricing').innerHTML=`
     <div class="review-row"><span class="review-key">Subtotal</span><span class="review-val">₹${campaignCost.base.toLocaleString('en-IN')}</span></div>
-    ${disc?`<div class="review-row"><span class="review-key" style="color:var(--success);">Discount</span><span class="review-val" style="color:var(--success);">−₹${disc.toLocaleString('en-IN')}</span></div>`:''}
+    ${disc?`<div class="review-row"><span class="review-key" style="color:var(--success);">Coupon</span><span class="review-val" style="color:var(--success);">−₹${disc.toLocaleString('en-IN')}</span></div>`:''}
     <div class="review-row"><span class="review-key">GST (18%)</span><span class="review-val">₹${campaignCost.gst.toLocaleString('en-IN')}</span></div>
-    <div class="review-total"><span>Total</span><span style="color:var(--primary);">₹${total.toLocaleString('en-IN')}</span></div>`;
+    ${walletUse>0?`<div class="review-row"><span class="review-key" style="color:var(--primary);">Wallet</span><span class="review-val" style="color:var(--primary);">−₹${walletUse.toLocaleString('en-IN')}</span></div>`:''}
+    <div class="review-total"><span>${due===0?'Total (Wallet)':'Total Due'}</span><span style="color:var(--primary);">₹${due.toLocaleString('en-IN')}</span></div>`;
+}
+
+function toggleWalletApply(){
+  walletApplied=!walletApplied;
+  renderPricing();
 }
 
 async function applyCoupon(){
@@ -2460,16 +2499,23 @@ async function applyCoupon(){
 async function submitCampaign(){
   const btn=document.getElementById('btn-submit-campaign');btn.innerHTML='<div class="loading-spinner"></div> Processing…';btn.disabled=true;
   try{
-    const body={title:document.getElementById('cmp-name').value.trim(),screen_ids:selectedScreenIds,content_id:uploadedContentId,start_date:document.getElementById('sch-start').value,end_date:document.getElementById('sch-end').value,start_time:document.getElementById('sch-time-start').value+':00',end_time:document.getElementById('sch-time-end').value+':00',package_name:selectedPkg,coupon_code:document.getElementById('coupon-input').value.trim()||undefined};
+    const afterDisc=campaignCost.total-(campaignCost.discount||0);
+    const walletUse=walletApplied?Math.min(walletBalance,afterDisc):0;
+    const body={title:document.getElementById('cmp-name').value.trim(),screen_ids:selectedScreenIds,content_id:uploadedContentId,start_date:document.getElementById('sch-start').value,end_date:document.getElementById('sch-end').value,start_time:document.getElementById('sch-time-start').value+':00',end_time:document.getElementById('sch-time-end').value+':00',package_name:selectedPkg,coupon_code:document.getElementById('coupon-input').value.trim()||undefined,wallet_amount:walletUse||undefined};
     const campaign=await api('/campaigns',{method:'POST',body:JSON.stringify(body)});
-    // Free campaigns (Trial) skip Razorpay entirely
-    if(parseFloat(campaign.amount_total)===0){
-      await api(`/campaigns/${campaign.id}/confirm-payment`,{method:'POST',body:JSON.stringify({payment_method:'free'})});
-      toast('Trial campaign submitted for approval!','success');
+    // Free / wallet-fully-covered — no Razorpay needed
+    if(parseFloat(campaign.amount_total)===0||campaign.wallet_paid){
+      const msg=parseFloat(campaign.amount_total)===0?'Trial campaign submitted for approval!':'Payment via wallet! Campaign submitted for approval.';
+      toast(msg,'success');
+      if(walletUse>0){walletBalance=Math.max(0,walletBalance-walletUse);document.getElementById('sidebar-wallet-bal').textContent='₹'+fmtNum(walletBalance);}
       setTimeout(()=>navigate('campaigns'),1500);
       return;
     }
-    const result=await openRazorpay(campaign,btn,'Confirm & Pay →',()=>{setTimeout(()=>navigate('campaigns'),1500);});
+    // Partial wallet + Razorpay for remainder
+    const result=await openRazorpay(campaign,btn,'Confirm & Pay →',()=>{
+      if(walletUse>0){walletBalance=Math.max(0,walletBalance-walletUse);document.getElementById('sidebar-wallet-bal').textContent='₹'+fmtNum(walletBalance);}
+      setTimeout(()=>navigate('campaigns'),1500);
+    });
     if(result&&result.dismissed){
       toast('Campaign saved! Complete payment from My Campaigns.','info');
       setTimeout(()=>navigate('campaigns'),1200);

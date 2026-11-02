@@ -6,6 +6,7 @@ const { authenticate, requireAdmin } = require('../middleware/auth');
 const { reviewCampaign } = require('../services/aiReview');
 const { sendInvoiceEmail, sendApprovedEmail, sendRejectedEmail } = require('../services/email');
 const { sendCampaignApprovedWA, sendInvoiceConfirmedWA } = require('../services/whatsapp');
+const { creditWallet, debitWallet } = require('../services/wallet');
 
 const getRzp = () => {
   if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
@@ -165,7 +166,7 @@ router.post('/', authenticate, async (req, res, next) => {
   const client = await getClient();
   try {
     await client.query('BEGIN');
-    const { screen_ids, content_id, title, start_date, end_date, start_time, end_time, coupon_code, package_name } = req.body;
+    const { screen_ids, content_id, title, start_date, end_date, start_time, end_time, coupon_code, package_name, wallet_amount } = req.body;
 
     if (!screen_ids?.length) throw { status: 400, message: 'At least one screen required' };
 
@@ -233,13 +234,17 @@ router.post('/', authenticate, async (req, res, next) => {
     const amount_gst = parseFloat((amount_base * gstRate).toFixed(2));
     const amount_total = parseFloat((amount_base + amount_gst).toFixed(2));
 
+    // Wallet payment — deduct before creating campaign
+    const walletUsed = Math.min(parseFloat(wallet_amount || 0), amount_total);
+    const razorpay_due = parseFloat((amount_total - walletUsed).toFixed(2));
+
     const code = await generateCampaignCode();
     const campResult = await client.query(
       `INSERT INTO campaigns (campaign_code, user_id, content_id, title, start_date, end_date, start_time, end_time,
-        amount_base, amount_gst, amount_total, coupon_code, discount_amount, slot_duration_sec, package_name, status)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,'pending_payment') RETURNING *`,
+        amount_base, amount_gst, amount_total, wallet_used, coupon_code, discount_amount, slot_duration_sec, package_name, status)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,'pending_payment') RETURNING *`,
       [code, req.user.id, content_id, title, start_date, end_date, start_time || '00:00:00', end_time || '23:59:59',
-       amount_base, amount_gst, amount_total, coupon_code, discount, slot_duration_sec, pkg.name]
+       amount_base, amount_gst, amount_total, walletUsed, coupon_code, discount, slot_duration_sec, pkg.name]
     );
     const campaign = campResult.rows[0];
 
@@ -248,8 +253,32 @@ router.post('/', authenticate, async (req, res, next) => {
       await client.query('INSERT INTO campaign_screens (campaign_id, screen_id) VALUES ($1,$2)', [campaign.id, sid]);
     }
 
+    // Deduct wallet amount and mark paid if wallet covers full amount
+    if (walletUsed > 0) {
+      await debitWallet(req.user.id, walletUsed, 'campaign_payment', campaign.id,
+        `Wallet payment for campaign ${code}`, client);
+    }
+    if (razorpay_due <= 0) {
+      // Fully covered by wallet — skip Razorpay
+      const invNum = await generateInvoiceNumber();
+      await client.query(
+        `UPDATE campaigns SET status='pending_approval', payment_status='paid', updated_at=NOW() WHERE id=$1`,
+        [campaign.id]
+      );
+      await client.query(
+        `INSERT INTO invoices (invoice_number, campaign_id, user_id, amount_base, amount_gst, amount_total, payment_id, payment_method, status)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,'wallet','paid')`,
+        [invNum, campaign.id, req.user.id, amount_base, amount_gst, amount_total, `WALLET-${code}`]
+      );
+      await client.query('COMMIT');
+      res.status(201).json({ ...campaign, status: 'pending_approval', payment_status: 'paid', wallet_paid: true, invoice_number: invNum });
+      reviewCampaign(campaign.id).catch(e => console.error('[AI Review]', e.message));
+      sendInvoiceEmail(campaign.id, invNum).catch(() => {});
+      return;
+    }
+
     await client.query('COMMIT');
-    res.status(201).json(campaign);
+    res.status(201).json({ ...campaign, wallet_used: walletUsed, razorpay_due });
   } catch (err) {
     await client.query('ROLLBACK');
     next(err);
@@ -271,13 +300,14 @@ router.post('/:id/create-order', authenticate, async (req, res, next) => {
     if (campaign.status !== 'pending_payment') {
       return res.status(400).json({ error: 'Campaign is not awaiting payment' });
     }
+    const razorpayDue = parseFloat(campaign.amount_total) - parseFloat(campaign.wallet_used || 0);
     const order = await getRzp().orders.create({
-      amount: Math.round(parseFloat(campaign.amount_total) * 100),
+      amount: Math.round(razorpayDue * 100),
       currency: 'INR',
       receipt: campaign.campaign_code,
       notes: { campaign_id: campaign.id, title: campaign.title },
     });
-    res.json({ order_id: order.id, amount: order.amount, currency: order.currency, key_id: process.env.RAZORPAY_KEY_ID });
+    res.json({ order_id: order.id, amount: order.amount, currency: order.currency, key_id: process.env.RAZORPAY_KEY_ID, razorpay_due: razorpayDue });
   } catch (err) { next(err); }
 });
 
@@ -341,16 +371,29 @@ router.post('/:id/approve', authenticate, requireAdmin, async (req, res, next) =
 router.post('/:id/reject', authenticate, requireAdmin, async (req, res, next) => {
   const { reason } = req.body;
   if (!reason) return res.status(400).json({ error: 'Rejection reason required' });
+  const client = await getClient();
   try {
-    const result = await query(
+    await client.query('BEGIN');
+    const result = await client.query(
       `UPDATE campaigns SET status='rejected', rejection_reason=$1, updated_at=NOW()
        WHERE id=$2 AND status='pending_approval' RETURNING *`,
       [reason, req.params.id]
     );
-    if (!result.rows.length) return res.status(404).json({ error: 'Campaign not found' });
-    res.json(result.rows[0]);
-    sendRejectedEmail(result.rows[0].id, reason).catch(() => {});
-  } catch (err) { next(err); }
+    if (!result.rows.length) { await client.query('ROLLBACK'); return res.status(404).json({ error: 'Campaign not found' }); }
+    const campaign = result.rows[0];
+
+    // Refund paid amount to wallet (skip Trial which is ₹0)
+    const refundAmt = parseFloat(campaign.amount_total || 0);
+    if (refundAmt > 0 && campaign.payment_status === 'paid') {
+      await creditWallet(campaign.user_id, refundAmt, 'refund', campaign.id,
+        `Refund for rejected campaign ${campaign.campaign_code}: ${reason.slice(0, 80)}`, client);
+    }
+
+    await client.query('COMMIT');
+    res.json({ ...campaign, refunded: refundAmt > 0 ? refundAmt : 0 });
+    sendRejectedEmail(campaign.id, reason).catch(() => {});
+  } catch (err) { await client.query('ROLLBACK'); next(err); }
+  finally { client.release(); }
 });
 
 // PATCH /api/campaigns/:id/admin-set-creative — admin direct creative replace (no approval workflow)
