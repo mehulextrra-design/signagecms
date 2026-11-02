@@ -1032,18 +1032,50 @@ textarea.form-input{resize:vertical;min-height:80px;}
 </div>
 
 <div class="modal-backdrop hidden" id="reject-modal">
-  <div class="modal">
+  <div class="modal" style="max-width:560px;">
     <div class="modal-header">
       <span class="modal-title">Reject Campaign</span>
       <button class="modal-close" onclick="closeModal('reject-modal')">✕</button>
     </div>
     <div class="modal-body">
-      <p style="font-size:13px;color:var(--text2);margin-bottom:14px;">Provide a reason for rejection. This will be shown to the advertiser.</p>
+      <p style="font-size:13px;color:var(--text2);margin-bottom:14px;">Select a reason or write a custom one. This will be shown to the advertiser.</p>
+      <div class="form-group" style="margin-bottom:10px;">
+        <label class="form-label">Quick Reason</label>
+        <select class="form-input" id="reject-preset" onchange="onRejectPreset(this.value)" style="font-size:13px;">
+          <option value="">— Select a reason —</option>
+          <optgroup label="Technical / Plan">
+            <option value="dur">Media duration exceeds plan slot limit</option>
+            <option value="format">Invalid file format — only MP4 (video) or JPG/PNG (image) accepted</option>
+            <option value="res">Low resolution — minimum 720p required for clear display</option>
+            <option value="corrupt">File is corrupted or unplayable on our players</option>
+            <option value="audio">Audio/visual sync issue — please re-export the file</option>
+          </optgroup>
+          <optgroup label="Content Policy">
+            <option value="porn">Pornographic / obscene / adult content — not permitted on public screens</option>
+            <option value="political">Political party promotion / election campaigning — not allowed on this network</option>
+            <option value="religious">Religious or communal content that may incite conflict — not permitted</option>
+            <option value="tobacco">Tobacco, alcohol, or drug promotion without required disclaimer — not allowed</option>
+            <option value="gambling">Gambling / betting / lottery promotion — not permitted</option>
+            <option value="violence">Violent, disturbing, or graphic content — not suitable for public display</option>
+            <option value="child">Content involving or exploiting minors — strictly prohibited</option>
+            <option value="misleading">Misleading claims / false advertising (e.g. "guaranteed cure", fake discounts)</option>
+          </optgroup>
+          <optgroup label="Business / Compliance">
+            <option value="brand">Brand name or logo does not match registered business on file</option>
+            <option value="defamation">Competitor brand attack or defamatory content — not permitted</option>
+            <option value="unrelated">Creative content unrelated to declared business category</option>
+            <option value="disclaimer">Missing mandatory disclaimer required for medical / legal / financial content</option>
+            <option value="duplicate">Duplicate campaign — same creative already running on this network</option>
+          </optgroup>
+          <option value="custom">✏ Custom reason…</option>
+        </select>
+      </div>
       <div class="form-group">
-        <label class="form-label">Rejection Reason</label>
-        <textarea class="form-input" id="reject-reason" rows="4" placeholder="e.g. Creative does not meet resolution requirements…"></textarea>
+        <label class="form-label">Rejection Message <span style="color:var(--text3);font-weight:400;">(sent to advertiser)</span></label>
+        <textarea class="form-input" id="reject-reason" rows="4" placeholder="Reason will appear here after selecting above, or write your own…"></textarea>
       </div>
       <input type="hidden" id="reject-campaign-id">
+      <input type="hidden" id="reject-campaign-pkg">
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('reject-modal')">Cancel</button>
@@ -1865,7 +1897,7 @@ async function loadDashboard() {
         <td>
           <div style="display:flex;align-items:center;gap:2px;">
             <button class="ia-btn" title="Approve" style="color:#16a34a;" onclick="approveQuick('${c.id}')"><svg width="17" height="17" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></button>
-            <button class="ia-btn ia-danger" title="Reject" onclick="openRejectModal('${c.id}')"><svg width="17" height="17" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button>
+            <button class="ia-btn ia-danger" title="Reject" onclick="openRejectModal('${c.id}','${c.package_name||''}')"><svg width="17" height="17" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button>
           </div>
         </td>
       </tr>`).join('');
@@ -1898,7 +1930,7 @@ function renderCampaigns(data) {
         ${c.status === 'pending_approval' ? `
           <div style="display:flex;align-items:center;gap:2px;">
             <button class="ia-btn" title="Approve" style="color:#16a34a;" onclick="approveQuick('${c.id}')"><svg width="17" height="17" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></button>
-            <button class="ia-btn ia-danger" title="Reject" onclick="openRejectModal('${c.id}')"><svg width="17" height="17" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button>
+            <button class="ia-btn ia-danger" title="Reject" onclick="openRejectModal('${c.id}','${c.package_name||''}')"><svg width="17" height="17" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button>
           </div>
         ` : c.creative_change_status === 'pending' ? `
           <div style="display:flex;align-items:center;gap:2px;">
@@ -2028,7 +2060,7 @@ async function openCampaignDetail(id) {
       footer.innerHTML = `
         <button class="btn btn-success" onclick="approveQuick('${id}');closeModal('camp-detail-modal');">✓ Approve</button>
         ${isFuture ? `<button class="btn btn-primary" style="font-size:12px;" onclick="approveQuick('${id}',true);closeModal('camp-detail-modal');">⚡ Approve &amp; Start Today</button>` : ''}
-        <button class="btn btn-ghost" onclick="closeModal('camp-detail-modal');openRejectModal('${id}');">✕ Reject</button>`;
+        <button class="btn btn-ghost" onclick="closeModal('camp-detail-modal');openRejectModal('${id}','${c.package_name||''}');">✕ Reject</button>`;
     } else if (c.status === 'approved' || c.status === 'live') {
       const startDate = (c.start_date||'').slice(0,10);
       const today = new Date().toISOString().slice(0,10);
@@ -2114,7 +2146,7 @@ function renderApprovals(arr) {
         <td onclick="event.stopPropagation()">
           <div style="display:flex;align-items:center;gap:2px;">
             <button class="ia-btn" title="Approve" style="color:#16a34a;" onclick="approveQuick('${c.id}')"><svg width="17" height="17" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></button>
-            <button class="ia-btn ia-danger" title="Reject" onclick="openRejectModal('${c.id}')"><svg width="17" height="17" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button>
+            <button class="ia-btn ia-danger" title="Reject" onclick="openRejectModal('${c.id}','${c.package_name||''}')"><svg width="17" height="17" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button>
           </div>
         </td>
       </tr>`;}).join('');
@@ -2297,10 +2329,45 @@ async function saveEditMedia() {
   }
 }
 
-function openRejectModal(id) {
+const PLAN_SLOTS = { trial: 8, starter: 10, complete: 15, growth: 20 };
+
+function openRejectModal(id, pkg) {
   document.getElementById('reject-campaign-id').value = id;
+  document.getElementById('reject-campaign-pkg').value = pkg || '';
   document.getElementById('reject-reason').value = '';
-  document.getElementById('reject-modal').classList.remove('hidden');
+  document.getElementById('reject-preset').value = '';
+  openModal('reject-modal');
+}
+
+function onRejectPreset(val) {
+  const pkg = (document.getElementById('reject-campaign-pkg').value || 'complete').toLowerCase();
+  const slot = PLAN_SLOTS[pkg] || 15;
+  const planName = pkg.charAt(0).toUpperCase() + pkg.slice(1);
+  const msgs = {
+    dur:        `Media duration exceeds the ${planName} plan slot limit (max ${slot}s). Please trim your video to ${slot} seconds or less and re-submit.`,
+    format:     `Invalid file format. Only MP4 (video) or JPG/PNG (image) files are accepted on our network. Please re-upload in the correct format.`,
+    res:        `Low resolution creative. A minimum of 720p (1280×720) is required for clear display on our screens. Please re-export at higher resolution.`,
+    corrupt:    `The uploaded file is corrupted or unplayable on our digital players. Please re-export and re-upload the creative.`,
+    audio:      `Audio/visual sync issue detected in the video. Please re-export the file and re-submit.`,
+    porn:       `Your creative contains pornographic, obscene, or adult content which is not permitted on public digital screens. Campaign rejected.`,
+    political:  `Political party promotion and election campaigning content is not allowed on this network. Campaign rejected.`,
+    religious:  `Creative contains religious or communal content that may incite conflict. This content is not permitted on our network.`,
+    tobacco:    `Promotion of tobacco, alcohol, or drugs without the required legal disclaimer is not permitted. Please add mandatory disclaimers and re-submit.`,
+    gambling:   `Gambling, betting, and lottery promotion is not permitted on this network. Campaign rejected.`,
+    violence:   `Creative contains violent, disturbing, or graphic content not suitable for public display. Campaign rejected.`,
+    child:      `Creative contains or exploits minors in a manner that violates our content policy. Campaign permanently rejected.`,
+    misleading: `Creative contains misleading claims or false advertising. Please ensure all claims are accurate, verifiable, and comply with advertising standards.`,
+    brand:      `The brand name or logo in the creative does not match the registered business on file. Please update your creative or your business details and re-submit.`,
+    defamation: `Creative contains competitor brand attacks or defamatory content which is not permitted on our network.`,
+    unrelated:  `The creative content is unrelated to the business category declared in your advertiser profile. Please submit a relevant creative.`,
+    disclaimer: `Content in this category (medical / legal / financial) requires a mandatory disclaimer. Please add the required disclaimer and re-submit.`,
+    duplicate:  `A campaign with identical or very similar creative is already running on this network. Duplicate campaigns are not permitted simultaneously.`,
+    custom:     '',
+  };
+  if (val && msgs[val] !== undefined) {
+    document.getElementById('reject-reason').value = msgs[val];
+    if (val === 'custom') document.getElementById('reject-reason').focus();
+  }
 }
 
 async function confirmReject() {
