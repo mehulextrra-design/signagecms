@@ -1104,6 +1104,22 @@ textarea.form-input{resize:vertical;min-height:80px;}
         <div class="form-group"><label class="form-label">Height (px)</label><input type="number" class="form-input" id="sc-height" value="1080"></div>
       </div>
       <div class="form-row">
+        <div class="form-group"><label class="form-label">Venue Type</label>
+          <select class="form-select" id="sc-venue-type">
+            <option value="Mall">Mall</option>
+            <option value="Gym">Gym</option>
+            <option value="Salon">Salon</option>
+            <option value="Restaurant">Restaurant</option>
+            <option value="Office">Office</option>
+            <option value="Society">Society</option>
+            <option value="Cafe">Cafe</option>
+            <option value="Hotel">Hotel</option>
+            <option value="Other" selected>Other</option>
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label">Approx. Footfall / Day</label><input type="number" class="form-input" id="sc-footfall" value="0" placeholder="e.g. 500"></div>
+      </div>
+      <div class="form-row">
         <div class="form-group"><label class="form-label">Price / Day (₹)</label><input type="number" class="form-input" id="sc-price" value="900"></div>
         <div class="form-group"><label class="form-label">Daily Impressions</label><input type="number" class="form-input" id="sc-impressions" value="5000"></div>
       </div>
@@ -2355,6 +2371,8 @@ function openScreenModal(screen = null) {
   document.getElementById('sc-status-group').style.display = screen ? 'block' : 'none';
   document.getElementById('sc-status').value = screen?.status || 'online';
   document.getElementById('sc-audio').checked = screen?.audio_enabled || false;
+  document.getElementById('sc-venue-type').value = screen?.venue_type || 'Other';
+  document.getElementById('sc-footfall').value = screen?.approx_footfall || 0;
   document.getElementById('screen-modal').classList.remove('hidden');
 }
 
@@ -2493,6 +2511,8 @@ async function saveScreen() {
     longitude: document.getElementById('sc-lng').value || null,
     status: document.getElementById('sc-status').value || 'online',
     audio_enabled: document.getElementById('sc-audio').checked,
+    venue_type: document.getElementById('sc-venue-type').value,
+    approx_footfall: parseInt(document.getElementById('sc-footfall').value) || 0,
   };
   if(!body.screen_code || !body.name) { showToast('Screen Code and Name required', 'error'); return; }
   const btn = document.getElementById('sc-save-btn');

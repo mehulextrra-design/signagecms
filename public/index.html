@@ -1500,11 +1500,12 @@ function renderScreensMap(){
 
 let _sbcSelected = new Set(); // selected screen ids
 
-// Plays/screen/day for Regular package (40,500s paid airtime ÷ 15s slot)
-const _PLAYS_PER_SCREEN = Math.floor(40500/15); // 2,700
-
 function _sbcCard(s){
   const sel=_sbcSelected.has(s.id);
+  const footfall=s.approx_footfall>0?s.approx_footfall.toLocaleString('en-IN'):'—';
+  const venueType=s.venue_type||'—';
+  const statusLabel=s.status==='online'?'Online':s.status==='maintenance'?'Maintenance':'Offline';
+  const statusColor=s.status==='online'?'#22c55e':s.status==='maintenance'?'#f59e0b':'#ef4444';
   return `<div class="screen-browse-card${sel?' sbc-selected':''}" id="sbc-card-${s.id}" onclick="_sbcToggle('${s.id}',event)">
     <div class="sbc-visual">
       <div class="sbc-monitor">
@@ -1514,7 +1515,7 @@ function _sbcCard(s){
       <div class="sbc-cb${sel?' checked':''}" onclick="_sbcToggle('${s.id}',event)">
         ${sel?`<svg width="10" height="10" fill="none" viewBox="0 0 24 24" stroke="#fff" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>`:''}
       </div>
-      ${s.screen_type?`<div class="sbc-type-tag">${s.screen_type}</div>`:''}
+      ${venueType!=='—'?`<div class="sbc-type-tag">${venueType}</div>`:''}
     </div>
     <div class="sbc-body">
       <div class="sbc-name">${s.name}</div>
@@ -1524,9 +1525,9 @@ function _sbcCard(s){
       </div>
       <div class="sbc-divider"></div>
       <div class="sbc-stats">
-        <div class="sbc-stat"><div class="sbc-stat-val">~2,700</div><div class="sbc-stat-lbl">plays/day</div></div>
+        <div class="sbc-stat"><div class="sbc-stat-val">${footfall}</div><div class="sbc-stat-lbl">footfall/day</div></div>
         <div class="sbc-stat-sep"></div>
-        <div class="sbc-stat"><div class="sbc-stat-val" style="color:var(--primary);">Regular</div><div class="sbc-stat-lbl">15s pkg</div></div>
+        <div class="sbc-stat"><div class="sbc-stat-val" style="color:${statusColor};">${statusLabel}</div><div class="sbc-stat-lbl">status</div></div>
       </div>
       <button class="sbc-book-btn" onclick="_sbcBookOne('${s.id}',event)">Book Campaign →</button>
     </div>
@@ -1577,8 +1578,9 @@ function _sbcUpdateBar(){
   if(!bar) return;
   if(_sbcSelected.size===0){ bar.style.display='none'; return; }
   bar.style.display='flex';
-  const totalPlays=_sbcSelected.size * _PLAYS_PER_SCREEN;
-  cnt.textContent=`${_sbcSelected.size} screen${_sbcSelected.size>1?'s':''} selected · ~${totalPlays.toLocaleString('en-IN')} plays/day (Regular pkg)`;
+  const totalFootfall=Array.from(_sbcSelected).reduce((sum,id)=>{ const s=allScreens.find(x=>x.id===id); return sum+(s&&s.approx_footfall?s.approx_footfall:0); },0);
+  const footfallTxt=totalFootfall>0?` · ~${totalFootfall.toLocaleString('en-IN')} footfall/day`:'';
+  cnt.textContent=`${_sbcSelected.size} screen${_sbcSelected.size>1?'s':''} selected${footfallTxt}`;
 }
 
 function _sbcClearSelection(){
@@ -1621,17 +1623,21 @@ async function renderScreensList(){
     return;
   }
 
+  // Auto-select all screens by default
+  allScreens.forEach(s=>_sbcSelected.add(s.id));
+
   let groups=[];
   try{ groups=await api('/screens/groups'); }catch(e){}
 
   const groupedIds=new Set();
   let html='';
 
-  function groupSection(id, name, desc, screenIds, playsPerDay, onlineCount, cards){
+  function groupSection(id, name, desc, screenIds, totalFootfall, onlineCount, cards){
+    const footfallTxt=totalFootfall>0?`~${totalFootfall.toLocaleString('en-IN')} footfall/day`:'';
     return `<div class="sbc-group-section">
       <div class="sbc-group-header" onclick="_sbcAccordion('${id}',event)">
         <div style="display:flex;align-items:center;gap:8px;min-width:0;">
-          <div id="sbc-gcb-${id}" class="sbc-grp-cb" onclick="_sbcGroupToggle('${id}',[${screenIds.map(x=>`'${x}'`).join(',')}],event)"></div>
+          <div id="sbc-gcb-${id}" class="sbc-grp-cb checked" onclick="_sbcGroupToggle('${id}',[${screenIds.map(x=>`'${x}'`).join(',')}],event)"><svg width="10" height="10" fill="none" viewBox="0 0 24 24" stroke="#fff" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></div>
           <div class="sbc-group-name">
             <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
             ${name}${desc?`<span class="sbc-group-desc">· ${desc}</span>`:''}
@@ -1642,8 +1648,7 @@ async function renderScreensList(){
             <span>${screenIds.length} screen${screenIds.length!==1?'s':''}</span>
             <span style="color:var(--text3);">·</span>
             <span style="color:#22c55e;">${onlineCount} online</span>
-            <span style="color:var(--text3);">·</span>
-            <span style="font-weight:700;">~${playsPerDay.toLocaleString('en-IN')} plays/day</span>
+            ${footfallTxt?`<span style="color:var(--text3);">·</span><span style="font-weight:700;">${footfallTxt}</span>`:''}
           </div>
           <svg id="sbc-chev-${id}" class="sbc-chevron open" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
         </div>
@@ -1655,19 +1660,19 @@ async function renderScreensList(){
   groups.forEach(g=>{
     if(!g.screens.length) return;
     const screenIds=g.screens.map(gs=>(allScreens.find(x=>x.id===gs.id)||gs).id);
-    const playsPerDay=g.screens.length * _PLAYS_PER_SCREEN;
+    const totalFootfall=g.screens.reduce((sum,gs)=>{ const s=allScreens.find(x=>x.id===gs.id)||gs; return sum+(s.approx_footfall||0); },0);
     const onlineCount=g.screens.filter(sc=>sc.status==='online').length;
     const cards=g.screens.map(gs=>{ const s=allScreens.find(x=>x.id===gs.id)||gs; groupedIds.add(s.id); return _sbcCard(s); }).join('');
-    html+=groupSection(g.id, g.name, g.description||'', screenIds, playsPerDay, onlineCount, cards);
+    html+=groupSection(g.id, g.name, g.description||'', screenIds, totalFootfall, onlineCount, cards);
   });
 
   const ungrouped=allScreens.filter(s=>!groupedIds.has(s.id));
   if(ungrouped.length){
     if(groups.length){
       const uIds=ungrouped.map(s=>s.id);
-      const uPlays=ungrouped.length * _PLAYS_PER_SCREEN;
+      const uFootfall=ungrouped.reduce((sum,s)=>sum+(s.approx_footfall||0),0);
       const uOnline=ungrouped.filter(s=>s.status==='online').length;
-      html+=groupSection('__ungrouped','Other Screens','',uIds,uPlays,uOnline,ungrouped.map(_sbcCard).join(''));
+      html+=groupSection('__ungrouped','Other Screens','',uIds,uFootfall,uOnline,ungrouped.map(_sbcCard).join(''));
     } else {
       html=`<div class="screens-grid">${ungrouped.map(_sbcCard).join('')}</div>`;
     }
@@ -1675,6 +1680,7 @@ async function renderScreensList(){
 
   wrap.innerHTML=html;
   wrap.style.display='block';
+  _sbcUpdateBar();
 }
 
 async function loadDashboard(){

@@ -9,7 +9,8 @@ router.get('/', async (req, res, next) => {
   try {
     const { city, zone, status } = req.query;
     let sql = `SELECT id, screen_code, name, location, city, zone, latitude, longitude,
-               width_px, height_px, status, last_heartbeat, price_per_day, daily_impressions, audio_enabled
+               width_px, height_px, status, last_heartbeat, price_per_day, daily_impressions, audio_enabled,
+               venue_type, approx_footfall
                FROM screens WHERE 1=1`;
     const params = [];
     if (city) { params.push(city); sql += ` AND city ILIKE $${params.length}`; }
@@ -23,12 +24,12 @@ router.get('/', async (req, res, next) => {
 
 // POST /api/screens — admin only
 router.post('/', authenticate, requireAdmin, async (req, res, next) => {
-  const { screen_code, name, location, city, zone, latitude, longitude, width_px, height_px, price_per_day, daily_impressions, audio_enabled } = req.body;
+  const { screen_code, name, location, city, zone, latitude, longitude, width_px, height_px, price_per_day, daily_impressions, audio_enabled, venue_type, approx_footfall } = req.body;
   try {
     const result = await query(
-      `INSERT INTO screens (screen_code, name, location, city, zone, latitude, longitude, width_px, height_px, price_per_day, daily_impressions, audio_enabled)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12) RETURNING *`,
-      [screen_code, name, location, city, zone || 'A', latitude, longitude, width_px || 1920, height_px || 1080, price_per_day || 900, daily_impressions || 5000, audio_enabled || false]
+      `INSERT INTO screens (screen_code, name, location, city, zone, latitude, longitude, width_px, height_px, price_per_day, daily_impressions, audio_enabled, venue_type, approx_footfall)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14) RETURNING *`,
+      [screen_code, name, location, city, zone || 'A', latitude, longitude, width_px || 1920, height_px || 1080, price_per_day || 900, daily_impressions || 5000, audio_enabled || false, venue_type || 'Other', approx_footfall || 0]
     );
     res.status(201).json(result.rows[0]);
   } catch (err) { next(err); }
@@ -135,13 +136,13 @@ router.get('/:id/availability', authenticate, async (req, res, next) => {
 
 // PUT /api/screens/:id
 router.put('/:id', authenticate, requireAdmin, async (req, res, next) => {
-  const { name, location, city, zone, latitude, longitude, price_per_day, daily_impressions, status, audio_enabled } = req.body;
+  const { name, location, city, zone, latitude, longitude, price_per_day, daily_impressions, status, audio_enabled, venue_type, approx_footfall } = req.body;
   try {
     const result = await query(
       `UPDATE screens SET name=$1, location=$2, city=$3, zone=$4, price_per_day=$5, daily_impressions=$6,
-       status=$7, latitude=$8, longitude=$9, audio_enabled=$10, updated_at=NOW()
-       WHERE id = $11 RETURNING *`,
-      [name, location, city, zone, price_per_day, daily_impressions, status, latitude || null, longitude || null, audio_enabled || false, req.params.id]
+       status=$7, latitude=$8, longitude=$9, audio_enabled=$10, venue_type=$11, approx_footfall=$12, updated_at=NOW()
+       WHERE id = $13 RETURNING *`,
+      [name, location, city, zone, price_per_day, daily_impressions, status, latitude || null, longitude || null, audio_enabled || false, venue_type || 'Other', approx_footfall || 0, req.params.id]
     );
     if (!result.rows.length) return res.status(404).json({ error: 'Screen not found' });
     res.json(result.rows[0]);
