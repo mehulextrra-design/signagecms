@@ -1940,7 +1940,10 @@ async function openCampaignDetail(id) {
     const inner = document.getElementById('cdm-creative-inner');
     if (c.creative_url) {
       if (c.creative_type === 'video') {
-        inner.innerHTML = `<video src="${c.creative_url}" controls autoplay muted playsinline style="max-width:100%;max-height:340px;display:block;background:#000;" oncanplay="this.muted=false"></video>`;
+        const poster = c.creative_url.includes('cloudinary')
+          ? c.creative_url.replace('/video/upload/','/video/upload/so_0,w_640,c_fill/').replace(/\.(mp4|webm|mov|avi|mkv|m4v)$/i,'.jpg')
+          : '';
+        inner.innerHTML = `<video src="${c.creative_url}" controls autoplay muted playsinline poster="${poster}" style="max-width:100%;max-height:340px;display:block;background:#000;" oncanplay="this.muted=false"></video>`;
       } else {
         inner.innerHTML = `<img src="${c.creative_url}" style="max-width:100%;max-height:340px;object-fit:contain;display:block;">`;
       }
@@ -1999,7 +2002,7 @@ async function openCampaignDetail(id) {
       { label: 'Creative uploaded', ok: !!c.creative_url },
       { label: 'Screens assigned', ok: !!(c.screen_names||[]).filter(Boolean).length },
       { label: 'Valid dates', ok: c.start_date && c.end_date && new Date(c.end_date) >= new Date(c.start_date) },
-      { label: 'Payment received', ok: c.payment_status === 'paid' },
+      { label: parseFloat(c.amount_total||0)===0 ? 'Free trial · ₹0' : 'Payment received', ok: c.payment_status === 'paid' },
       { label: 'No pending creative change', ok: c.creative_change_status !== 'pending' },
     ];
     document.getElementById('cdm-checklist-items').innerHTML = checks.map(ch => `
