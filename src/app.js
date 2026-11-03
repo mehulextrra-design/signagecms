@@ -51,6 +51,14 @@ app.use(cors({ origin: process.env.CMS_ORIGIN || '*', credentials: true }));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
+// Redirect Railway URL → canonical custom domain (keep /api/* on Railway for player APK)
+app.use((req, res, next) => {
+  if (req.hostname === 'signagecrm-production.up.railway.app' && !req.path.startsWith('/api/')) {
+    return res.redirect(301, 'https://www.extrravenue.com' + req.originalUrl);
+  }
+  next();
+});
+
 // Favicon — browsers auto-request /favicon.ico before reading <link> tags
 app.get('/favicon.ico', (req, res) => {
   res.sendFile(path.join(__dirname, '../public/favicon.svg'), {
