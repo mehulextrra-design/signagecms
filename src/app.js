@@ -70,6 +70,11 @@ app.get('/', (req, res, next) => {
   next();
 });
 
+// /cms → Advertiser portal (works on all domains)
+app.get('/cms', (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/index.html'));
+});
+
 // CMS frontend — HTML files never cached, assets cached 1 day
 app.use(express.static(path.join(__dirname, '../public'), {
   setHeaders(res, filePath) {
