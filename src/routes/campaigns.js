@@ -387,6 +387,11 @@ router.post('/:id/reject', authenticate, requireAdmin, async (req, res, next) =>
     if (refundAmt > 0 && campaign.payment_status === 'paid') {
       await creditWallet(campaign.user_id, refundAmt, 'refund', campaign.id,
         `Refund for rejected campaign ${campaign.campaign_code}: ${reason.slice(0, 80)}`, client);
+      // Mark the original invoice as refunded so it's clear in the billing history
+      await client.query(
+        `UPDATE invoices SET status='refunded' WHERE campaign_id=$1`,
+        [campaign.id]
+      );
     }
 
     await client.query('COMMIT');

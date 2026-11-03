@@ -916,6 +916,7 @@
           <div class="filter-tabs" id="invoice-filters">
             <div class="filter-tab active" onclick="filterInvoices('all',this)">All</div>
             <div class="filter-tab" onclick="filterInvoices('paid',this)">Paid</div>
+            <div class="filter-tab" onclick="filterInvoices('refunded',this)">Refunded</div>
             <div class="filter-tab" onclick="filterInvoices('pending',this)">Pending</div>
           </div>
         </div>
@@ -1783,8 +1784,11 @@ function filterInvoices(filter,el){
 function renderInvoicesTable(invoices){
   const wrap=document.getElementById('invoices-table-wrap');
   if(!invoices.length){wrap.innerHTML=`<div class="empty-state"><div class="empty-icon"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg></div><div class="empty-title">No invoices found</div></div>`;return;}
-  wrap.innerHTML=`<div class="table-wrap"><table><thead><tr><th>Invoice #</th><th>Campaign</th><th>Date</th><th>Base</th><th>GST (18%)</th><th>Total</th><th>Status</th></tr></thead><tbody>${invoices.map(i=>`
-    <tr><td class="td-bold">${i.invoice_number}</td><td style="font-size:13px;">${i.campaign_code||'—'}</td><td style="font-size:13px;">${fmtDate(i.issued_at)}</td><td>₹${parseFloat(i.amount_base||0).toLocaleString('en-IN')}</td><td>₹${parseFloat(i.amount_gst||0).toLocaleString('en-IN')}</td><td style="font-weight:600;">₹${parseFloat(i.amount_total||0).toLocaleString('en-IN')}</td><td>${payBadge(i.status)}</td></tr>`).join('')}</tbody></table></div>`;
+  const pmLabel={razorpay:'Razorpay',wallet:'Wallet',free:'Free',cash:'Cash'};
+  const pmBadge=m=>{const l=pmLabel[m]||m||'—';const color=m==='wallet'?'var(--primary)':m==='free'?'var(--text3)':'#6366f1';return`<span style="font-size:11px;font-weight:600;color:${color};background:${color}18;padding:2px 8px;border-radius:12px;">${l}</span>`;};
+  const invBadge=s=>s==='refunded'?`<span class="status-badge" style="background:rgba(239,68,68,0.12);color:var(--danger);">↩ Refunded</span>`:payBadge(s);
+  wrap.innerHTML=`<div class="table-wrap"><table><thead><tr><th>Invoice #</th><th>Campaign</th><th>Date</th><th>Base</th><th>GST (18%)</th><th>Total</th><th>Payment</th><th>Status</th></tr></thead><tbody>${invoices.map(i=>`
+    <tr><td class="td-bold">${i.invoice_number}</td><td style="font-size:13px;">${i.campaign_code||'—'}</td><td style="font-size:13px;">${fmtDate(i.issued_at)}</td><td>₹${parseFloat(i.amount_base||0).toLocaleString('en-IN')}</td><td>₹${parseFloat(i.amount_gst||0).toLocaleString('en-IN')}</td><td style="font-weight:600;">₹${parseFloat(i.amount_total||0).toLocaleString('en-IN')}</td><td>${pmBadge(i.payment_method)}</td><td>${invBadge(i.status)}</td></tr>`).join('')}</tbody></table></div>`;
 }
 
 // ── PROOF OF PLAY ────────────────────────────────────────────────────────
