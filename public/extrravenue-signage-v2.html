@@ -2610,20 +2610,8 @@ const ro = new IntersectionObserver(entries => {
 document.querySelectorAll('[data-reveal]').forEach(el => ro.observe(el));
 
 // Accordion Steps — auto-advance with progress bar
-// Drift gallery — Row 1 aur Row 2 ke liye ALAG files rakho
-// Nayi file add karni ho to: folder mein daalo + array mein naam likhao
-var DRIFT_ROW1 = [
-  'img/carousel/916 Gold Palace.png',
-  'img/carousel/Aavya Classes_5.jpg',
-  'img/carousel/Keystone_GSEB.mp4',
-  'img/carousel/Ami_Kothari_2.jpeg'
-];
-var DRIFT_ROW2 = [
-  'img/carousel/lubdhi Tution Classes (1).mp4',
-  'img/carousel/NIlesh Jewellers.jpeg',
-  'img/carousel/Navkar Handicrafts.jpg',
-  'img/carousel/Shreeji Enclave.jpg.jpeg'
-];
+// Drift gallery — public/img/carousel/ folder se auto-load hota hai
+// Nayi image/video add karni ho to: sirf folder mein daalo, bas!
 (function(){
   var container = document.getElementById('driftRows');
   if(!container) return;
@@ -2656,39 +2644,41 @@ var DRIFT_ROW2 = [
     return row;
   }
 
-  var r0 = buildRow('driftR1', DRIFT_ROW1); // top row → RIGHT
-  var r1 = buildRow('driftR2', DRIFT_ROW2); // bottom row → LEFT
-  var half0 = DRIFT_ROW1.length * SLOT;
-  var half1 = DRIFT_ROW2.length * SLOT;
-
-  // Row 0 starts mid-way (going right), Row 1 starts at 0 (going left)
-  var pos0 = -half0 * 0.5;
-  var pos1 = 0;
-  var scrollVel = 0, lastY = window.scrollY;
-
-  window.addEventListener('scroll', function(){
-    scrollVel += (window.scrollY - lastY) * 0.12;
-    lastY = window.scrollY;
-  }, {passive:true});
-
-  function tick(){
-    scrollVel *= 0.82;
-
-    // Row 0: base RIGHT, scroll pushes LEFT
-    pos0 += 0.5 - scrollVel * 0.04;
-    if(pos0 >= 0)      pos0 -= half0;
-    if(pos0 < -half0)  pos0 += half0;
-
-    // Row 1: base LEFT, scroll also pushes LEFT
-    pos1 -= 0.35 + scrollVel * 0.03;
-    if(pos1 < -half1)  pos1 += half1;
-    if(pos1 > 0)       pos1 -= half1;
-
-    r0.style.transform = 'translateX('+pos0+'px)';
-    r1.style.transform = 'translateX('+pos1+'px)';
+  function startDrift(DRIFT_ROW1, DRIFT_ROW2){
+    var r0 = buildRow('driftR1', DRIFT_ROW1);
+    var r1 = buildRow('driftR2', DRIFT_ROW2);
+    var half0 = DRIFT_ROW1.length * SLOT;
+    var half1 = DRIFT_ROW2.length * SLOT;
+    var pos0 = -half0 * 0.5;
+    var pos1 = 0;
+    var scrollVel = 0, lastY = window.scrollY;
+    window.addEventListener('scroll', function(){
+      scrollVel += (window.scrollY - lastY) * 0.12;
+      lastY = window.scrollY;
+    }, {passive:true});
+    function tick(){
+      scrollVel *= 0.82;
+      pos0 += 0.5 - scrollVel * 0.04;
+      if(pos0 >= 0)      pos0 -= half0;
+      if(pos0 < -half0)  pos0 += half0;
+      pos1 -= 0.35 + scrollVel * 0.03;
+      if(pos1 < -half1)  pos1 += half1;
+      if(pos1 > 0)       pos1 -= half1;
+      r0.style.transform = 'translateX('+pos0+'px)';
+      r1.style.transform = 'translateX('+pos1+'px)';
+      requestAnimationFrame(tick);
+    }
     requestAnimationFrame(tick);
   }
-  requestAnimationFrame(tick);
+
+  // Fetch gallery from server — sirf public/img/carousel/ folder manage karo
+  fetch('/api/gallery').then(function(r){ return r.json(); }).then(function(files){
+    if(!files || files.length < 2) return;
+    var row1 = files.filter(function(_,i){ return i%2===0; });
+    var row2 = files.filter(function(_,i){ return i%2!==0; });
+    if(!row2.length) row2 = row1.slice();
+    startDrift(row1, row2);
+  }).catch(function(){});
 })();
 
 // Signage carousel

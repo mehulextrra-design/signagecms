@@ -96,6 +96,21 @@ app.use('/api/contact', contactRoutes);
 app.use('/api/auth/google',     googleRoutes);
 app.use('/api/auth/instagram', instagramRoutes);
 
+// Public gallery — reads img/carousel/ folder, no auth needed
+app.get('/api/gallery', (req, res) => {
+  const fs = require('fs');
+  const dir = path.join(__dirname, '../public/img/carousel');
+  const ALLOWED = /\.(jpe?g|png|webp|gif|mp4|webm|mov)$/i;
+  try {
+    const files = fs.readdirSync(dir)
+      .filter(f => ALLOWED.test(f) && !f.startsWith('.'))
+      .map(f => 'img/carousel/' + f);
+    res.json(files);
+  } catch (e) {
+    res.json([]);
+  }
+});
+
 // Privacy Policy — required by Meta app review
 app.get('/privacy', (req, res) => {
   res.setHeader('Content-Type', 'text/html');
