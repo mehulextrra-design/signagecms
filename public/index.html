@@ -6,8 +6,6 @@
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <title>SignageCMS — Advertiser Portal</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -1441,7 +1439,9 @@ async function loadScreens(){
 }
 
 let _screensView = 'grid';
-let _leafletMap = null;
+let _gmap = null;
+let _gmapLoaded = false;
+let _gmapLoading = false;
 
 function setScreensView(view){
   _screensView = view;
@@ -1460,43 +1460,77 @@ function setScreensView(view){
   }
 }
 
-function renderScreensMap(){
+async function _loadGoogleMaps() {
+  if(_gmapLoaded) return;
+  if(_gmapLoading) { await new Promise(r=>{ const t=setInterval(()=>{if(_gmapLoaded){clearInterval(t);r();}},100); }); return; }
+  _gmapLoading = true;
+  const cfg = await fetch('/api/config').then(r=>r.json()).catch(()=>({}));
+  if(!cfg.googleMapsApiKey) throw new Error('GOOGLE_MAPS_API_KEY not configured on server');
+  await new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = `https://maps.googleapis.com/maps/api/js?key=${cfg.googleMapsApiKey}`;
+    s.onload = () => { _gmapLoaded = true; resolve(); };
+    s.onerror = () => reject(new Error('Google Maps failed to load'));
+    document.head.appendChild(s);
+  });
+}
+
+async function renderScreensMap(){
+  const mapEl = document.getElementById('screens-map');
   const screensWithCoords = allScreens.filter(s=>s.latitude && s.longitude);
   if(!screensWithCoords.length){
-    document.getElementById('screens-map').innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--text2);font-size:14px;">No screen coordinates available</div>';
+    mapEl.innerHTML='<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:8px;color:var(--text2);"><svg width="32" height="32" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg><span style="font-size:14px;">Screen coordinates not set yet</span><span style="font-size:12px;color:var(--text3);">Admin panel → Screens → add lat/lng to each screen</span></div>';
     return;
   }
-  if(_leafletMap){ _leafletMap.remove(); _leafletMap=null; }
-  _leafletMap = L.map('screens-map',{zoomControl:true});
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
-    attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-    maxZoom:19
-  }).addTo(_leafletMap);
-
-  const bounds=[];
-  screensWithCoords.forEach(s=>{
-    const lat=parseFloat(s.latitude), lng=parseFloat(s.longitude);
+  mapEl.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--text2);font-size:13px;">Loading map…</div>';
+  try {
+    await _loadGoogleMaps();
+  } catch(e) {
+    mapEl.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#ef4444;font-size:13px;">Map error: ${e.message}</div>`;
+    return;
+  }
+  _gmap = new google.maps.Map(mapEl, {
+    zoom: 13,
+    center: { lat: parseFloat(screensWithCoords[0].latitude), lng: parseFloat(screensWithCoords[0].longitude) },
+    mapTypeId: 'roadmap',
+    mapTypeControl: false,
+    streetViewControl: false,
+    fullscreenControl: false,
+  });
+  const bounds = new google.maps.LatLngBounds();
+  screensWithCoords.forEach(s => {
+    const lat = parseFloat(s.latitude), lng = parseFloat(s.longitude);
     if(isNaN(lat)||isNaN(lng)) return;
-    bounds.push([lat,lng]);
-    const isOnline = s.status==='online';
-    const markerHtml=`<div style="width:36px;height:36px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:${isOnline?'#10b981':'#f59e0b'};border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,0.25);display:flex;align-items:center;justify-content:center;">
-      <svg style="transform:rotate(45deg)" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#fff" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-    </div>`;
-    const icon=L.divIcon({html:markerHtml,className:'',iconSize:[36,36],iconAnchor:[18,36],popupAnchor:[0,-38]});
-    const popup=`<div style="font-family:Inter,sans-serif;min-width:180px;">
+    const pos = { lat, lng };
+    bounds.extend(pos);
+    const isOnline = s.status === 'online';
+    const marker = new google.maps.Marker({
+      position: pos,
+      map: _gmap,
+      title: s.name,
+      icon: {
+        path: 'M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z',
+        fillColor: isOnline ? '#10b981' : '#f59e0b',
+        fillOpacity: 1,
+        strokeColor: '#fff',
+        strokeWeight: 1.5,
+        scale: 1.6,
+        anchor: new google.maps.Point(12, 22),
+      }
+    });
+    const popup = `<div style="font-family:Inter,sans-serif;min-width:180px;padding:4px 0;">
       <div style="font-size:14px;font-weight:700;margin-bottom:2px;">${s.name}</div>
       <div style="font-size:12px;color:#6b7280;margin-bottom:8px;">${s.location||s.city||''}</div>
-      <div style="display:flex;gap:12px;margin-bottom:10px;">
-        <div><div style="font-size:13px;font-weight:700;">${s.approx_footfall>0?s.approx_footfall.toLocaleString('en-IN'):'—'}</div><div style="font-size:10px;color:#9ca3af;">footfall/day</div></div>
-        <div><div style="font-size:13px;font-weight:700;color:${s.status==='online'?'#10b981':'#f59e0b'};">${s.venue_type||'Screen'}</div><div style="font-size:10px;color:#9ca3af;">${s.status==='online'?'online':'offline'}</div></div>
+      <div style="display:flex;gap:14px;margin-bottom:10px;">
+        <div><div style="font-size:13px;font-weight:700;">${s.approx_footfall>0?Number(s.approx_footfall).toLocaleString('en-IN'):'—'}</div><div style="font-size:10px;color:#9ca3af;">footfall/day</div></div>
+        <div><div style="font-size:13px;font-weight:700;color:${isOnline?'#10b981':'#f59e0b'};">${s.venue_type||'Screen'}</div><div style="font-size:10px;color:#9ca3af;">${isOnline?'online':'offline'}</div></div>
       </div>
       <button onclick="navigate('new-campaign')" style="width:100%;padding:7px;background:#10b981;color:#fff;border:none;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">Book Campaign →</button>
     </div>`;
-    L.marker([lat,lng],{icon}).addTo(_leafletMap).bindPopup(popup,{maxWidth:220});
+    const infoWin = new google.maps.InfoWindow({ content: popup, maxWidth: 220 });
+    marker.addListener('click', () => { infoWin.open(_gmap, marker); });
   });
-  if(bounds.length===1) _leafletMap.setView(bounds[0],14);
-  else if(bounds.length>1) _leafletMap.fitBounds(bounds,{padding:[40,40]});
-  setTimeout(()=>_leafletMap.invalidateSize(),400);
+  if(screensWithCoords.length > 1) _gmap.fitBounds(bounds);
 }
 
 let _sbcSelected = new Set(); // selected screen ids

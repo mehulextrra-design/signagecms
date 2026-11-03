@@ -37,11 +37,11 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net", "https://checkout.razorpay.com"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net", "https://checkout.razorpay.com", "https://maps.googleapis.com", "https://maps.gstatic.com"],
       scriptSrcAttr: ["'unsafe-inline'"],
       styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
       fontSrc: ["'self'", "https://fonts.gstatic.com"],
-      imgSrc: ["'self'", "data:", "blob:", "*"],
+      imgSrc: ["'self'", "data:", "blob:", "*", "https://maps.gstatic.com", "https://maps.googleapis.com"],
       connectSrc: ["'self'", "*"],
       frameSrc: ["'self'", "https://api.razorpay.com", "https://checkout.razorpay.com"],
     }
@@ -97,6 +97,13 @@ app.use('/api/contact', contactRoutes);
 app.use('/api/auth/google',     googleRoutes);
 app.use('/api/auth/instagram', instagramRoutes);
 app.use('/api/blog', blogRoutes);
+
+// Public config — exposes safe client-side keys (no auth needed)
+app.get('/api/config', (req, res) => {
+  res.json({
+    googleMapsApiKey: process.env.GOOGLE_MAPS_API_KEY || ''
+  });
+});
 
 // Public gallery — reads img/carousel/ folder, no auth needed
 app.get('/api/gallery', (req, res) => {
