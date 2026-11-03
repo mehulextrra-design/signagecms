@@ -2638,19 +2638,22 @@ document.querySelectorAll('[data-reveal]').forEach(el => ro.observe(el));
   function buildRow(id, pool){
     var row = document.createElement('div');
     row.className='drift-row'; row.id=id;
-    for(var c=0;c<2;c++)
+    // Enough copies so 1 copy fills > viewport; loop resets by exactly 1 copy (no visible duplication)
+    var singleW = pool.length * SLOT;
+    var copies = Math.max(3, Math.ceil((window.innerWidth * 3) / singleW) + 1);
+    for(var c=0;c<copies;c++)
       for(var i=0;i<pool.length;i++) row.appendChild(makeCard(pool[i]));
     container.appendChild(row);
-    return row;
+    return {row:row, half:singleW};
   }
 
-  function startDrift(DRIFT_ROW1, DRIFT_ROW2){
-    var r0 = buildRow('driftR1', DRIFT_ROW1);
-    var r1 = buildRow('driftR2', DRIFT_ROW2);
-    var half0 = DRIFT_ROW1.length * SLOT;
-    var half1 = DRIFT_ROW2.length * SLOT;
-    var pos0 = -half0 * 0.5;
-    var pos1 = 0;
+  function startDrift(files){
+    // Row 1: original order; Row 2: reversed — different look, same images
+    var row2 = files.slice().reverse();
+    var b0 = buildRow('driftR1', files);
+    var b1 = buildRow('driftR2', row2);
+    var half0 = b0.half, half1 = b1.half;
+    var pos0 = 0, pos1 = 0;
     var scrollVel = 0, lastY = window.scrollY;
     window.addEventListener('scroll', function(){
       scrollVel += (window.scrollY - lastY) * 0.12;
@@ -2658,14 +2661,14 @@ document.querySelectorAll('[data-reveal]').forEach(el => ro.observe(el));
     }, {passive:true});
     function tick(){
       scrollVel *= 0.82;
-      pos0 += 0.5 - scrollVel * 0.04;
-      if(pos0 >= 0)      pos0 -= half0;
-      if(pos0 < -half0)  pos0 += half0;
-      pos1 -= 0.35 + scrollVel * 0.03;
-      if(pos1 < -half1)  pos1 += half1;
-      if(pos1 > 0)       pos1 -= half1;
-      r0.style.transform = 'translateX('+pos0+'px)';
-      r1.style.transform = 'translateX('+pos1+'px)';
+      pos0 -= 0.5 + scrollVel * 0.04;   // row 1 → left
+      if(pos0 < -half0) pos0 += half0;
+      if(pos0 > 0)      pos0 -= half0;
+      pos1 += 0.35 - scrollVel * 0.03;  // row 2 → right (opposite direction)
+      if(pos1 > 0)      pos1 -= half1;
+      if(pos1 < -half1) pos1 += half1;
+      b0.row.style.transform = 'translateX('+pos0+'px)';
+      b1.row.style.transform = 'translateX('+pos1+'px)';
       requestAnimationFrame(tick);
     }
     requestAnimationFrame(tick);
@@ -2673,11 +2676,8 @@ document.querySelectorAll('[data-reveal]').forEach(el => ro.observe(el));
 
   // Fetch gallery from server — sirf public/img/carousel/ folder manage karo
   fetch('/api/gallery').then(function(r){ return r.json(); }).then(function(files){
-    if(!files || files.length < 2) return;
-    var row1 = files.filter(function(_,i){ return i%2===0; });
-    var row2 = files.filter(function(_,i){ return i%2!==0; });
-    if(!row2.length) row2 = row1.slice();
-    startDrift(row1, row2);
+    if(!files || !files.length) return;
+    startDrift(files);
   }).catch(function(){});
 })();
 
