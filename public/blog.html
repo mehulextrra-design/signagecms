@@ -353,6 +353,17 @@
 
 </main>
 
+<section id="latest-articles" class="blog-section" style="display:none" aria-labelledby="la-heading">
+  <div class="wrap">
+    <div class="section-header">
+      <span class="section-tag">Latest</span>
+      <h2 id="la-heading">Naye Articles</h2>
+      <p>Platform updates, tips, aur industry insights — har mahine naye articles.</p>
+    </div>
+    <div id="latest-grid" class="article-grid"></div>
+  </div>
+</section>
+
 <section class="cta-strip">
   <div class="wrap">
     <h2>Abhi shuru karein — free account banayein</h2>
@@ -376,6 +387,31 @@
   const btns=document.querySelectorAll('.cat-btn');
   const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){btns.forEach(b=>b.classList.remove('active'));const m=document.querySelector(`.cat-btn[href="#${e.target.id}"]`);if(m)m.classList.add('active');}});},{rootMargin:'-30% 0px -60% 0px'});
   sects.forEach(id=>{const el=document.getElementById(id);if(el)obs.observe(el);});
+
+  // Load dynamically generated articles from API
+  (function loadLatest(){
+    fetch('/api/blog').then(function(r){return r.json();}).then(function(posts){
+      if(!posts||!posts.length)return;
+      var grid=document.getElementById('latest-grid');
+      var section=document.getElementById('latest-articles');
+      if(!grid||!section)return;
+      var fmtDate=function(d){try{return new Date(d).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});}catch(e){return '';}};
+      var html=posts.map(function(p){
+        var img=p.hero_image_url?'<img src="'+p.hero_image_url+'" alt="'+p.title+'" loading="lazy">':'';
+        var date=p.published_at?fmtDate(p.published_at):'';
+        var slug='/blog/generated/'+p.slug;
+        return '<article class="article-card"><a href="'+slug+'" class="card-thumb">'+img+'</a>'
+          +'<div class="card-body"><div class="card-meta"><span class="card-cat">'+p.category+'</span>'
+          +(date?'<span class="card-dot"></span><time class="card-date">'+date+'</time>':'')+'</div>'
+          +'<h3>'+p.title+'</h3><p>'+p.description+'</p>'
+          +'<div class="card-footer"><span class="card-read">'+p.read_time+'</span>'
+          +'<a href="'+slug+'" class="card-link">Poora Padhein <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg></a>'
+          +'</div></div></article>';
+      }).join('');
+      grid.innerHTML=html;
+      section.style.display='';
+    }).catch(function(){});
+  })();
 </script>
 </body>
 </html>
