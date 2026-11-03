@@ -24,6 +24,42 @@ router.get('/', authenticate, requireAdmin, async (req, res, next) => {
   } catch (err) { next(err); }
 });
 
+// ── APPROVE venue partner (admin) ────────────────────────────────────────────
+router.post('/:id/approve', authenticate, requireAdmin, async (req, res, next) => {
+  const { filler_quota_sec } = req.body;
+  try {
+    const result = await query(
+      `UPDATE venue_partners SET
+         approval_status = 'approved',
+         is_active = true,
+         approved_at = NOW(),
+         approved_by = $2
+         ${filler_quota_sec != null ? ', filler_quota_sec = $3' : ''}
+       WHERE id = $1 RETURNING *`,
+      filler_quota_sec != null
+        ? [req.params.id, req.user.id, parseInt(filler_quota_sec)]
+        : [req.params.id, req.user.id]
+    );
+    if (!result.rows.length) return res.status(404).json({ error: 'Not found' });
+    // Activate the linked user account
+    await query('UPDATE users SET is_active = true WHERE venue_partner_id = $1', [req.params.id]);
+    res.json({ ok: true, ...result.rows[0] });
+  } catch (err) { next(err); }
+});
+
+// ── REJECT venue partner (admin) ─────────────────────────────────────────────
+router.post('/:id/reject', authenticate, requireAdmin, async (req, res, next) => {
+  try {
+    const result = await query(
+      `UPDATE venue_partners SET approval_status = 'rejected', is_active = false WHERE id = $1 RETURNING id`,
+      [req.params.id]
+    );
+    if (!result.rows.length) return res.status(404).json({ error: 'Not found' });
+    await query('UPDATE users SET is_active = false WHERE venue_partner_id = $1', [req.params.id]);
+    res.json({ ok: true });
+  } catch (err) { next(err); }
+});
+
 // ── GET single venue partner ──────────────────────────────────────────────────
 router.get('/:id', authenticate, async (req, res, next) => {
   try {
@@ -68,19 +104,19 @@ router.post('/', authenticate, requireAdmin, async (req, res, next) => {
     const plain = password || Math.random().toString(36).slice(-8) + 'V1!';
     const hash = await bcrypt.hash(plain, 10);
 
-    // Create venue_partner record first
+    // Create venue_partner record first (pending approval by default)
     const vp = await query(
-      `INSERT INTO venue_partners (business_name, venue_category, city, address, contact_name, contact_phone, revenue_share_pct)
-       VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING *`,
+      `INSERT INTO venue_partners (business_name, venue_category, city, address, contact_name, contact_phone, revenue_share_pct, approval_status, is_active)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,'pending',false) RETURNING *`,
       [business_name, venue_category || 'other', city || null, address || null,
        contact_name || null, contact_phone || null, revenue_share_pct || 30]
     );
     const venuePartner = vp.rows[0];
 
-    // Create user account linked to venue_partner
+    // Create user account linked to venue_partner (inactive until approved)
     const user = await query(
       `INSERT INTO users (email, password_hash, role, first_name, business_name, city, is_verified, is_active, venue_partner_id)
-       VALUES ($1,$2,'venue_partner',$3,$4,$5,TRUE,TRUE,$6) RETURNING id, email, role`,
+       VALUES ($1,$2,'venue_partner',$3,$4,$5,TRUE,FALSE,$6) RETURNING id, email, role`,
       [email, hash, contact_name || business_name, business_name, city || null, venuePartner.id]
     );
 
@@ -90,21 +126,26 @@ router.post('/', authenticate, requireAdmin, async (req, res, next) => {
     res.status(201).json({
       venue_partner: { ...venuePartner, user_id: user.rows[0].id },
       user: user.rows[0],
-      generated_password: password ? null : plain  // only send if auto-generated
+      generated_password: password ? null : plain,
+      note: 'Account created with pending approval. Approve from Venue Partners list to activate portal access.'
     });
   } catch (err) { next(err); }
 });
 
 // ── UPDATE venue partner (admin) ──────────────────────────────────────────────
 router.put('/:id', authenticate, requireAdmin, async (req, res, next) => {
-  const { business_name, venue_category, city, address, contact_name, contact_phone, revenue_share_pct, is_active } = req.body;
+  const { business_name, venue_category, city, address, contact_name, contact_phone, revenue_share_pct, is_active, filler_quota_sec } = req.body;
   try {
     const result = await query(
       `UPDATE venue_partners SET
         business_name=$1, venue_category=$2, city=$3, address=$4,
-        contact_name=$5, contact_phone=$6, revenue_share_pct=$7, is_active=$8
-       WHERE id=$9 RETURNING *`,
-      [business_name, venue_category, city, address, contact_name, contact_phone, revenue_share_pct, is_active !== false, req.params.id]
+        contact_name=$5, contact_phone=$6, revenue_share_pct=$7, is_active=$8,
+        filler_quota_sec=COALESCE($9, filler_quota_sec)
+       WHERE id=$10 RETURNING *`,
+      [business_name, venue_category, city, address, contact_name, contact_phone,
+       revenue_share_pct, is_active !== false,
+       filler_quota_sec != null ? parseInt(filler_quota_sec) : null,
+       req.params.id]
     );
     if (!result.rows.length) return res.status(404).json({ error: 'Not found' });
     res.json(result.rows[0]);

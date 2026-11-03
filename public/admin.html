@@ -809,13 +809,13 @@ textarea.form-input{resize:vertical;min-height:80px;}
           <div class="stat-card"><div class="stat-label">Total Venues</div><div class="stat-value" id="vn-total">—</div></div>
           <div class="stat-card"><div class="stat-label">Active Screens</div><div class="stat-value" id="vn-screens">—</div></div>
           <div class="stat-card"><div class="stat-label">Revenue Earned (Total)</div><div class="stat-value" id="vn-revenue">—</div></div>
-          <div class="stat-card"><div class="stat-label">Pending Settlement</div><div class="stat-value" id="vn-pending">—</div></div>
+          <div class="stat-card" style="border-color:#f59e0b;"><div class="stat-label" style="color:#f59e0b;">Pending Approval</div><div class="stat-value" id="vn-pending-approval" style="color:#f59e0b;">—</div></div>
         </div>
         <div class="table-card">
           <table class="data-table">
             <thead><tr>
               <th>Business</th><th>Category</th><th>City</th>
-              <th>Screens</th><th>Rev Share</th><th>Total Earned</th><th>Status</th><th>Actions</th>
+              <th>Screens</th><th>Rev Share</th><th>Filler Quota</th><th>Status</th><th>Actions</th>
             </tr></thead>
             <tbody id="venues-table"></tbody>
           </table>
@@ -914,8 +914,12 @@ textarea.form-input{resize:vertical;min-height:80px;}
           <input type="text" id="vn-phone" class="form-input" placeholder="9876543210">
         </div>
         <div class="form-group">
-          <label class="form-label">Revenue Share %</label>
+          <label class="form-label">Ad Earnings Share %</label>
           <input type="number" id="vn-revshare" class="form-input" value="30" min="0" max="60" step="5">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Filler Quota (min/day) <span style="color:var(--text3);font-weight:400;">default 60</span></label>
+          <input type="number" id="vn-filler-quota" class="form-input" value="60" min="0" max="1440" step="15" placeholder="60">
         </div>
         <div class="form-group" id="vn-login-group">
           <label class="form-label">Login Email *</label>
@@ -1469,14 +1473,28 @@ async function loadVenues() {
   try {
     const venues = await api('/venue-partners');
     // stats
+    const pendingCount = venues.filter(v => v.approval_status === 'pending').length;
     document.getElementById('vn-total').textContent = venues.length;
     document.getElementById('vn-screens').textContent = venues.reduce((a,v)=>a+parseInt(v.screen_count||0),0);
     document.getElementById('vn-revenue').textContent = '₹'+fmt(venues.reduce((a,v)=>a+parseFloat(v.total_revenue_earned||0),0));
-    document.getElementById('vn-pending').textContent = '—';
+    document.getElementById('vn-pending-approval').textContent = pendingCount || '0';
 
     if (!venues.length) { tbody.innerHTML = emptyRow(8,'No venue partners yet — add your first one!'); return; }
-    tbody.innerHTML = venues.map(v => `
-      <tr>
+    tbody.innerHTML = venues.map(v => {
+      const approvalBadge = v.approval_status === 'approved'
+        ? '<span class="badge badge-green">Approved</span>'
+        : v.approval_status === 'rejected'
+        ? '<span class="badge" style="background:#fee2e2;color:#dc2626;">Rejected</span>'
+        : '<span class="badge" style="background:#fef3c7;color:#b45309;">Pending</span>';
+      const activeBadge = v.is_active
+        ? '<span class="badge badge-green" style="font-size:10px;">Active</span>'
+        : '<span class="badge" style="background:var(--surface2);color:var(--text2);font-size:10px;">Inactive</span>';
+      const quotaMins = Math.round((v.filler_quota_sec||3600)/60);
+      const approveRejectBtns = v.approval_status === 'pending' ? `
+        <button class="btn btn-xs" style="background:#16a34a;color:#fff;font-size:10px;padding:2px 7px;border-radius:4px;border:none;cursor:pointer;" onclick="approveVenue('${v.id}','${v.business_name.replace(/'/g,"\\'")}')">✓ Approve</button>
+        <button class="btn btn-xs" style="background:#dc2626;color:#fff;font-size:10px;padding:2px 7px;border-radius:4px;border:none;cursor:pointer;margin-left:2px;" onclick="rejectVenue('${v.id}','${v.business_name.replace(/'/g,"\\'")}')">✕ Reject</button>` : '';
+      return `
+      <tr style="${v.approval_status==='pending'?'background:rgba(245,158,11,0.04);':''}">
         <td>
           <div style="font-weight:600;">${v.business_name}</div>
           <div style="font-size:11px;color:var(--text2);">${v.email||''}</div>
@@ -1485,8 +1503,13 @@ async function loadVenues() {
         <td style="font-size:12px;">${v.city||'—'}</td>
         <td style="text-align:center;font-weight:600;">${v.screen_count||0}</td>
         <td style="text-align:center;font-weight:600;color:var(--primary);">${v.revenue_share_pct}%</td>
-        <td style="font-weight:600;">₹${fmt(v.total_revenue_earned||0)}</td>
-        <td>${v.is_active ? '<span class="badge badge-green">Active</span>' : '<span class="badge" style="background:var(--surface2);color:var(--text2);">Inactive</span>'}</td>
+        <td style="text-align:center;font-size:12px;">${quotaMins} min/day</td>
+        <td>
+          <div style="display:flex;flex-direction:column;gap:3px;align-items:flex-start;">
+            ${approvalBadge}${activeBadge}
+          </div>
+          ${approveRejectBtns ? '<div style="margin-top:4px;">'+approveRejectBtns+'</div>' : ''}
+        </td>
         <td>
           <div style="display:flex;align-items:center;gap:2px;">
             <button class="ia-btn" title="View Revenue" onclick="openVenueRevenue('${v.id}','${v.business_name.replace(/'/g,"\\'")}')" style="color:var(--primary);">
@@ -1498,13 +1521,35 @@ async function loadVenues() {
             <button class="ia-btn" title="Copy Portal Link" onclick="copyVenueLink('${v.email||''}')">
               <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
             </button>
-            <button class="ia-btn ia-danger" title="Deactivate" onclick="toggleVenue('${v.id}',${!v.is_active})">
+            <button class="ia-btn ia-danger" title="${v.is_active?'Deactivate':'Activate'}" onclick="toggleVenue('${v.id}',${!v.is_active})">
               <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="${v.is_active ? 'M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636' : 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z'}"/></svg>
             </button>
           </div>
         </td>
-      </tr>`).join('');
+      </tr>`;
+    }).join('');
   } catch(e) { tbody.innerHTML = emptyRow(8, 'Error: '+e.message); }
+}
+
+async function approveVenue(id, name) {
+  const quotaInput = prompt(`Approve "${name}"?\n\nFiller quota (min/day) — leave blank to keep current:`, '60');
+  if (quotaInput === null) return; // cancelled
+  try {
+    const body = {};
+    if (quotaInput.trim() !== '') body.filler_quota_sec = parseInt(quotaInput) * 60;
+    await api('/venue-partners/'+id+'/approve', { method:'POST', body: JSON.stringify(body) });
+    showToast(name + ' approved — portal access activated', 'success');
+    loadVenues();
+  } catch(e) { showToast('Error: '+e.message, 'error'); }
+}
+
+async function rejectVenue(id, name) {
+  if (!confirm('Reject "' + name + '"? Their portal access will be disabled.')) return;
+  try {
+    await api('/venue-partners/'+id+'/reject', { method:'POST', body: JSON.stringify({}) });
+    showToast(name + ' rejected', 'success');
+    loadVenues();
+  } catch(e) { showToast('Error: '+e.message, 'error'); }
 }
 
 function openVenueModal(id) {
@@ -1518,6 +1563,7 @@ function openVenueModal(id) {
   // clear fields
   ['vn-business','vn-city','vn-address','vn-contact','vn-phone','vn-email','vn-password'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('vn-revshare').value = 30;
+  document.getElementById('vn-filler-quota').value = 60;
   document.getElementById('vn-category').value = 'gym';
 
   if (isEdit) {
@@ -1529,6 +1575,7 @@ function openVenueModal(id) {
       document.getElementById('vn-contact').value = v.contact_name || '';
       document.getElementById('vn-phone').value = v.contact_phone || '';
       document.getElementById('vn-revshare').value = v.revenue_share_pct || 30;
+      document.getElementById('vn-filler-quota').value = Math.round((v.filler_quota_sec||3600)/60);
     }).catch(e => showToast('Error: '+e.message,'error'));
   }
   document.getElementById('venue-modal').classList.remove('hidden');
@@ -1536,6 +1583,7 @@ function openVenueModal(id) {
 
 async function saveVenuePartner() {
   const id = document.getElementById('venue-edit-id').value;
+  const fillerMins = parseInt(document.getElementById('vn-filler-quota').value) || 60;
   const body = {
     business_name: document.getElementById('vn-business').value.trim(),
     venue_category: document.getElementById('vn-category').value,
@@ -1544,6 +1592,7 @@ async function saveVenuePartner() {
     contact_name: document.getElementById('vn-contact').value.trim(),
     contact_phone: document.getElementById('vn-phone').value.trim(),
     revenue_share_pct: parseFloat(document.getElementById('vn-revshare').value)||30,
+    filler_quota_sec: fillerMins * 60,
   };
   if (!body.business_name) return showToast('Business name required','error');
 
@@ -1562,9 +1611,10 @@ async function saveVenuePartner() {
       document.getElementById('vn-cred-email').textContent = body.email;
       document.getElementById('vn-cred-pass').textContent = res.generated_password || '(password you set)';
       document.getElementById('vn-cred-box').style.display = 'block';
+      document.getElementById('vn-cred-box').innerHTML += '<div style="margin-top:8px;font-size:11px;color:#b45309;background:#fef3c7;border-radius:6px;padding:6px 10px;">⚠ Account is PENDING — click Approve in the list to activate portal access.</div>';
       document.getElementById('vn-save-btn').textContent = 'Done';
       document.getElementById('vn-save-btn').onclick = () => { closeModal('venue-modal'); loadVenues(); };
-      showToast('Venue partner created','success');
+      showToast('Venue partner created — pending approval','success');
     }
     loadVenues();
   } catch(e) { showToast('Error: '+e.message,'error'); }
