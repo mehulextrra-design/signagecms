@@ -61,6 +61,15 @@ app.get('/favicon.ico', (req, res) => {
 // Redirect old v1 landing page to current v2
 app.get('/extrravenue-signage.html', (req, res) => res.redirect(301, '/extrravenue-signage-v2.html'));
 
+// Public domain root → landing page; Railway URL root → CMS (index.html)
+app.get('/', (req, res, next) => {
+  const host = req.hostname;
+  if (host === 'www.extrravenue.com' || host === 'extrravenue.com') {
+    return res.sendFile(path.join(__dirname, '../public/extrravenue-signage-v2.html'));
+  }
+  next();
+});
+
 // CMS frontend — HTML files never cached, assets cached 1 day
 app.use(express.static(path.join(__dirname, '../public'), {
   setHeaders(res, filePath) {
