@@ -1,0 +1,50 @@
+C:\Users\admin\AppData\Local\Android\Sdk\platform-tools\adb.exe connect 192.168.1.33:5555
+
+C:\Users\admin\AppData\Local\Android\Sdk\platform-tools\adb.exe install -r "C:\Users\admin\Downloads\app-release.apk"
+
+Purana logo replace karo naya wala add karo
+
+C:\Users\admin\AppData\Local\Android\Sdk\platform-tools\adb.exe -s 192.168.1.32:5555 push "C:\Users\admin\Downloads\logo.jpg" /sdcard/slideshow/slideshow/vs_cus_logo.jpg
+
+Remove all media from slideshow folder
+C:\Users\admin\AppData\Local\Android\Sdk\platform-tools\adb.exe -s 192.168.1.33:5555 shell rm /sdcard/slideshow/slideshow/*
+
+
+adb connect 192.168.1.7:5555
+adb shell dpm set-device-owner in.signagecms.player/.admin.DeviceAdminReceiver
+
+
+C:\Users\admin\AppData\Local\Android\Sdk\platform-tools\adb.exe -s 192.168.1.14:5555 install "C:\Users\admin\Downloads\SignageCMS-Player-v1.47\app-release.apk"
+
+Version Check
+C:\Users\admin\AppData\Local\Android\Sdk\platform-tools\adb.exe -s 192.168.1.26:5555 shell dumpsys package in.signagecms.player | findstr versionName
+
+
+C:\Users\admin\AppData\Local\Android\Sdk\platform-tools\adb.exe -s 192.168.1.27:5555 shell appops set in.signagecms.player REQUEST_INSTALL_PACKAGES allow
+
+
+For Boot logo - 
+powershell -ExecutionPolicy Bypass -File "C:\Users\admin\AppData\Local\Temp\claude\H--Signagecms\36d3e765-bee0-4958-9aae-6f26a08d5f5b\scratchpad\make_bootanim.ps1"
+
+C:\Users\admin\AppData\Local\Android\Sdk\platform-tools\adb.exe connect 192.168.1.24
+C:\Users\admin\AppData\Local\Android\Sdk\platform-tools\adb.exe root
+C:\Users\admin\AppData\Local\Android\Sdk\platform-tools\adb.exe push "C:\Users\admin\Downloads\bootanimation.zip" /data/local/bootanimation.zip
+C:\Users\admin\AppData\Local\Android\Sdk\platform-tools\adb.exe shell chmod 644 /data/local/bootanimation.zip
+C:\Users\admin\AppData\Local\Android\Sdk\platform-tools\adb.exe reboot
+
+C:\Users\admin\AppData\Local\Android\Sdk\platform-tools\adb.exe connect 192.168.1.26
+C:\Users\admin\AppData\Local\Android\Sdk\platform-tools\adb.exe shell appops get in.signagecms.player REQUEST_INSTALL_PACKAGES
+
+fOR sETUP ACTIVITY
+C:\Users\admin\AppData\Local\Android\Sdk\platform-tools\adb.exe -s 192.168.1.27:5555 shell am start -n in.signagecms.player/.SetupActivity
+
+
+C:\Users\admin\AppData\Local\Android\Sdk\platform-tools\adb.exe -s 192.168.1.27:5555 shell appops set in.signagecms.player REQUEST_INSTALL_PACKAGES allow
+
+
+C:\Users\admin\AppData\Local\Android\Sdk\platform-tools\adb.exe -s 192.168.1.27:5555 shell appops set in.signagecms.player REQUEST_INSTALL_PACKAGES allow
+C:\Users\admin\AppData\Local\Android\Sdk\platform-tools\adb.exe -s 192.168.1.27:5555 shell am start -n in.signagecms.player/.SetupActivity
+
+
+Auto Update version
+C:\Users\admin\AppData\Local\Android\Sdk\platform-tools\adb.exe connect <TV_IP>:5555; C:\Users\admin\AppData\Local\Android\Sdk\platform-tools\adb.exe -s <TV_IP>:5555 install -r "C:\Users\admin\Downloads\v154\app-release.apk"; C:\Users\admin\AppData\Local\Android\Sdk\platform-tools\adb.exe -s <TV_IP>:5555 shell appops set in.signagecms.player REQUEST_INSTALL_PACKAGES allow; C:\Users\admin\AppData\Local\Android\Sdk\platform-tools\adb.exe -s <TV_IP>:5555 shell monkey -p in.signagecms.player 1

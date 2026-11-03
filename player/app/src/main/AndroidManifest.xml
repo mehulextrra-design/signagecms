@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="28" />
+    <uses-permission android:name="android.permission.MANAGE_DEVICE_POLICY_LOCK_TASK" />
+
+    <!-- Android TV banner -->
+    <uses-feature android:name="android.software.leanback" android:required="false" />
+    <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
+
+    <application
+        android:name=".PlayerApp"
+        android:allowBackup="false"
+        android:banner="@drawable/ic_banner"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/Theme.PravaahPlayer"
+        android:hardwareAccelerated="true"
+        android:largeHeap="true">
+
+        <!-- Boot receiver — auto-start player on device boot -->
+        <receiver
+            android:name=".services.BootReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Device Admin receiver for kiosk/lock task mode -->
+        <receiver
+            android:name=".services.DeviceAdminReceiver"
+            android:permission="android.permission.BIND_DEVICE_ADMIN"
+            android:exported="true">
+            <meta-data
+                android:name="android.app.device_admin"
+                android:resource="@xml/device_admin" />
+            <intent-filter>
+                <action android:name="android.app.action.DEVICE_ADMIN_ENABLED" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Setup / registration screen -->
+        <activity
+            android:name=".SetupActivity"
+            android:exported="true"
+            android:screenOrientation="landscape"
+            android:launchMode="singleTask">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- Main player — full screen, no decorations -->
+        <activity
+            android:name=".PlayerActivity"
+            android:exported="false"
+            android:screenOrientation="landscape"
+            android:launchMode="singleTask"
+            android:theme="@style/Theme.FullScreen"
+            android:showWhenLocked="true"
+            android:turnScreenOn="true"
+            android:keepScreenOn="true" />
+
+        <!-- Background sync service -->
+        <service
+            android:name=".services.SyncService"
+            android:exported="false"
+            android:foregroundServiceType="mediaPlayback" />
+
+        <!-- Heartbeat WorkManager worker — declared automatically by WorkManager -->
+
+    </application>
+</manifest>

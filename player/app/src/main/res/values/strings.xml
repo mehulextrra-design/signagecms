@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Pravaah Player</string>
+    <string name="device_admin_label">Pravaah Signage</string>
+    <string name="device_admin_description">Required for kiosk mode — prevents the home button and other apps from interrupting ad playback</string>
+</resources>

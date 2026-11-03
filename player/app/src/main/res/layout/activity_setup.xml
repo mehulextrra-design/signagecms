@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/setup_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="48dp"
+    android:background="#0F172A">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Pravaah Signage Player"
+        android:textColor="#14B8A6"
+        android:textSize="32sp"
+        android:fontFamily="sans-serif-medium"
+        android:layout_marginBottom="8dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Device Setup"
+        android:textColor="#6B7280"
+        android:textSize="16sp"
+        android:layout_marginBottom="40dp" />
+
+    <EditText
+        android:id="@+id/et_api_url"
+        android:layout_width="480dp"
+        android:layout_height="wrap_content"
+        android:hint="API Server URL (e.g. http://192.168.1.100:3000/api/)"
+        android:textColorHint="#4B5563"
+        android:textColor="#F9FAFB"
+        android:background="@drawable/input_bg"
+        android:padding="16dp"
+        android:textSize="16sp"
+        android:inputType="textUri"
+        android:layout_marginBottom="16dp" />
+
+    <EditText
+        android:id="@+id/et_screen_code"
+        android:layout_width="480dp"
+        android:layout_height="wrap_content"
+        android:hint="Screen Code (e.g. PHX-001)"
+        android:textColorHint="#4B5563"
+        android:textColor="#F9FAFB"
+        android:background="@drawable/input_bg"
+        android:padding="16dp"
+        android:textSize="18sp"
+        android:textAllCaps="true"
+        android:inputType="textCapCharacters"
+        android:layout_marginBottom="24dp" />
+
+    <Button
+        android:id="@+id/btn_register"
+        android:layout_width="480dp"
+        android:layout_height="56dp"
+        android:text="Register This Screen"
+        android:textSize="16sp"
+        android:fontFamily="sans-serif-medium"
+        android:background="#14B8A6"
+        android:textColor="#FFFFFF"
+        android:layout_marginBottom="24dp" />
+
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:layout_marginBottom="16dp" />
+
+    <TextView
+        android:id="@+id/tv_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#9CA3AF"
+        android:textSize="14sp" />
+
+</LinearLayout>
