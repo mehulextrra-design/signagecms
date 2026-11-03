@@ -1,0 +1,19 @@
+User-agent: *
+Allow: /
+
+# Public pages
+Allow: /extrravenue-signage-v2.html
+Allow: /blog.html
+Allow: /blog/
+Allow: /careers.html
+Allow: /privacy-policy.html
+Allow: /terms-of-service.html
+
+# Block private portals
+Disallow: /index.html
+Disallow: /cms
+Disallow: /admin.html
+Disallow: /venue.html
+Disallow: /api/
+
+Sitemap: https://www.extrravenue.com/sitemap.xml
