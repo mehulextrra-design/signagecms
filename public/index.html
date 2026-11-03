@@ -1468,10 +1468,8 @@ function renderScreensMap(){
   }
   if(_leafletMap){ _leafletMap.remove(); _leafletMap=null; }
   _leafletMap = L.map('screens-map',{zoomControl:true});
-  L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/streets-v12/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWVodWxkZSIsImEiOiJjbXVvYmhmbXAwNDIzMnpzN2xvdmFnbWZlIn0.YI1oX9vYenukXy-c0-bNLw',{
-    attribution:'© <a href="https://www.mapbox.com/">Mapbox</a>',
-    tileSize:512,
-    zoomOffset:-1,
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+    attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
     maxZoom:19
   }).addTo(_leafletMap);
 
@@ -1498,7 +1496,7 @@ function renderScreensMap(){
   });
   if(bounds.length===1) _leafletMap.setView(bounds[0],14);
   else if(bounds.length>1) _leafletMap.fitBounds(bounds,{padding:[40,40]});
-  setTimeout(()=>_leafletMap.invalidateSize(),250);
+  setTimeout(()=>_leafletMap.invalidateSize(),400);
 }
 
 let _sbcSelected = new Set(); // selected screen ids
