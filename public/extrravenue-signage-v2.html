@@ -665,8 +665,8 @@ body{margin:0;background:#f2efe9;}
 .plan-stats{display:flex;flex-direction:column;gap:11px;margin-bottom:20px;}
 .plan-stat{display:flex;flex-direction:column;gap:1px;}
 .plan-stat-num{font-family:'Magra',sans-serif;font-size:19px;font-weight:700;color:var(--orange);line-height:1.1;}
-.plan-stat-lbl{font-size:10.5px;color:rgba(26,23,20,.65);}
-.featured .plan-stat-lbl{color:rgba(242,239,233,.6);}
+.plan-stat-lbl{font-size:11.5px;color:rgba(26,23,20,.78);font-weight:500;}
+.featured .plan-stat-lbl{color:rgba(242,239,233,.8);}
 .channels{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px;align-items:center;}
 .ch-pill{display:inline-flex;align-items:center;justify-content:center;}
 .ch-pill svg{display:block;}
@@ -690,10 +690,10 @@ body{margin:0;background:#f2efe9;}
 .featured .pcta{background:var(--orange);color:#fff;}
 .featured .pcta:hover{background:var(--grad-dark);box-shadow:0 4px 14px -4px rgba(123,104,200,.6);}
 .price-top{display:flex;align-items:baseline;gap:8px;margin-bottom:4px;}
-.price-orig{font-size:13px;color:rgba(26,23,20,.4);text-decoration:line-through;font-weight:400;}
+.price-orig{font-size:16px;color:rgba(26,23,20,.65);text-decoration:line-through;font-weight:500;}
 .disc-pct{font-size:11px;font-weight:700;color:#1a8a4a;letter-spacing:.02em;}
 .disc-pct.best{color:var(--orange);}
-.featured .price-orig{color:rgba(242,239,233,.38);}
+.featured .price-orig{color:rgba(242,239,233,.65);}
 .featured .disc-pct{color:#7bcf9a;}
 .plans-footnote{text-align:center;margin-top:28px;font-size:13.5px;color:rgba(26,23,20,.72);font-weight:500;line-height:2;}
 @media(max-width:600px){
@@ -1725,13 +1725,7 @@ body{margin:0;background:#f2efe9;}
   <input type="file" id="fi" accept="image/*,video/*" style="display:none">
 
   <!-- OMNICHANNEL MOCKUP CARD -->
-  <style>@keyframes ev-swirl-float{0%,100%{transform:translateY(0) rotate(-5deg)}50%{transform:translateY(-8px) rotate(5deg)}}#ev-swirl-arrow{animation:ev-swirl-float 2s ease-in-out infinite;transform-origin:center bottom;}</style>
-  <div style="width:100%;border-radius:18px;overflow:visible;box-shadow:0 4px 12px rgba(0,0,0,.08),0 10px 32px rgba(0,0,0,.1);background:#fff;position:relative;">
-  <svg id="ev-swirl-arrow" width="54" height="62" viewBox="0 0 54 62" fill="none" xmlns="http://www.w3.org/2000/svg" style="position:absolute;top:-66px;right:4px;pointer-events:none;z-index:10;">
-    <path d="M 10 30 C 8 10, 42 4, 46 22 C 50 38, 34 50, 20 46 C 9 42, 10 30, 20 28 C 30 26, 42 38, 34 54" stroke="#c94baa" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
-    <polygon points="27,62 34,54 43,58" fill="#c94baa"/>
-  </svg>
-  <div style="width:100%;display:flex;flex-direction:column;gap:0;border-radius:18px;overflow:hidden;background:#fff;">
+  <div style="width:100%;display:flex;flex-direction:column;gap:0;border-radius:18px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,.08),0 10px 32px rgba(0,0,0,.1);background:#fff;">
 
     <!-- Card Header -->
     <div style="padding:12px 14px;border-bottom:1px solid #e2e8f0;display:flex;flex-direction:column;gap:10px;background:#fff;">
@@ -1853,8 +1847,7 @@ body{margin:0;background:#f2efe9;}
       </div>
 
     </div><!-- end mockup views -->
-  </div><!-- end card inner -->
-  </div><!-- end card outer -->
+  </div>
 
   <div id="pv-desc" style="font-size:13px;color:var(--mid);line-height:1.65;padding-top:8px;"></div>
 </div><!-- .preview-col -->
@@ -2557,7 +2550,7 @@ function loadPreset(key){
           <li class="off">Google Business Profile</li>
           <li class="off">Digital Card</li>
         </ul>
-        <a class="pcta pcta-free" href="/get-started.html">Free mein try karo &rarr;</a>
+        <a class="pcta pcta-free" href="/get-started.html">Free Trial &rarr;</a>
       </div>
 
       <!-- Starter -->
@@ -2592,7 +2585,7 @@ function loadPreset(key){
           <li class="off">Google Business Profile</li>
           <li class="off">Digital Card</li>
         </ul>
-        <a class="pcta pcta-dark" href="/get-started.html">Shuru karo &rarr;</a>
+        <a class="pcta pcta-dark" href="/get-started.html">Book Slot &rarr;</a>
       </div>
 
       <!-- Complete -->
@@ -2631,7 +2624,7 @@ function loadPreset(key){
           <li>Google Business Profile post</li>
           <li class="off">Digital Card</li>
         </ul>
-        <a class="pcta" href="/get-started.html">Book karo &rarr;</a>
+        <a class="pcta" href="/get-started.html">Book Slot &rarr;</a>
       </div>
 
       <!-- Growth -->
@@ -2671,7 +2664,7 @@ function loadPreset(key){
           <li>Google Business Profile post</li>
           <li>Digital Card (shareable profile)</li>
         </ul>
-        <a class="pcta pcta-outline" href="/get-started.html">Book karo &rarr;</a>
+        <a class="pcta pcta-outline" href="/get-started.html">Book Slot &rarr;</a>
       </div>
 
     </div>
