@@ -1725,7 +1725,13 @@ body{margin:0;background:#f2efe9;}
   <input type="file" id="fi" accept="image/*,video/*" style="display:none">
 
   <!-- OMNICHANNEL MOCKUP CARD -->
-  <div style="width:100%;display:flex;flex-direction:column;gap:0;border-radius:18px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,.08),0 10px 32px rgba(0,0,0,.1);background:#fff;">
+  <style>@keyframes ev-swirl-float{0%,100%{transform:translateY(0) rotate(-5deg)}50%{transform:translateY(-8px) rotate(5deg)}}#ev-swirl-arrow{animation:ev-swirl-float 2s ease-in-out infinite;transform-origin:center bottom;}</style>
+  <div style="width:100%;border-radius:18px;overflow:visible;box-shadow:0 4px 12px rgba(0,0,0,.08),0 10px 32px rgba(0,0,0,.1);background:#fff;position:relative;">
+  <svg id="ev-swirl-arrow" width="54" height="62" viewBox="0 0 54 62" fill="none" xmlns="http://www.w3.org/2000/svg" style="position:absolute;top:-66px;right:4px;pointer-events:none;z-index:10;">
+    <path d="M 10 30 C 8 10, 42 4, 46 22 C 50 38, 34 50, 20 46 C 9 42, 10 30, 20 28 C 30 26, 42 38, 34 54" stroke="#c94baa" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <polygon points="27,62 34,54 43,58" fill="#c94baa"/>
+  </svg>
+  <div style="width:100%;display:flex;flex-direction:column;gap:0;border-radius:18px;overflow:hidden;background:#fff;">
 
     <!-- Card Header -->
     <div style="padding:12px 14px;border-bottom:1px solid #e2e8f0;display:flex;flex-direction:column;gap:10px;background:#fff;">
@@ -1847,7 +1853,8 @@ body{margin:0;background:#f2efe9;}
       </div>
 
     </div><!-- end mockup views -->
-  </div><!-- end card -->
+  </div><!-- end card inner -->
+  </div><!-- end card outer -->
 
   <div id="pv-desc" style="font-size:13px;color:var(--mid);line-height:1.65;padding-top:8px;"></div>
 </div><!-- .preview-col -->
