@@ -570,6 +570,11 @@ body{margin:0;background:#f2efe9;}
 .pcta-outline:hover{background:var(--grad);color:#fff;box-shadow:0 4px 14px -4px rgba(123,104,200,.5);}
 .featured .pcta{background:var(--orange);color:#fff;}
 .featured .pcta:hover{background:var(--grad-dark);box-shadow:0 4px 14px -4px rgba(123,104,200,.6);}
+.price-orig{font-size:13.5px;color:rgba(26,23,20,.45);text-decoration:line-through;margin-bottom:2px;}
+.featured .price-orig{color:rgba(242,239,233,.4);}
+.disc-badge{display:inline-block;background:#e05050;color:#fff;font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;border-radius:99px;padding:2px 9px;margin-bottom:5px;}
+.featured .disc-badge{background:#fff;color:#e05050;}
+.disc-badge.best{background:var(--orange);}
 .plans-footnote{text-align:center;margin-top:28px;font-size:13.5px;color:rgba(26,23,20,.72);font-weight:500;line-height:2;}
 @media(max-width:600px){
   .comic-wrap{
@@ -2431,6 +2436,8 @@ function loadPreset(key){
       <!-- Starter -->
       <div class="plan">
         <div class="plan-label">Starter</div>
+        <div class="price-orig">&#8377;5,999</div>
+        <span class="disc-badge">75% OFF</span>
         <div class="price-amt">&#8377;1,499<span class="price-mo">/mo</span></div>
         <div class="plan-slot">Monthly · 10-second slot</div>
         <hr class="plan-div">
@@ -2466,6 +2473,8 @@ function loadPreset(key){
       <div class="plan featured">
         <div class="plan-badge">Most Popular</div>
         <div class="plan-label">Complete</div>
+        <div class="price-orig">&#8377;8,999</div>
+        <span class="disc-badge">61% OFF</span>
         <div class="price-amt">&#8377;3,499<span class="price-mo">/mo</span></div>
         <div class="plan-slot">Monthly · 15-second slot + Social</div>
         <hr class="plan-div">
@@ -2502,7 +2511,10 @@ function loadPreset(key){
 
       <!-- Growth -->
       <div class="plan">
+        <div class="plan-badge">Best Value</div>
         <div class="plan-label">Growth</div>
+        <div class="price-orig">&#8377;29,999</div>
+        <span class="disc-badge best">80% OFF</span>
         <div class="price-amt">&#8377;5,999<span class="price-mo">/mo</span></div>
         <div class="plan-slot">Monthly · 20-second priority slot + All channels</div>
         <hr class="plan-div">
