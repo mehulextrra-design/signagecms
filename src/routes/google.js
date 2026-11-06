@@ -206,6 +206,53 @@ router.get('/status', authenticate, async (req, res) => {
   });
 });
 
+// POST /api/auth/google/retry-fetch — retry fetching account/location using saved tokens
+router.post('/retry-fetch', authenticate, async (req, res) => {
+  try {
+    const result = await query(
+      'SELECT google_access_token, google_refresh_token, google_account_id FROM users WHERE id=$1',
+      [req.user.id]
+    );
+    const u = result.rows[0];
+    if (!u || !u.google_refresh_token) return res.status(400).json({ error: 'Not connected' });
+
+    // Refresh access token
+    const refreshed = await refreshAccessToken(u.google_refresh_token);
+    if (refreshed.error) return res.status(400).json({ error: refreshed.error_description || 'Token refresh failed' });
+    const accessToken = refreshed.access_token;
+
+    // Fetch accounts
+    const accounts = await googleGet('https://mybusinessaccountmanagement.googleapis.com/v1/accounts', accessToken);
+    if (accounts.error) return res.status(400).json({ error: accounts.error.message || 'API quota not yet available' });
+    if (!accounts.accounts || !accounts.accounts.length) return res.status(400).json({ error: 'No business account found' });
+
+    const account = accounts.accounts[0];
+    const accountName = account.name;
+    let locationId = null, businessName = account.accountName || 'Google Business';
+
+    try {
+      const locations = await googleGet(
+        `https://mybusinessbusinessinformation.googleapis.com/v1/${accountName}/locations?readMask=name,title`,
+        accessToken
+      );
+      if (locations.locations && locations.locations.length) {
+        locationId   = locations.locations[0].name;
+        businessName = locations.locations[0].title || businessName;
+      }
+    } catch (_) {}
+
+    await query(
+      `UPDATE users SET google_account_id=$1, google_location_id=$2, google_business_name=$3,
+       google_access_token=$4 WHERE id=$5`,
+      [accountName, locationId, businessName, accessToken, req.user.id]
+    );
+
+    res.json({ success: true, business_name: businessName, location_id: locationId });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // ── Posting ────────────────────────────────────────────────────────────────────
 
 async function postCampaignToGoogle(campaignId) {

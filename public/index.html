@@ -2180,16 +2180,40 @@ async function loadGoogleStatus(){
     const loc=document.getElementById('gbp-location');
     if(!btn)return;
     if(s.connected){
+      const isPending=s.account_id==='pending'||!s.location_id;
       name.textContent=s.business_name||'Google Business Profile';
-      loc.textContent=s.location_id?'Location connected':'Account connected';
+      loc.textContent=isPending?'Account connected (pending verification)':'Location connected';
       btn.textContent='Disconnect';btn.style.background='#e53e3e';
       btn.onclick=disconnectGoogle;
+      // Show retry button if pending
+      let retryBtn=document.getElementById('gbp-retry-btn');
+      if(isPending&&!retryBtn){
+        retryBtn=document.createElement('button');
+        retryBtn.id='gbp-retry-btn';
+        retryBtn.textContent='Retry';
+        retryBtn.style.cssText='padding:6px 10px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:none;background:#38a169;color:#fff;white-space:nowrap;flex-shrink:0;margin-right:6px;';
+        btn.parentNode.insertBefore(retryBtn,btn);
+        retryBtn.onclick=retryGoogleFetch;
+      }else if(!isPending&&retryBtn){retryBtn.remove();}
     }else{
       name.textContent='Google Business Profile';loc.textContent='Not connected';
       btn.textContent='Connect';btn.style.background='#4285F4';
       btn.onclick=connectGoogle;
     }
   }catch(_){}
+}
+
+async function retryGoogleFetch(){
+  const btn=document.getElementById('gbp-retry-btn');
+  if(btn){btn.textContent='Retrying...';btn.disabled=true;}
+  try{
+    const r=await api('/auth/google/retry-fetch',{method:'POST'});
+    toast('Google Business Profile updated: '+r.business_name,'success');
+    loadGoogleStatus();
+  }catch(e){
+    toast(e.message||'API quota not yet available. Try again later.','error');
+    if(btn){btn.textContent='Retry';btn.disabled=false;}
+  }
 }
 
 async function connectGoogle(){
