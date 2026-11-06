@@ -135,34 +135,36 @@ router.get('/callback', async (req, res) => {
     const accessToken  = tokens.access_token;
     const refreshToken = tokens.refresh_token;
 
-    // Get Google Business accounts
-    const accounts = await googleGet('https://mybusinessaccountmanagement.googleapis.com/v1/accounts', accessToken);
-    console.log('[Google OAuth] accounts response:', JSON.stringify(accounts).slice(0, 500));
-    if (accounts.error) {
-      return res.redirect('/?gbp_error=' + encodeURIComponent(accounts.error.message || accounts.error.status || 'api_error'));
-    }
-    if (!accounts.accounts || !accounts.accounts.length) {
-      return res.redirect('/?gbp_error=no_business_account');
-    }
-
-    // Use first account
-    const account = accounts.accounts[0];
-    const accountName = account.name; // e.g. "accounts/123456789"
-
-    // Get first location for this account
-    let locationId = null, businessName = account.accountName || 'Google Business';
+    // Try to get Google Business accounts (may fail if API quota not yet approved)
+    let accountName = 'pending', locationId = null, businessName = 'Google Business (pending)';
     try {
-      const locations = await googleGet(
-        `https://mybusinessbusinessinformation.googleapis.com/v1/${accountName}/locations?readMask=name,title`,
-        accessToken
-      );
-      if (locations.locations && locations.locations.length) {
-        const loc = locations.locations[0];
-        locationId   = loc.name; // e.g. "locations/987654321"
-        businessName = loc.title || businessName;
-      }
-    } catch (_) {}
+      const accounts = await googleGet('https://mybusinessaccountmanagement.googleapis.com/v1/accounts', accessToken);
+      console.log('[Google OAuth] accounts response:', JSON.stringify(accounts).slice(0, 500));
+      if (!accounts.error && accounts.accounts && accounts.accounts.length) {
+        const account = accounts.accounts[0];
+        accountName  = account.name;
+        businessName = account.accountName || 'Google Business';
 
+        // Get first location for this account
+        try {
+          const locations = await googleGet(
+            `https://mybusinessbusinessinformation.googleapis.com/v1/${accountName}/locations?readMask=name,title`,
+            accessToken
+          );
+          if (locations.locations && locations.locations.length) {
+            const loc = locations.locations[0];
+            locationId   = loc.name;
+            businessName = loc.title || businessName;
+          }
+        } catch (_) {}
+      } else if (accounts.error) {
+        console.warn('[Google OAuth] accounts API error (quota?):', accounts.error.message || accounts.error.status);
+      }
+    } catch (apiErr) {
+      console.warn('[Google OAuth] accounts fetch failed (quota?):', apiErr.message);
+    }
+
+    // Always save tokens — even if account fetch failed, tokens are valid
     await query(
       `UPDATE users SET
         google_account_id=$1, google_location_id=$2, google_business_name=$3,
