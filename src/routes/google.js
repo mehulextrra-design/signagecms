@@ -123,7 +123,7 @@ router.get('/connect', authenticate, (req, res) => {
 // GET /api/auth/google/callback — OAuth callback
 router.get('/callback', async (req, res) => {
   const { code, state, error } = req.query;
-  if (error) return res.redirect('/?gbp_error=' + encodeURIComponent(error));
+  if (error) return res.redirect('/cms?gbp_error=' + encodeURIComponent(error));
 
   try {
     const { userId } = JSON.parse(Buffer.from(decodeURIComponent(state), 'base64').toString());
@@ -173,10 +173,10 @@ router.get('/callback', async (req, res) => {
       [accountName, locationId, businessName, accessToken, refreshToken, userId]
     );
 
-    res.redirect('/?gbp_connected=1');
+    res.redirect('/cms?gbp_connected=1');
   } catch (err) {
     console.error('[Google OAuth]', err.message);
-    res.redirect('/?gbp_error=' + encodeURIComponent(err.message));
+    res.redirect('/cms?gbp_error=' + encodeURIComponent(err.message));
   }
 });
 
