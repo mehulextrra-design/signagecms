@@ -246,7 +246,7 @@ async function postCampaignToGoogle(campaignId) {
       media: [{ mediaFormat: 'PHOTO', sourceUrl: row.file_url }],
       callToAction: {
         actionType: 'LEARN_MORE',
-        url: 'https://signagecrm-production.up.railway.app'
+        url: 'https://www.extrravenue.com'
       }
     };
 
