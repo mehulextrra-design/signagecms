@@ -439,7 +439,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
       <!-- DASHBOARD -->
       <div id="page-dashboard" class="page active">
         <div class="stat-grid" id="dash-stats">
-          <div class="stat-card"><div class="stat-icon si-teal"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div><div class="stat-label">Revenue This Month</div><div class="stat-value" id="ds-revenue">?0</div><div class="stat-sub">Paid invoices</div></div>
+          <div class="stat-card"><div class="stat-icon si-teal"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div><div class="stat-label">Revenue This Month</div><div class="stat-value" id="ds-revenue">â‚¹0</div><div class="stat-sub">Paid invoices</div></div>
           <div class="stat-card"><div class="stat-icon si-yellow"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div><div class="stat-label">Pending Approvals</div><div class="stat-value" id="ds-pending">0</div><div class="stat-sub">Awaiting review</div></div>
           <div class="stat-card"><div class="stat-icon si-green"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/></svg></div><div class="stat-label">Active Screens</div><div class="stat-value" id="ds-screens">0</div><div class="stat-sub">Online now</div></div>
           <div class="stat-card"><div class="stat-icon si-teal"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div><div class="stat-label">Active Advertisers</div><div class="stat-value" id="ds-advertisers">0</div><div class="stat-sub">Registered users</div></div>
@@ -465,7 +465,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
         <div class="section-head">
           <h2>All Campaigns</h2>
           <div style="display:flex;gap:8px;align-items:center;">
-            <div class="search-wrap"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg><input type="text" class="search-input" id="camp-search" placeholder="Search campaigns…" oninput="filterCampaigns()"></div>
+            <div class="search-wrap"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg><input type="text" class="search-input" id="camp-search" placeholder="Search campaignsâ€¦" oninput="filterCampaigns()"></div>
             <select class="form-select" id="camp-status-filter" style="width:160px;" onchange="filterCampaigns()">
               <option value="">All Statuses</option>
               <option value="pending_approval">Pending Approval</option>
@@ -489,7 +489,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
         <div class="section-head" style="flex-wrap:wrap;gap:8px;">
           <h2>Pending Approvals</h2>
           <div style="display:flex;align-items:center;gap:8px;margin-left:auto;">
-            <input id="approvals-search" type="text" placeholder="Filter by advertiser…" oninput="filterApprovals()" style="padding:5px 10px;border-radius:7px;border:1.5px solid var(--border);background:var(--surface);color:var(--text);font-size:12px;width:180px;font-family:inherit;">
+            <input id="approvals-search" type="text" placeholder="Filter by advertiserâ€¦" oninput="filterApprovals()" style="padding:5px 10px;border-radius:7px;border:1.5px solid var(--border);background:var(--surface);color:var(--text);font-size:12px;width:180px;font-family:inherit;">
             <button class="btn btn-primary" onclick="loadApprovals()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>Refresh</button>
           </div>
         </div>
@@ -525,7 +525,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
           <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
             <div class="search-wrap">
               <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-              <input type="text" class="search-input" id="content-adv-search" placeholder="Filter by advertiser name…" oninput="filterContent()">
+              <input type="text" class="search-input" id="content-adv-search" placeholder="Filter by advertiser nameâ€¦" oninput="filterContent()">
             </div>
             <select id="content-type-filter" onchange="filterContent()" style="padding:7px 10px;border:1px solid var(--border);border-radius:6px;font-size:13px;background:var(--surface);color:var(--text);cursor:pointer;">
               <option value="">All Types</option>
@@ -552,7 +552,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
         <div class="table-card">
           <table class="data-table">
             <thead><tr><th>Preview</th><th>Title</th><th>Type</th><th>Duration</th><th>Screens</th><th>Status</th><th>Actions</th></tr></thead>
-            <tbody id="filler-table"><tr><td colspan="7" style="text-align:center;color:var(--text3);padding:32px;">Loading…</td></tr></tbody>
+            <tbody id="filler-table"><tr><td colspan="7" style="text-align:center;color:var(--text3);padding:32px;">Loadingâ€¦</td></tr></tbody>
           </table>
         </div>
       </div>
@@ -562,7 +562,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
         <div style="background:var(--surface);border-radius:12px;padding:28px;width:520px;max-width:95vw;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
             <h3 style="margin:0;font-size:17px;">Upload Filler Content</h3>
-            <button onclick="closeFillerUploadModal()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text2);line-height:1;">×</button>
+            <button onclick="closeFillerUploadModal()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text2);line-height:1;">Ã—</button>
           </div>
 
           <!-- File picker -->
@@ -601,7 +601,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
             </div>
             <div style="font-size:11px;color:var(--text3);margin-bottom:8px;">Leave all unchecked to play on every screen.</div>
             <div id="filler-screen-list" style="max-height:180px;overflow-y:auto;border:1px solid var(--border);border-radius:8px;padding:8px 12px;">
-              <div style="color:var(--text3);font-size:13px;text-align:center;padding:12px;">Loading screens…</div>
+              <div style="color:var(--text3);font-size:13px;text-align:center;padding:12px;">Loading screensâ€¦</div>
             </div>
           </div>
 
@@ -610,7 +610,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
             <div style="height:4px;background:var(--border);border-radius:3px;overflow:hidden;">
               <div id="filler-modal-prog-fill" style="height:100%;background:var(--primary);width:0%;transition:width 0.3s;border-radius:3px;"></div>
             </div>
-            <div style="font-size:11px;color:var(--text2);margin-top:4px;" id="filler-modal-prog-text">Uploading…</div>
+            <div style="font-size:11px;color:var(--text2);margin-top:4px;" id="filler-modal-prog-text">Uploadingâ€¦</div>
           </div>
 
           <div style="display:flex;gap:10px;justify-content:flex-end;">
@@ -625,7 +625,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
         <div style="background:var(--surface);border-radius:12px;padding:28px;width:420px;max-width:95vw;max-height:80vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
             <h3 style="margin:0;font-size:17px;">Assign Screens</h3>
-            <button onclick="closeFillerScreensModal()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text2);line-height:1;">×</button>
+            <button onclick="closeFillerScreensModal()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text2);line-height:1;">Ã—</button>
           </div>
           <input type="hidden" id="filler-screens-modal-id">
           <div style="font-size:11px;color:var(--text3);margin-bottom:12px;">Leave all unchecked to play on every screen.</div>
@@ -635,7 +635,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
             <button onclick="fillerAssignSelectAll(false)" style="font-size:11px;color:var(--text2);background:none;border:none;cursor:pointer;padding:0;">None</button>
           </div>
           <div id="filler-assign-screen-list" style="max-height:220px;overflow-y:auto;border:1px solid var(--border);border-radius:8px;padding:8px 12px;margin-bottom:20px;">
-            <div style="color:var(--text3);font-size:13px;text-align:center;padding:12px;">Loading…</div>
+            <div style="color:var(--text3);font-size:13px;text-align:center;padding:12px;">Loadingâ€¦</div>
           </div>
           <div style="display:flex;gap:10px;justify-content:flex-end;">
             <button onclick="closeFillerScreensModal()" class="btn btn-outline">Cancel</button>
@@ -649,7 +649,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
         <div class="section-head">
           <h2>Advertisers</h2>
           <div style="display:flex;gap:8px;align-items:center;">
-            <div class="search-wrap"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg><input type="text" class="search-input" id="adv-search" placeholder="Search…" oninput="filterAdvertisers()"></div>
+            <div class="search-wrap"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg><input type="text" class="search-input" id="adv-search" placeholder="Searchâ€¦" oninput="filterAdvertisers()"></div>
             <button class="btn btn-primary" onclick="openCreateAdvertiser()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>New Advertiser</button>
           </div>
         </div>
@@ -739,9 +739,9 @@ textarea.form-input{resize:vertical;min-height:80px;}
         </div>
         <!-- Summary stats bar -->
         <div id="pop-summary" style="display:none;background:var(--surface2);border-radius:8px;padding:10px 14px;margin-bottom:10px;display:flex;gap:20px;flex-wrap:wrap;">
-          <span style="font-size:12px;color:var(--text2);">Log entries: <strong id="pop-stat-records">—</strong></span>
-          <span style="font-size:12px;color:var(--text2);">Total plays: <strong id="pop-stat-plays" style="color:var(--primary);">—</strong></span>
-          <span style="font-size:12px;color:var(--text2);">Total in DB: <strong id="pop-stat-db">—</strong></span>
+          <span style="font-size:12px;color:var(--text2);">Log entries: <strong id="pop-stat-records">â€”</strong></span>
+          <span style="font-size:12px;color:var(--text2);">Total plays: <strong id="pop-stat-plays" style="color:var(--primary);">â€”</strong></span>
+          <span style="font-size:12px;color:var(--text2);">Total in DB: <strong id="pop-stat-db">â€”</strong></span>
         </div>
         <div class="table-card">
           <div style="font-size:12px;color:var(--text2);padding:8px 4px 4px;" id="pop-count"></div>
@@ -782,7 +782,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
               </div>
               <div class="form-group">
                 <label class="form-label">Message</label>
-                <textarea class="form-input" id="notif-body" placeholder="Notification body text…" rows="4"></textarea>
+                <textarea class="form-input" id="notif-body" placeholder="Notification body textâ€¦" rows="4"></textarea>
               </div>
               <div class="form-group">
                 <label class="form-label">Action URL (optional)</label>
@@ -806,10 +806,10 @@ textarea.form-input{resize:vertical;min-height:80px;}
         </div>
         <!-- Stats row -->
         <div class="stat-grid" style="margin-bottom:16px;">
-          <div class="stat-card"><div class="stat-label">Total Venues</div><div class="stat-value" id="vn-total">—</div></div>
-          <div class="stat-card"><div class="stat-label">Active Screens</div><div class="stat-value" id="vn-screens">—</div></div>
-          <div class="stat-card"><div class="stat-label">Revenue Earned (Total)</div><div class="stat-value" id="vn-revenue">—</div></div>
-          <div class="stat-card" style="border-color:#f59e0b;"><div class="stat-label" style="color:#f59e0b;">Pending Approval</div><div class="stat-value" id="vn-pending-approval" style="color:#f59e0b;">—</div></div>
+          <div class="stat-card"><div class="stat-label">Total Venues</div><div class="stat-value" id="vn-total">â€”</div></div>
+          <div class="stat-card"><div class="stat-label">Active Screens</div><div class="stat-value" id="vn-screens">â€”</div></div>
+          <div class="stat-card"><div class="stat-label">Revenue Earned (Total)</div><div class="stat-value" id="vn-revenue">â€”</div></div>
+          <div class="stat-card" style="border-color:#f59e0b;"><div class="stat-label" style="color:#f59e0b;">Pending Approval</div><div class="stat-value" id="vn-pending-approval" style="color:#f59e0b;">â€”</div></div>
         </div>
         <div class="table-card">
           <table class="data-table">
@@ -833,7 +833,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
         </div>
         <div class="table-card" style="margin-bottom:20px">
           <div style="padding:20px 24px;border-bottom:1px solid var(--border)">
-            <p style="font-size:13px;color:var(--text-secondary)">Generate naya blog article using AI — topic optional. Article pehle draft save hoga, phir publish karo. Published articles <a href="/blog.html" target="_blank" style="color:var(--accent)">blog page</a> par dikhenge.</p>
+            <p style="font-size:13px;color:var(--text-secondary)">Generate naya blog article using AI â€” topic optional. Article pehle draft save hoga, phir publish karo. Published articles <a href="/blog.html" target="_blank" style="color:var(--accent)">blog page</a> par dikhenge.</p>
           </div>
           <div style="padding:20px 24px;display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap">
             <div style="flex:1;min-width:220px">
@@ -931,7 +931,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
         </div>
       </div>
       <div id="vn-cred-box" style="display:none;margin-top:12px;background:var(--surface2);border:1.5px solid var(--primary);border-radius:8px;padding:12px;">
-        <div style="font-size:11px;font-weight:700;color:var(--primary);margin-bottom:6px;">? Venue Portal Credentials — Share with venue:</div>
+        <div style="font-size:11px;font-weight:700;color:var(--primary);margin-bottom:6px;">? Venue Portal Credentials â€” Share with venue:</div>
         <div style="font-size:12px;color:var(--text);line-height:2;">
           Portal URL: <strong id="vn-cred-url"></strong><br>
           Email: <strong id="vn-cred-email"></strong><br>
@@ -953,14 +953,14 @@ textarea.form-input{resize:vertical;min-height:80px;}
       <span class="modal-title" id="vrm-title">Revenue Details</span>
       <button class="modal-close" onclick="closeModal('venue-revenue-modal')">?</button>
     </div>
-    <div class="modal-body" id="vrm-body">Loading…</div>
+    <div class="modal-body" id="vrm-body">Loadingâ€¦</div>
   </div>
 </div>
 
 <!-- Creative Lightbox -->
 <div id="creative-lightbox" onclick="closeLightbox()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:9999;align-items:center;justify-content:center;cursor:zoom-out;">
   <div onclick="event.stopPropagation()" style="position:relative;max-width:92vw;max-height:92vh;display:flex;flex-direction:column;align-items:center;">
-    <button onclick="closeLightbox()" style="position:absolute;top:-40px;right:0;background:rgba(255,255,255,0.12);border:none;color:#fff;font-size:22px;cursor:pointer;line-height:1;width:32px;height:32px;border-radius:50%;">×</button>
+    <button onclick="closeLightbox()" style="position:absolute;top:-40px;right:0;background:rgba(255,255,255,0.12);border:none;color:#fff;font-size:22px;cursor:pointer;line-height:1;width:32px;height:32px;border-radius:50%;">Ã—</button>
     <img id="lightbox-img" src="" alt="" style="max-width:88vw;max-height:82vh;object-fit:contain;border-radius:8px;display:block;">
     <video id="lightbox-vid" src="" controls autoplay playsinline style="max-width:88vw;max-height:82vh;border-radius:8px;display:none;background:#000;outline:none;"></video>
     <div id="lightbox-name" style="color:rgba(255,255,255,0.6);font-size:12px;text-align:center;margin-top:10px;"></div>
@@ -1057,10 +1057,10 @@ textarea.form-input{resize:vertical;min-height:80px;}
         <label style="font-size:12px;font-weight:600;color:var(--text2);display:block;margin-bottom:6px;">Select New Media File</label>
         <input type="file" id="edit-media-file" accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm"
           style="width:100%;font-size:13px;color:var(--text);" onchange="previewEditMedia(this)">
-        <div style="font-size:11px;color:var(--text3);margin-top:4px;">Accepted: JPG, PNG, WebP, GIF, MP4, WebM · Max 200MB</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:4px;">Accepted: JPG, PNG, WebP, GIF, MP4, WebM Â· Max 200MB</div>
       </div>
       <div id="edit-media-progress" style="display:none;">
-        <div style="font-size:12px;color:var(--text2);margin-bottom:6px;" id="edit-media-progress-label">Uploading…</div>
+        <div style="font-size:12px;color:var(--text2);margin-bottom:6px;" id="edit-media-progress-label">Uploadingâ€¦</div>
         <div style="height:4px;background:var(--surface2);border-radius:2px;overflow:hidden;">
           <div id="edit-media-progress-bar" style="height:100%;background:var(--primary);width:0%;transition:width .3s;"></div>
         </div>
@@ -1084,37 +1084,37 @@ textarea.form-input{resize:vertical;min-height:80px;}
       <div class="form-group" style="margin-bottom:10px;">
         <label class="form-label">Quick Reason</label>
         <select class="form-input" id="reject-preset" onchange="onRejectPreset(this.value)" style="font-size:13px;">
-          <option value="">— Select a reason —</option>
+          <option value="">â€” Select a reason â€”</option>
           <optgroup label="Technical / Plan">
             <option value="dur">Media duration exceeds plan slot limit</option>
-            <option value="format">Invalid file format — only MP4 (video) or JPG/PNG (image) accepted</option>
-            <option value="res">Low resolution — minimum 720p required for clear display</option>
+            <option value="format">Invalid file format â€” only MP4 (video) or JPG/PNG (image) accepted</option>
+            <option value="res">Low resolution â€” minimum 720p required for clear display</option>
             <option value="corrupt">File is corrupted or unplayable on our players</option>
-            <option value="audio">Audio/visual sync issue — please re-export the file</option>
+            <option value="audio">Audio/visual sync issue â€” please re-export the file</option>
           </optgroup>
           <optgroup label="Content Policy">
-            <option value="porn">Pornographic / obscene / adult content — not permitted on public screens</option>
-            <option value="political">Political party promotion / election campaigning — not allowed on this network</option>
-            <option value="religious">Religious or communal content that may incite conflict — not permitted</option>
-            <option value="tobacco">Tobacco, alcohol, or drug promotion without required disclaimer — not allowed</option>
-            <option value="gambling">Gambling / betting / lottery promotion — not permitted</option>
-            <option value="violence">Violent, disturbing, or graphic content — not suitable for public display</option>
-            <option value="child">Content involving or exploiting minors — strictly prohibited</option>
+            <option value="porn">Pornographic / obscene / adult content â€” not permitted on public screens</option>
+            <option value="political">Political party promotion / election campaigning â€” not allowed on this network</option>
+            <option value="religious">Religious or communal content that may incite conflict â€” not permitted</option>
+            <option value="tobacco">Tobacco, alcohol, or drug promotion without required disclaimer â€” not allowed</option>
+            <option value="gambling">Gambling / betting / lottery promotion â€” not permitted</option>
+            <option value="violence">Violent, disturbing, or graphic content â€” not suitable for public display</option>
+            <option value="child">Content involving or exploiting minors â€” strictly prohibited</option>
             <option value="misleading">Misleading claims / false advertising (e.g. "guaranteed cure", fake discounts)</option>
           </optgroup>
           <optgroup label="Business / Compliance">
             <option value="brand">Brand name or logo does not match registered business on file</option>
-            <option value="defamation">Competitor brand attack or defamatory content — not permitted</option>
+            <option value="defamation">Competitor brand attack or defamatory content â€” not permitted</option>
             <option value="unrelated">Creative content unrelated to declared business category</option>
             <option value="disclaimer">Missing mandatory disclaimer required for medical / legal / financial content</option>
-            <option value="duplicate">Duplicate campaign — same creative already running on this network</option>
+            <option value="duplicate">Duplicate campaign â€” same creative already running on this network</option>
           </optgroup>
-          <option value="custom">? Custom reason…</option>
+          <option value="custom">? Custom reasonâ€¦</option>
         </select>
       </div>
       <div class="form-group">
         <label class="form-label">Rejection Message <span style="color:var(--text3);font-weight:400;">(sent to advertiser)</span></label>
-        <textarea class="form-input" id="reject-reason" rows="4" placeholder="Reason will appear here after selecting above, or write your own…"></textarea>
+        <textarea class="form-input" id="reject-reason" rows="4" placeholder="Reason will appear here after selecting above, or write your ownâ€¦"></textarea>
       </div>
       <input type="hidden" id="reject-campaign-id">
       <input type="hidden" id="reject-campaign-pkg">
@@ -1342,7 +1342,7 @@ async function doLogin() {
   const errEl = document.getElementById('auth-error');
   const btn = document.getElementById('login-btn');
   errEl.style.display = 'none';
-  btn.disabled = true; btn.textContent = 'Signing in…';
+  btn.disabled = true; btn.textContent = 'Signing inâ€¦';
   try {
     const res = await fetch(`${API}/auth/login`, {
       method: 'POST', headers: {'Content-Type':'application/json'},
@@ -1476,10 +1476,10 @@ async function loadVenues() {
     const pendingCount = venues.filter(v => v.approval_status === 'pending').length;
     document.getElementById('vn-total').textContent = venues.length;
     document.getElementById('vn-screens').textContent = venues.reduce((a,v)=>a+parseInt(v.screen_count||0),0);
-    document.getElementById('vn-revenue').textContent = '?'+fmt(venues.reduce((a,v)=>a+parseFloat(v.total_revenue_earned||0),0));
+    document.getElementById('vn-revenue').textContent = 'â‚¹'+fmt(venues.reduce((a,v)=>a+parseFloat(v.total_revenue_earned||0),0));
     document.getElementById('vn-pending-approval').textContent = pendingCount || '0';
 
-    if (!venues.length) { tbody.innerHTML = emptyRow(8,'No venue partners yet — add your first one!'); return; }
+    if (!venues.length) { tbody.innerHTML = emptyRow(8,'No venue partners yet â€” add your first one!'); return; }
     tbody.innerHTML = venues.map(v => {
       const approvalBadge = v.approval_status === 'approved'
         ? '<span class="badge badge-green">Approved</span>'
@@ -1500,7 +1500,7 @@ async function loadVenues() {
           <div style="font-size:11px;color:var(--text2);">${v.email||''}</div>
         </td>
         <td><span class="badge badge-blue">${VENUE_CAT_LABELS[v.venue_category]||v.venue_category}</span></td>
-        <td style="font-size:12px;">${v.city||'—'}</td>
+        <td style="font-size:12px;">${v.city||'â€”'}</td>
         <td style="text-align:center;font-weight:600;">${v.screen_count||0}</td>
         <td style="text-align:center;font-weight:600;color:var(--primary);">${v.revenue_share_pct}%</td>
         <td style="text-align:center;font-size:12px;">${quotaMins} min/day</td>
@@ -1532,13 +1532,13 @@ async function loadVenues() {
 }
 
 async function approveVenue(id, name) {
-  const quotaInput = prompt(`Approve "${name}"?\n\nFiller quota (min/day) — leave blank to keep current:`, '60');
+  const quotaInput = prompt(`Approve "${name}"?\n\nFiller quota (min/day) â€” leave blank to keep current:`, '60');
   if (quotaInput === null) return; // cancelled
   try {
     const body = {};
     if (quotaInput.trim() !== '') body.filler_quota_sec = parseInt(quotaInput) * 60;
     await api('/venue-partners/'+id+'/approve', { method:'POST', body: JSON.stringify(body) });
-    showToast(name + ' approved — portal access activated', 'success');
+    showToast(name + ' approved â€” portal access activated', 'success');
     loadVenues();
   } catch(e) { showToast('Error: '+e.message, 'error'); }
 }
@@ -1611,10 +1611,10 @@ async function saveVenuePartner() {
       document.getElementById('vn-cred-email').textContent = body.email;
       document.getElementById('vn-cred-pass').textContent = res.generated_password || '(password you set)';
       document.getElementById('vn-cred-box').style.display = 'block';
-      document.getElementById('vn-cred-box').innerHTML += '<div style="margin-top:8px;font-size:11px;color:#b45309;background:#fef3c7;border-radius:6px;padding:6px 10px;">? Account is PENDING — click Approve in the list to activate portal access.</div>';
+      document.getElementById('vn-cred-box').innerHTML += '<div style="margin-top:8px;font-size:11px;color:#b45309;background:#fef3c7;border-radius:6px;padding:6px 10px;">? Account is PENDING â€” click Approve in the list to activate portal access.</div>';
       document.getElementById('vn-save-btn').textContent = 'Done';
       document.getElementById('vn-save-btn').onclick = () => { closeModal('venue-modal'); loadVenues(); };
-      showToast('Venue partner created — pending approval','success');
+      showToast('Venue partner created â€” pending approval','success');
     }
     loadVenues();
   } catch(e) { showToast('Error: '+e.message,'error'); }
@@ -1631,8 +1631,8 @@ async function toggleVenue(id, setActive) {
 }
 
 async function openVenueRevenue(id, name) {
-  document.getElementById('vrm-title').textContent = name + ' — Revenue';
-  document.getElementById('vrm-body').innerHTML = '<div style="padding:20px;text-align:center;color:var(--text2);">Loading…</div>';
+  document.getElementById('vrm-title').textContent = name + ' â€” Revenue';
+  document.getElementById('vrm-body').innerHTML = '<div style="padding:20px;text-align:center;color:var(--text2);">Loadingâ€¦</div>';
   document.getElementById('venue-revenue-modal').classList.remove('hidden');
   try {
     const r = await api('/venue-partners/'+id+'/revenue');
@@ -1641,15 +1641,15 @@ async function openVenueRevenue(id, name) {
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px;">
         <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:8px;padding:12px;text-align:center;">
           <div style="font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;margin-bottom:4px;">Total Earned</div>
-          <div style="font-size:20px;font-weight:800;color:var(--primary);">?${fmt(s.total_earned)}</div>
+          <div style="font-size:20px;font-weight:800;color:var(--primary);">â‚¹${fmt(s.total_earned)}</div>
         </div>
         <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:8px;padding:12px;text-align:center;">
           <div style="font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;margin-bottom:4px;">Settled</div>
-          <div style="font-size:20px;font-weight:800;color:#16a34a;">?${fmt(s.total_settled)}</div>
+          <div style="font-size:20px;font-weight:800;color:#16a34a;">â‚¹${fmt(s.total_settled)}</div>
         </div>
         <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:8px;padding:12px;text-align:center;">
           <div style="font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;margin-bottom:4px;">Pending</div>
-          <div style="font-size:20px;font-weight:800;color:#f59e0b;">?${fmt(s.pending_settlement)}</div>
+          <div style="font-size:20px;font-weight:800;color:#f59e0b;">â‚¹${fmt(s.pending_settlement)}</div>
         </div>
       </div>
       <div style="font-size:11px;font-weight:700;color:var(--text2);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.04em;">Monthly Breakdown</div>
@@ -1657,7 +1657,7 @@ async function openVenueRevenue(id, name) {
         ${r.monthly.map(m=>`<tr>
           <td>${m.month}</td>
           <td>${Number(m.plays||0).toLocaleString()}</td>
-          <td style="font-weight:600;color:var(--primary);">?${fmt(m.earned)}</td>
+          <td style="font-weight:600;color:var(--primary);">â‚¹${fmt(m.earned)}</td>
           <td><span class="status-badge ${m.settled?'badge-green':'badge-yellow'}">${m.settled?'Settled':'Pending'}</span></td>
           <td>${!m.settled ? `<button class="btn btn-sm" style="font-size:11px;padding:3px 10px;" onclick="settleVenueMonth('${id}','${m.month}',this)">Mark Settled</button>` : ''}</td>
         </tr>`).join('')}
@@ -1667,7 +1667,7 @@ async function openVenueRevenue(id, name) {
 }
 
 async function settleVenueMonth(venueId, month, btn) {
-  btn.disabled = true; btn.textContent = '…';
+  btn.disabled = true; btn.textContent = 'â€¦';
   try {
     const r = await api('/venue-partners/'+venueId+'/settle', { method:'POST', body: JSON.stringify({ month }) });
     showToast(`${r.settled_rows} rows settled for ${month}`, 'success');
@@ -1710,12 +1710,12 @@ function _getCheckedScreenIds(containerId) {
 
 async function loadFiller() {
   const tbody = document.getElementById('filler-table');
-  tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text3);padding:32px;">Loading…</td></tr>';
+  tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text3);padding:32px;">Loadingâ€¦</td></tr>';
   try {
     await _getAllScreens();
     const items = await api('/filler');
     if (!items.length) {
-      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text3);padding:40px;">No filler content yet — upload your first file above.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text3);padding:40px;">No filler content yet â€” upload your first file above.</td></tr>';
       return;
     }
     const screenMap = {};
@@ -1731,7 +1731,7 @@ async function loadFiller() {
         : sids.map(id => `<span class="status-badge" style="background:var(--primary-light);color:var(--primary);font-size:10px;margin:1px;">${screenMap[id]||id.slice(0,6)}</span>`).join('');
       return `<tr>
         <td>${thumb}</td>
-        <td style="font-weight:600;">${f.title||'—'}</td>
+        <td style="font-weight:600;">${f.title||'â€”'}</td>
         <td><span class="status-badge" style="background:var(--surface2);color:var(--text2);">${f.type}</span></td>
         <td>${f.duration_sec}s</td>
         <td style="max-width:160px;">${screensBadge}</td>
@@ -1796,7 +1796,7 @@ function doFillerUpload() {
   const text = document.getElementById('filler-modal-prog-text');
   document.getElementById('filler-modal-progress').style.display = 'block';
   fill.style.width = '10%';
-  text.textContent = 'Uploading ' + file.name + '…';
+  text.textContent = 'Uploading ' + file.name + 'â€¦';
   document.getElementById('filler-upload-btn').disabled = true;
 
   const fd = new FormData();
@@ -1902,10 +1902,10 @@ function showToast(msg, type = '') {
 // -- HELPERS ---------------------------------------------------------------
 function fmt(n) { return new Intl.NumberFormat('en-IN', {maximumFractionDigits:0}).format(n); }
 const fmtNum = fmt;
-function fmtDate(d) { if(!d) return '—'; return new Date(d).toLocaleDateString('en-IN', {day:'2-digit',month:'short',year:'numeric'}); }
-function fmtDateTime(d) { if(!d) return '—'; return new Date(d).toLocaleString('en-IN', {day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}); }
+function fmtDate(d) { if(!d) return 'â€”'; return new Date(d).toLocaleDateString('en-IN', {day:'2-digit',month:'short',year:'numeric'}); }
+function fmtDateTime(d) { if(!d) return 'â€”'; return new Date(d).toLocaleString('en-IN', {day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}); }
 function timeAgo(d) {
-  if(!d) return '—';
+  if(!d) return 'â€”';
   const s = Math.floor((Date.now() - new Date(d)) / 1000);
   if(s < 60) return 'Just now';
   if(s < 3600) return Math.floor(s/60) + 'm ago';
@@ -1939,7 +1939,7 @@ async function loadDashboard() {
       api('/campaigns?status=pending_approval&limit=5')
     ]);
     // Stats
-    document.getElementById('ds-revenue').textContent = '?' + fmt(dash.revenue_this_month || 0);
+    document.getElementById('ds-revenue').textContent = 'â‚¹' + fmt(dash.revenue_this_month || 0);
     document.getElementById('ds-pending').textContent = dash.pending_approvals || 0;
     const onlineScreens = (dash.screens || []).find(s => s.status === 'online');
     document.getElementById('ds-screens').textContent = onlineScreens ? onlineScreens.count : 0;
@@ -1982,8 +1982,8 @@ async function loadDashboard() {
       <tr>
         <td><code style="font-size:11px;background:var(--surface2);padding:2px 6px;border-radius:4px;">${c.campaign_code}</code><div style="font-size:11px;color:var(--text2);margin-top:2px;">${c.title||''}</div></td>
         <td style="color:var(--text2);">${c.first_name||''} ${c.last_name||''}<br><span style="font-size:11px;">${c.email||''}</span></td>
-        <td style="font-weight:600;">?${fmt(c.amount_total||0)}</td>
-        <td style="font-size:12px;color:var(--text2);">${c.created_at ? new Date(c.created_at).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}) : '—'}</td>
+        <td style="font-weight:600;">â‚¹${fmt(c.amount_total||0)}</td>
+        <td style="font-size:12px;color:var(--text2);">${c.created_at ? new Date(c.created_at).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}) : 'â€”'}</td>
         <td>
           <div style="display:flex;align-items:center;gap:2px;">
             <button class="ia-btn" title="Approve" style="color:#16a34a;" onclick="approveQuick('${c.id}')"><svg width="17" height="17" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></button>
@@ -2013,8 +2013,8 @@ function renderCampaigns(data) {
       <td><code style="font-size:11px;background:var(--surface2);padding:2px 6px;border-radius:4px;">${c.campaign_code}</code></td>
       <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500;">${c.title}</td>
       <td style="color:var(--text2);font-size:12px;">${c.first_name||''} ${c.last_name||''}<br>${c.business_name||c.email||''}</td>
-      <td style="font-size:12px;">${fmtDate(c.start_date)} – ${fmtDate(c.end_date)}</td>
-      <td style="font-weight:600;font-variant-numeric:tabular-nums;">?${fmt(c.amount_total||0)}</td>
+      <td style="font-size:12px;">${fmtDate(c.start_date)} â€“ ${fmtDate(c.end_date)}</td>
+      <td style="font-weight:600;font-variant-numeric:tabular-nums;">â‚¹${fmt(c.amount_total||0)}</td>
       <td>${statusBadge(c.status)}</td>
       <td onclick="event.stopPropagation()">
         ${c.status === 'pending_approval' ? `
@@ -2041,7 +2041,7 @@ function renderCampaigns(data) {
           <div style="display:flex;align-items:center;gap:2px;">
             <button class="ia-btn ia-danger" title="Cancel" onclick="cancelCampaignPrompt('${c.id}')"><svg width="17" height="17" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button>
           </div>
-        ` : '—'}
+        ` : 'â€”'}
       </td>
     </tr>`).join('');
 }
@@ -2049,8 +2049,8 @@ function renderCampaigns(data) {
 async function openCampaignDetail(id) {
   openModal('camp-detail-modal');
   // Show loading state
-  document.getElementById('cdm-title').textContent = 'Loading…';
-  document.getElementById('cdm-creative-inner').innerHTML = '<div style="color:rgba(255,255,255,0.3);font-size:13px;">Loading…</div>';
+  document.getElementById('cdm-title').textContent = 'Loadingâ€¦';
+  document.getElementById('cdm-creative-inner').innerHTML = '<div style="color:rgba(255,255,255,0.3);font-size:13px;">Loadingâ€¦</div>';
   document.getElementById('cdm-footer').innerHTML = '';
   try {
     const c = await api('/campaigns/' + id);
@@ -2087,23 +2087,23 @@ async function openCampaignDetail(id) {
     } else { pendingWrap.style.display = 'none'; }
 
     // Advertiser
-    document.getElementById('cdm-advertiser').textContent = (c.first_name||'') + ' ' + (c.last_name||'') + (c.business_name ? ' · ' + c.business_name : '');
+    document.getElementById('cdm-advertiser').textContent = (c.first_name||'') + ' ' + (c.last_name||'') + (c.business_name ? ' Â· ' + c.business_name : '');
     document.getElementById('cdm-email').textContent = c.email || '';
 
     // Campaign info
     document.getElementById('cdm-code').textContent = c.campaign_code;
     document.getElementById('cdm-dates').textContent = fmtDate(c.start_date) + ' ? ' + fmtDate(c.end_date);
-    document.getElementById('cdm-time').textContent = (c.start_time||'00:00').slice(0,5) + ' – ' + (c.end_time||'23:59').slice(0,5) + ' daily';
+    document.getElementById('cdm-time').textContent = (c.start_time||'00:00').slice(0,5) + ' â€“ ' + (c.end_time||'23:59').slice(0,5) + ' daily';
 
     // Screens
     const names = (c.screen_names||[]).filter(Boolean);
     document.getElementById('cdm-screens').innerHTML = names.length
       ? names.map(n=>`<span style="display:inline-block;background:var(--surface2);border-radius:4px;padding:1px 7px;margin:2px;font-size:11px;">${n}</span>`).join('')
-      : '<span style="color:var(--text3);">—</span>';
+      : '<span style="color:var(--text3);">â€”</span>';
 
     // Amount
-    document.getElementById('cdm-amount').textContent = '?' + fmt(c.amount_total||0);
-    document.getElementById('cdm-amount-detail').textContent = `Base ?${fmt(c.amount_base||0)} + GST ?${fmt(c.amount_gst||0)}${c.discount_amount>0?' · Discount ?'+fmt(c.discount_amount):''}`;
+    document.getElementById('cdm-amount').textContent = 'â‚¹' + fmt(c.amount_total||0);
+    document.getElementById('cdm-amount-detail').textContent = `Base â‚¹${fmt(c.amount_base||0)} + GST â‚¹${fmt(c.amount_gst||0)}${c.discount_amount>0?' Â· Discount ?'+fmt(c.discount_amount):''}`;
 
     // Status
     document.getElementById('cdm-status').innerHTML = statusBadge(c.status);
@@ -2114,7 +2114,7 @@ async function openCampaignDetail(id) {
     if (c.creative_type) parts.push(c.creative_type.toUpperCase());
     if (c.creative_duration) parts.push(c.creative_duration + 's');
     if (c.creative_size) parts.push((c.creative_size/1024/1024).toFixed(1) + ' MB');
-    document.getElementById('cdm-creative-info').textContent = parts.join(' · ') || '—';
+    document.getElementById('cdm-creative-info').textContent = parts.join(' Â· ') || 'â€”';
 
     // Notes / rejection reason
     const notesWrap = document.getElementById('cdm-notes-wrap');
@@ -2128,7 +2128,7 @@ async function openCampaignDetail(id) {
       { label: 'Creative uploaded', ok: !!c.creative_url },
       { label: 'Screens assigned', ok: !!(c.screen_names||[]).filter(Boolean).length },
       { label: 'Valid dates', ok: c.start_date && c.end_date && new Date(c.end_date) >= new Date(c.start_date) },
-      { label: parseFloat(c.amount_total||0)===0 ? 'Free trial · ?0' : 'Payment received', ok: c.payment_status === 'paid' },
+      { label: parseFloat(c.amount_total||0)===0 ? 'Free trial Â· â‚¹0' : 'Payment received', ok: c.payment_status === 'paid' },
       { label: 'No pending creative change', ok: c.creative_change_status !== 'pending' },
     ];
     document.getElementById('cdm-checklist-items').innerHTML = checks.map(ch => `
@@ -2210,7 +2210,7 @@ function filterApprovals() {
 }
 function renderApprovals(arr) {
   const tbody = document.getElementById('approvals-table');
-  if(!arr.length) { tbody.innerHTML = emptyRow(9, 'No pending approvals — all clear!'); return; }
+  if(!arr.length) { tbody.innerHTML = emptyRow(9, 'No pending approvals â€” all clear!'); return; }
     tbody.innerHTML = arr.map(c => {
       const aiStatus = c.ai_review_status;
       const aiNote = c.ai_review_notes || '';
@@ -2223,15 +2223,15 @@ function renderApprovals(arr) {
         ? `<td onclick="event.stopPropagation()" style="width:70px;"><img src="${c.creative_url}" alt="creative" style="width:64px;height:48px;object-fit:cover;border-radius:6px;border:1px solid var(--border);cursor:zoom-in;" onclick="openLightbox('${c.creative_url}','${(c.creative_name||'').replace(/'/g,"\\'")}','image')" title="Click to preview"></td>`
         : c.creative_url && c.creative_type === 'video'
         ? `<td onclick="event.stopPropagation()" style="width:70px;"><div style="width:64px;height:48px;background:var(--surface2);border-radius:6px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:24px;cursor:zoom-in;" onclick="openLightbox('${c.creative_url}','${(c.creative_name||'').replace(/'/g,"\\'")}','video')" title="Click to preview">??</div></td>`
-        : `<td onclick="event.stopPropagation()" style="width:70px;"><div style="width:64px;height:48px;background:var(--surface2);border-radius:6px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:11px;">—</div></td>`;
+        : `<td onclick="event.stopPropagation()" style="width:70px;"><div style="width:64px;height:48px;background:var(--surface2);border-radius:6px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:11px;">â€”</div></td>`;
       return `<tr style="cursor:pointer;" onclick="openCampaignDetail('${c.id}')">
         <td><code style="font-size:11px;background:var(--surface2);padding:2px 6px;border-radius:4px;">${c.campaign_code}</code></td>
         ${creativeTd}
         <td style="font-weight:500;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${c.title}</td>
         <td style="font-size:12px;">${c.first_name||''} ${c.last_name||''}<br><span style="color:var(--text3);">${c.email||''}</span></td>
-        <td style="font-size:12px;">${(c.screens||[]).join(', ') || '—'}</td>
-        <td style="font-size:12px;">${fmtDate(c.start_date)} – ${fmtDate(c.end_date)}</td>
-        <td style="font-weight:600;">?${fmt(c.amount_total||0)}</td>
+        <td style="font-size:12px;">${(c.screens||[]).join(', ') || 'â€”'}</td>
+        <td style="font-size:12px;">${fmtDate(c.start_date)} â€“ ${fmtDate(c.end_date)}</td>
+        <td style="font-weight:600;">â‚¹${fmt(c.amount_total||0)}</td>
         <td>${aiBadge}</td>
         <td onclick="event.stopPropagation()">
           <div style="display:flex;align-items:center;gap:2px;">
@@ -2275,7 +2275,7 @@ async function approveQuick(id, forceStartToday) {
       method: 'POST',
       ...(body ? { body, headers: { 'Content-Type': 'application/json' } } : {})
     });
-    showToast(startToday ? 'Campaign approved — starts today!' : 'Campaign approved', 'success');
+    showToast(startToday ? 'Campaign approved â€” starts today!' : 'Campaign approved', 'success');
     refreshPendingBadge();
     const activePage = document.querySelector('.page.active')?.id?.replace('page-','');
     if(activePage === 'approvals') loadApprovals();
@@ -2288,7 +2288,7 @@ async function forceLiveCampaign(id) {
   if(!confirm('Override start date to TODAY and set campaign LIVE immediately?\n\nScreens will reload within 60 seconds.')) return;
   try {
     await api(`/campaigns/${id}/force-live`, { method: 'POST' });
-    showToast('Campaign is now live — screens will update within 60 sec', 'success');
+    showToast('Campaign is now live â€” screens will update within 60 sec', 'success');
     closeModal('camp-detail-modal');
     loadCampaigns();
   } catch(e) { showToast('Error: ' + e.message, 'error'); }
@@ -2375,7 +2375,7 @@ async function saveEditMedia() {
 
   btn.disabled = true;
   progressWrap.style.display = 'block';
-  progressLabel.textContent = 'Uploading to Cloudinary…';
+  progressLabel.textContent = 'Uploading to Cloudinaryâ€¦';
   progressBar.style.width = '20%';
 
   try {
@@ -2401,7 +2401,7 @@ async function saveEditMedia() {
     });
 
     progressBar.style.width = '90%';
-    progressLabel.textContent = 'Saving to campaign…';
+    progressLabel.textContent = 'Saving to campaignâ€¦';
 
     await api(`/campaigns/${campaignId}/admin-set-creative`, {
       method: 'PATCH',
@@ -2436,7 +2436,7 @@ function onRejectPreset(val) {
   const msgs = {
     dur:        `Media duration exceeds the ${planName} plan slot limit (max ${slot}s). Please trim your video to ${slot} seconds or less and re-submit.`,
     format:     `Invalid file format. Only MP4 (video) or JPG/PNG (image) files are accepted on our network. Please re-upload in the correct format.`,
-    res:        `Low resolution creative. A minimum of 720p (1280×720) is required for clear display on our screens. Please re-export at higher resolution.`,
+    res:        `Low resolution creative. A minimum of 720p (1280Ã—720) is required for clear display on our screens. Please re-export at higher resolution.`,
     corrupt:    `The uploaded file is corrupted or unplayable on our digital players. Please re-export and re-upload the creative.`,
     audio:      `Audio/visual sync issue detected in the video. Please re-export the file and re-submit.`,
     porn:       `Your creative contains pornographic, obscene, or adult content which is not permitted on public digital screens. Campaign rejected.`,
@@ -2467,7 +2467,7 @@ async function confirmReject() {
   try {
     const res = await api(`/campaigns/${id}/reject`, { method: 'POST', body: JSON.stringify({ reason }) });
     closeModal('reject-modal');
-    const msg = res.refunded > 0 ? `Campaign rejected · ?${parseFloat(res.refunded).toLocaleString('en-IN')} refunded to advertiser wallet` : 'Campaign rejected';
+    const msg = res.refunded > 0 ? `Campaign rejected Â· â‚¹${parseFloat(res.refunded).toLocaleString('en-IN')} refunded to advertiser wallet` : 'Campaign rejected';
     showToast(msg, 'success');
     refreshPendingBadge();
     const activePage = document.querySelector('.page.active')?.id?.replace('page-','');
@@ -2490,14 +2490,14 @@ async function loadScreens() {
       <tr>
         <td><code style="font-size:11px;background:var(--surface2);padding:2px 6px;border-radius:4px;">${s.screen_code}</code></td>
         <td style="font-weight:500;">${s.name}</td>
-        <td style="font-size:12px;color:var(--text2);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${s.location||'—'}<br>${s.city||''}</td>
+        <td style="font-size:12px;color:var(--text2);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${s.location||'â€”'}<br>${s.city||''}</td>
         <td><span class="zone-tag zone-${s.zone||'A'}">${s.zone||'A'}</span></td>
-        <td style="font-size:12px;font-variant-numeric:tabular-nums;">${s.width_px}×${s.height_px}</td>
+        <td style="font-size:12px;font-variant-numeric:tabular-nums;">${s.width_px}Ã—${s.height_px}</td>
         <td style="font-variant-numeric:tabular-nums;font-weight:600;">${(s.daily_impressions||5000).toLocaleString('en-IN')}</td>
         <td>
           <span style="display:inline-flex;align-items:center;gap:5px;">
             <span class="status-dot dot-${s.status||'offline'}"></span>
-            <span style="font-size:12px;text-transform:capitalize;">${s.status||'—'}</span>
+            <span style="font-size:12px;text-transform:capitalize;">${s.status||'â€”'}</span>
           </span>
         </td>
         <td style="font-size:12px;color:var(--text3);">${timeAgo(s.last_heartbeat)}</td>
@@ -2507,7 +2507,7 @@ async function loadScreens() {
             <button class="ia-btn" title="Reboot app" onclick="sendCommand('${s.id}','reboot',this)"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg></button>
             <button class="ia-btn" title="Clear cache" onclick="sendCommand('${s.id}','clear_cache',this)"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
             <button class="ia-btn" title="Register Device (generate player token)" onclick="registerDevice('${s.id}','${s.screen_code}')"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg></button>
-            <button class="ia-btn" title="Preview Schedule — what this screen will play today" onclick="previewSchedule('${s.id}','${s.screen_code}')"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg></button>
+            <button class="ia-btn" title="Preview Schedule â€” what this screen will play today" onclick="previewSchedule('${s.id}','${s.screen_code}')"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg></button>
             <div style="width:1px;height:18px;background:var(--border);margin:0 2px;"></div>
             <button class="ia-btn" title="Edit" onclick="editScreen(${JSON.stringify(s).replace(/"/g,'&quot;')})"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></button>
             <button class="ia-btn" title="Copy / Duplicate" onclick="copyScreen(${JSON.stringify(s).replace(/"/g,'&quot;')})"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg></button>
@@ -2546,7 +2546,7 @@ function editScreen(s) { openScreenModal(s); }
 function copyScreen(s) {
   // Open Add Screen modal with all fields pre-filled except screen_code (must be unique)
   openScreenModal({ ...s, id: '', screen_code: '' });
-  document.getElementById('screen-modal-title').textContent = 'Copy Screen — Enter new Screen Code';
+  document.getElementById('screen-modal-title').textContent = 'Copy Screen â€” Enter new Screen Code';
   document.getElementById('sc-code').disabled = false;
   document.getElementById('sc-code').value = '';
   document.getElementById('sc-code').placeholder = s.screen_code + '-COPY';
@@ -2556,10 +2556,10 @@ function copyScreen(s) {
 async function sendCommand(screenId, command, btn) {
   const labels = { reload: 'Reload', reboot: 'Reboot', clear_cache: 'Clear Cache' };
   const orig = btn.textContent;
-  btn.disabled = true; btn.textContent = '…';
+  btn.disabled = true; btn.textContent = 'â€¦';
   try {
     await api(`/screens/${screenId}/command`, { method: 'POST', body: JSON.stringify({ command }) });
-    showToast(`${labels[command]} command queued — will execute on next heartbeat (~60s)`, 'success');
+    showToast(`${labels[command]} command queued â€” will execute on next heartbeat (~60s)`, 'success');
   } catch(e) { showToast('Error: ' + e.message, 'error'); }
   finally { btn.textContent = orig; btn.disabled = false; }
 }
@@ -2567,8 +2567,8 @@ async function sendCommand(screenId, command, btn) {
 async function previewSchedule(screenId, screenCode) {
   const modal = document.getElementById('schedule-preview-modal');
   const body = document.getElementById('schedule-preview-body');
-  document.getElementById('schedule-preview-title').textContent = `Schedule Preview — ${screenCode}`;
-  body.innerHTML = '<p style="text-align:center;padding:32px;color:var(--text3);">Loading…</p>';
+  document.getElementById('schedule-preview-title').textContent = `Schedule Preview â€” ${screenCode}`;
+  body.innerHTML = '<p style="text-align:center;padding:32px;color:var(--text3);">Loadingâ€¦</p>';
   modal.classList.remove('hidden');
   try {
     const d = await api(`/reports/schedule-preview/${screenId}`);
@@ -2613,11 +2613,11 @@ async function previewSchedule(screenId, screenCode) {
         const st = c.start_time ? c.start_time.slice(0,5) : '00:00';
         const et = c.end_time   ? c.end_time.slice(0,5)   : '23:59';
         html += `<tr style="border-bottom:1px solid var(--border);">
-          <td style="padding:6px 8px;"><strong>${c.title||'—'}</strong><br><span style="color:var(--text3);font-size:11px;">${c.campaign_code||''}</span></td>
+          <td style="padding:6px 8px;"><strong>${c.title||'â€”'}</strong><br><span style="color:var(--text3);font-size:11px;">${c.campaign_code||''}</span></td>
           <td style="padding:6px 8px;text-align:center;"><span class="status-badge status-${c.status}">${c.status}</span></td>
-          <td style="padding:6px 8px;text-align:center;font-variant-numeric:tabular-nums;">${c.start_date?.slice(0,10)||'—'} ? ${c.end_date?.slice(0,10)||'—'}</td>
-          <td style="padding:6px 8px;text-align:center;">${st} – ${et}</td>
-          <td style="padding:6px 8px;text-align:center;">${c.content_type||'—'} ${c.duration_sec?'('+parseFloat(c.duration_sec).toFixed(1)+'s)':''}</td>
+          <td style="padding:6px 8px;text-align:center;font-variant-numeric:tabular-nums;">${c.start_date?.slice(0,10)||'â€”'} ? ${c.end_date?.slice(0,10)||'â€”'}</td>
+          <td style="padding:6px 8px;text-align:center;">${st} â€“ ${et}</td>
+          <td style="padding:6px 8px;text-align:center;">${c.content_type||'â€”'} ${c.duration_sec?'('+parseFloat(c.duration_sec).toFixed(1)+'s)':''}</td>
         </tr>`;
       }
       html += '</tbody></table>';
@@ -2635,9 +2635,9 @@ async function previewSchedule(screenId, screenCode) {
         const isActive = c.start_date?.slice(0,10) <= d.today && c.end_date?.slice(0,10) >= d.today;
         const rowStyle = isActive ? '' : 'color:var(--text3);';
         html += `<tr style="border-bottom:1px solid var(--border);${rowStyle}">
-          <td style="padding:4px 8px;">${c.title||'—'} <span style="font-size:10px;color:var(--text3);">${c.campaign_code||''}</span></td>
+          <td style="padding:4px 8px;">${c.title||'â€”'} <span style="font-size:10px;color:var(--text3);">${c.campaign_code||''}</span></td>
           <td style="padding:4px 8px;text-align:center;"><span class="status-badge status-${c.status}">${c.status}</span></td>
-          <td style="padding:4px 8px;text-align:center;font-variant-numeric:tabular-nums;font-size:11px;">${c.start_date?.slice(0,10)||'—'} ? ${c.end_date?.slice(0,10)||'—'}</td>
+          <td style="padding:4px 8px;text-align:center;font-variant-numeric:tabular-nums;font-size:11px;">${c.start_date?.slice(0,10)||'â€”'} ? ${c.end_date?.slice(0,10)||'â€”'}</td>
         </tr>`;
       }
       html += '</tbody></table></details>';
@@ -2681,7 +2681,7 @@ async function saveScreen() {
   };
   if(!body.screen_code || !body.name) { showToast('Screen Code and Name required', 'error'); return; }
   const btn = document.getElementById('sc-save-btn');
-  btn.disabled = true; btn.textContent = 'Saving…';
+  btn.disabled = true; btn.textContent = 'Savingâ€¦';
   try {
     if(id) { await api(`/screens/${id}`, { method: 'PUT', body: JSON.stringify(body) }); }
     else { await api('/screens', { method: 'POST', body: JSON.stringify(body) }); }
@@ -2701,7 +2701,7 @@ async function loadScreenGroups() {
     const tbody = document.getElementById('groups-table');
     if (!groups.length) { tbody.innerHTML = emptyRow(4, 'No groups yet. Create your first group.'); return; }
     tbody.innerHTML = groups.map(g => {
-      const screenNames = g.screens.map(s => s.name).join(', ') || '—';
+      const screenNames = g.screens.map(s => s.name).join(', ') || 'â€”';
       const totalPPD = g.screens.reduce((s, sc) => s + parseFloat(sc.price_per_day || 0), 0);
       return `<tr>
         <td><div style="font-weight:600;">${g.name}</div>${g.description ? `<div style="font-size:11px;color:var(--text3);">${g.description}</div>` : ''}</td>
@@ -2728,7 +2728,7 @@ function openGroupModal(group = null) {
       <input type="checkbox" value="${s.id}" ${memberIds.has(s.id)?'checked':''} style="width:15px;height:15px;accent-color:var(--primary);">
       <div>
         <div style="font-size:13px;font-weight:600;">${s.name} <span style="font-size:11px;color:var(--text3);font-weight:400;">${s.screen_code}</span></div>
-        <div style="font-size:11px;color:var(--text3);">${s.location||s.city||'—'} · ?${parseFloat(s.price_per_day||0).toLocaleString('en-IN')}/day</div>
+        <div style="font-size:11px;color:var(--text3);">${s.location||s.city||'â€”'} Â· â‚¹${parseFloat(s.price_per_day||0).toLocaleString('en-IN')}/day</div>
       </div>
     </label>`).join('');
   document.getElementById('group-modal').classList.remove('hidden');
@@ -2741,7 +2741,7 @@ async function saveGroup() {
   const screen_ids = [...document.querySelectorAll('#grp-screens-list input[type=checkbox]:checked')].map(c => c.value);
   const body = { name, description: document.getElementById('grp-desc').value.trim() || null, screen_ids };
   const btn = document.getElementById('grp-save-btn');
-  btn.disabled = true; btn.textContent = 'Saving…';
+  btn.disabled = true; btn.textContent = 'Savingâ€¦';
   try {
     if (id) await api(`/screens/groups/${id}`, { method: 'PUT', body: JSON.stringify(body) });
     else await api('/screens/groups', { method: 'POST', body: JSON.stringify(body) });
@@ -2773,8 +2773,8 @@ async function deleteScreen(id, code) {
 async function registerDevice(screenId, screenCode) {
   const modal = document.getElementById('device-register-modal');
   const body = document.getElementById('device-register-body');
-  document.getElementById('device-register-title').textContent = `Connect Device — ${screenCode}`;
-  body.innerHTML = '<p style="text-align:center;padding:32px;color:var(--text3);">Generating token…</p>';
+  document.getElementById('device-register-title').textContent = `Connect Device â€” ${screenCode}`;
+  body.innerHTML = '<p style="text-align:center;padding:32px;color:var(--text3);">Generating tokenâ€¦</p>';
   modal.classList.remove('hidden');
   try {
     // Call register endpoint to generate fresh player JWT
@@ -2793,11 +2793,11 @@ async function registerDevice(screenId, screenCode) {
       <div style="background:var(--surface2);border-radius:10px;padding:16px;margin-bottom:16px;">
         <div style="font-size:12px;color:var(--text3);margin-bottom:4px;">Screen</div>
         <div style="font-weight:600;font-size:15px;">${data.screen.name} (${screenCode})</div>
-        <div style="font-size:12px;color:var(--text3);">${data.screen.width_px}×${data.screen.height_px}</div>
+        <div style="font-size:12px;color:var(--text3);">${data.screen.width_px}Ã—${data.screen.height_px}</div>
       </div>
 
       <div style="margin-bottom:16px;">
-        <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px;">Step 1 — Server URL</div>
+        <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px;">Step 1 â€” Server URL</div>
         <div style="display:flex;gap:8px;align-items:center;">
           <code style="flex:1;background:var(--surface2);padding:8px 12px;border-radius:6px;font-size:13px;word-break:break-all;">${serverUrl}</code>
           <button class="btn btn-ghost" style="white-space:nowrap;font-size:12px;" onclick="navigator.clipboard.writeText('${serverUrl}').then(()=>showToast('Copied','success'))">Copy</button>
@@ -2805,7 +2805,7 @@ async function registerDevice(screenId, screenCode) {
       </div>
 
       <div style="margin-bottom:16px;">
-        <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px;">Step 2 — Screen Code</div>
+        <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px;">Step 2 â€” Screen Code</div>
         <div style="display:flex;gap:8px;align-items:center;">
           <code style="flex:1;background:var(--surface2);padding:8px 12px;border-radius:6px;font-size:18px;font-weight:700;letter-spacing:2px;">${screenCode}</code>
           <button class="btn btn-ghost" style="white-space:nowrap;font-size:12px;" onclick="navigator.clipboard.writeText('${screenCode}').then(()=>showToast('Copied','success'))">Copy</button>
@@ -2813,7 +2813,7 @@ async function registerDevice(screenId, screenCode) {
       </div>
 
       <div style="margin-bottom:16px;">
-        <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px;">Step 3 — Player Token (valid 365 days)</div>
+        <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px;">Step 3 â€” Player Token (valid 365 days)</div>
         <div style="display:flex;gap:8px;align-items:flex-start;">
           <code id="player-token-box" style="flex:1;background:var(--surface2);padding:8px 12px;border-radius:6px;font-size:10px;word-break:break-all;line-height:1.5;">${data.token}</code>
           <button class="btn btn-ghost" style="white-space:nowrap;font-size:12px;" onclick="navigator.clipboard.writeText(document.getElementById('player-token-box').textContent.trim()).then(()=>showToast('Token copied!','success'))">Copy</button>
@@ -2825,7 +2825,7 @@ async function registerDevice(screenId, screenCode) {
         1. APK open karo ? Settings icon dbaao<br>
         2. "Server URL" mein upar wala URL daalo<br>
         3. "Screen Code" mein <strong>${screenCode}</strong> daalo<br>
-        4. Save/Connect dabao — APK khud register ho jaayega<br><br>
+        4. Save/Connect dabao â€” APK khud register ho jaayega<br><br>
         <em>Token APK khud generate kar leta hai register ke waqt. Agar manual token entry ki zaroorat ho, upar wala copy karo.</em>
       </div>`;
 
@@ -2871,9 +2871,9 @@ function renderContent(arr) {
           : `<div style="width:64px;height:40px;background:var(--surface2);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:20px;cursor:zoom-in;" onclick="openLightbox('${c.file_url}','${(c.original_name||'').replace(/'/g,"\\'")}','video')" title="Click to preview">??</div>`}
       </td>
       <td style="font-weight:500;font-size:13px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${c.original_name}">${c.original_name}</td>
-      <td><span class="badge ${c.type==='video'?'badge-blue':'badge-green'}">${c.type||'—'}</span></td>
-      <td style="font-size:12px;color:var(--text2);">${c.first_name||''} ${c.business_name ? '· '+c.business_name : ''}<br>${c.email||''}</td>
-      <td style="font-size:12px;">${c.file_size ? (c.file_size/1024/1024).toFixed(1)+' MB' : '—'}</td>
+      <td><span class="badge ${c.type==='video'?'badge-blue':'badge-green'}">${c.type||'â€”'}</span></td>
+      <td style="font-size:12px;color:var(--text2);">${c.first_name||''} ${c.business_name ? 'Â· '+c.business_name : ''}<br>${c.email||''}</td>
+      <td style="font-size:12px;">${c.file_size ? (c.file_size/1024/1024).toFixed(1)+' MB' : 'â€”'}</td>
       <td style="font-size:12px;color:var(--text3);">${fmtDate(c.created_at)}</td>
     </tr>`).join('');
 }
@@ -2899,9 +2899,9 @@ function renderAdvertisers(data) {
     <tr>
       <td style="font-weight:600;">${u.first_name||''} ${u.last_name||''}</td>
       <td style="font-size:12px;">${u.email}</td>
-      <td style="font-size:12px;color:var(--text2);">${u.business_name||'—'}</td>
-      <td style="font-size:12px;">${u.city||'—'}</td>
-      <td style="font-size:11px;font-family:monospace;">${u.gst_number||'—'}</td>
+      <td style="font-size:12px;color:var(--text2);">${u.business_name||'â€”'}</td>
+      <td style="font-size:12px;">${u.city||'â€”'}</td>
+      <td style="font-size:11px;font-family:monospace;">${u.gst_number||'â€”'}</td>
       <td style="font-size:12px;color:var(--text3);">${fmtDate(u.created_at)}</td>
       <td><span class="badge ${u.is_active?'badge-green':'badge-red'}">${u.is_active?'Active':'Suspended'}</span></td>
       <td>
@@ -2949,13 +2949,13 @@ async function viewAdvertiser(id) {
   document.getElementById('adv-edit-btn').onclick = switchToEditMode;
   document.getElementById('adv-modal-body').innerHTML = `
     <div class="info-grid">
-      <div class="info-item"><label>Full Name</label><span>${u.first_name||'—'} ${u.last_name||''}</span></div>
+      <div class="info-item"><label>Full Name</label><span>${u.first_name||'â€”'} ${u.last_name||''}</span></div>
       <div class="info-item"><label>Email</label><span>${u.email}</span></div>
-      <div class="info-item"><label>Mobile</label><span>${u.mobile||'—'}</span></div>
-      <div class="info-item"><label>City</label><span>${u.city||'—'}</span></div>
-      <div class="info-item"><label>Business</label><span>${u.business_name||'—'}</span></div>
-      <div class="info-item"><label>Business Type</label><span>${u.business_type||'—'}</span></div>
-      <div class="info-item"><label>GST Number</label><span style="font-family:monospace;">${u.gst_number||'—'}</span></div>
+      <div class="info-item"><label>Mobile</label><span>${u.mobile||'â€”'}</span></div>
+      <div class="info-item"><label>City</label><span>${u.city||'â€”'}</span></div>
+      <div class="info-item"><label>Business</label><span>${u.business_name||'â€”'}</span></div>
+      <div class="info-item"><label>Business Type</label><span>${u.business_type||'â€”'}</span></div>
+      <div class="info-item"><label>GST Number</label><span style="font-family:monospace;">${u.gst_number||'â€”'}</span></div>
       <div class="info-item"><label>Status</label><span class="badge ${u.is_active?'badge-green':'badge-red'}">${u.is_active?'Active':'Suspended'}</span></div>
       <div class="info-item"><label>Verified</label><span>${u.is_verified?'? Yes':'? No'}</span></div>
       <div class="info-item"><label>Joined</label><span>${fmtDate(u.created_at)}</span></div>
@@ -2984,7 +2984,7 @@ function switchToEditMode() {
 
 async function saveAdvertiserEdit() {
   const btn = document.getElementById('adv-edit-btn');
-  btn.disabled = true; btn.textContent = 'Saving…';
+  btn.disabled = true; btn.textContent = 'Savingâ€¦';
   try {
     const body = {
       first_name: document.getElementById('ae-first').value,
@@ -3023,7 +3023,7 @@ async function createAdvertiser() {
   const gst_number = document.getElementById('ca-gst').value.trim();
   if(!first_name||!last_name||!email||!mobile||!password) { showToast('Fill all required fields', 'error'); return; }
   if(password.length < 8) { showToast('Password must be at least 8 characters', 'error'); return; }
-  btn.disabled = true; btn.textContent = 'Creating…';
+  btn.disabled = true; btn.textContent = 'Creatingâ€¦';
   try {
     await api('/auth/register-admin', { method: 'POST', body: JSON.stringify({ first_name, last_name, email, mobile, password, business_name, city, gst_number }) });
     showToast('Advertiser created!', 'success');
@@ -3050,11 +3050,11 @@ function renderInvoices(data) {
   tbody.innerHTML = data.map(i => `
     <tr>
       <td><code style="font-size:11px;background:var(--surface2);padding:2px 6px;border-radius:4px;">${i.invoice_number}</code></td>
-      <td style="font-size:12px;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${i.campaign_title||i.campaign_code||'—'}</td>
-      <td style="font-size:12px;color:var(--text2);">${i.user_id?.substring(0,8)||'—'}</td>
-      <td style="font-variant-numeric:tabular-nums;">?${fmt(i.amount_base||0)}</td>
-      <td style="font-variant-numeric:tabular-nums;">?${fmt(i.amount_gst||0)}</td>
-      <td style="font-weight:700;font-variant-numeric:tabular-nums;">?${fmt(i.amount_total||0)}</td>
+      <td style="font-size:12px;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${i.campaign_title||i.campaign_code||'â€”'}</td>
+      <td style="font-size:12px;color:var(--text2);">${i.user_id?.substring(0,8)||'â€”'}</td>
+      <td style="font-variant-numeric:tabular-nums;">â‚¹${fmt(i.amount_base||0)}</td>
+      <td style="font-variant-numeric:tabular-nums;">â‚¹${fmt(i.amount_gst||0)}</td>
+      <td style="font-weight:700;font-variant-numeric:tabular-nums;">â‚¹${fmt(i.amount_total||0)}</td>
       <td><span class="badge ${i.status==='paid'?'badge-green':i.status==='refunded'?'badge-red':'badge-yellow'}">${i.status}</span></td>
       <td style="font-size:12px;color:var(--text3);">${fmtDate(i.issued_at)}</td>
     </tr>`).join('');
@@ -3076,10 +3076,10 @@ async function loadCoupons() {
       <tr>
         <td><code style="font-size:12px;font-weight:700;background:var(--primary-light);color:var(--primary);padding:2px 8px;border-radius:4px;">${c.code}</code></td>
         <td><span class="badge ${c.type==='percent'?'badge-blue':'badge-teal'}">${c.type}</span></td>
-        <td style="font-weight:600;">${c.type==='percent'?c.value+'%':'?'+fmt(c.value)}</td>
-        <td style="font-size:12px;">?${fmt(c.min_order||0)}</td>
+        <td style="font-weight:600;">${c.type==='percent'?c.value+'%':'â‚¹'+fmt(c.value)}</td>
+        <td style="font-size:12px;">â‚¹${fmt(c.min_order||0)}</td>
         <td style="font-size:12px;">${c.used_count||0} / ${c.usage_limit||'8'}</td>
-        <td style="font-size:12px;">${fmtDate(c.valid_from)} – ${fmtDate(c.valid_until)}</td>
+        <td style="font-size:12px;">${fmtDate(c.valid_from)} â€“ ${fmtDate(c.valid_until)}</td>
         <td><span class="badge ${c.is_active?'badge-green':'badge-red'}">${c.is_active?'Active':'Inactive'}</span></td>
         <td>
           <button class="btn btn-ghost btn-xs" onclick="editCoupon(${JSON.stringify(c).replace(/"/g,'&quot;')})">Edit</button>
@@ -3122,7 +3122,7 @@ async function saveCoupon() {
   };
   if(!body.code || !body.value || !body.valid_from || !body.valid_until) { showToast('Fill required fields', 'error'); return; }
   const btn = document.getElementById('cpn-save-btn');
-  btn.disabled = true; btn.textContent = 'Saving…';
+  btn.disabled = true; btn.textContent = 'Savingâ€¦';
   try {
     if(id) { await api(`/coupons/${id}`, { method: 'PUT', body: JSON.stringify(body) }); }
     else { await api('/coupons', { method: 'POST', body: JSON.stringify(body) }); }
@@ -3144,7 +3144,7 @@ async function deactivateCoupon(id) {
 // -- ANALYTICS -------------------------------------------------------------
 async function loadAnalytics() {
   const statsEl = document.getElementById('analytics-stats');
-  statsEl.innerHTML = '<div style="color:var(--text3);">Loading…</div>';
+  statsEl.innerHTML = '<div style="color:var(--text3);">Loadingâ€¦</div>';
   try {
     const [dash, revenue, screenUtil] = await Promise.all([
       api('/reports/dashboard'),
@@ -3157,8 +3157,8 @@ async function loadAnalytics() {
     const totalRev = totalRevArr.reduce((s,r) => s + parseFloat(r.total||0), 0);
     const liveCamps = (dash.campaigns||[]).find(c => c.status === 'live');
     statsEl.innerHTML = `
-      <div class="stat-card"><div class="stat-icon si-teal"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8V7m0 1v8m0 0v1"/></svg></div><div class="stat-label">Total Revenue</div><div class="stat-value">?${fmt(totalRev)}</div><div class="stat-sub">All time</div></div>
-      <div class="stat-card"><div class="stat-icon si-yellow"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div><div class="stat-label">Revenue This Month</div><div class="stat-value">?${fmt(dash.revenue_this_month||0)}</div><div class="stat-sub">Paid invoices MTD</div></div>
+      <div class="stat-card"><div class="stat-icon si-teal"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8V7m0 1v8m0 0v1"/></svg></div><div class="stat-label">Total Revenue</div><div class="stat-value">â‚¹${fmt(totalRev)}</div><div class="stat-sub">All time</div></div>
+      <div class="stat-card"><div class="stat-icon si-yellow"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div><div class="stat-label">Revenue This Month</div><div class="stat-value">â‚¹${fmt(dash.revenue_this_month||0)}</div><div class="stat-sub">Paid invoices MTD</div></div>
       <div class="stat-card"><div class="stat-icon si-green"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7"/></svg></div><div class="stat-label">Live Campaigns</div><div class="stat-value">${liveCamps?.count||0}</div><div class="stat-sub">Currently airing</div></div>
       <div class="stat-card"><div class="stat-icon si-teal"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/></svg></div><div class="stat-label">Total Invoices</div><div class="stat-value">${totalRevArr.reduce((s,r)=>s+parseInt(r.invoice_count||0),0)}</div><div class="stat-sub">Across all periods</div></div>`;
 
@@ -3172,7 +3172,7 @@ async function loadAnalytics() {
         const h = Math.max(Math.round((parseFloat(m.total||0)/maxVal)*130), 2);
         const mon = new Date(m.month).toLocaleDateString('en-IN', {month:'short',year:'2-digit'});
         return `<div class="chart-bar-col">
-          <div class="chart-bar-val">?${fmt(m.total||0)}</div>
+          <div class="chart-bar-val">â‚¹${fmt(m.total||0)}</div>
           <div class="chart-bar" style="height:${h}px;"></div>
           <div class="chart-bar-label">${mon}</div>
         </div>`;
@@ -3237,7 +3237,7 @@ async function loadPop() {
     const summaryEl = document.getElementById('pop-summary');
     document.getElementById('pop-stat-records').textContent = fmtNum(arr.length);
     document.getElementById('pop-stat-plays').textContent   = fmtNum(totalPlays);
-    document.getElementById('pop-stat-db').textContent      = totalPlaysInDb !== null ? fmtNum(totalPlaysInDb) + ' total plays' : (totalInDb !== null ? fmtNum(totalInDb) + ' log entries' : '—');
+    document.getElementById('pop-stat-db').textContent      = totalPlaysInDb !== null ? fmtNum(totalPlaysInDb) + ' total plays' : (totalInDb !== null ? fmtNum(totalInDb) + ' log entries' : 'â€”');
     summaryEl.style.display = 'flex';
 
     // Export button
@@ -3245,19 +3245,19 @@ async function loadPop() {
 
     const countEl = document.getElementById('pop-count');
     if (arr.length) {
-      countEl.textContent = `${fmtNum(arr.length)} log entr${arr.length>1?'ies':'y'} · ${fmtNum(totalPlays)} total plays`;
+      countEl.textContent = `${fmtNum(arr.length)} log entr${arr.length>1?'ies':'y'} Â· ${fmtNum(totalPlays)} total plays`;
       countEl.style.color = '';
     } else {
       countEl.innerHTML = `No play logs for selected filters.` +
-        (totalInDb === 0 ? ' <span style="color:var(--warning);">DB is empty — APK has not submitted proof of play yet.</span>'
-                         : totalInDb !== null ? ` <span style="color:var(--text3);">(${fmtNum(totalInDb)} log entries exist in DB — try widening the date range.)</span>` : '');
+        (totalInDb === 0 ? ' <span style="color:var(--warning);">DB is empty â€” APK has not submitted proof of play yet.</span>'
+                         : totalInDb !== null ? ` <span style="color:var(--text3);">(${fmtNum(totalInDb)} log entries exist in DB â€” try widening the date range.)</span>` : '');
       countEl.style.color = 'var(--text2)';
     }
 
     if(!arr.length) {
       tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:32px;color:var(--text3);">
         ${totalInDb === 0
-          ? 'Play logs table is empty — APK has not submitted proof of play yet.'
+          ? 'Play logs table is empty â€” APK has not submitted proof of play yet.'
           : 'No records match these filters. Try clearing the date range or removing other filters.'}
       </td></tr>`;
       return;
@@ -3266,12 +3266,12 @@ async function loadPop() {
     const tierColors = { paid:'var(--primary)', venue_own:'#ca8a04', venue_cross:'#2563EB', filler:'var(--text3)' };
     tbody.innerHTML = arr.map(p => `
       <tr>
-        <td><code style="font-size:11px;background:var(--surface2);padding:2px 6px;border-radius:4px;">${p.screen_code||'—'}</code><br><span style="font-size:11px;color:var(--text3);">${p.screen_name||''}</span></td>
-        <td style="font-size:12px;color:var(--text2);">${p.advertiser_name||p.user_email||'—'}</td>
-        <td style="font-size:12px;">${p.campaign_title||'<span style="color:var(--text3);">—</span>'}<br><span style="font-size:10px;color:var(--text3);">${p.campaign_code||''}</span></td>
+        <td><code style="font-size:11px;background:var(--surface2);padding:2px 6px;border-radius:4px;">${p.screen_code||'â€”'}</code><br><span style="font-size:11px;color:var(--text3);">${p.screen_name||''}</span></td>
+        <td style="font-size:12px;color:var(--text2);">${p.advertiser_name||p.user_email||'â€”'}</td>
+        <td style="font-size:12px;">${p.campaign_title||'<span style="color:var(--text3);">â€”</span>'}<br><span style="font-size:10px;color:var(--text3);">${p.campaign_code||''}</span></td>
         <td style="font-size:12px;white-space:nowrap;">${fmtDateTime(p.played_at)}</td>
-        <td style="font-size:12px;white-space:nowrap;color:var(--text2);">${p.played_until ? fmtDateTime(p.played_until) : '—'}</td>
-        <td style="font-variant-numeric:tabular-nums;">${p.duration_sec||'—'}</td>
+        <td style="font-size:12px;white-space:nowrap;color:var(--text2);">${p.played_until ? fmtDateTime(p.played_until) : 'â€”'}</td>
+        <td style="font-variant-numeric:tabular-nums;">${p.duration_sec||'â€”'}</td>
         <td style="font-variant-numeric:tabular-nums;font-weight:600;">${p.play_count||1}</td>
         <td><span style="font-size:10px;font-weight:700;color:${tierColors[p.content_tier]||'var(--text2)'};">${(p.content_tier||'paid').replace('_',' ')}</span></td>
       </tr>`).join('');
@@ -3285,7 +3285,7 @@ function exportPopCsv() {
   const a = document.createElement('a');
   a.href = '/api/reports/proof-of-play?' + params.toString();
   a.setAttribute('download', '');
-  // Pass auth via URL workaround — use fetch+blob for auth header
+  // Pass auth via URL workaround â€” use fetch+blob for auth header
   fetch('/api/reports/proof-of-play?' + params.toString(), {
     headers: { Authorization: 'Bearer ' + token }
   }).then(r => r.blob()).then(blob => {
@@ -3310,11 +3310,11 @@ async function populatePopFilters() {
     ]);
     const scrSel = document.getElementById('pop-screen');
     (Array.isArray(screens)?screens:(screens.screens||[])).forEach(s => {
-      scrSel.innerHTML += `<option value="${s.id}">${s.screen_code} — ${s.name||s.location||''}</option>`;
+      scrSel.innerHTML += `<option value="${s.id}">${s.screen_code} â€” ${s.name||s.location||''}</option>`;
     });
     const cmpSel = document.getElementById('pop-campaign');
     (Array.isArray(campaigns)?campaigns:[]).forEach(c => {
-      cmpSel.innerHTML += `<option value="${c.id}">${c.campaign_code} — ${c.title}</option>`;
+      cmpSel.innerHTML += `<option value="${c.id}">${c.campaign_code} â€” ${c.title}</option>`;
     });
     const usrSel = document.getElementById('pop-user');
     (Array.isArray(users)?users:[]).forEach(u => {
@@ -3359,7 +3359,7 @@ async function sendNotification() {
   const user_id = target === 'user' ? document.getElementById('notif-user-select').value : null;
   if(!title) { showToast('Title is required', 'error'); return; }
   const btn = document.getElementById('notif-send-btn');
-  btn.disabled = true; btn.textContent = 'Sending…';
+  btn.disabled = true; btn.textContent = 'Sendingâ€¦';
   try {
     const res = await api('/notifications/send', { method: 'POST', body: JSON.stringify({ user_id, title, body, type, action_url }) });
     showToast(`Sent to ${res.count} user(s)`, 'success');
@@ -3418,11 +3418,11 @@ async function generateBlogArticle() {
   const status = document.getElementById('blog-gen-status');
   const topicInput = document.getElementById('blog-topic-input');
   const topic = topicInput ? topicInput.value.trim() : '';
-  if (btn) { btn.disabled = true; btn.textContent = 'Generating…'; }
-  if (status) { status.style.display = 'block'; status.textContent = 'AI article generate ho raha hai… (30-60 seconds)'; }
+  if (btn) { btn.disabled = true; btn.textContent = 'Generatingâ€¦'; }
+  if (status) { status.style.display = 'block'; status.textContent = 'AI article generate ho raha haiâ€¦ (30-60 seconds)'; }
   try {
     const result = await api('/blog/generate', { method: 'POST', body: JSON.stringify({ topic: topic || undefined }) });
-    if (status) status.textContent = `? Article ready: "${result.title}" — Review karo aur publish karo.`;
+    if (status) status.textContent = `? Article ready: "${result.title}" â€” Review karo aur publish karo.`;
     if (topicInput) topicInput.value = '';
     loadBlogPosts();
   } catch(e) {
@@ -3461,8 +3461,8 @@ async function loadActivity() {
         <td style="font-size:12px;color:var(--text3);white-space:nowrap;">${fmtDateTime(a.created_at)}</td>
         <td style="font-size:12px;">${a.first_name||''} <span style="color:var(--text3);">${a.email||'System'}</span></td>
         <td><code style="font-size:11px;background:var(--surface2);padding:2px 6px;border-radius:4px;">${a.action}</code></td>
-        <td style="font-size:12px;text-transform:capitalize;">${a.entity_type||'—'}</td>
-        <td style="font-size:11px;color:var(--text3);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${a.details ? JSON.stringify(a.details).slice(0,80) : '—'}</td>
+        <td style="font-size:12px;text-transform:capitalize;">${a.entity_type||'â€”'}</td>
+        <td style="font-size:11px;color:var(--text3);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${a.details ? JSON.stringify(a.details).slice(0,80) : 'â€”'}</td>
       </tr>`).join('');
   } catch(e) { tbody.innerHTML = emptyRow(5, 'Error: ' + e.message); }
 }
