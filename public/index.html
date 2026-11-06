@@ -2219,7 +2219,14 @@ async function retryGoogleFetch(){
 async function connectGoogle(){
   try{
     const data=await api('/auth/google/connect');
-    window.location.href=data.url;
+    const popup=window.open(data.url,'google_oauth','width=520,height=620,top=100,left=200');
+    const timer=setInterval(()=>{
+      if(!popup||popup.closed){
+        clearInterval(timer);
+        loadGoogleStatus();
+        toast('Google Business Profile connected!','success');
+      }
+    },1000);
   }catch(e){toast('Could not start Google login','error');}
 }
 
