@@ -255,11 +255,12 @@ router.post('/retry-fetch', authenticate, async (req, res) => {
 
 // ── Posting ────────────────────────────────────────────────────────────────────
 
+const MAKE_GBP_WEBHOOK = 'https://hook.eu1.make.com/t689r3nbxfl4rsm3fn57qureowu3i3lb';
+
 async function postCampaignToGoogle(campaignId) {
   const result = await query(
     `SELECT c.id, c.title, c.campaign_code, c.start_date, c.end_date,
-            u.google_account_id, u.google_location_id,
-            u.google_access_token, u.google_refresh_token,
+            u.google_refresh_token,
             ct.file_url, ct.type AS content_type
      FROM campaigns c
      JOIN users u ON u.id = c.user_id
@@ -268,48 +269,37 @@ async function postCampaignToGoogle(campaignId) {
     [campaignId]
   );
   const row = result.rows[0];
-  if (!row || !row.google_location_id || !row.google_refresh_token) return;
-  if (!row.file_url || row.content_type !== 'image') {
-    console.log(`[GBP] Campaign ${row.campaign_code} — only images supported for GBP posts, skipping`);
-    return;
-  }
+  if (!row || !row.google_refresh_token) return;
 
-  try {
-    // Refresh the access token (they expire in 1 hour)
-    const refreshed = await refreshAccessToken(row.google_refresh_token);
-    if (refreshed.error) throw new Error(refreshed.error_description || refreshed.error);
-    const accessToken = refreshed.access_token;
+  const payload = JSON.stringify({
+    title: row.title || 'ExtrraVenue Campaign Live',
+    summary: `${row.title || 'Campaign'} is now live on ExtrraVenue digital screens in Ahmedabad!`,
+    image_url: (row.content_type === 'image' && row.file_url) ? row.file_url : null,
+    campaign_code: row.campaign_code
+  });
 
-    // Save refreshed token to DB
-    await query('UPDATE users SET google_access_token=$1 WHERE google_account_id=$2', [accessToken, row.google_account_id]);
-
-    // Derive account name from location (e.g. "accounts/123/locations/456" → "accounts/123")
-    const accountName = row.google_account_id;
-    const locationName = row.google_location_id; // full resource name like "accounts/123/locations/456"
-    // If locationId is bare (e.g. "locations/456"), combine with account
-    const fullLocation = locationName.startsWith('accounts/') ? locationName : `${accountName}/${locationName}`;
-
-    const postBody = {
-      topicType: 'STANDARD',
-      summary: `${row.title || 'Campaign update'} — extrravenue digital screen campaign now live!`,
-      media: [{ mediaFormat: 'PHOTO', sourceUrl: row.file_url }],
-      callToAction: {
-        actionType: 'LEARN_MORE',
-        url: 'https://www.extrravenue.com'
-      }
-    };
-
-    const response = await googlePost(
-      `https://mybusiness.googleapis.com/v4/${fullLocation}/localPosts`,
-      accessToken,
-      postBody
-    );
-
-    if (response.error) throw new Error(response.error.message || JSON.stringify(response.error));
-    console.log(`[GBP] Posted to Google Business Profile for campaign ${row.campaign_code}: ${response.name}`);
-  } catch (err) {
-    console.error(`[GBP] Post failed for campaign ${row.campaign_code}:`, err.message);
-  }
+  return new Promise((resolve) => {
+    const parsed = new URL(MAKE_GBP_WEBHOOK);
+    const req = https.request({
+      hostname: parsed.hostname,
+      path: parsed.pathname,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(payload) }
+    }, res => {
+      let data = '';
+      res.on('data', d => data += d);
+      res.on('end', () => {
+        console.log(`[GBP] Make webhook called for campaign ${row.campaign_code}: ${res.statusCode} ${data.slice(0,100)}`);
+        resolve();
+      });
+    });
+    req.on('error', err => {
+      console.error(`[GBP] Make webhook failed for campaign ${row.campaign_code}:`, err.message);
+      resolve();
+    });
+    req.write(payload);
+    req.end();
+  });
 }
 
 module.exports = router;
