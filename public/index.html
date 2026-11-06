@@ -1,10 +1,10 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-<title>SignageCMS — Advertiser Portal</title>
+<title>SignageCMS � Advertiser Portal</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <style>
@@ -202,7 +202,7 @@
   .screen-card { background:var(--surface);border:2px solid var(--border);border-radius:var(--radius-lg);padding:12px;cursor:pointer;transition:all 0.15s;position:relative; }
   .screen-card:hover { border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-light); }
   .screen-card.selected { border-color:var(--primary);background:var(--primary-light); }
-  .screen-card.selected::after { content:'✓';position:absolute;top:8px;right:8px;width:18px;height:18px;background:var(--primary);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700; }
+  .screen-card.selected::after { content:'?';position:absolute;top:8px;right:8px;width:18px;height:18px;background:var(--primary);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700; }
   /* Group chip */
   .group-chip{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:20px;border:1.5px solid var(--primary);background:var(--primary-light);color:var(--primary);font-size:12.5px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.15s;}
   .group-chip:hover{background:var(--primary);color:#fff;}
@@ -420,7 +420,7 @@
       <div><div class="auth-logo-name">SignageCMS</div><div class="auth-logo-tag">Digital Out-of-Home Platform</div></div>
     </div>
     <h2 class="auth-heading">Sign in</h2>
-    <p class="auth-subtext">Welcome back — manage your campaigns</p>
+    <p class="auth-subtext">Welcome back � manage your campaigns</p>
     <div class="form-group">
       <label class="form-label">Mobile Number</label>
       <div style="display:flex;gap:8px;">
@@ -448,9 +448,9 @@
     </div>
     <h2 class="auth-heading">Admin Sign in</h2>
     <div class="form-group"><label class="form-label">Email</label><input type="email" id="admin-email" class="form-input" placeholder="admin@signagecms.in"></div>
-    <div class="form-group"><label class="form-label">Password</label><input type="password" id="admin-password" class="form-input" placeholder="••••••••"></div>
+    <div class="form-group"><label class="form-label">Password</label><input type="password" id="admin-password" class="form-input" placeholder="��������"></div>
     <button class="btn btn-primary btn-full" id="admin-login-btn" onclick="doAdminLogin()">Sign in</button>
-    <div style="text-align:center;margin-top:8px;"><a onclick="showLogin()" style="font-size:12px;color:var(--text2);cursor:pointer;">← Back to OTP login</a></div>
+    <div style="text-align:center;margin-top:8px;"><a onclick="showLogin()" style="font-size:12px;color:var(--text2);cursor:pointer;">? Back to OTP login</a></div>
   </div>
 
   <div id="register-card" class="auth-card hidden" style="max-width:520px">
@@ -572,24 +572,24 @@
         <div class="stat-grid" id="stat-grid">
           <div class="stat-card">
             <div class="stat-icon" style="background:#F0FDFA;"><svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="#0D9488"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg></div>
-            <div class="stat-label">Active Campaigns</div><div class="stat-value" id="stat-active">—</div><div class="stat-change" id="stat-active-sub">Loading…</div>
+            <div class="stat-label">Active Campaigns</div><div class="stat-value" id="stat-active">�</div><div class="stat-change" id="stat-active-sub">Loading�</div>
           </div>
           <div class="stat-card">
             <div class="stat-icon" style="background:#ECFDF5;"><svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="#10B981"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0zM2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg></div>
-            <div class="stat-label">Total Impressions</div><div class="stat-value" id="stat-impr">—</div><div class="stat-change" id="stat-impr-sub">Loading…</div>
+            <div class="stat-label">Total Impressions</div><div class="stat-value" id="stat-impr">�</div><div class="stat-change" id="stat-impr-sub">Loading�</div>
           </div>
           <div class="stat-card">
             <div class="stat-icon" style="background:#FEF3C7;"><svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="#F59E0B"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
-            <div class="stat-label">Total Spent</div><div class="stat-value" id="stat-spent">—</div><div class="stat-change" id="stat-spent-sub">Loading…</div>
+            <div class="stat-label">Total Spent</div><div class="stat-value" id="stat-spent">�</div><div class="stat-change" id="stat-spent-sub">Loading�</div>
           </div>
           <div class="stat-card">
             <div class="stat-icon" style="background:#FEE2E2;"><svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="#EF4444"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
-            <div class="stat-label">Pending Actions</div><div class="stat-value" id="stat-pending">—</div><div class="stat-change" id="stat-pending-sub">Loading…</div>
+            <div class="stat-label">Pending Actions</div><div class="stat-value" id="stat-pending">�</div><div class="stat-change" id="stat-pending-sub">Loading�</div>
           </div>
         </div>
         <div>
           <div class="section-header"><div class="section-title">Recent Campaigns</div><button class="btn btn-ghost btn-sm" onclick="navigate('campaigns')">View all</button></div>
-          <div class="card"><div id="recent-campaigns-list" style="padding:16px;color:var(--text2);">Loading…</div></div>
+          <div class="card"><div id="recent-campaigns-list" style="padding:16px;color:var(--text2);">Loading�</div></div>
         </div>
       </div>
 
@@ -612,16 +612,16 @@
           </div>
         </div>
         <div class="stat-grid">
-          <div class="stat-card"><div class="stat-icon" style="float:right;width:28px;height:28px;border-radius:6px;background:#e0f2fe;display:flex;align-items:center;justify-content:center;"><svg width="14" height="14" fill="none" stroke="#0ea5e9" stroke-width="2" viewBox="0 0 24 24"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg></div><div class="stat-label">Total Plays</div><div class="stat-value" id="an-plays">—</div><div class="stat-change" id="an-plays-sub">Selected period</div></div>
-          <div class="stat-card"><div class="stat-icon" style="float:right;width:28px;height:28px;border-radius:6px;background:#f0fdf4;display:flex;align-items:center;justify-content:center;"><svg width="14" height="14" fill="none" stroke="#22c55e" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div><div class="stat-label">Screens Used</div><div class="stat-value" id="an-screens">—</div><div class="stat-change">Unique screens</div></div>
-          <div class="stat-card"><div class="stat-icon" style="float:right;width:28px;height:28px;border-radius:6px;background:#fef3c7;display:flex;align-items:center;justify-content:center;"><svg width="14" height="14" fill="none" stroke="#f59e0b" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg></div><div class="stat-label">Active Campaigns</div><div class="stat-value" id="an-campaigns">—</div><div class="stat-change">With plays</div></div>
-          <div class="stat-card"><div class="stat-icon" style="float:right;width:28px;height:28px;border-radius:6px;background:#fce7f3;display:flex;align-items:center;justify-content:center;"><svg width="14" height="14" fill="none" stroke="#ec4899" stroke-width="2" viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0"/></svg></div><div class="stat-label">Est. Impressions</div><div class="stat-value" id="an-impr">—</div><div class="stat-change">Plays × 150</div></div>
+          <div class="stat-card"><div class="stat-icon" style="float:right;width:28px;height:28px;border-radius:6px;background:#e0f2fe;display:flex;align-items:center;justify-content:center;"><svg width="14" height="14" fill="none" stroke="#0ea5e9" stroke-width="2" viewBox="0 0 24 24"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg></div><div class="stat-label">Total Plays</div><div class="stat-value" id="an-plays">�</div><div class="stat-change" id="an-plays-sub">Selected period</div></div>
+          <div class="stat-card"><div class="stat-icon" style="float:right;width:28px;height:28px;border-radius:6px;background:#f0fdf4;display:flex;align-items:center;justify-content:center;"><svg width="14" height="14" fill="none" stroke="#22c55e" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div><div class="stat-label">Screens Used</div><div class="stat-value" id="an-screens">�</div><div class="stat-change">Unique screens</div></div>
+          <div class="stat-card"><div class="stat-icon" style="float:right;width:28px;height:28px;border-radius:6px;background:#fef3c7;display:flex;align-items:center;justify-content:center;"><svg width="14" height="14" fill="none" stroke="#f59e0b" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg></div><div class="stat-label">Active Campaigns</div><div class="stat-value" id="an-campaigns">�</div><div class="stat-change">With plays</div></div>
+          <div class="stat-card"><div class="stat-icon" style="float:right;width:28px;height:28px;border-radius:6px;background:#fce7f3;display:flex;align-items:center;justify-content:center;"><svg width="14" height="14" fill="none" stroke="#ec4899" stroke-width="2" viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0"/></svg></div><div class="stat-label">Est. Impressions</div><div class="stat-value" id="an-impr">�</div><div class="stat-change">Plays � 150</div></div>
         </div>
         <div id="an-projected-banner" style="display:none;background:linear-gradient(135deg,#eff6ff,#f0fdf4);border:1px solid #bfdbfe;border-radius:10px;padding:10px 14px;margin-bottom:14px;display:none;align-items:center;gap:10px;">
           <svg width="16" height="16" fill="none" stroke="#3b82f6" stroke-width="2" viewBox="0 0 24 24" style="flex-shrink:0;"><path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
           <span style="font-size:12px;color:#1e40af;line-height:1.4;">Estimated plays based on booked campaigns. Actual play logs will appear once screens go live.</span>
         </div>
-        <div class="section-header"><div class="section-title" id="an-chart-title">Plays — Last 7 Days</div></div>
+        <div class="section-header"><div class="section-title" id="an-chart-title">Plays � Last 7 Days</div></div>
         <div class="card card-body" style="margin-bottom:20px;">
           <div style="padding:8px 0;min-height:80px;"><div class="bar-chart" id="bar-chart"><div class="empty-state" style="padding:20px;"><div class="empty-title">No play data</div></div></div></div>
         </div>
@@ -654,8 +654,8 @@
           </button>
         </div>
         <div id="pop-summary" style="display:none;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin-bottom:14px;display:none;gap:24px;flex-wrap:wrap;">
-          <div><div style="font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.04em;font-weight:600;margin-bottom:2px;">Total Plays</div><div style="font-size:20px;font-weight:700;" id="pop-total-plays">—</div></div>
-          <div><div style="font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.04em;font-weight:600;margin-bottom:2px;">Records</div><div style="font-size:20px;font-weight:700;" id="pop-total-records">—</div></div>
+          <div><div style="font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.04em;font-weight:600;margin-bottom:2px;">Total Plays</div><div style="font-size:20px;font-weight:700;" id="pop-total-plays">�</div></div>
+          <div><div style="font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.04em;font-weight:600;margin-bottom:2px;">Records</div><div style="font-size:20px;font-weight:700;" id="pop-total-records">�</div></div>
         </div>
         <div class="card" style="overflow:auto;">
           <table style="width:100%;border-collapse:collapse;font-size:13px;" id="pop-table-wrap">
@@ -699,15 +699,15 @@
             </button>
           </div>
         </div>
-        <div id="screens-grid" class="screens-grid"><div style="grid-column:1/-1;" class="empty-state"><div class="empty-title">Loading screens…</div></div></div>
+        <div id="screens-grid" class="screens-grid"><div style="grid-column:1/-1;" class="empty-state"><div class="empty-title">Loading screens�</div></div></div>
         <div id="screens-map-wrap" style="display:none;border-radius:var(--radius-lg);overflow:hidden;border:1.5px solid var(--border);height:520px;">
           <div id="screens-map" style="height:100%;width:100%;"></div>
         </div>
         <!-- Floating selection bar -->
         <div id="sbc-sel-bar" style="display:none;position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--primary);color:#fff;border-radius:12px;padding:10px 18px;display:none;align-items:center;gap:14px;box-shadow:0 8px 32px rgba(0,0,0,0.22);z-index:200;white-space:nowrap;">
           <span id="sbc-sel-count" style="font-size:13px;font-weight:600;"></span>
-          <button onclick="_sbcBookSelected()" style="background:#fff;color:var(--primary);border:none;border-radius:8px;padding:6px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Book Selected →</button>
-          <button onclick="_sbcClearSelection()" style="background:rgba(255,255,255,0.18);color:#fff;border:none;border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer;font-family:inherit;">✕ Clear</button>
+          <button onclick="_sbcBookSelected()" style="background:#fff;color:var(--primary);border:none;border-radius:8px;padding:6px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Book Selected ?</button>
+          <button onclick="_sbcClearSelection()" style="background:rgba(255,255,255,0.18);color:#fff;border:none;border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer;font-family:inherit;">? Clear</button>
         </div>
       </div>
 
@@ -737,8 +737,8 @@
               <div style="height:1px;background:var(--border);margin:14px 0;"></div>
               <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.05em;">Individual Screens</div>
             </div>
-            <div id="wizard-screens-grid" class="screens-grid" style="margin-bottom:16px;"><div style="grid-column:1/-1;text-align:center;padding:24px;color:var(--text2);">Loading screens…</div></div>
-            <div class="wizard-nav"><div></div><button class="btn btn-primary" onclick="wizardNext(1)" id="btn-next-1" disabled>Continue →</button></div>
+            <div id="wizard-screens-grid" class="screens-grid" style="margin-bottom:16px;"><div style="grid-column:1/-1;text-align:center;padding:24px;color:var(--text2);">Loading screens�</div></div>
+            <div class="wizard-nav"><div></div><button class="btn btn-primary" onclick="wizardNext(1)" id="btn-next-1" disabled>Continue ?</button></div>
           </div>
 
           <!-- Step 2 -->
@@ -747,12 +747,12 @@
             <div style="display:flex;align-items:flex-end;gap:12px;margin-bottom:12px;flex-wrap:wrap;">
               <div style="flex:1;min-width:180px;">
                 <label class="form-label" style="margin-bottom:4px;">Campaign Name</label>
-                <input type="text" id="cmp-name" class="form-input" placeholder="e.g. Domino's Weekend Offer — July">
+                <input type="text" id="cmp-name" class="form-input" placeholder="e.g. Domino's Weekend Offer � July">
               </div>
               <div id="storage-bar-wrap" style="flex-shrink:0;min-width:190px;background:var(--surface);border:1.5px solid var(--border);border-radius:8px;padding:6px 10px;margin-bottom:2px;">
                 <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px;">
                   <span style="font-size:10.5px;font-weight:600;color:var(--text2);letter-spacing:0.03em;">STORAGE</span>
-                  <span id="storage-bar-label" style="font-size:10.5px;color:var(--text3);">Loading…</span>
+                  <span id="storage-bar-label" style="font-size:10.5px;color:var(--text3);">Loading�</span>
                 </div>
                 <div style="height:4px;background:var(--border);border-radius:3px;overflow:hidden;">
                   <div id="storage-bar-fill" style="height:100%;background:var(--primary);border-radius:3px;width:0%;transition:width 0.4s;"></div>
@@ -769,22 +769,22 @@
               <div class="upload-zone" id="upload-zone" onclick="document.getElementById('file-input').click()" ondragover="handleDragOver(event)" ondrop="handleDrop(event)" style="padding:22px 24px;">
                 <div class="upload-icon" style="width:40px;height:40px;margin:0 auto 8px;"><svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="#0D9488"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg></div>
                 <div class="upload-title" style="font-size:14px;">Drag &amp; drop or click to browse</div>
-                <div class="upload-sub">MP4 · MOV · JPG · PNG · max 200 MB</div>
+                <div class="upload-sub">MP4 � MOV � JPG � PNG � max 200 MB</div>
               </div>
               <input type="file" id="file-input" accept="video/*,image/*" style="display:none" onchange="handleFileSelect(event)">
             </div>
             <!-- Library tab -->
             <div id="creative-library-section" style="display:none;">
-              <div id="library-grid" class="library-grid"><div style="color:var(--text2);font-size:13px;padding:20px;text-align:center;">Loading library…</div></div>
+              <div id="library-grid" class="library-grid"><div style="color:var(--text2);font-size:13px;padding:20px;text-align:center;">Loading library�</div></div>
             </div>
             <!-- Shared preview -->
             <div id="upload-preview" style="display:none;" class="upload-preview">
               <img id="preview-thumb" src="" alt="" style="width:56px;height:42px;object-fit:cover;border-radius:6px;border:1px solid var(--border);display:none;">
-              <div id="preview-icon-wrap" style="width:56px;height:42px;background:var(--primary-light);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:22px;">🎬</div>
-              <div style="flex:1;min-width:0;"><div class="upload-preview-name" id="preview-name" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">—</div><div class="upload-preview-size" id="preview-size">—</div></div>
-              <button onclick="clearFile()" style="margin-left:auto;background:none;border:none;cursor:pointer;color:var(--text2);font-size:20px;flex-shrink:0;">×</button>
+              <div id="preview-icon-wrap" style="width:56px;height:42px;background:var(--primary-light);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:22px;">??</div>
+              <div style="flex:1;min-width:0;"><div class="upload-preview-name" id="preview-name" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">�</div><div class="upload-preview-size" id="preview-size">�</div></div>
+              <button onclick="clearFile()" style="margin-left:auto;background:none;border:none;cursor:pointer;color:var(--text2);font-size:20px;flex-shrink:0;">�</button>
             </div>
-            <div class="wizard-nav"><button class="btn btn-ghost" onclick="wizardBack(2)">← Back</button><button class="btn btn-primary" onclick="wizardNext(2)" id="btn-next-2" disabled>Continue →</button></div>
+            <div class="wizard-nav"><button class="btn btn-ghost" onclick="wizardBack(2)">? Back</button><button class="btn btn-primary" onclick="wizardNext(2)" id="btn-next-2" disabled>Continue ?</button></div>
           </div>
 
           <!-- Step 3 -->
@@ -800,10 +800,10 @@
               <div class="form-group">
                 <label class="form-label">Duration</label>
                 <select id="sch-duration" class="select-input" onchange="updateEndFromDuration()">
-                  <option value="15">15 Days — Half Month</option>
-                  <option value="30" selected>30 Days — 1 Month</option>
-                  <option value="60">60 Days — 2 Months</option>
-                  <option value="90">90 Days — 3 Months</option>
+                  <option value="15">15 Days � Half Month</option>
+                  <option value="30" selected>30 Days � 1 Month</option>
+                  <option value="60">60 Days � 2 Months</option>
+                  <option value="90">90 Days � 3 Months</option>
                 </select>
                 <div class="form-hint" id="sch-end-display" style="color:var(--primary);font-weight:500;"></div>
               </div>
@@ -822,61 +822,61 @@
             <div id="pkg-network-summary" style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin-bottom:14px;display:grid;grid-template-columns:1fr 1fr;gap:12px;">
               <div>
                 <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;font-weight:600;">Screens</div>
-                <div style="font-size:18px;font-weight:700;color:var(--primary)" id="sum-screens">—</div>
+                <div style="font-size:18px;font-weight:700;color:var(--primary)" id="sum-screens">�</div>
               </div>
               <div>
                 <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;font-weight:600;">Package Rate</div>
-                <div style="font-size:18px;font-weight:700;color:var(--primary)" id="sum-cpd">—</div>
+                <div style="font-size:18px;font-weight:700;color:var(--primary)" id="sum-cpd">�</div>
               </div>
               <div>
                 <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;font-weight:600;">Plays / Day</div>
-                <div style="font-size:18px;font-weight:700;" id="sum-impressions">—</div>
+                <div style="font-size:18px;font-weight:700;" id="sum-impressions">�</div>
               </div>
               <div>
                 <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;font-weight:600;">Plays / Month</div>
-                <div style="font-size:18px;font-weight:700;" id="sum-impressions-mo">—</div>
+                <div style="font-size:18px;font-weight:700;" id="sum-impressions-mo">�</div>
               </div>
             </div>
 
             <div class="form-group" style="margin-top:4px;">
-              <label class="form-label">Select Package <span style="color:var(--text3);font-weight:400;">(entire network · all screens)</span></label>
+              <label class="form-label">Select Package <span style="color:var(--text3);font-weight:400;">(entire network � all screens)</span></label>
               <div class="pkg-selector" id="pkg-selector">
                 <div class="pkg-opt" data-pkg="trial" onclick="selectPkg('trial')" style="border-color:#f59e0b;">
                   <div class="pkg-name">Trial <span class="pkg-trial-badge">3 DAYS</span></div>
                   <div class="pkg-slot">8 sec</div>
-                  <div class="pkg-price" style="font-size:22px;">FREE<span style="font-size:11px;font-weight:400;color:var(--text3)"> · ₹0</span></div>
-                  <div class="pkg-ppd">3 days · filler network</div>
+                  <div class="pkg-price" style="font-size:22px;">FREE<span style="font-size:11px;font-weight:400;color:var(--text3)"> � ?0</span></div>
+                  <div class="pkg-ppd">3 days � filler network</div>
                   <div id="pkg-imp-trial" class="pkg-imp"></div>
                   <div class="pkg-desc"><span style="color:var(--text3);font-size:10px;">Best suited for:</span><br>First-time advertisers, event promos</div>
                 </div>
                 <div class="pkg-opt" data-pkg="starter" onclick="selectPkg('starter')">
                   <div class="pkg-name">Starter</div>
                   <div class="pkg-slot">10 sec</div>
-                  <div class="pkg-price">₹1,499<span style="font-size:11px;font-weight:400;color:var(--text3)">/mo</span></div>
-                  <div class="pkg-ppd">≈ ₹50/day</div>
+                  <div class="pkg-price">?1,499<span style="font-size:11px;font-weight:400;color:var(--text3)">/mo</span></div>
+                  <div class="pkg-ppd">� ?50/day</div>
                   <div id="pkg-imp-starter" class="pkg-imp"></div>
                   <div class="pkg-desc"><span style="color:var(--text3);font-size:10px;">Best suited for:</span><br>Tea shops, salons, tuition</div>
                 </div>
                 <div class="pkg-opt selected" data-pkg="complete" onclick="selectPkg('complete')">
-                  <div class="pkg-name">Complete ⭐</div>
+                  <div class="pkg-name">Complete ?</div>
                   <div class="pkg-slot">15 sec</div>
-                  <div class="pkg-price">₹3,499<span style="font-size:11px;font-weight:400;color:var(--text3)">/mo</span></div>
-                  <div class="pkg-ppd">≈ ₹117/day</div>
+                  <div class="pkg-price">?3,499<span style="font-size:11px;font-weight:400;color:var(--text3)">/mo</span></div>
+                  <div class="pkg-ppd">� ?117/day</div>
                   <div id="pkg-imp-complete" class="pkg-imp"></div>
                   <div class="pkg-desc"><span style="color:var(--text3);font-size:10px;">Best suited for:</span><br>Restaurants, clinics, coaching</div>
                 </div>
                 <div class="pkg-opt" data-pkg="growth" onclick="selectPkg('growth')">
                   <div class="pkg-name">Growth</div>
                   <div class="pkg-slot">20 sec</div>
-                  <div class="pkg-price">₹5,999<span style="font-size:11px;font-weight:400;color:var(--text3)">/mo</span></div>
-                  <div class="pkg-ppd">≈ ₹200/day</div>
+                  <div class="pkg-price">?5,999<span style="font-size:11px;font-weight:400;color:var(--text3)">/mo</span></div>
+                  <div class="pkg-ppd">� ?200/day</div>
                   <div id="pkg-imp-growth" class="pkg-imp"></div>
                   <div class="pkg-desc"><span style="color:var(--text3);font-size:10px;">Best suited for:</span><br>Real estate, jewellers, hospitals</div>
                 </div>
               </div>
-              <p style="font-size:12px;color:var(--text3);margin-top:8px;">Video duration must be ≤ your plan's slot. Longer content = rejected at upload.</p>
+              <p style="font-size:12px;color:var(--text3);margin-top:8px;">Video duration must be = your plan's slot. Longer content = rejected at upload.</p>
             </div>
-            <div class="wizard-nav"><button class="btn btn-ghost" onclick="wizardBack(3)">← Back</button><button class="btn btn-primary" onclick="wizardNext(3)">Continue →</button></div>
+            <div class="wizard-nav"><button class="btn btn-ghost" onclick="wizardBack(3)">? Back</button><button class="btn btn-primary" onclick="wizardNext(3)">Continue ?</button></div>
           </div>
 
           <!-- Step 4 -->
@@ -893,7 +893,7 @@
                 <div id="wallet-apply-row" style="display:none;background:rgba(13,148,136,0.07);border:1px solid rgba(13,148,136,0.2);border-radius:8px;padding:10px 12px;margin-bottom:10px;">
                   <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
                     <div>
-                      <div style="font-size:12px;font-weight:600;color:var(--primary);">💰 Wallet Balance: <span id="wallet-avail-lbl">₹0</span></div>
+                      <div style="font-size:12px;font-weight:600;color:var(--primary);">?? Wallet Balance: <span id="wallet-avail-lbl">?0</span></div>
                       <div style="font-size:11px;color:var(--text2);margin-top:2px;" id="wallet-apply-hint"></div>
                     </div>
                     <button class="btn btn-ghost" id="wallet-apply-btn" onclick="toggleWalletApply()" style="font-size:12px;padding:4px 12px;">Apply</button>
@@ -903,7 +903,7 @@
                 <div id="coupon-msg" style="font-size:12px;margin-top:6px;"></div>
               </div>
             </div>
-            <div class="wizard-nav"><button class="btn btn-ghost" onclick="wizardBack(4)">← Back</button><button class="btn btn-primary" id="btn-submit-campaign" onclick="submitCampaign()">Confirm &amp; Pay →</button></div>
+            <div class="wizard-nav"><button class="btn btn-ghost" onclick="wizardBack(4)">? Back</button><button class="btn btn-primary" id="btn-submit-campaign" onclick="submitCampaign()">Confirm &amp; Pay ?</button></div>
           </div>
         </div>
       </div>
@@ -926,17 +926,17 @@
         <div class="stat-grid" style="margin-bottom:20px;">
           <div class="stat-card" style="grid-column:span 2;">
             <div class="stat-label">Wallet Balance</div>
-            <div class="stat-value" id="wallet-balance-display">—</div>
+            <div class="stat-value" id="wallet-balance-display">�</div>
             <div class="stat-sub">Available for campaign booking or refund</div>
           </div>
           <div class="stat-card">
             <div class="stat-label">Total Credited</div>
-            <div class="stat-value" id="wallet-total-in">—</div>
+            <div class="stat-value" id="wallet-total-in">�</div>
             <div class="stat-sub">Pause / cancel refunds</div>
           </div>
           <div class="stat-card">
             <div class="stat-label">Total Used</div>
-            <div class="stat-value" id="wallet-total-out">—</div>
+            <div class="stat-value" id="wallet-total-out">�</div>
             <div class="stat-sub">Resume / new campaigns</div>
           </div>
         </div>
@@ -946,7 +946,7 @@
           <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:12px;">Request Bank Refund</div>
           <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;">
             <div>
-              <label style="font-size:12px;font-weight:600;color:var(--text2);display:block;margin-bottom:4px;">Amount (₹)</label>
+              <label style="font-size:12px;font-weight:600;color:var(--text2);display:block;margin-bottom:4px;">Amount (?)</label>
               <input type="number" id="refund-amount" placeholder="0.00" style="padding:8px 10px;border:1.5px solid var(--border);border-radius:6px;font-size:14px;background:var(--surface);color:var(--text);width:120px;">
             </div>
             <div style="flex:1;min-width:180px;">
@@ -971,8 +971,8 @@
           <div class="profile-section" style="display:flex;align-items:center;gap:12px;padding:14px 18px;margin-bottom:10px;">
             <div class="profile-avatar" id="profile-avatar">R</div>
             <div style="flex:1;min-width:0;">
-              <div style="font-size:15px;font-weight:700;margin-bottom:1px;" id="profile-fullname">—</div>
-              <div style="font-size:12px;color:var(--text2);" id="profile-email-disp">—</div>
+              <div style="font-size:15px;font-weight:700;margin-bottom:1px;" id="profile-fullname">�</div>
+              <div style="font-size:12px;color:var(--text2);" id="profile-email-disp">�</div>
             </div>
           </div>
 
@@ -1069,7 +1069,7 @@
                 <button id="ig-connect-btn" onclick="connectInstagram()" style="padding:6px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:none;background:linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);color:#fff;white-space:nowrap;flex-shrink:0;">Connect</button>
               </div>
               <div style="padding:8px 14px 10px;background:var(--bg);border-top:1px solid var(--border);font-size:11px;color:var(--text2);line-height:1.5;">
-                For Instagram Business accounts — works even without a Facebook Page. Requires a Business or Creator account.
+                For Instagram Business accounts � works even without a Facebook Page. Requires a Business or Creator account.
               </div>
             </div>
 
@@ -1136,7 +1136,7 @@
   <div class="more-sheet-user">
     <div class="more-sheet-avatar" id="more-avatar">R</div>
     <div>
-      <div class="more-sheet-name" id="more-name">—</div>
+      <div class="more-sheet-name" id="more-name">�</div>
       <div class="more-sheet-role" id="more-role">Advertiser</div>
     </div>
   </div>
@@ -1171,7 +1171,7 @@
     <button class="btn btn-ghost btn-sm" onclick="markAllRead()" style="font-size:12px;padding:4px 10px;">Mark all read</button>
   </div>
   <div class="notif-list" id="notif-list">
-    <div style="padding:40px 20px;text-align:center;color:var(--text2);">Loading…</div>
+    <div style="padding:40px 20px;text-align:center;color:var(--text2);">Loading�</div>
   </div>
 </div>
 
@@ -1246,7 +1246,7 @@ let _loginOtpTimer=null;
 async function sendLoginOtp(){
   const mobile=document.getElementById('login-mobile').value.trim();
   if(!mobile){toast('Mobile number daalo','error');return;}
-  const btn=document.getElementById('login-otp-btn');btn.disabled=true;btn.textContent='Sending…';
+  const btn=document.getElementById('login-otp-btn');btn.disabled=true;btn.textContent='Sending�';
   try{
     const r=await fetch(`${API}/auth/send-otp`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mobile})});
     const data=await r.json();if(!r.ok)throw new Error(data.error||'OTP send failed');
@@ -1293,12 +1293,12 @@ async function sendOtp(){
   const mobile=document.getElementById('reg-mobile').value.trim();
   if(!mobile){toast('Mobile number daalo pehle','error');return;}
   const btn=document.getElementById('send-otp-btn');
-  btn.disabled=true;btn.textContent='Sending…';
+  btn.disabled=true;btn.textContent='Sending�';
   try{
     const r=await fetch(`${API}/auth/send-otp`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mobile})});
     const data=await r.json();if(!r.ok)throw new Error(data.error||'OTP send failed');
     document.getElementById('otp-group').classList.remove('hidden');
-    document.getElementById('otp-sent-msg').textContent='✓ OTP aapke WhatsApp pe bheja gaya';
+    document.getElementById('otp-sent-msg').textContent='? OTP aapke WhatsApp pe bheja gaya';
     document.getElementById('register-btn').disabled=false;
     // 10 min countdown
     let secs=600;
@@ -1419,7 +1419,7 @@ function navigate(page, fromPopstate){
   if(page==='wallet')loadWallet();
 }
 
-// Android / browser back button — navigate within SPA, don't exit the app
+// Android / browser back button � navigate within SPA, don't exit the app
 window.addEventListener('popstate', function(e){
   const page = (e.state && e.state.page) || 'dashboard';
   navigate(page, true);
@@ -1479,10 +1479,10 @@ async function renderScreensMap(){
   const mapEl = document.getElementById('screens-map');
   const screensWithCoords = allScreens.filter(s=>s.latitude && s.longitude);
   if(!screensWithCoords.length){
-    mapEl.innerHTML='<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:8px;color:var(--text2);"><svg width="32" height="32" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg><span style="font-size:14px;">Screen coordinates not set yet</span><span style="font-size:12px;color:var(--text3);">Admin panel → Screens → add lat/lng to each screen</span></div>';
+    mapEl.innerHTML='<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:8px;color:var(--text2);"><svg width="32" height="32" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg><span style="font-size:14px;">Screen coordinates not set yet</span><span style="font-size:12px;color:var(--text3);">Admin panel ? Screens ? add lat/lng to each screen</span></div>';
     return;
   }
-  mapEl.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--text2);font-size:13px;">Loading map…</div>';
+  mapEl.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--text2);font-size:13px;">Loading map�</div>';
   try {
     await _loadGoogleMaps();
   } catch(e) {
@@ -1522,10 +1522,10 @@ async function renderScreensMap(){
       <div style="font-size:14px;font-weight:700;margin-bottom:2px;">${s.name}</div>
       <div style="font-size:12px;color:#6b7280;margin-bottom:8px;">${s.location||s.city||''}</div>
       <div style="display:flex;gap:14px;margin-bottom:10px;">
-        <div><div style="font-size:13px;font-weight:700;">${s.approx_footfall>0?Number(s.approx_footfall).toLocaleString('en-IN'):'—'}</div><div style="font-size:10px;color:#9ca3af;">footfall/day</div></div>
+        <div><div style="font-size:13px;font-weight:700;">${s.approx_footfall>0?Number(s.approx_footfall).toLocaleString('en-IN'):'�'}</div><div style="font-size:10px;color:#9ca3af;">footfall/day</div></div>
         <div><div style="font-size:13px;font-weight:700;color:${isOnline?'#10b981':'#f59e0b'};">${s.venue_type||'Screen'}</div><div style="font-size:10px;color:#9ca3af;">${isOnline?'online':'offline'}</div></div>
       </div>
-      <button onclick="navigate('new-campaign')" style="width:100%;padding:7px;background:#10b981;color:#fff;border:none;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">Book Campaign →</button>
+      <button onclick="navigate('new-campaign')" style="width:100%;padding:7px;background:#10b981;color:#fff;border:none;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">Book Campaign ?</button>
     </div>`;
     const infoWin = new google.maps.InfoWindow({ content: popup, maxWidth: 220 });
     marker.addListener('click', () => { infoWin.open(_gmap, marker); });
@@ -1537,8 +1537,8 @@ let _sbcSelected = new Set(); // selected screen ids
 
 function _sbcCard(s){
   const sel=_sbcSelected.has(s.id);
-  const footfall=s.approx_footfall>0?s.approx_footfall.toLocaleString('en-IN'):'—';
-  const venueType=s.venue_type||'—';
+  const footfall=s.approx_footfall>0?s.approx_footfall.toLocaleString('en-IN'):'�';
+  const venueType=s.venue_type||'�';
   const statusLabel=s.status==='online'?'Online':s.status==='maintenance'?'Maintenance':'Offline';
   const statusColor=s.status==='online'?'#22c55e':s.status==='maintenance'?'#f59e0b':'#ef4444';
   return `<div class="screen-browse-card${sel?' sbc-selected':''}" id="sbc-card-${s.id}" onclick="_sbcToggle('${s.id}',event)">
@@ -1550,13 +1550,13 @@ function _sbcCard(s){
       <div class="sbc-cb${sel?' checked':''}" onclick="_sbcToggle('${s.id}',event)">
         ${sel?`<svg width="10" height="10" fill="none" viewBox="0 0 24 24" stroke="#fff" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>`:''}
       </div>
-      ${venueType!=='—'?`<div class="sbc-type-tag">${venueType}</div>`:''}
+      ${venueType!=='�'?`<div class="sbc-type-tag">${venueType}</div>`:''}
     </div>
     <div class="sbc-body">
       <div class="sbc-name">${s.name}</div>
       <div class="sbc-location">
         <svg width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-        ${s.location||s.city||'—'}
+        ${s.location||s.city||'�'}
       </div>
       <div class="sbc-divider"></div>
       <div class="sbc-stats">
@@ -1564,7 +1564,7 @@ function _sbcCard(s){
         <div class="sbc-stat-sep"></div>
         <div class="sbc-stat"><div class="sbc-stat-val" style="color:${statusColor};">${statusLabel}</div><div class="sbc-stat-lbl">status</div></div>
       </div>
-      <button class="sbc-book-btn" onclick="_sbcBookOne('${s.id}',event)">Book Campaign →</button>
+      <button class="sbc-book-btn" onclick="_sbcBookOne('${s.id}',event)">Book Campaign ?</button>
     </div>
   </div>`;
 }
@@ -1614,7 +1614,7 @@ function _sbcUpdateBar(){
   if(_sbcSelected.size===0){ bar.style.display='none'; return; }
   bar.style.display='flex';
   const totalFootfall=Array.from(_sbcSelected).reduce((sum,id)=>{ const s=allScreens.find(x=>x.id===id); return sum+(s&&s.approx_footfall?s.approx_footfall:0); },0);
-  const footfallTxt=totalFootfall>0?` · ~${totalFootfall.toLocaleString('en-IN')} footfall/day`:'';
+  const footfallTxt=totalFootfall>0?` � ~${totalFootfall.toLocaleString('en-IN')} footfall/day`:'';
   cnt.textContent=`${_sbcSelected.size} screen${_sbcSelected.size>1?'s':''} selected${footfallTxt}`;
 }
 
@@ -1675,15 +1675,15 @@ async function renderScreensList(){
           <div id="sbc-gcb-${id}" class="sbc-grp-cb checked" onclick="_sbcGroupToggle('${id}',[${screenIds.map(x=>`'${x}'`).join(',')}],event)"><svg width="10" height="10" fill="none" viewBox="0 0 24 24" stroke="#fff" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></div>
           <div class="sbc-group-name">
             <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-            ${name}${desc?`<span class="sbc-group-desc">· ${desc}</span>`:''}
+            ${name}${desc?`<span class="sbc-group-desc">� ${desc}</span>`:''}
           </div>
         </div>
         <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
           <div class="sbc-group-meta">
             <span>${screenIds.length} screen${screenIds.length!==1?'s':''}</span>
-            <span style="color:var(--text3);">·</span>
+            <span style="color:var(--text3);">�</span>
             <span style="color:#22c55e;">${onlineCount} online</span>
-            ${footfallTxt?`<span style="color:var(--text3);">·</span><span style="font-weight:700;">${footfallTxt}</span>`:''}
+            ${footfallTxt?`<span style="color:var(--text3);">�</span><span style="font-weight:700;">${footfallTxt}</span>`:''}
           </div>
           <svg id="sbc-chev-${id}" class="sbc-chevron open" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
         </div>
@@ -1731,7 +1731,7 @@ async function loadDashboard(){
     document.getElementById('stat-active-sub').textContent=`${allCampaigns.length} total`;
     document.getElementById('stat-impr').textContent=impr>999999?`${(impr/1000000).toFixed(1)}M`:impr>999?`${(impr/1000).toFixed(1)}K`:impr||'0';
     document.getElementById('stat-impr-sub').textContent='All campaigns';
-    document.getElementById('stat-spent').textContent=`₹${spent.toLocaleString('en-IN')}`;
+    document.getElementById('stat-spent').textContent=`?${spent.toLocaleString('en-IN')}`;
     document.getElementById('stat-spent-sub').textContent=`${allInvoices.filter(i=>i.status==='paid').length} invoices`;
     document.getElementById('stat-pending').textContent=pending||0;
     document.getElementById('stat-pending-sub').textContent=pending?'Need attention':'All clear';
@@ -1742,7 +1742,7 @@ async function loadDashboard(){
 
     }else{
       rclEl.innerHTML=`<div class="table-wrap"><table><thead><tr><th>Campaign</th><th>Status</th><th>Dates</th><th>Amount</th></tr></thead><tbody>${recent.map(c=>`
-        <tr><td class="td-bold">${c.title||c.campaign_code}</td><td>${statusBadge(c.status)}</td><td style="font-size:12px;color:var(--text2);">${fmtDate(c.start_date)} – ${fmtDate(c.end_date)}</td><td style="font-weight:600;">₹${parseFloat(c.amount_total||0).toLocaleString('en-IN')}</td></tr>`).join('')}</tbody></table></div>`;
+        <tr><td class="td-bold">${c.title||c.campaign_code}</td><td>${statusBadge(c.status)}</td><td style="font-size:12px;color:var(--text2);">${fmtDate(c.start_date)} � ${fmtDate(c.end_date)}</td><td style="font-weight:600;">?${parseFloat(c.amount_total||0).toLocaleString('en-IN')}</td></tr>`).join('')}</tbody></table></div>`;
     }
   }catch(e){toast('Could not load dashboard','error');}
 }
@@ -1750,7 +1750,7 @@ async function loadDashboard(){
 async function loadCampaigns(){
   try{const data=await api('/campaigns?limit=100');allCampaigns=Array.isArray(data)?data:(data.campaigns||data.data||[]);renderCampaignsTable(allCampaigns);}
   catch(e){toast('Could not load campaigns','error');}
-  // Refresh wallet balance — a rejected campaign may have triggered a refund
+  // Refresh wallet balance � a rejected campaign may have triggered a refund
   loadWallet().catch(()=>{});
 }
 
@@ -1775,29 +1775,29 @@ function renderCampaignsTable(campaigns){
         ${c.creative_url&&c.creative_type==='image'
           ?`<img src="${c.creative_url}" alt="${c.creative_name||'creative'}" style="width:56px;height:42px;object-fit:cover;border-radius:4px;border:1px solid var(--border);cursor:zoom-in;" onclick="openLightbox('${c.creative_url}','${(c.creative_name||'').replace(/'/g,"\\'")}','image')" title="Click to preview">`
           :c.creative_url&&c.creative_type==='video'
-          ?`<div style="width:56px;height:42px;background:var(--surface2);border-radius:4px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:20px;cursor:zoom-in;" onclick="openLightbox('${c.creative_url}','${(c.creative_name||'').replace(/'/g,"\\'")}','video')" title="Click to preview">🎬</div>`
-          :'<div style="width:56px;height:42px;background:var(--surface2);border-radius:4px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:10px;">—</div>'}
+          ?`<div style="width:56px;height:42px;background:var(--surface2);border-radius:4px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:20px;cursor:zoom-in;" onclick="openLightbox('${c.creative_url}','${(c.creative_name||'').replace(/'/g,"\\'")}','video')" title="Click to preview">??</div>`
+          :'<div style="width:56px;height:42px;background:var(--surface2);border-radius:4px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:10px;">�</div>'}
       </td>
       <td>
         ${statusBadge(c.status)}
-        ${c.ai_review_status==='approved'?'<div style="font-size:10px;color:var(--success);margin-top:2px;">✓ AI Approved</div>':c.ai_review_status==='pending'&&c.status==='pending_approval'?'<div style="font-size:10px;color:var(--warning);margin-top:2px;">⏳ AI Review…</div>':''}
-        ${c.status==='rejected'&&c.rejection_reason?`<div class="rejection-reason" title="${c.rejection_reason}">✗ ${c.rejection_reason.substring(0,80)}${c.rejection_reason.length>80?'…':''}</div>`:''}
+        ${c.ai_review_status==='approved'?'<div style="font-size:10px;color:var(--success);margin-top:2px;">? AI Approved</div>':c.ai_review_status==='pending'&&c.status==='pending_approval'?'<div style="font-size:10px;color:var(--warning);margin-top:2px;">? AI Review�</div>':''}
+        ${c.status==='rejected'&&c.rejection_reason?`<div class="rejection-reason" title="${c.rejection_reason}">? ${c.rejection_reason.substring(0,80)}${c.rejection_reason.length>80?'�':''}</div>`:''}
       </td>
       <td style="font-size:13px;">${fmtDate(c.start_date)}</td>
       <td style="font-size:13px;">${fmtDate(c.end_date)}</td>
-      <td style="font-weight:600;">₹${parseFloat(c.amount_total||0).toLocaleString('en-IN')}</td>
+      <td style="font-weight:600;">?${parseFloat(c.amount_total||0).toLocaleString('en-IN')}</td>
       <td>${payBadge(c.payment_status)}</td>
       <td>
         <div class="camp-actions">
         ${c.status==='pending_payment'?`<button class="ca-btn ca-primary" onclick="submitForApproval('${c.id}',this)" title="Complete Payment"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>Pay Now</button>`:''}
-        ${c.status==='pending_payment'&&['admin','superadmin'].includes(currentUser?.role)?`<button class="ca-btn" style="background:var(--warning,#f59e0b);color:#fff;font-size:10px;" onclick="adminTestPay('${c.id}',this)" title="Mark Paid (Test — bypass Razorpay)">Test Pay</button>`:''}
+        ${c.status==='pending_payment'&&['admin','superadmin'].includes(currentUser?.role)?`<button class="ca-btn" style="background:var(--warning,#f59e0b);color:#fff;font-size:10px;" onclick="adminTestPay('${c.id}',this)" title="Mark Paid (Test � bypass Razorpay)">Test Pay</button>`:''}
         ${c.status==='rejected'?`<button class="ca-btn ca-primary" onclick="navigate('new-campaign')" title="Book Again"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"/></svg></button>`:''}
         ${c.status==='live'?`<button class="ca-btn ca-default" onclick="campaignPause('${c.id}',this)" title="Pause Campaign"><svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg></button>`:''}
         ${c.status==='paused'?`<button class="ca-btn ca-primary" onclick="campaignResume('${c.id}',this)" title="Resume Campaign"><svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></button>`:''}
         ${['live','paused','approved'].includes(c.status)?`<button class="ca-btn ca-purple${c.creative_change_status==='pending'?' ca-pulse':''}" onclick="openCreativeModal('${c.id}','${(c.title||'').replace(/'/g,"\\'")}','${c.creative_change_status||''}')" title="${c.creative_change_status==='pending'?'Creative review pending':'Change Creative'}"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>`:''}
         ${['live','approved','paused'].includes(c.status)&&c.creative_type==='image'?`<button class="ca-btn ca-teal${c.qr_enabled?' ca-active':''}" onclick="openQRModal('${c.id}','${(c.campaign_code||'').replace(/'/g,"\\'")}','${(c.title||'').replace(/'/g,"\\'")}',${c.qr_enabled?'true':'false'},'${c.qr_placement||'bot-right'}','${c.qr_phone||''}',${c.qr_content_url?`'${c.qr_content_url}'`:'null'},'${(c.qr_message||'').replace(/'/g,"\\'")}')" title="${c.qr_enabled?'QR Active':'Enable QR Overlay'}"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="3" height="3"/><rect x="18" y="18" width="3" height="3"/><rect x="14" y="18" width="3" height="3"/><rect x="18" y="14" width="3" height="3"/></svg></button>`:''}
         ${['live','paused','approved'].includes(c.status)?`<button class="ca-btn ca-danger" onclick="campaignCancel('${c.id}','${(c.title||c.campaign_code).replace(/'/g,"\\'")}')` + `" title="Cancel Campaign"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></button>`:''}
-        ${!['pending_payment','rejected','live','approved','paused'].includes(c.status)?'<span style="color:var(--text3);font-size:12px;">—</span>':''}
+        ${!['pending_payment','rejected','live','approved','paused'].includes(c.status)?'<span style="color:var(--text3);font-size:12px;">�</span>':''}
         </div>
       </td>
     </tr>`).join('')}</tbody></table></div>`;
@@ -1817,13 +1817,13 @@ function renderInvoicesTable(invoices){
   const wrap=document.getElementById('invoices-table-wrap');
   if(!invoices.length){wrap.innerHTML=`<div class="empty-state"><div class="empty-icon"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg></div><div class="empty-title">No invoices found</div></div>`;return;}
   const pmLabel={razorpay:'Razorpay',wallet:'Wallet',free:'Free',cash:'Cash'};
-  const pmBadge=m=>{const l=pmLabel[m]||m||'—';const color=m==='wallet'?'var(--primary)':m==='free'?'var(--text3)':'#6366f1';return`<span style="font-size:11px;font-weight:600;color:${color};background:${color}18;padding:2px 8px;border-radius:12px;">${l}</span>`;};
-  const invBadge=s=>s==='refunded'?`<span class="status-badge" style="background:rgba(239,68,68,0.12);color:var(--danger);">↩ Refunded</span>`:payBadge(s);
+  const pmBadge=m=>{const l=pmLabel[m]||m||'�';const color=m==='wallet'?'var(--primary)':m==='free'?'var(--text3)':'#6366f1';return`<span style="font-size:11px;font-weight:600;color:${color};background:${color}18;padding:2px 8px;border-radius:12px;">${l}</span>`;};
+  const invBadge=s=>s==='refunded'?`<span class="status-badge" style="background:rgba(239,68,68,0.12);color:var(--danger);">? Refunded</span>`:payBadge(s);
   wrap.innerHTML=`<div class="table-wrap"><table><thead><tr><th>Invoice #</th><th>Campaign</th><th>Date</th><th>Base</th><th>GST (18%)</th><th>Total</th><th>Payment</th><th>Status</th></tr></thead><tbody>${invoices.map(i=>`
-    <tr><td class="td-bold">${i.invoice_number}</td><td style="font-size:13px;">${i.campaign_code||'—'}</td><td style="font-size:13px;">${fmtDate(i.issued_at)}</td><td>₹${parseFloat(i.amount_base||0).toLocaleString('en-IN')}</td><td>₹${parseFloat(i.amount_gst||0).toLocaleString('en-IN')}</td><td style="font-weight:600;">₹${parseFloat(i.amount_total||0).toLocaleString('en-IN')}</td><td>${pmBadge(i.payment_method)}</td><td>${invBadge(i.status)}</td></tr>`).join('')}</tbody></table></div>`;
+    <tr><td class="td-bold">${i.invoice_number}</td><td style="font-size:13px;">${i.campaign_code||'�'}</td><td style="font-size:13px;">${fmtDate(i.issued_at)}</td><td>?${parseFloat(i.amount_base||0).toLocaleString('en-IN')}</td><td>?${parseFloat(i.amount_gst||0).toLocaleString('en-IN')}</td><td style="font-weight:600;">?${parseFloat(i.amount_total||0).toLocaleString('en-IN')}</td><td>${pmBadge(i.payment_method)}</td><td>${invBadge(i.status)}</td></tr>`).join('')}</tbody></table></div>`;
 }
 
-// ── PROOF OF PLAY ────────────────────────────────────────────────────────
+// -- PROOF OF PLAY --------------------------------------------------------
 let _popCampaigns=[];
 
 async function initPop(){
@@ -1848,7 +1848,7 @@ async function initPop(){
 async function loadPop(){
   const tbody=document.getElementById('pop-tbody');
   const summary=document.getElementById('pop-summary');
-  tbody.innerHTML=`<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text2);">Loading…</td></tr>`;
+  tbody.innerHTML=`<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text2);">Loading�</td></tr>`;
   const start=document.getElementById('pop-start').value;
   const end=document.getElementById('pop-end').value;
   const campId=document.getElementById('pop-campaign-filter').value;
@@ -1868,14 +1868,14 @@ async function loadPop(){
       return;
     }
     tbody.innerHTML=rows.map(r=>{
-      const playedAt=r.played_at?new Date(r.played_at).toLocaleString('en-IN',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}):'—';
+      const playedAt=r.played_at?new Date(r.played_at).toLocaleString('en-IN',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}):'�';
       const srcBadge=r.source==='server'?`<span style="font-size:10px;background:#fef3c7;color:#92400e;border-radius:4px;padding:1px 6px;font-weight:600;">estimated</span>`:`<span style="font-size:10px;background:#f0fdf4;color:#166534;border-radius:4px;padding:1px 6px;font-weight:600;">live</span>`;
       return`<tr style="border-bottom:1px solid var(--border);">
         <td style="padding:9px 12px;white-space:nowrap;">${playedAt}</td>
-        <td style="padding:9px 12px;font-weight:500;">${r.screen_name||r.screen_code||'—'}</td>
-        <td style="padding:9px 12px;color:var(--text2);">${r.screen_city||'—'}</td>
-        <td style="padding:9px 12px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${r.campaign_title||''}">${r.campaign_title||'—'}</td>
-        <td style="padding:9px 12px;text-align:right;">${r.duration_sec||'—'}</td>
+        <td style="padding:9px 12px;font-weight:500;">${r.screen_name||r.screen_code||'�'}</td>
+        <td style="padding:9px 12px;color:var(--text2);">${r.screen_city||'�'}</td>
+        <td style="padding:9px 12px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${r.campaign_title||''}">${r.campaign_title||'�'}</td>
+        <td style="padding:9px 12px;text-align:right;">${r.duration_sec||'�'}</td>
         <td style="padding:9px 12px;text-align:right;font-weight:600;">${fmtNum(r.play_count||1)}</td>
         <td style="padding:9px 12px;">${srcBadge}</td>
       </tr>`;
@@ -1916,7 +1916,7 @@ function setAnPeriod(period,el){
 }
 
 function fmtNum(n){
-  if(n==null||n===''||isNaN(n))return'—';
+  if(n==null||n===''||isNaN(n))return'�';
   n=parseInt(n);
   if(n>=10000000)return`${(n/10000000).toFixed(1)}Cr`;
   if(n>=100000)return`${(n/100000).toFixed(1)}L`;
@@ -2002,7 +2002,7 @@ async function loadAnalytics(){
       document.getElementById('an-screens').textContent=fmtNum(uniqueScreens);
       document.getElementById('an-campaigns').textContent=fmtNum(uniqueCamps);
       document.getElementById('an-impr').textContent='~'+fmtNum(totalProjPlays*150);
-      document.getElementById('an-chart-title').textContent='Est. Plays — '+(labels[anPeriod]||'Selected Period');
+      document.getElementById('an-chart-title').textContent='Est. Plays � '+(labels[anPeriod]||'Selected Period');
       if(banner) banner.style.display='flex';
 
       const max=Math.max(...projChart.map(r=>r.plays),1);
@@ -2016,7 +2016,7 @@ async function loadAnalytics(){
       tbl.innerHTML=`<table class="data-table"><thead><tr><th>Campaign</th><th>Code</th><th>Est. Plays/Day</th><th>Screens</th><th>Package</th><th>Status</th></tr></thead><tbody>${
         projected.map(c=>{
           const ppd=_projPlaysPerScreen(c.slot_duration_sec)*parseInt(c.screen_count||1);
-          return`<tr><td>${c.title||'—'}</td><td><code>${c.campaign_code||'—'}</code></td><td style="color:var(--primary);font-weight:600;">~${fmtNum(ppd)}</td><td>${fmtNum(c.screen_count)}</td><td><span style="text-transform:capitalize;">${c.package_name||'—'}</span></td><td><span class="badge badge-${c.status==='live'?'success':c.status==='approved'?'info':c.status==='completed'?'default':'warning'}">${c.status||'—'}</span></td></tr>`;
+          return`<tr><td>${c.title||'�'}</td><td><code>${c.campaign_code||'�'}</code></td><td style="color:var(--primary);font-weight:600;">~${fmtNum(ppd)}</td><td>${fmtNum(c.screen_count)}</td><td><span style="text-transform:capitalize;">${c.package_name||'�'}</span></td><td><span class="badge badge-${c.status==='live'?'success':c.status==='approved'?'info':c.status==='completed'?'default':'warning'}">${c.status||'�'}</span></td></tr>`;
         }).join('')
       }</tbody></table>`;
     }else{
@@ -2025,7 +2025,7 @@ async function loadAnalytics(){
       document.getElementById('an-screens').textContent=fmtNum(st.screens_used);
       document.getElementById('an-campaigns').textContent=fmtNum(st.campaigns_active);
       document.getElementById('an-impr').textContent=fmtNum(plays*150);
-      document.getElementById('an-chart-title').textContent='Plays — '+(labels[anPeriod]||'Selected Period');
+      document.getElementById('an-chart-title').textContent='Plays � '+(labels[anPeriod]||'Selected Period');
 
       const chart=data.chart||[];
       if(!chart.length){
@@ -2045,7 +2045,7 @@ async function loadAnalytics(){
         tbl.innerHTML='<div class="empty-state"><div class="empty-title">No campaign data</div><div class="empty-sub">No plays recorded in this period.</div></div>';
       }else{
         tbl.innerHTML=`<table class="data-table"><thead><tr><th>Campaign</th><th>Code</th><th>Plays</th><th>Screens</th><th>QR Scans</th><th>Status</th></tr></thead><tbody>${
-          camps.map(c=>`<tr><td>${c.title||'—'}</td><td><code>${c.campaign_code||'—'}</code></td><td>${fmtNum(c.plays)}</td><td>${fmtNum(c.screens)}</td><td>${c.qr_enabled?`<span style="color:var(--primary);font-weight:600;">${fmtNum(c.qr_scans)}</span>`:'<span style="color:var(--text3);font-size:11px;">—</span>'}</td><td><span class="badge badge-${c.status==='live'?'success':c.status==='paused'?'warning':'default'}">${c.status||'—'}</span></td></tr>`).join('')
+          camps.map(c=>`<tr><td>${c.title||'�'}</td><td><code>${c.campaign_code||'�'}</code></td><td>${fmtNum(c.plays)}</td><td>${fmtNum(c.screens)}</td><td>${c.qr_enabled?`<span style="color:var(--primary);font-weight:600;">${fmtNum(c.qr_scans)}</span>`:'<span style="color:var(--text3);font-size:11px;">�</span>'}</td><td><span class="badge badge-${c.status==='live'?'success':c.status==='paused'?'warning':'default'}">${c.status||'�'}</span></td></tr>`).join('')
         }</tbody></table>`;
       }
     }
@@ -2283,7 +2283,7 @@ async function checkTrialUsed(){
     trialCard.onclick=()=>selectPkg('trial');
     const badge=trialCard.querySelector('.pkg-trial-badge');
     if(badge)badge.textContent='3 DAYS';
-    trialCard.querySelector('.pkg-ppd').textContent='3 days · filler network';
+    trialCard.querySelector('.pkg-ppd').textContent='3 days � filler network';
   }
 }
 
@@ -2292,7 +2292,7 @@ let allScreenGroups=[];
 async function renderWizardScreens(){
   const grid=document.getElementById('wizard-screens-grid');
   if(!allScreens.length){
-    grid.innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:32px;color:var(--text2);">Loading screens…</div>`;
+    grid.innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:32px;color:var(--text2);">Loading screens�</div>`;
     await loadScreens();
   }
   // Load groups
@@ -2313,7 +2313,7 @@ async function renderWizardScreens(){
     groupsWrap.style.display='none';
   }
 
-  grid.innerHTML=allScreens.map(s=>`<div class="screen-card ${selectedScreenIds.includes(s.id)?'selected':''}" id="sc-card-${s.id}" onclick="toggleScreen('${s.id}',this)"><div class="screen-name">${s.name}</div><div class="screen-loc">${s.location||s.city||'—'}</div><div style="display:flex;align-items:center;justify-content:space-between;"><div class="screen-price">${s.approx_footfall>0?'~'+s.approx_footfall.toLocaleString('en-IN')+' footfall/day':'—'}</div><div style="width:7px;height:7px;border-radius:50%;background:${s.status==='online'?'var(--success)':'var(--warning)'};"></div></div><div style="font-size:11px;color:var(--text2);margin-top:6px;">${s.venue_type||'Screen'} · ${s.zone||'A'} zone</div></div>`).join('');
+  grid.innerHTML=allScreens.map(s=>`<div class="screen-card ${selectedScreenIds.includes(s.id)?'selected':''}" id="sc-card-${s.id}" onclick="toggleScreen('${s.id}',this)"><div class="screen-name">${s.name}</div><div class="screen-loc">${s.location||s.city||'�'}</div><div style="display:flex;align-items:center;justify-content:space-between;"><div class="screen-price">${s.approx_footfall>0?'~'+s.approx_footfall.toLocaleString('en-IN')+' footfall/day':'�'}</div><div style="width:7px;height:7px;border-radius:50%;background:${s.status==='online'?'var(--success)':'var(--warning)'};"></div></div><div style="font-size:11px;color:var(--text2);margin-top:6px;">${s.venue_type||'Screen'} � ${s.zone||'A'} zone</div></div>`).join('');
 }
 
 function selectGroup(groupId){
@@ -2329,7 +2329,7 @@ function selectGroup(groupId){
   const cnt=selectedScreenIds.length;
   document.getElementById('selected-count').textContent=cnt?`${cnt} screen${cnt>1?'s':''} selected`:'';
   document.getElementById('btn-next-1').disabled=!cnt;
-  toast(`${group.name} — ${group.screens.length} screen${group.screens.length!==1?'s':''} selected`,'success');
+  toast(`${group.name} � ${group.screens.length} screen${group.screens.length!==1?'s':''} selected`,'success');
 }
 
 function toggleScreen(id,el){
@@ -2345,7 +2345,7 @@ function updateWizardUI(step){
   for(let i=1;i<=4;i++){
     document.getElementById(`wp${i}`).classList.toggle('active',i===step);
     const num=document.getElementById(`ws${i}`);const lbl=document.getElementById(`wl${i}`);
-    if(i<step){num.className='ws-num done';num.innerHTML='✓';lbl.className='ws-label done';}
+    if(i<step){num.className='ws-num done';num.innerHTML='?';lbl.className='ws-label done';}
     else if(i===step){num.className='ws-num active';num.textContent=i;lbl.className='ws-label active';}
     else{num.className='ws-num pending';num.textContent=i;lbl.className='ws-label';}
     if(i<4)document.getElementById(`wc${i}`).classList.toggle('done',i<step);
@@ -2365,14 +2365,14 @@ async function wizardNext(step){
     if(!name){toast('Enter a campaign name','error');return;}
     if(!uploadedFile&&!uploadedContentId){toast('Upload your creative file','error');return;}
     if(!uploadedContentId){
-      const btn=document.getElementById('btn-next-2');btn.innerHTML='<div class="loading-spinner"></div> Uploading…';btn.disabled=true;
+      const btn=document.getElementById('btn-next-2');btn.innerHTML='<div class="loading-spinner"></div> Uploading�';btn.disabled=true;
       try{
         const fd=new FormData();fd.append('file',uploadedFile);
         const r=await fetch(`${API}/content/upload`,{method:'POST',headers:{Authorization:`Bearer ${token}`},body:fd});
         const data=await r.json();if(!r.ok)throw new Error(data.error||'Upload failed');
         uploadedContentId=data.content?.id||data.id;toast('Creative uploaded!','success');
-      }catch(e){toast(e.message,'error');document.getElementById('btn-next-2').innerHTML='Continue →';document.getElementById('btn-next-2').disabled=false;return;}
-      document.getElementById('btn-next-2').innerHTML='Continue →';
+      }catch(e){toast(e.message,'error');document.getElementById('btn-next-2').innerHTML='Continue ?';document.getElementById('btn-next-2').disabled=false;return;}
+      document.getElementById('btn-next-2').innerHTML='Continue ?';
     }
     updateWizardUI(3);updateNetworkSummary();
   }else if(step===3){
@@ -2385,7 +2385,7 @@ async function wizardNext(step){
 }
 
 const PKG_RATES={
-  trial:    {ppd:0,   flat:0,    monthly:0,    slot:8,  multiplier:0, label:'Trial (8s · 3 days)',  fixedDays:3},
+  trial:    {ppd:0,   flat:0,    monthly:0,    slot:8,  multiplier:0, label:'Trial (8s � 3 days)',  fixedDays:3},
   starter:  {ppd:50,  flat:1499, monthly:1499, slot:10, multiplier:1, label:'Starter (10s)'},
   complete: {ppd:117, flat:3499, monthly:3499, slot:15, multiplier:2, label:'Complete (15s)'},
   growth:   {ppd:200, flat:5999, monthly:5999, slot:20, multiplier:3, label:'Growth (20s)'},
@@ -2398,12 +2398,12 @@ function selectPkg(pkg){
   // Trial locks duration to 3 days; paid plans get normal options
   const durEl=document.getElementById('sch-duration');
   if(pkg==='trial'){
-    durEl.innerHTML='<option value="3">3 Days (FREE · Trial)</option>';
+    durEl.innerHTML='<option value="3">3 Days (FREE � Trial)</option>';
     durEl.value='3';
     durEl.disabled=true;
   } else {
     if(durEl.querySelector('option[value="3"]')){
-      durEl.innerHTML=`<option value="15">15 Days — Half Month</option><option value="30" selected>30 Days — 1 Month</option><option value="60">60 Days — 2 Months</option><option value="90">90 Days — 3 Months</option>`;
+      durEl.innerHTML=`<option value="15">15 Days � Half Month</option><option value="30" selected>30 Days � 1 Month</option><option value="60">60 Days � 2 Months</option><option value="90">90 Days � 3 Months</option>`;
       durEl.value='30';
     }
     durEl.disabled=false;
@@ -2478,7 +2478,7 @@ function updateNetworkSummary(){
     impDay=playsPerScreen*n; impMo=impDay*30;
   }
   const dur=parseInt(document.getElementById('sch-duration')?.value)||30;
-  const pkgRateLabel=rate.fixedDays?'FREE (₹0)':`₹${rate.monthly.toLocaleString('en-IN')}/mo`;
+  const pkgRateLabel=rate.fixedDays?'FREE (?0)':`?${rate.monthly.toLocaleString('en-IN')}/mo`;
   document.getElementById('sum-screens').textContent=rate.fixedDays?'Filler network':n+' screens';
   document.getElementById('sum-impressions').textContent='~'+impDay.toLocaleString('en-IN');
   document.getElementById('sum-impressions-mo').textContent='~'+impMo.toLocaleString('en-IN');
@@ -2486,7 +2486,7 @@ function updateNetworkSummary(){
   ['trial','starter','complete','growth'].forEach(p=>{
     const el=document.getElementById('pkg-imp-'+p);if(!el)return;
     const r=PKG_RATES[p];
-    if(r.fixedDays){ el.textContent='~1,200/day · filler slots'; return; }
+    if(r.fixedDays){ el.textContent='~1,200/day � filler slots'; return; }
     const plays=Math.round((54000/850)*r.multiplier)*n;
     el.textContent='~'+plays.toLocaleString('en-IN')+' plays/day';
   });
@@ -2510,11 +2510,11 @@ function renderReview(){
   const rate=PKG_RATES[selectedPkg]||PKG_RATES.complete;
   document.getElementById('review-details').innerHTML=`
     <div class="review-row"><span class="review-key">Campaign</span><span class="review-val">${document.getElementById('cmp-name').value}</span></div>
-    <div class="review-row"><span class="review-key">Package</span><span class="review-val" style="color:var(--primary);font-weight:600;">${rate.label} — Entire Network</span></div>
+    <div class="review-row"><span class="review-key">Package</span><span class="review-val" style="color:var(--primary);font-weight:600;">${rate.label} � Entire Network</span></div>
     <div class="review-row"><span class="review-key">Duration</span><span class="review-val">${days} days</span></div>
-    <div class="review-row"><span class="review-key">Period</span><span class="review-val">${fmtDate(start)} – ${fmtDate(end)}</span></div>
-    <div class="review-row"><span class="review-key">Time Window</span><span class="review-val">${document.getElementById('sch-time-start').value} – ${document.getElementById('sch-time-end').value}</span></div>
-    <div class="review-row"><span class="review-key">Rate</span><span class="review-val">${rate.fixedDays?'FREE (₹0 · 3 days)':days>=28&&rate.monthly?'₹'+rate.monthly.toLocaleString('en-IN')+'/mo (monthly flat)':'₹'+rate.ppd.toLocaleString('en-IN')+'/day × '+days+' days'}</span></div>`;
+    <div class="review-row"><span class="review-key">Period</span><span class="review-val">${fmtDate(start)} � ${fmtDate(end)}</span></div>
+    <div class="review-row"><span class="review-key">Time Window</span><span class="review-val">${document.getElementById('sch-time-start').value} � ${document.getElementById('sch-time-end').value}</span></div>
+    <div class="review-row"><span class="review-key">Rate</span><span class="review-val">${rate.fixedDays?'FREE (?0 � 3 days)':days>=28&&rate.monthly?'?'+rate.monthly.toLocaleString('en-IN')+'/mo (monthly flat)':'?'+rate.ppd.toLocaleString('en-IN')+'/day � '+days+' days'}</span></div>`;
   renderPricing();
 }
 
@@ -2530,21 +2530,21 @@ function renderPricing(){
   const applyBtn=document.getElementById('wallet-apply-btn');
   if(walletBalance>0&&campaignCost.total>0){
     walletRow.style.display='block';
-    availLbl.textContent='₹'+walletBalance.toLocaleString('en-IN',{minimumFractionDigits:2});
+    availLbl.textContent='?'+walletBalance.toLocaleString('en-IN',{minimumFractionDigits:2});
     if(walletApplied){
-      hintEl.textContent=walletUse===afterDisc?'Full amount covered by wallet — no payment needed!':`₹${walletUse.toLocaleString('en-IN')} from wallet, ₹${due.toLocaleString('en-IN')} via Razorpay`;
+      hintEl.textContent=walletUse===afterDisc?'Full amount covered by wallet � no payment needed!':`?${walletUse.toLocaleString('en-IN')} from wallet, ?${due.toLocaleString('en-IN')} via Razorpay`;
       applyBtn.textContent='Remove';applyBtn.style.color='var(--danger)';
     } else {
-      hintEl.textContent=`Apply ₹${Math.min(walletBalance,afterDisc).toLocaleString('en-IN')} from wallet to reduce payment`;
+      hintEl.textContent=`Apply ?${Math.min(walletBalance,afterDisc).toLocaleString('en-IN')} from wallet to reduce payment`;
       applyBtn.textContent='Apply';applyBtn.style.color='';
     }
   } else { walletRow.style.display='none'; }
   document.getElementById('review-pricing').innerHTML=`
-    <div class="review-row"><span class="review-key">Subtotal</span><span class="review-val">₹${campaignCost.base.toLocaleString('en-IN')}</span></div>
-    ${disc?`<div class="review-row"><span class="review-key" style="color:var(--success);">Coupon</span><span class="review-val" style="color:var(--success);">−₹${disc.toLocaleString('en-IN')}</span></div>`:''}
-    <div class="review-row"><span class="review-key">GST (18%)</span><span class="review-val">₹${campaignCost.gst.toLocaleString('en-IN')}</span></div>
-    ${walletUse>0?`<div class="review-row"><span class="review-key" style="color:var(--primary);">Wallet</span><span class="review-val" style="color:var(--primary);">−₹${walletUse.toLocaleString('en-IN')}</span></div>`:''}
-    <div class="review-total"><span>${due===0?'Total (Wallet)':'Total Due'}</span><span style="color:var(--primary);">₹${due.toLocaleString('en-IN')}</span></div>`;
+    <div class="review-row"><span class="review-key">Subtotal</span><span class="review-val">?${campaignCost.base.toLocaleString('en-IN')}</span></div>
+    ${disc?`<div class="review-row"><span class="review-key" style="color:var(--success);">Coupon</span><span class="review-val" style="color:var(--success);">-?${disc.toLocaleString('en-IN')}</span></div>`:''}
+    <div class="review-row"><span class="review-key">GST (18%)</span><span class="review-val">?${campaignCost.gst.toLocaleString('en-IN')}</span></div>
+    ${walletUse>0?`<div class="review-row"><span class="review-key" style="color:var(--primary);">Wallet</span><span class="review-val" style="color:var(--primary);">-?${walletUse.toLocaleString('en-IN')}</span></div>`:''}
+    <div class="review-total"><span>${due===0?'Total (Wallet)':'Total Due'}</span><span style="color:var(--primary);">?${due.toLocaleString('en-IN')}</span></div>`;
 }
 
 function toggleWalletApply(){
@@ -2558,36 +2558,36 @@ async function applyCoupon(){
   try{
     const data=await api('/coupons/validate',{method:'POST',body:JSON.stringify({code,amount:campaignCost.base})});
     const disc=data.discount_amount||0;campaignCost.discount=disc;campaignCost.gst=Math.round((campaignCost.base-disc)*0.18);
-    renderPricing();document.getElementById('coupon-msg').innerHTML=`<span style="color:var(--success);">✓ Saved ₹${disc.toLocaleString('en-IN')}</span>`;
-    toast(`Coupon applied! ₹${disc.toLocaleString('en-IN')} off`,'success');
+    renderPricing();document.getElementById('coupon-msg').innerHTML=`<span style="color:var(--success);">? Saved ?${disc.toLocaleString('en-IN')}</span>`;
+    toast(`Coupon applied! ?${disc.toLocaleString('en-IN')} off`,'success');
   }catch(e){document.getElementById('coupon-msg').innerHTML=`<span style="color:var(--danger);">${e.message}</span>`;}
 }
 
 async function submitCampaign(){
-  const btn=document.getElementById('btn-submit-campaign');btn.innerHTML='<div class="loading-spinner"></div> Processing…';btn.disabled=true;
+  const btn=document.getElementById('btn-submit-campaign');btn.innerHTML='<div class="loading-spinner"></div> Processing�';btn.disabled=true;
   try{
     const afterDisc=campaignCost.total-(campaignCost.discount||0);
     const walletUse=walletApplied?Math.min(walletBalance,afterDisc):0;
     const body={title:document.getElementById('cmp-name').value.trim(),screen_ids:selectedScreenIds,content_id:uploadedContentId,start_date:document.getElementById('sch-start').value,end_date:document.getElementById('sch-end').value,start_time:document.getElementById('sch-time-start').value+':00',end_time:document.getElementById('sch-time-end').value+':00',package_name:selectedPkg,coupon_code:document.getElementById('coupon-input').value.trim()||undefined,wallet_amount:walletUse||undefined};
     const campaign=await api('/campaigns',{method:'POST',body:JSON.stringify(body)});
-    // Free / wallet-fully-covered — no Razorpay needed
+    // Free / wallet-fully-covered � no Razorpay needed
     if(parseFloat(campaign.amount_total)===0||campaign.wallet_paid){
       const msg=parseFloat(campaign.amount_total)===0?'Trial campaign submitted for approval!':'Payment via wallet! Campaign submitted for approval.';
       toast(msg,'success');
-      if(walletUse>0){walletBalance=Math.max(0,walletBalance-walletUse);document.getElementById('sidebar-wallet-bal').textContent='₹'+fmtNum(walletBalance);}
+      if(walletUse>0){walletBalance=Math.max(0,walletBalance-walletUse);document.getElementById('sidebar-wallet-bal').textContent='?'+fmtNum(walletBalance);}
       setTimeout(()=>navigate('campaigns'),1500);
       return;
     }
     // Partial wallet + Razorpay for remainder
-    const result=await openRazorpay(campaign,btn,'Confirm & Pay →',()=>{
-      if(walletUse>0){walletBalance=Math.max(0,walletBalance-walletUse);document.getElementById('sidebar-wallet-bal').textContent='₹'+fmtNum(walletBalance);}
+    const result=await openRazorpay(campaign,btn,'Confirm & Pay ?',()=>{
+      if(walletUse>0){walletBalance=Math.max(0,walletBalance-walletUse);document.getElementById('sidebar-wallet-bal').textContent='?'+fmtNum(walletBalance);}
       setTimeout(()=>navigate('campaigns'),1500);
     });
     if(result&&result.dismissed){
       toast('Campaign saved! Complete payment from My Campaigns.','info');
       setTimeout(()=>navigate('campaigns'),1200);
     }
-  }catch(e){toast(e.message,'error');btn.innerHTML='Confirm & Pay →';btn.disabled=false;}
+  }catch(e){toast(e.message,'error');btn.innerHTML='Confirm & Pay ?';btn.disabled=false;}
 }
 
 function openRazorpay(campaign,btn,btnLabel,onSuccess){
@@ -2625,12 +2625,12 @@ function openRazorpay(campaign,btn,btnLabel,onSuccess){
 }
 
 async function submitForApproval(id,btn){
-  const orig=btn.innerHTML;btn.innerHTML='…';btn.disabled=true;
+  const orig=btn.innerHTML;btn.innerHTML='�';btn.disabled=true;
   try{
     const found=allCampaigns.find(c=>c.id===id)||allCampaigns.find(c=>String(c.id)===String(id));
     const amount=found?parseFloat(found.amount_total):null;
     if(amount===0){
-      // Free campaign (Trial) — bypass Razorpay
+      // Free campaign (Trial) � bypass Razorpay
       await api(`/campaigns/${id}/confirm-payment`,{method:'POST',body:JSON.stringify({payment_method:'free'})});
       toast('Trial campaign submitted for approval!','success');
       await loadCampaigns();
@@ -2638,13 +2638,13 @@ async function submitForApproval(id,btn){
       return;
     }
     const campaign={id};
-    await openRazorpay(campaign,btn,orig,async()=>{ toast('Payment successful! AI review running…','success'); await loadCampaigns(); });
+    await openRazorpay(campaign,btn,orig,async()=>{ toast('Payment successful! AI review running�','success'); await loadCampaigns(); });
   }catch(e){toast(e.message,'error');btn.innerHTML=orig;btn.disabled=false;}
 }
 
 async function adminTestPay(id,btn){
   if(!confirm('Razorpay bypass karke campaign ko paid mark karo? (Sirf testing ke liye)'))return;
-  const orig=btn.innerHTML;btn.innerHTML='…';btn.disabled=true;
+  const orig=btn.innerHTML;btn.innerHTML='�';btn.disabled=true;
   try{
     const res=await api(`/campaigns/${id}/confirm-payment`,{method:'POST',body:JSON.stringify({
       payment_id:`TEST-${Date.now()}`,
@@ -2685,17 +2685,17 @@ async function loadLibraryGrid(){
     return url.replace('/video/upload/','/video/upload/so_0,w_320,c_fill/').replace(/\.(mp4|webm|mov|avi|mkv|m4v)$/i,'.jpg');
   }
   const grid=document.getElementById('library-grid');
-  grid.innerHTML='<div style="color:var(--text2);font-size:13px;padding:20px;text-align:center;">Loading…</div>';
+  grid.innerHTML='<div style="color:var(--text2);font-size:13px;padding:20px;text-align:center;">Loading�</div>';
   loadStorageBar();
   try{
     const data=await api('/content');
     userLibrary=Array.isArray(data)?data:[];
-    if(!userLibrary.length){grid.innerHTML='<div style="color:var(--text2);font-size:13px;padding:20px;text-align:center;">No uploads yet — use "Upload New" tab.</div>';return;}
+    if(!userLibrary.length){grid.innerHTML='<div style="color:var(--text2);font-size:13px;padding:20px;text-align:center;">No uploads yet � use "Upload New" tab.</div>';return;}
     grid.innerHTML=userLibrary.map(c=>`
       <div class="lib-item${uploadedContentId===c.id?' selected':''}" id="lib-item-${c.id}" onclick="selectFromLibrary('${c.id}','${c.original_name.replace(/'/g,"\\'")}','${c.type}','${(c.file_url||'').replace(/'/g,"%27")}')">
         ${c.type==='image'?`<img class="lib-thumb" src="${c.file_url}" onerror="this.style.display='none'">`:`<div class="lib-thumb-vid"><img src="${_vidThumb(c.file_url)}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" onerror="this.remove()"><svg style="position:relative;z-index:1;filter:drop-shadow(0 1px 3px rgba(0,0,0,.6))" width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="rgba(255,255,255,0.9)" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>`}
         <div class="lib-name" title="${c.original_name}">${c.original_name}</div>
-        <div class="lib-type">${c.type}${c.file_size?' · '+(c.file_size/1048576).toFixed(1)+' MB':''}</div>
+        <div class="lib-type">${c.type}${c.file_size?' � '+(c.file_size/1048576).toFixed(1)+' MB':''}</div>
         <button class="lib-del-btn" title="Delete from library" onclick="deleteLibraryItem('${c.id}',event)"><svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
       </div>`).join('');
   }catch(e){grid.innerHTML=`<div style="color:var(--danger);font-size:13px;padding:20px;">${e.message}</div>`;}
@@ -2721,7 +2721,7 @@ function selectFromLibrary(id,name,type,url){
   if(type==='image'&&url){
     thumb.src=url;thumb.style.display='';iconWrap.style.display='none';
   }else{
-    thumb.style.display='none';iconWrap.style.display='flex';iconWrap.textContent='🎬';
+    thumb.style.display='none';iconWrap.style.display='flex';iconWrap.textContent='??';
   }
   document.getElementById('preview-name').textContent=name;
   document.getElementById('preview-size').textContent='From library';
@@ -2744,7 +2744,7 @@ function setUploadFile(file){
   }else{
     thumb.style.display='none';
     iconWrap.style.display='flex';
-    iconWrap.textContent='🎬';
+    iconWrap.textContent='??';
   }
   document.getElementById('preview-name').textContent=file.name;
   document.getElementById('preview-size').textContent=formatBytes(file.size);
@@ -2763,7 +2763,7 @@ function openLightbox(url,name,type){
   if(!lb){
     lb=document.createElement('div');lb.id='creative-lightbox';
     lb.style.cssText='display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;align-items:center;justify-content:center;cursor:zoom-out;';
-    lb.innerHTML=`<div onclick="event.stopPropagation()" style="position:relative;max-width:90vw;max-height:90vh;"><button onclick="closeLightbox()" style="position:absolute;top:-36px;right:0;background:none;border:none;color:#fff;font-size:28px;cursor:pointer;line-height:1;">×</button><img id="lb-img" src="" style="max-width:90vw;max-height:85vh;object-fit:contain;border-radius:8px;display:block;"><video id="lb-vid" src="" controls style="max-width:90vw;max-height:85vh;border-radius:8px;display:none;"></video><div id="lb-name" style="color:#ccc;font-size:12px;text-align:center;margin-top:8px;"></div></div>`;
+    lb.innerHTML=`<div onclick="event.stopPropagation()" style="position:relative;max-width:90vw;max-height:90vh;"><button onclick="closeLightbox()" style="position:absolute;top:-36px;right:0;background:none;border:none;color:#fff;font-size:28px;cursor:pointer;line-height:1;">�</button><img id="lb-img" src="" style="max-width:90vw;max-height:85vh;object-fit:contain;border-radius:8px;display:block;"><video id="lb-vid" src="" controls style="max-width:90vw;max-height:85vh;border-radius:8px;display:none;"></video><div id="lb-name" style="color:#ccc;font-size:12px;text-align:center;margin-top:8px;"></div></div>`;
     lb.onclick=closeLightbox;
     document.body.appendChild(lb);
   }
@@ -2782,18 +2782,18 @@ function closeLightbox(){
 function _lbEsc(e){if(e.key==='Escape')closeLightbox();}
 
 function formatBytes(b){if(b<1024)return b+' B';if(b<1048576)return (b/1024).toFixed(1)+' KB';return (b/1048576).toFixed(1)+' MB';}
-function fmtDate(d){if(!d)return '—';return new Date(d).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});}
+function fmtDate(d){if(!d)return '�';return new Date(d).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});}
 function statusBadge(s){const map={live:'badge-live',pending_payment:'badge-pending',pending_approval:'badge-pending',approved:'badge-live',completed:'badge-completed',cancelled:'badge-rejected',rejected:'badge-rejected',paused:'badge-draft'};return `<span class="badge ${map[s]||'badge-draft'}">${(s||'').replace(/_/g,' ')}</span>`;}
-function payBadge(s){const map={paid:'badge-live',pending:'badge-pending',refunded:'badge-rejected'};return `<span class="badge ${map[s]||'badge-draft'}">${s||'—'}</span>`;}
-function toggleMobileMenu(){/* kept for compatibility — sidebar hidden on mobile */}
+function payBadge(s){const map={paid:'badge-live',pending:'badge-pending',refunded:'badge-rejected'};return `<span class="badge ${map[s]||'badge-draft'}">${s||'�'}</span>`;}
+function toggleMobileMenu(){/* kept for compatibility � sidebar hidden on mobile */}
 
 function toast(msg,type='info'){
   const el=document.createElement('div');el.className=`toast toast-${type}`;
-  const icons={success:'✓',error:'✕',info:'ℹ'};el.innerHTML=`<span>${icons[type]||'ℹ'}</span> ${msg}`;
+  const icons={success:'?',error:'?',info:'?'};el.innerHTML=`<span>${icons[type]||'?'}</span> ${msg}`;
   document.getElementById('toast-area').appendChild(el);setTimeout(()=>el.remove(),4000);
 }
 
-/* ── NOTIFICATIONS ── */
+/* -- NOTIFICATIONS -- */
 let allNotifications=[];
 let notifOpen=false;
 
@@ -2817,7 +2817,7 @@ function renderNotifBadge(){
 function renderNotifList(){
   const list=document.getElementById('notif-list');
   if(!allNotifications.length){
-    list.innerHTML=`<div style="padding:48px 20px;text-align:center;"><div style="font-size:32px;margin-bottom:10px;">🔔</div><div style="font-size:14px;font-weight:600;margin-bottom:4px;">All caught up!</div><div style="font-size:12px;color:var(--text2);">No notifications yet</div></div>`;
+    list.innerHTML=`<div style="padding:48px 20px;text-align:center;"><div style="font-size:32px;margin-bottom:10px;">??</div><div style="font-size:14px;font-weight:600;margin-bottom:4px;">All caught up!</div><div style="font-size:12px;color:var(--text2);">No notifications yet</div></div>`;
     return;
   }
   list.innerHTML=allNotifications.map(n=>`
@@ -2876,22 +2876,22 @@ function timeAgo(dateStr){
   return d===1?'Yesterday':`${d} days ago`;
 }
 
-// ── WALLET ───────────────────────────────────────────────────────────────────
+// -- WALLET -------------------------------------------------------------------
 let walletBalance = 0;
 
 async function loadWallet(){
   try{
     const data = await api('/wallet');
     walletBalance = parseFloat(data.balance || 0);
-    document.getElementById('wallet-balance-display').textContent = '₹' + walletBalance.toLocaleString('en-IN', {minimumFractionDigits:2});
-    document.getElementById('sidebar-wallet-bal').textContent = '₹' + fmtNum(walletBalance);
+    document.getElementById('wallet-balance-display').textContent = '?' + walletBalance.toLocaleString('en-IN', {minimumFractionDigits:2});
+    document.getElementById('sidebar-wallet-bal').textContent = '?' + fmtNum(walletBalance);
     document.getElementById('refund-amount').max = walletBalance;
 
     const txns = data.transactions || [];
     const totalIn  = txns.filter(t=>parseFloat(t.amount)>0).reduce((s,t)=>s+parseFloat(t.amount),0);
     const totalOut = txns.filter(t=>parseFloat(t.amount)<0).reduce((s,t)=>s+Math.abs(parseFloat(t.amount)),0);
-    document.getElementById('wallet-total-in').textContent  = '₹' + totalIn.toLocaleString('en-IN',{minimumFractionDigits:2});
-    document.getElementById('wallet-total-out').textContent = '₹' + totalOut.toLocaleString('en-IN',{minimumFractionDigits:2});
+    document.getElementById('wallet-total-in').textContent  = '?' + totalIn.toLocaleString('en-IN',{minimumFractionDigits:2});
+    document.getElementById('wallet-total-out').textContent = '?' + totalOut.toLocaleString('en-IN',{minimumFractionDigits:2});
 
     const refundSec = document.getElementById('wallet-refund-section');
     if(refundSec) refundSec.style.display = walletBalance > 0 ? 'block' : 'none';
@@ -2915,8 +2915,8 @@ async function loadWallet(){
           return `<tr>
             <td style="font-size:12px;">${fmtDate(t.created_at)}</td>
             <td><span style="font-size:12px;font-weight:500;color:${typeColor[t.type]||'var(--text)'};">${typeLabel[t.type]||t.type}</span></td>
-            <td style="font-size:12px;color:var(--text2);">${t.campaign_code||'—'}</td>
-            <td style="font-weight:700;color:${isCredit?'var(--success)':'var(--error)'};">${isCredit?'+':''}₹${Math.abs(amt).toLocaleString('en-IN',{minimumFractionDigits:2})}</td>
+            <td style="font-size:12px;color:var(--text2);">${t.campaign_code||'�'}</td>
+            <td style="font-weight:700;color:${isCredit?'var(--success)':'var(--error)'};">${isCredit?'+':''}?${Math.abs(amt).toLocaleString('en-IN',{minimumFractionDigits:2})}</td>
           </tr>`;
         }).join('')
       }</tbody></table></div>`;
@@ -2937,8 +2937,8 @@ async function requestWalletRefund(){
   }catch(e){toast(e.message||'Error','error');}
 }
 
-// ── CAMPAIGN ACTIONS ──────────────────────────────────────────────────────────
-// ── CONFIRM MODAL ────────────────────────────────────────────────────────────
+// -- CAMPAIGN ACTIONS ----------------------------------------------------------
+// -- CONFIRM MODAL ------------------------------------------------------------
 let _confirmResolve=null;
 function showConfirm({title,body,okLabel='Confirm',danger=false}){
   return new Promise(resolve=>{
@@ -2970,23 +2970,23 @@ async function campaignPause(id, btn){
   try{
     const data = await api(`/campaigns/${id}/pause`,{method:'POST',body:JSON.stringify({})});
     const credited = parseFloat(data.wallet_credited||0);
-    toast(credited>0?`Campaign paused. ₹${credited.toLocaleString('en-IN',{minimumFractionDigits:2})} credited to wallet.`:'Campaign paused.','success');
-    document.getElementById('sidebar-wallet-bal').textContent='₹'+fmtNum(walletBalance+credited);
+    toast(credited>0?`Campaign paused. ?${credited.toLocaleString('en-IN',{minimumFractionDigits:2})} credited to wallet.`:'Campaign paused.','success');
+    document.getElementById('sidebar-wallet-bal').textContent='?'+fmtNum(walletBalance+credited);
     walletBalance+=credited;
     await loadCampaigns();
   }catch(e){toast(e.message||'Could not pause','error');btn.disabled=false;}
 }
 
 async function campaignResume(id, btn){
-  btn.disabled=true; btn.textContent='…';
+  btn.disabled=true; btn.textContent='�';
   try{
     const data = await api(`/campaigns/${id}/resume`,{method:'POST',body:JSON.stringify({})});
     const debited = parseFloat(data.wallet_debited||0);
-    toast(debited>0?`Campaign resumed. ₹${debited.toLocaleString('en-IN',{minimumFractionDigits:2})} deducted from wallet.`:'Campaign resumed.','success');
+    toast(debited>0?`Campaign resumed. ?${debited.toLocaleString('en-IN',{minimumFractionDigits:2})} deducted from wallet.`:'Campaign resumed.','success');
     walletBalance = Math.max(0, walletBalance - debited);
-    document.getElementById('sidebar-wallet-bal').textContent='₹'+fmtNum(walletBalance);
+    document.getElementById('sidebar-wallet-bal').textContent='?'+fmtNum(walletBalance);
     await loadCampaigns();
-  }catch(e){toast(e.message||'Could not resume — check wallet balance','error');btn.disabled=false;btn.textContent='▶ Resume';}
+  }catch(e){toast(e.message||'Could not resume � check wallet balance','error');btn.disabled=false;btn.textContent='? Resume';}
 }
 
 async function campaignCancel(id, title){
@@ -2995,14 +2995,14 @@ async function campaignCancel(id, title){
   try{
     const data = await api(`/campaigns/${id}`,{method:'DELETE',body:JSON.stringify({reason:'Cancelled by advertiser'})});
     const credited = parseFloat(data.wallet_credited||0);
-    toast(credited>0?`Campaign cancelled. ₹${credited.toLocaleString('en-IN',{minimumFractionDigits:2})} credited to wallet.`:'Campaign cancelled.','success');
+    toast(credited>0?`Campaign cancelled. ?${credited.toLocaleString('en-IN',{minimumFractionDigits:2})} credited to wallet.`:'Campaign cancelled.','success');
     walletBalance+=credited;
-    document.getElementById('sidebar-wallet-bal').textContent='₹'+fmtNum(walletBalance);
+    document.getElementById('sidebar-wallet-bal').textContent='?'+fmtNum(walletBalance);
     await loadCampaigns();
   }catch(e){toast(e.message||'Could not cancel','error');}
 }
 
-// ── CREATIVE CHANGE MODAL ─────────────────────────────────────────────────────
+// -- CREATIVE CHANGE MODAL -----------------------------------------------------
 let creativeCampaignId = null;
 
 function openCreativeModal(id, title, changeStatus){
@@ -3024,7 +3024,7 @@ async function submitCreativeChange(){
   if(!fileInput.files.length){toast('Select a file first','error');return;}
   const file = fileInput.files[0];
   const statusEl = document.getElementById('creative-upload-status');
-  statusEl.textContent = 'Uploading…';
+  statusEl.textContent = 'Uploading�';
   try{
     // Upload file first
     const formData = new FormData();
@@ -3036,7 +3036,7 @@ async function submitCreativeChange(){
     if(!uploadRes.ok) throw new Error(uploadData.error||'Upload failed');
     const contentId = uploadData.id || uploadData.content?.id;
     // Submit creative change
-    statusEl.textContent = 'Submitting for review…';
+    statusEl.textContent = 'Submitting for review�';
     await api(`/campaigns/${creativeCampaignId}/creative`,{method:'PUT',body:JSON.stringify({content_id:contentId})});
     toast('Creative change submitted for admin review. Current creative continues until approved.','success');
     closeCreativeModal();
@@ -3047,7 +3047,7 @@ async function submitCreativeChange(){
   }
 }
 
-// ── QR OVERLAY MODAL ─────────────────────────────────────────────────────────
+// -- QR OVERLAY MODAL ---------------------------------------------------------
 let qrModalCampaignId=null;
 
 function openQRModal(id,code,title,enabled,placement,phone,previewUrl,message){
@@ -3086,7 +3086,7 @@ async function saveQRSettings(){
   const placement=document.querySelector('.qr-pos-btn.active')?.dataset.pos||'bot-right';
   if(enabled&&!phone){toast('WhatsApp number required','error');return;}
   const btn=document.getElementById('qr-save-btn');
-  btn.disabled=true;btn.textContent='Saving…';
+  btn.disabled=true;btn.textContent='Saving�';
   try{
     const data=await api(`/campaigns/${qrModalCampaignId}/qr`,{method:'PUT',body:JSON.stringify({qr_enabled:enabled,qr_placement:placement,qr_phone:phone,qr_message:message})});
     toast(enabled?'QR overlay enabled!':'QR overlay disabled','success');
@@ -3125,7 +3125,7 @@ async function saveQRSettings(){
         <div style="font-size:15px;font-weight:700;color:var(--text);" id="qr-modal-title">Campaign</div>
         <div style="font-size:12px;color:var(--text2);" id="qr-modal-code"></div>
       </div>
-      <button onclick="closeQRModal()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text2);line-height:1;">×</button>
+      <button onclick="closeQRModal()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text2);line-height:1;">�</button>
     </div>
     <div style="padding:18px 20px;">
       <!-- Toggle -->
@@ -3158,12 +3158,12 @@ async function saveQRSettings(){
         <div style="margin-bottom:16px;">
           <label style="font-size:12px;font-weight:600;color:var(--text2);display:block;margin-bottom:8px;">QR Position</label>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;max-width:260px;">
-            <button class="qr-pos-btn" data-pos="top-left" onclick="selectQRPos(this)" style="padding:8px 12px;border:1.5px solid var(--border);border-radius:6px;background:var(--surface);cursor:pointer;font-size:12px;color:var(--text);text-align:left;">↖ Top Left</button>
-            <button class="qr-pos-btn" data-pos="top-right" onclick="selectQRPos(this)" style="padding:8px 12px;border:1.5px solid var(--border);border-radius:6px;background:var(--surface);cursor:pointer;font-size:12px;color:var(--text);text-align:right;">Top Right ↗</button>
-            <button class="qr-pos-btn" data-pos="mid-left" onclick="selectQRPos(this)" style="padding:8px 12px;border:1.5px solid var(--border);border-radius:6px;background:var(--surface);cursor:pointer;font-size:12px;color:var(--text);text-align:left;">← Mid Left</button>
-            <button class="qr-pos-btn" data-pos="mid-right" onclick="selectQRPos(this)" style="padding:8px 12px;border:1.5px solid var(--border);border-radius:6px;background:var(--surface);cursor:pointer;font-size:12px;color:var(--text);text-align:right;">Mid Right →</button>
-            <button class="qr-pos-btn" data-pos="bot-left" onclick="selectQRPos(this)" style="padding:8px 12px;border:1.5px solid var(--border);border-radius:6px;background:var(--surface);cursor:pointer;font-size:12px;color:var(--text);text-align:left;">↙ Bot Left</button>
-            <button class="qr-pos-btn active" data-pos="bot-right" onclick="selectQRPos(this)" style="padding:8px 12px;border:1.5px solid var(--border);border-radius:6px;background:var(--surface);cursor:pointer;font-size:12px;color:var(--text);text-align:right;">Bot Right ↘</button>
+            <button class="qr-pos-btn" data-pos="top-left" onclick="selectQRPos(this)" style="padding:8px 12px;border:1.5px solid var(--border);border-radius:6px;background:var(--surface);cursor:pointer;font-size:12px;color:var(--text);text-align:left;">? Top Left</button>
+            <button class="qr-pos-btn" data-pos="top-right" onclick="selectQRPos(this)" style="padding:8px 12px;border:1.5px solid var(--border);border-radius:6px;background:var(--surface);cursor:pointer;font-size:12px;color:var(--text);text-align:right;">Top Right ?</button>
+            <button class="qr-pos-btn" data-pos="mid-left" onclick="selectQRPos(this)" style="padding:8px 12px;border:1.5px solid var(--border);border-radius:6px;background:var(--surface);cursor:pointer;font-size:12px;color:var(--text);text-align:left;">? Mid Left</button>
+            <button class="qr-pos-btn" data-pos="mid-right" onclick="selectQRPos(this)" style="padding:8px 12px;border:1.5px solid var(--border);border-radius:6px;background:var(--surface);cursor:pointer;font-size:12px;color:var(--text);text-align:right;">Mid Right ?</button>
+            <button class="qr-pos-btn" data-pos="bot-left" onclick="selectQRPos(this)" style="padding:8px 12px;border:1.5px solid var(--border);border-radius:6px;background:var(--surface);cursor:pointer;font-size:12px;color:var(--text);text-align:left;">? Bot Left</button>
+            <button class="qr-pos-btn active" data-pos="bot-right" onclick="selectQRPos(this)" style="padding:8px 12px;border:1.5px solid var(--border);border-radius:6px;background:var(--surface);cursor:pointer;font-size:12px;color:var(--text);text-align:right;">Bot Right ?</button>
           </div>
         </div>
 
@@ -3199,11 +3199,11 @@ async function saveQRSettings(){
         <div style="font-size:15px;font-weight:700;color:var(--text);">Change Creative</div>
         <div style="font-size:12px;color:var(--text2);" id="creative-modal-title"></div>
       </div>
-      <button onclick="closeCreativeModal()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text2);">×</button>
+      <button onclick="closeCreativeModal()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text2);">�</button>
     </div>
     <div style="padding:18px 20px;">
       <div id="creative-status-note" style="display:none;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:8px;padding:10px 12px;font-size:13px;color:var(--warning);margin-bottom:14px;">
-        ⏳ A creative change is already pending admin review.
+        ? A creative change is already pending admin review.
       </div>
       <div style="margin-bottom:14px;">
         <label style="font-size:12px;font-weight:600;color:var(--text2);display:block;margin-bottom:6px;">Upload New Creative (Image only)</label>
@@ -3211,7 +3211,7 @@ async function saveQRSettings(){
           style="width:100%;box-sizing:border-box;padding:8px;border:1.5px dashed var(--border);border-radius:8px;font-size:13px;background:var(--surface);color:var(--text);cursor:pointer;">
       </div>
       <div style="font-size:12px;color:var(--text2);margin-bottom:16px;background:var(--surface2);border-radius:6px;padding:10px;">
-        ℹ Your current creative will keep running until admin approves the change. No billing interruption.
+        ? Your current creative will keep running until admin approves the change. No billing interruption.
       </div>
       <div id="creative-upload-status" style="font-size:13px;color:var(--primary);margin-bottom:10px;"></div>
       <div style="display:flex;gap:10px;justify-content:flex-end;">
