@@ -2905,12 +2905,25 @@ function renderAdvertisers(data) {
       <td style="font-size:12px;color:var(--text3);">${fmtDate(u.created_at)}</td>
       <td><span class="badge ${u.is_active?'badge-green':'badge-red'}">${u.is_active?'Active':'Suspended'}</span></td>
       <td>
-        <button class="btn btn-ghost btn-xs" onclick="viewAdvertiser('${u.id}')">View</button>
-        ${u.is_active
-          ? `<button class="btn btn-danger btn-xs" style="margin-left:4px;" onclick="suspendUser('${u.id}')">Suspend</button>`
-          : `<button class="btn btn-success btn-xs" style="margin-left:4px;" onclick="activateUser('${u.id}')">Activate</button>`
-        }
-        <button class="btn btn-xs" style="margin-left:4px;background:${u.wa_enabled?'#25d366':'var(--bg3)'};color:${u.wa_enabled?'#fff':'var(--text2)'};" title="${u.wa_enabled?'WA Broadcast ON':'WA Broadcast OFF'}" onclick="toggleWa('${u.id}')">WA</button>
+        <div style="display:flex;align-items:center;gap:5px;">
+          <!-- View -->
+          <button title="View" onclick="viewAdvertiser('${u.id}')" style="width:30px;height:30px;border-radius:6px;border:1px solid var(--border);background:var(--bg2);color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;flex-shrink:0;">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+          <!-- Suspend / Activate -->
+          ${u.is_active
+            ? `<button title="Suspend" onclick="suspendUser('${u.id}')" style="width:30px;height:30px;border-radius:6px;border:none;background:#fee2e2;color:#dc2626;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;flex-shrink:0;">
+                <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>
+               </button>`
+            : `<button title="Activate" onclick="activateUser('${u.id}')" style="width:30px;height:30px;border-radius:6px;border:none;background:#dcfce7;color:#16a34a;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;flex-shrink:0;">
+                <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
+               </button>`
+          }
+          <!-- WA toggle -->
+          <button title="${u.wa_enabled?'WA ON — click to disable':'WA OFF — click to enable'}" onclick="toggleWa('${u.id}')" style="width:30px;height:30px;border-radius:6px;border:none;background:${u.wa_enabled?'#25d366':'var(--bg3)'};color:${u.wa_enabled?'#fff':'var(--text3)'};cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;flex-shrink:0;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12c0 1.89.525 3.656 1.438 5.168L2 22l4.978-1.408A9.942 9.942 0 0012 22c5.523 0 10-4.477 10-10S17.523 2 12 2zm4.95 13.65c-.206.577-.99 1.057-1.637 1.197-.437.094-.99.17-2.876-.618-2.414-.993-3.973-3.448-4.093-3.608-.116-.16-.95-1.263-.95-2.41 0-1.148.6-1.713.812-1.945.212-.23.464-.29.619-.29l.447.008c.144.006.337.014.527.4.206.419.698 1.712.76 1.835.06.123.1.267.02.43-.08.164-.12.267-.238.41-.12.144-.25.32-.358.43-.12.11-.244.233-.104.456.14.224.62 1.02 1.33 1.652.914.812 1.685 1.062 1.924 1.18.238.12.377.1.516-.06.14-.16.6-.7.76-.94.158-.24.317-.2.535-.12.219.08 1.389.655 1.628.774.238.12.397.178.457.278.06.1.06.578-.146 1.155z"/></svg>
+          </button>
+        </div>
       </td>
     </tr>`).join('');
 }
