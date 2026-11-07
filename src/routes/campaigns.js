@@ -8,7 +8,6 @@ const { sendInvoiceEmail, sendApprovedEmail, sendRejectedEmail } = require('../s
 const { sendCampaignApprovedWA, sendInvoiceConfirmedWA } = require('../services/whatsapp');
 const { creditWallet, debitWallet } = require('../services/wallet');
 const { postCampaignToSocial } = require('./facebook');
-const { postCampaignToGoogle } = require('./google');
 
 const getRzp = () => {
   if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
@@ -372,7 +371,6 @@ router.post('/:id/approve', authenticate, requireAdmin, async (req, res, next) =
       query(`UPDATE campaigns SET status='live', updated_at=NOW() WHERE id=$1`, [campaign.id])
         .then(() => {
           postCampaignToSocial(campaign.id).catch(e => console.error('[FB/IG] post error:', e.message));
-          postCampaignToGoogle(campaign.id).catch(e => console.error('[GBP] post error:', e.message));
         })
         .catch(e => console.error('[Approve] live update error:', e.message));
     }

@@ -253,126 +253,13 @@ router.post('/retry-fetch', authenticate, async (req, res) => {
   }
 });
 
-// POST /api/auth/google/test-gbp/:campaignId — manually trigger GBP post (admin only)
-router.post('/test-gbp/:campaignId', async (req, res) => {
-  try {
-    await postCampaignToGoogle(req.params.campaignId);
-    res.json({ success: true, message: 'GBP post triggered — check Railway logs' });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// ── Posting ────────────────────────────────────────────────────────────────────
-
-const MAKE_GBP_WEBHOOK = 'https://hook.eu1.make.com/t689r3nbxfl4rsm3fn57qureowu3i3lb';
+// ── Posting (placeholder — implement when Make.com native GBP module is set up) ──
 
 async function postCampaignToGoogle(campaignId) {
-  const result = await query(
-    `SELECT c.id, c.title, c.campaign_code, c.start_date, c.end_date,
-            admin.google_refresh_token, admin.google_account_id, admin.google_location_id,
-            ct.file_url, ct.type AS content_type
-     FROM campaigns c
-     JOIN users admin ON admin.google_refresh_token IS NOT NULL AND admin.google_account_id IS NOT NULL AND admin.google_account_id != 'pending'
-     LEFT JOIN content ct ON ct.id = c.content_id
-     WHERE c.id = $1
-     LIMIT 1`,
-    [campaignId]
-  );
-  const row = result.rows[0];
-  if (!row || !row.google_refresh_token) {
-    console.log(`[GBP] skipped campaign ${campaignId} — no refresh_token (row=${!!row})`);
-    return;
-  }
-
-  // Refresh access token server-side
-  let accessToken = null;
-  try {
-    const refreshed = await refreshAccessToken(row.google_refresh_token);
-    if (refreshed.access_token) accessToken = refreshed.access_token;
-  } catch (_) {}
-
-  if (!accessToken) return; // Can't post without a valid token
-
-  // If account/location were saved as pending, try to fetch them now
-  let accountId   = (row.google_account_id && row.google_account_id !== 'pending') ? row.google_account_id : null;
-  let locationId  = row.google_location_id || null;
-
-  if (!accountId) {
-    try {
-      const accounts = await googleGet('https://mybusinessaccountmanagement.googleapis.com/v1/accounts', accessToken);
-      if (accounts.accounts && accounts.accounts.length) {
-        accountId = accounts.accounts[0].name;
-        await query('UPDATE users SET google_account_id=$1 WHERE id=(SELECT user_id FROM campaigns WHERE id=$2)', [accountId, campaignId]);
-      }
-    } catch (_) {}
-  }
-
-  if (accountId && !locationId) {
-    try {
-      const locs = await googleGet(
-        `https://mybusinessbusinessinformation.googleapis.com/v1/${accountId}/locations?readMask=name,title`,
-        accessToken
-      );
-      if (locs.locations && locs.locations.length) {
-        locationId = locs.locations[0].name;
-        await query('UPDATE users SET google_location_id=$1 WHERE id=(SELECT user_id FROM campaigns WHERE id=$2)', [locationId, campaignId]);
-      }
-    } catch (_) {}
-  }
-
-  if (!locationId) {
-    console.log(`[GBP] skipped campaign ${campaignId} — no location_id resolved`);
-    return;
-  }
-
-  console.log(`[GBP] campaign ${row.campaign_code} content_type=${row.content_type} file_url=${row.file_url}`);
-
-  const gbpBody = {
-    summary: `${row.title || 'Campaign'} is now live on ExtrraVenue digital screens in Ahmedabad!`,
-    topicType: 'STANDARD'
-  };
-  if (row.content_type === 'image' && row.file_url) {
-    gbpBody.media = [{ mediaFormat: 'PHOTO', sourceUrl: row.file_url }];
-  }
-
-  // Call GBP API directly from backend (v4 format used by Make.com native module)
-  const postUrl = `https://mybusiness.googleapis.com/v4/${locationId}/localPosts`;
-  console.log(`[GBP] Calling: POST ${postUrl}`);
-  try {
-    const result = await googlePost(postUrl, accessToken, gbpBody);
-    if (result.error) {
-      console.error(`[GBP] API error for ${row.campaign_code}:`, JSON.stringify(result.error));
-    } else {
-      console.log(`[GBP] Post created for ${row.campaign_code}:`, JSON.stringify(result).slice(0, 300));
-    }
-  } catch (err) {
-    console.error(`[GBP] Post failed for ${row.campaign_code}:`, err.message);
-  }
-
-  return new Promise((resolve) => {
-    const parsed = new URL(MAKE_GBP_WEBHOOK);
-    const payload = JSON.stringify({ info: 'GBP called directly from backend' });
-    const req = https.request({
-      hostname: parsed.hostname,
-      path: parsed.pathname,
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(payload) }
-    }, res => {
-      let data = '';
-      res.on('data', d => data += d);
-      res.on('end', () => {
-        console.log(`[GBP] Make webhook called for campaign ${row.campaign_code}: ${res.statusCode} ${data.slice(0,100)}`);
-        resolve();
-      });
-    });
-    req.on('error', err => {
-      console.error(`[GBP] Make webhook failed for campaign ${row.campaign_code}:`, err.message);
-      resolve();
-    });
-    req.write(payload);
-    req.end();
-  });
+  // TODO: Implement using Make.com native GBP module with master ops account
+  // Each shopkeeper adds ops@extrravenue.com as GBP Manager during onboarding
+  // Make.com maps location_id dynamically from webhook payload
+  console.log(`[GBP] posting not yet implemented for campaign ${campaignId}`);
 }
 
 module.exports = router;
