@@ -1150,11 +1150,9 @@
             <div id="wa-contacts-box" style="border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px;">
               <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
                 <div style="font-size:13px;font-weight:600;color:var(--text);">Contacts <span id="wa-contacts-count" style="font-size:11px;color:var(--text2);font-weight:400;"></span></div>
-                <div style="display:flex;gap:6px;">
-                  <label style="padding:5px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;background:var(--primary);color:#fff;">
-                    Import CSV
-                    <input type="file" accept=".csv" style="display:none;" onchange="waImportCSV(this)">
-                  </label>
+                <div style="display:flex;gap:6px;" id="wa-contacts-actions">
+                  <button onclick="waImportContacts()" id="wa-import-btn" style="padding:5px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;background:var(--primary);color:#fff;border:none;">Import CSV</button>
+                  <input type="file" id="wa-csv-input" accept=".csv,text/csv" style="display:none;" onchange="waImportCSV(this)">
                   <button onclick="waClearContacts()" style="padding:5px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--bg);color:var(--text2);">Clear All</button>
                 </div>
               </div>
@@ -1193,8 +1191,8 @@
       </div>
 
       <div>
-        <div style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text2);margin-bottom:6px;">Risk of Account Restriction</div>
-        <p style="font-size:12.5px;color:var(--text);line-height:1.7;margin:0;">Meta (WhatsApp) may <strong>permanently ban or restrict</strong> your WhatsApp number if it detects bulk or automated messaging activity. This risk is inherent to the nature of this feature and cannot be eliminated. The User acknowledges and accepts this risk in full.</p>
+        <div style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text2);margin-bottom:6px;">Platform Policy Compliance</div>
+        <p style="font-size:12.5px;color:var(--text);line-height:1.7;margin:0;">Messaging platforms maintain independent Terms of Service governing account usage and automated communications. The User is solely responsible for ensuring their use of this feature complies with all applicable platform policies. <strong>extrravenue</strong> exercises no control over platform-side enforcement actions, and account standing remains entirely at the discretion of the respective platform provider. The User acknowledges this independently of any representation by extrravenue.</p>
       </div>
 
       <div>
@@ -2202,6 +2200,11 @@ async function loadProfile(){
       document.getElementById('wa-section').style.display='';
       loadWaStatus();
       loadWaContacts();
+      // Label: mobile contact picker if supported, else CSV
+      if('contacts' in navigator && 'ContactsManager' in window){
+        const btn=document.getElementById('wa-import-btn');
+        if(btn) btn.textContent='Import Contacts';
+      }
       // Show WA broadcast toggle in campaign wizard
       const waTogBox=document.getElementById('wa-campaign-toggle');
       if(waTogBox)waTogBox.style.display='';
@@ -2300,6 +2303,35 @@ async function loadWaContacts(){
       </div>`
     ).join('')+(r.total>20?`<div style="padding:4px 0;color:var(--text2);font-size:11px;">...aur ${r.total-20} contacts</div>`:'');
   }catch(e){}
+}
+
+async function waImportContacts(){
+  // Use Contact Picker API on supported mobile browsers
+  if('contacts' in navigator && 'ContactsManager' in window){
+    try{
+      const contacts=await navigator.contacts.select(['name','tel'],{multiple:true});
+      if(!contacts||!contacts.length)return;
+      const list=[];
+      for(const c of contacts){
+        const tels=c.tel||[];
+        const name=(c.name&&c.name[0])||'';
+        for(const t of tels){
+          const digits=t.replace(/\D/g,'').slice(-10);
+          if(digits.length===10)list.push({name,phone:digits});
+        }
+      }
+      if(!list.length){showToast('Koi valid number nahi mila');return;}
+      const r=await fetch('/api/wa/contacts',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+localStorage.getItem('token')},body:JSON.stringify({contacts:list})});
+      const d=await r.json();
+      if(r.ok){showToast((d.added||list.length)+' contacts import ho gaye');loadWaContacts();}
+      else showToast(d.error||'Import failed');
+      return;
+    }catch(e){
+      // User cancelled or API not available — fall through to CSV
+    }
+  }
+  // Fallback: file picker
+  document.getElementById('wa-csv-input').click();
 }
 
 async function waImportCSV(input){
