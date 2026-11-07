@@ -2031,16 +2031,16 @@ function loadPreset(key){
   </div>
 </section>
 <style>
-  .venue-card--fullimg{background:#111 !important;padding:0 !important;overflow:hidden;position:relative;min-height:220px;align-items:stretch !important;}
+  .venue-card--fullimg{background:#111 !important;padding:0 !important;overflow:hidden;position:relative;min-height:380px;align-items:stretch !important;}
   .vic-bg{position:absolute;inset:0;overflow:hidden;}
   .vic-bg-track{display:flex;height:100%;width:500%;transition:transform .75s cubic-bezier(.4,0,.2,1);}
-  .vic-bg-track img{flex:none;width:20%;height:100%;object-fit:cover;}
-  .vic-fade{position:absolute;inset:0;z-index:1;background:linear-gradient(to right,#111 25%,rgba(17,17,17,.82) 48%,rgba(17,17,17,.3) 70%,transparent 100%);}
+  .vic-bg-track img{flex:none;width:20%;height:100%;object-fit:cover;object-position:center 20%;}
+  .vic-fade{position:absolute;inset:0;z-index:1;background:linear-gradient(to right,rgba(17,17,17,.92) 18%,rgba(17,17,17,.55) 42%,rgba(17,17,17,.12) 65%,transparent 100%);}
   .vic-content{position:relative;z-index:2;padding:44px 48px;display:flex;flex-direction:column;gap:14px;max-width:52ch;}
   .vic-dots{position:absolute;bottom:16px;right:20px;z-index:3;display:flex;gap:6px;}
   .vic-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.35);transition:background .3s,transform .3s;}
   .vic-dot.active{background:#fff;transform:scale(1.25);}
-  @media(max-width:640px){.venue-card--fullimg{min-height:180px;}.vic-content{padding:28px 24px;}.vic-fade{background:linear-gradient(to right,#111 50%,rgba(17,17,17,.4) 80%,transparent 100%);}}
+  @media(max-width:640px){.venue-card--fullimg{min-height:260px;}.vic-content{padding:28px 24px;}.vic-fade{background:linear-gradient(to right,rgba(17,17,17,.95) 45%,rgba(17,17,17,.4) 75%,transparent 100%);}}
 </style>
 <script>
   (function(){
