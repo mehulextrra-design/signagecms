@@ -365,6 +365,21 @@ async function applyCriticalFixes(pool) {
   } catch (err) {
     console.warn('[DB] WA column fix warn:', err.message);
   }
+  // WA disclaimer acceptance audit log (migration 026)
+  try {
+    await pool.query(`CREATE TABLE IF NOT EXISTS wa_disclaimer_acceptances (
+      id SERIAL PRIMARY KEY,
+      user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+      accepted_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      ip_address VARCHAR(45),
+      user_agent TEXT,
+      disclaimer_version VARCHAR(20) NOT NULL DEFAULT 'v1'
+    )`);
+    await pool.query(`CREATE INDEX IF NOT EXISTS wa_disclaimer_user_idx ON wa_disclaimer_acceptances(user_id)`);
+    console.log('[DB] wa_disclaimer_acceptances ensured');
+  } catch (err) {
+    console.warn('[DB] WA disclaimer table fix warn:', err.message);
+  }
   console.log('[DB] Critical column fixes done');
 }
 

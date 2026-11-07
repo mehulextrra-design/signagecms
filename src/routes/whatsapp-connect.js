@@ -28,6 +28,25 @@ async function requireWaEnabled(req, res, next) {
   next();
 }
 
+// POST /api/wa/disclaimer-accept  — log user's acceptance for legal audit
+// Called BEFORE connect; no wa_enabled guard needed (just auth)
+router.post('/disclaimer-accept', authenticate, async (req, res) => {
+  try {
+    const ip = (req.headers['x-forwarded-for'] || req.socket.remoteAddress || '').split(',')[0].trim();
+    const ua = req.headers['user-agent'] || '';
+    const version = req.body.version || 'v1';
+    await query(
+      `INSERT INTO wa_disclaimer_acceptances (user_id, ip_address, user_agent, disclaimer_version)
+       VALUES ($1,$2,$3,$4)`,
+      [req.user.id, ip, ua, version]
+    );
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('[WA] disclaimer log error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // POST /api/wa/connect  — request pairing code
 router.post('/connect', authenticate, requireWaEnabled, async (req, res) => {
   try {

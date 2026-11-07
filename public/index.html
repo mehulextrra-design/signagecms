@@ -2252,9 +2252,17 @@ function waDisclaimerClose(){
   document.getElementById('wa-disclaimer-overlay').style.display='none';
 }
 
-function waDisclaimerProceed(){
+async function waDisclaimerProceed(){
   document.getElementById('wa-disclaimer-overlay').style.display='none';
   document.getElementById('wa-pairing-box').style.display='';
+  // Log acceptance for legal audit trail (fire-and-forget)
+  try{
+    await fetch('/api/wa/disclaimer-accept',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+localStorage.getItem('token')},
+      body:JSON.stringify({version:'v1'})
+    });
+  }catch(e){}
 }
 
 async function waGetCode(){
