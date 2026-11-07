@@ -184,7 +184,7 @@ async function makePostgresAuthState(userId) {
 async function initSession(userId) {
   if (activeSockets.has(userId)) return activeSockets.get(userId);
 
-  const { default: makeWASocket, DisconnectReason, fetchLatestBaileysVersion } = await baileys();
+  const { default: makeWASocket, DisconnectReason, fetchLatestBaileysVersion, Browsers } = await baileys();
   const { version } = await fetchLatestBaileysVersion();
   const { state, saveCreds } = await makePostgresAuthState(userId);
 
@@ -192,7 +192,7 @@ async function initSession(userId) {
     version,
     auth: state,
     printQRInTerminal: false,
-    browser: ['ExtrraVenue', 'Chrome', '1.0'],
+    browser: Browsers.ubuntu('Chrome'),
     getMessage: async () => ({ conversation: '' }),
   });
 
