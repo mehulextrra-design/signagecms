@@ -31,29 +31,55 @@ async function sendMail({ to, subject, html, attachments = [] }) {
   return res.json();
 }
 
-// ── HTML wrapper ──────────────────────────────────────────────────────────
-function wrap(title, body) {
-  return `<!DOCTYPE html><html><head><meta charset="utf-8">
-<style>
+// ── Shared CSS + HTML shell ───────────────────────────────────────────────
+const CSS = `
   body{margin:0;padding:0;background:#f2efe9;font-family:'Helvetica Neue',Arial,sans-serif;}
   .shell{max-width:560px;margin:32px auto;background:#fff;border-radius:16px;overflow:hidden;border:1px solid #e0dbd3;}
-  .hd{background:#1e1e1e;padding:24px 32px;display:flex;align-items:center;gap:10px;}
-  .hd-dot{width:28px;height:28px;background:#ff5c00;border-radius:50%;display:flex;align-items:center;justify-content:center;}
+  .hd{background:#1e1e1e;padding:22px 32px;display:flex;align-items:center;gap:10px;}
+  .hd-dot{width:28px;height:28px;background:#ff5c00;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
   .hd-name{color:#fafafa;font-size:17px;font-weight:700;letter-spacing:-.5px;}
-  .bd{padding:32px;}
-  h2{margin:0 0 8px;font-size:22px;font-weight:700;color:#1e1e1e;letter-spacing:-.04em;}
+  .bd{padding:28px 32px;}
+  .tag{display:inline-block;background:#ebe6dd;border-radius:8px;padding:4px 10px;font-size:12px;font-weight:600;color:#787068;letter-spacing:.03em;text-transform:uppercase;margin-bottom:16px;}
+  h2{margin:0 0 6px;font-size:22px;font-weight:700;color:#1e1e1e;letter-spacing:-.04em;}
+  .sub{font-size:14px;color:#888;margin:0 0 20px;line-height:1.5;}
   p{margin:0 0 16px;font-size:15px;color:#787068;line-height:1.6;}
-  .tag{display:inline-block;background:#ebe6dd;border-radius:8px;padding:4px 10px;font-size:12px;font-weight:600;color:#787068;letter-spacing:.03em;text-transform:uppercase;margin-bottom:20px;}
-  .card{background:#f7f4ef;border-radius:12px;padding:20px;margin:20px 0;}
-  .row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #e8e4de;}
-  .row:last-child{border-bottom:none;}
-  .rl{font-size:13px;color:#aaa8a2;}
-  .rv{font-size:14px;font-weight:600;color:#1e1e1e;}
-  .btn{display:inline-block;background:#ff5c00;color:#fff;text-decoration:none;padding:12px 28px;border-radius:100px;font-size:15px;font-weight:600;margin:8px 0;}
-  .ft{padding:20px 32px;border-top:1px solid #f0ece6;font-size:12px;color:#b0aba4;text-align:center;}
-  .status-ok{color:#16a34a;font-weight:700;}
-  .status-err{color:#dc2626;font-weight:700;}
-</style></head><body>
+  .stats-row{display:grid;gap:10px;margin-bottom:22px;}
+  .stats-row.cols-2{grid-template-columns:1fr 1fr;}
+  .stats-row.cols-3{grid-template-columns:1fr 1fr 1fr;}
+  .stat-card{background:#f7f4ef;border-radius:12px;padding:14px 16px;text-align:center;}
+  .stat-num{font-size:28px;font-weight:700;color:#1e1e1e;line-height:1;}
+  .stat-num.orange{color:#ff5c00;}
+  .stat-num.green{color:#16a34a;}
+  .stat-num.red{color:#dc2626;}
+  .stat-num.amber{color:#d97706;}
+  .stat-label{font-size:11px;color:#aaa8a2;margin-top:5px;text-transform:uppercase;letter-spacing:.04em;font-weight:600;}
+  .info-card{background:#f7f4ef;border-radius:12px;padding:18px 20px;margin-bottom:16px;}
+  .info-row{display:flex;justify-content:space-between;align-items:flex-start;padding:7px 0;border-bottom:1px solid #e8e4de;}
+  .info-row:last-child{border-bottom:none;}
+  .ir-label{font-size:13px;color:#aaa8a2;padding-right:12px;}
+  .ir-value{font-size:14px;font-weight:600;color:#1e1e1e;text-align:right;}
+  .code-badge{display:inline-block;background:#ebe6dd;border-radius:6px;padding:3px 9px;font-size:11px;font-weight:700;color:#9e9890;letter-spacing:.04em;}
+  .camp-card{background:#f7f4ef;border-radius:12px;padding:16px 20px;margin-bottom:10px;display:flex;align-items:center;gap:16px;}
+  .camp-plays{text-align:center;min-width:70px;}
+  .camp-plays-num{font-size:26px;font-weight:700;color:#ff5c00;line-height:1;}
+  .camp-plays-label{font-size:11px;color:#aaa;text-transform:uppercase;letter-spacing:.04em;font-weight:600;margin-top:2px;}
+  .camp-info{flex:1;min-width:0;border-left:2px solid #e8e4de;padding-left:16px;}
+  .camp-title{font-size:15px;font-weight:700;color:#1e1e1e;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .camp-meta{font-size:12px;color:#aaa8a2;}
+  .section-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#bbb;margin:0 0 10px;}
+  .btn{display:inline-block;background:#ff5c00;color:#fff;text-decoration:none;padding:12px 28px;border-radius:100px;font-size:15px;font-weight:600;margin-top:8px;}
+  .divider{border:none;border-top:1px solid #f0ece6;margin:20px 0;}
+  .ft{padding:18px 32px;border-top:1px solid #f0ece6;font-size:12px;color:#b0aba4;text-align:center;}
+  .status-badge{display:inline-flex;align-items:center;gap:6px;border-radius:8px;padding:6px 14px;font-size:13px;font-weight:700;letter-spacing:.02em;}
+  .status-approved{background:#dcfce7;color:#15803d;}
+  .status-rejected{background:#fee2e2;color:#dc2626;}
+  .status-paused{background:#fef9c3;color:#a16207;}
+  .status-live{background:#dcfce7;color:#15803d;}
+  .status-hold{background:#fff7ed;color:#c2410c;}
+`;
+
+function wrap(body) {
+  return `<!DOCTYPE html><html><head><meta charset="utf-8"><style>${CSS}</style></head><body>
 <div class="shell">
   <div class="hd">
     <div class="hd-dot">
@@ -62,11 +88,17 @@ function wrap(title, body) {
     <span class="hd-name">SignageCMS</span>
   </div>
   <div class="bd">${body}</div>
-  <div class="ft">SignageCMS · India's OOH Advertising Network<br>This is an automated email. Do not reply.</div>
+  <div class="ft">SignageCMS &middot; India's OOH Advertising Network<br>This is an automated email. Do not reply.</div>
 </div></body></html>`;
 }
 
-// ── Invoice email (after payment confirmed) ───────────────────────────────
+function fmtDate(d) {
+  if (!d) return '—';
+  const dt = new Date(d);
+  return dt.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+
+// ── Invoice email ─────────────────────────────────────────────────────────
 async function sendInvoiceEmail(campaignId, invoiceNumber) {
   try {
     const { rows } = await query(
@@ -78,23 +110,34 @@ async function sendInvoiceEmail(campaignId, invoiceNumber) {
     );
     if (!rows.length) return;
     const c = rows[0];
-    const name = c.business_name || `${c.first_name} ${c.last_name}`;
+    const name = c.business_name || `${c.first_name} ${c.last_name}`.trim();
 
     const body = `
-      <div class="tag">Invoice</div>
-      <h2>Payment Confirmed ✓</h2>
-      <p>Hi ${name}, your payment has been received and your invoice is ready.</p>
-      <div class="card">
-        <div class="row"><span class="rl">Invoice No.</span><span class="rv">${invoiceNumber}</span></div>
-        <div class="row"><span class="rl">Campaign</span><span class="rv">${c.title}</span></div>
-        <div class="row"><span class="rl">Code</span><span class="rv">${c.campaign_code}</span></div>
-        <div class="row"><span class="rl">Period</span><span class="rv">${c.start_date} – ${c.end_date}</span></div>
-        ${c.coupon_code ? `<div class="row"><span class="rl">Coupon (${c.coupon_code})</span><span class="rv">−₹${parseFloat(c.discount_amount).toFixed(2)}</span></div>` : ''}
-        <div class="row"><span class="rl">Subtotal</span><span class="rv">₹${parseFloat(c.amount_base).toFixed(2)}</span></div>
-        <div class="row"><span class="rl">GST (18%)</span><span class="rv">₹${parseFloat(c.amount_gst).toFixed(2)}</span></div>
-        <div class="row"><span class="rl" style="font-weight:700;color:#1e1e1e">Total Paid</span><span class="rv" style="color:#ff5c00;font-size:16px">₹${parseFloat(c.amount_total).toFixed(2)}</span></div>
+      <div class="tag">Invoice · ${invoiceNumber}</div>
+      <h2>Payment Confirmed</h2>
+      <p class="sub">Hi ${name}, your payment is received. Invoice is attached below.</p>
+
+      <div class="stats-row cols-2">
+        <div class="stat-card">
+          <div class="stat-num orange">₹${parseFloat(c.amount_total).toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</div>
+          <div class="stat-label">Total Paid</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" style="font-size:16px;padding-top:4px"><span class="code-badge" style="font-size:13px">${c.campaign_code}</span></div>
+          <div class="stat-label">Campaign Code</div>
+        </div>
       </div>
-      <p>Your campaign is now under review. You will receive another email once it is approved and goes live.</p>
+
+      <div class="info-card">
+        <div class="info-row"><span class="ir-label">Campaign</span><span class="ir-value">${c.title}</span></div>
+        <div class="info-row"><span class="ir-label">Period</span><span class="ir-value">${fmtDate(c.start_date)} – ${fmtDate(c.end_date)}</span></div>
+        ${c.coupon_code ? `<div class="info-row"><span class="ir-label">Coupon (${c.coupon_code})</span><span class="ir-value" style="color:#16a34a">−₹${parseFloat(c.discount_amount).toFixed(2)}</span></div>` : ''}
+        <div class="info-row"><span class="ir-label">Subtotal</span><span class="ir-value">₹${parseFloat(c.amount_base).toFixed(2)}</span></div>
+        <div class="info-row"><span class="ir-label">GST (18%)</span><span class="ir-value">₹${parseFloat(c.amount_gst).toFixed(2)}</span></div>
+        <div class="info-row"><span class="ir-label" style="font-weight:700;color:#1e1e1e">Total</span><span class="ir-value" style="color:#ff5c00;font-size:16px">₹${parseFloat(c.amount_total).toFixed(2)}</span></div>
+      </div>
+
+      <p style="font-size:14px;color:#aaa">Your campaign is now under review. You'll get another email once it's approved and goes live.</p>
       <a class="btn" href="${process.env.APP_URL || 'https://signagecrm-production.up.railway.app'}">View Campaign</a>`;
 
     let pdfBuffer = null;
@@ -102,8 +145,8 @@ async function sendInvoiceEmail(campaignId, invoiceNumber) {
 
     await sendMail({
       to: c.email,
-      subject: `Invoice ${invoiceNumber} – ${c.campaign_code} | SignageCMS`,
-      html: wrap('Invoice', body),
+      subject: `Invoice ${invoiceNumber} – Payment confirmed for ${c.campaign_code} | SignageCMS`,
+      html: wrap(body),
       attachments: pdfBuffer ? [{ filename: `${invoiceNumber}.pdf`, content: pdfBuffer }] : [],
     });
     console.log(`[Email] Invoice sent to ${c.email} — ${invoiceNumber}${pdfBuffer ? ' (with PDF)' : ''}`);
@@ -123,25 +166,39 @@ async function sendApprovedEmail(campaignId) {
     );
     if (!rows.length) return;
     const c = rows[0];
-    const name = c.business_name || `${c.first_name} ${c.last_name}`;
+    const name = c.business_name || `${c.first_name} ${c.last_name}`.trim();
 
     const body = `
       <div class="tag">Campaign Approved</div>
-      <h2>Your Campaign is Live! 🚀</h2>
-      <p>Hi ${name}, great news — your campaign has been approved and is now live on our screens.</p>
-      <div class="card">
-        <div class="row"><span class="rl">Campaign</span><span class="rv">${c.title}</span></div>
-        <div class="row"><span class="rl">Code</span><span class="rv">${c.campaign_code}</span></div>
-        <div class="row"><span class="rl">Period</span><span class="rv">${c.start_date} – ${c.end_date}</span></div>
-        <div class="row"><span class="rl">Status</span><span class="rv status-ok">APPROVED ✓</span></div>
+      <h2>Your Ad is Live!</h2>
+      <p class="sub">Hi ${name}, great news — your campaign has been approved.</p>
+
+      <div class="stats-row cols-2">
+        <div class="stat-card">
+          <div class="stat-num green" style="font-size:20px;padding-top:4px">
+            <span class="status-badge status-approved">&#10003; Approved</span>
+          </div>
+          <div class="stat-label" style="margin-top:8px">Status</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" style="font-size:16px;padding-top:4px"><span class="code-badge" style="font-size:13px">${c.campaign_code}</span></div>
+          <div class="stat-label">Campaign Code</div>
+        </div>
       </div>
-      <p>You can track real-time impressions and play counts from your dashboard.</p>
+
+      <div class="info-card">
+        <div class="info-row"><span class="ir-label">Campaign</span><span class="ir-value">${c.title}</span></div>
+        <div class="info-row"><span class="ir-label">Start Date</span><span class="ir-value">${fmtDate(c.start_date)}</span></div>
+        <div class="info-row"><span class="ir-label">End Date</span><span class="ir-value">${fmtDate(c.end_date)}</span></div>
+      </div>
+
+      <p style="font-size:14px;color:#aaa">Track real-time impressions and play counts from your dashboard.</p>
       <a class="btn" href="${process.env.APP_URL || 'https://signagecrm-production.up.railway.app'}">View Live Campaign</a>`;
 
     await sendMail({
       to: c.email,
       subject: `Campaign Approved – ${c.campaign_code} is now live | SignageCMS`,
-      html: wrap('Campaign Approved', body),
+      html: wrap(body),
     });
     console.log(`[Email] Approval sent to ${c.email} — ${c.campaign_code}`);
   } catch (err) {
@@ -153,35 +210,256 @@ async function sendApprovedEmail(campaignId) {
 async function sendRejectedEmail(campaignId, reason) {
   try {
     const { rows } = await query(
-      `SELECT c.title, c.campaign_code, u.email, u.first_name, u.last_name, u.business_name
+      `SELECT c.title, c.campaign_code, c.amount_total, c.payment_status,
+              u.email, u.first_name, u.last_name, u.business_name
        FROM campaigns c JOIN users u ON u.id = c.user_id WHERE c.id = $1`,
       [campaignId]
     );
     if (!rows.length) return;
     const c = rows[0];
-    const name = c.business_name || `${c.first_name} ${c.last_name}`;
+    const name = c.business_name || `${c.first_name} ${c.last_name}`.trim();
+    const refundAmt = parseFloat(c.amount_total || 0);
+    const hasRefund = refundAmt > 0 && c.payment_status === 'paid';
 
     const body = `
       <div class="tag">Campaign Rejected</div>
       <h2>Campaign Requires Revision</h2>
-      <p>Hi ${name}, unfortunately your campaign could not be approved at this time.</p>
-      <div class="card">
-        <div class="row"><span class="rl">Campaign</span><span class="rv">${c.title}</span></div>
-        <div class="row"><span class="rl">Code</span><span class="rv">${c.campaign_code}</span></div>
-        <div class="row"><span class="rl">Status</span><span class="rv status-err">REJECTED</span></div>
-        <div class="row"><span class="rl">Reason</span><span class="rv" style="color:#dc2626">${reason}</span></div>
+      <p class="sub">Hi ${name}, your campaign could not be approved at this time.</p>
+
+      <div class="stats-row ${hasRefund ? 'cols-2' : 'cols-2'}">
+        <div class="stat-card">
+          <div class="stat-num red" style="font-size:20px;padding-top:4px">
+            <span class="status-badge status-rejected">&#10005; Rejected</span>
+          </div>
+          <div class="stat-label" style="margin-top:8px">Status</div>
+        </div>
+        ${hasRefund ? `
+        <div class="stat-card">
+          <div class="stat-num green">₹${refundAmt.toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</div>
+          <div class="stat-label">Refunded to Wallet</div>
+        </div>` : `
+        <div class="stat-card">
+          <div class="stat-num" style="font-size:16px;padding-top:4px"><span class="code-badge" style="font-size:13px">${c.campaign_code}</span></div>
+          <div class="stat-label">Campaign Code</div>
+        </div>`}
       </div>
-      <p>Please update your creative or contact us to resubmit your campaign.</p>
+
+      <div class="info-card">
+        <div class="info-row"><span class="ir-label">Campaign</span><span class="ir-value">${c.title}</span></div>
+        <div class="info-row"><span class="ir-label">Code</span><span class="ir-value"><span class="code-badge">${c.campaign_code}</span></span></div>
+        <div class="info-row"><span class="ir-label">Reason</span><span class="ir-value" style="color:#dc2626;max-width:260px;text-align:right">${reason}</span></div>
+        ${hasRefund ? `<div class="info-row"><span class="ir-label">Refund</span><span class="ir-value" style="color:#16a34a">₹${refundAmt.toFixed(2)} added to wallet</span></div>` : ''}
+      </div>
+
+      <p style="font-size:14px;color:#aaa">Please update your creative or contact us to resubmit your campaign.</p>
       <a class="btn" href="${process.env.APP_URL || 'https://signagecrm-production.up.railway.app'}">Update Campaign</a>`;
 
     await sendMail({
       to: c.email,
-      subject: `Campaign Update Required – ${c.campaign_code} | SignageCMS`,
-      html: wrap('Campaign Rejected', body),
+      subject: `Action Required – ${c.campaign_code} needs revision | SignageCMS`,
+      html: wrap(body),
     });
     console.log(`[Email] Rejection sent to ${c.email} — ${c.campaign_code}`);
   } catch (err) {
     console.error('[Email] sendRejectedEmail error:', err.message);
+  }
+}
+
+// ── Campaign paused email ─────────────────────────────────────────────────
+async function sendPausedEmail(campaignId) {
+  try {
+    const { rows } = await query(
+      `SELECT c.title, c.campaign_code, c.start_date, c.end_date,
+              u.email, u.first_name, u.last_name, u.business_name
+       FROM campaigns c JOIN users u ON u.id = c.user_id WHERE c.id = $1`,
+      [campaignId]
+    );
+    if (!rows.length) return;
+    const c = rows[0];
+    const name = c.business_name || `${c.first_name} ${c.last_name}`.trim();
+
+    const body = `
+      <div class="tag">Campaign Paused</div>
+      <h2>Your Campaign is Paused</h2>
+      <p class="sub">Hi ${name}, your campaign has been temporarily paused.</p>
+
+      <div class="stats-row cols-2">
+        <div class="stat-card">
+          <div class="stat-num amber" style="font-size:20px;padding-top:4px">
+            <span class="status-badge status-paused">&#9646;&#9646; Paused</span>
+          </div>
+          <div class="stat-label" style="margin-top:8px">Status</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" style="font-size:16px;padding-top:4px"><span class="code-badge" style="font-size:13px">${c.campaign_code}</span></div>
+          <div class="stat-label">Campaign Code</div>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <div class="info-row"><span class="ir-label">Campaign</span><span class="ir-value">${c.title}</span></div>
+        <div class="info-row"><span class="ir-label">Period</span><span class="ir-value">${fmtDate(c.start_date)} – ${fmtDate(c.end_date)}</span></div>
+      </div>
+
+      <p style="font-size:14px;color:#aaa">While paused, your ad will not be displayed on screens. You can resume anytime from your dashboard.</p>
+      <a class="btn" href="${process.env.APP_URL || 'https://signagecrm-production.up.railway.app'}">Manage Campaign</a>`;
+
+    await sendMail({
+      to: c.email,
+      subject: `Campaign Paused – ${c.campaign_code} | SignageCMS`,
+      html: wrap(body),
+    });
+    console.log(`[Email] Paused email sent to ${c.email} — ${c.campaign_code}`);
+  } catch (err) {
+    console.error('[Email] sendPausedEmail error:', err.message);
+  }
+}
+
+// ── Campaign resumed email ────────────────────────────────────────────────
+async function sendResumedEmail(campaignId) {
+  try {
+    const { rows } = await query(
+      `SELECT c.title, c.campaign_code, c.start_date, c.end_date,
+              u.email, u.first_name, u.last_name, u.business_name
+       FROM campaigns c JOIN users u ON u.id = c.user_id WHERE c.id = $1`,
+      [campaignId]
+    );
+    if (!rows.length) return;
+    const c = rows[0];
+    const name = c.business_name || `${c.first_name} ${c.last_name}`.trim();
+
+    const body = `
+      <div class="tag">Campaign Resumed</div>
+      <h2>Your Ad is Live Again!</h2>
+      <p class="sub">Hi ${name}, your campaign has been resumed and is now live on screens.</p>
+
+      <div class="stats-row cols-2">
+        <div class="stat-card">
+          <div class="stat-num green" style="font-size:20px;padding-top:4px">
+            <span class="status-badge status-live">&#9654; Live</span>
+          </div>
+          <div class="stat-label" style="margin-top:8px">Status</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" style="font-size:16px;padding-top:4px"><span class="code-badge" style="font-size:13px">${c.campaign_code}</span></div>
+          <div class="stat-label">Campaign Code</div>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <div class="info-row"><span class="ir-label">Campaign</span><span class="ir-value">${c.title}</span></div>
+        <div class="info-row"><span class="ir-label">End Date</span><span class="ir-value">${fmtDate(c.end_date)}</span></div>
+      </div>
+
+      <p style="font-size:14px;color:#aaa">Your ad is now being displayed on screens. Track live impressions from your dashboard.</p>
+      <a class="btn" href="${process.env.APP_URL || 'https://signagecrm-production.up.railway.app'}">View Live Campaign</a>`;
+
+    await sendMail({
+      to: c.email,
+      subject: `Campaign Resumed – ${c.campaign_code} is live again | SignageCMS`,
+      html: wrap(body),
+    });
+    console.log(`[Email] Resumed email sent to ${c.email} — ${c.campaign_code}`);
+  } catch (err) {
+    console.error('[Email] sendResumedEmail error:', err.message);
+  }
+}
+
+// ── Campaign on-hold email ────────────────────────────────────────────────
+async function sendOnHoldEmail(campaignId, reason) {
+  try {
+    const { rows } = await query(
+      `SELECT c.title, c.campaign_code, c.start_date, c.end_date,
+              u.email, u.first_name, u.last_name, u.business_name
+       FROM campaigns c JOIN users u ON u.id = c.user_id WHERE c.id = $1`,
+      [campaignId]
+    );
+    if (!rows.length) return;
+    const c = rows[0];
+    const name = c.business_name || `${c.first_name} ${c.last_name}`.trim();
+
+    const body = `
+      <div class="tag">Campaign On Hold</div>
+      <h2>Campaign Placed On Hold</h2>
+      <p class="sub">Hi ${name}, our team has placed your campaign on hold. Please review the details below.</p>
+
+      <div class="stats-row cols-2">
+        <div class="stat-card">
+          <div class="stat-num" style="font-size:20px;padding-top:4px">
+            <span class="status-badge status-hold">&#9679; On Hold</span>
+          </div>
+          <div class="stat-label" style="margin-top:8px">Status</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" style="font-size:16px;padding-top:4px"><span class="code-badge" style="font-size:13px">${c.campaign_code}</span></div>
+          <div class="stat-label">Campaign Code</div>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <div class="info-row"><span class="ir-label">Campaign</span><span class="ir-value">${c.title}</span></div>
+        <div class="info-row"><span class="ir-label">Period</span><span class="ir-value">${fmtDate(c.start_date)} – ${fmtDate(c.end_date)}</span></div>
+        ${reason ? `<div class="info-row"><span class="ir-label">Reason</span><span class="ir-value" style="color:#c2410c;max-width:260px;text-align:right">${reason}</span></div>` : ''}
+      </div>
+
+      <p style="font-size:14px;color:#aaa">Please contact us or update your campaign details. We'll review and resume as soon as possible.</p>
+      <a class="btn" href="${process.env.APP_URL || 'https://signagecrm-production.up.railway.app'}">Contact Support</a>`;
+
+    await sendMail({
+      to: c.email,
+      subject: `Campaign On Hold – ${c.campaign_code} needs attention | SignageCMS`,
+      html: wrap(body),
+    });
+    console.log(`[Email] On-hold email sent to ${c.email} — ${c.campaign_code}`);
+  } catch (err) {
+    console.error('[Email] sendOnHoldEmail error:', err.message);
+  }
+}
+
+// ── Wallet balance update email ───────────────────────────────────────────
+async function sendWalletCreditEmail(userId, amount, newBalance, description) {
+  try {
+    const { rows } = await query(
+      `SELECT email, first_name, last_name, business_name FROM users WHERE id = $1`,
+      [userId]
+    );
+    if (!rows.length || !rows[0].email) return;
+    const u = rows[0];
+    const name = u.business_name || `${u.first_name} ${u.last_name}`.trim() || 'Advertiser';
+    const creditedAt = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', hour12: true, day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+    const body = `
+      <div class="tag">Wallet Credited</div>
+      <h2>Wallet Balance Updated</h2>
+      <p class="sub">Hi ${name}, your SignageCMS wallet has been credited.</p>
+
+      <div class="stats-row cols-2">
+        <div class="stat-card">
+          <div class="stat-num green">+₹${parseFloat(amount).toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</div>
+          <div class="stat-label">Amount Credited</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num orange">₹${parseFloat(newBalance).toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</div>
+          <div class="stat-label">New Balance</div>
+        </div>
+      </div>
+
+      <div class="info-card">
+        ${description ? `<div class="info-row"><span class="ir-label">Description</span><span class="ir-value">${description}</span></div>` : ''}
+        <div class="info-row"><span class="ir-label">Credited At</span><span class="ir-value">${creditedAt}</span></div>
+      </div>
+
+      <p style="font-size:14px;color:#aaa">Use your wallet balance to pay for your next campaign at checkout.</p>
+      <a class="btn" href="${process.env.APP_URL || 'https://signagecrm-production.up.railway.app'}">Use Wallet</a>`;
+
+    await sendMail({
+      to: u.email,
+      subject: `Wallet Credited ₹${parseFloat(amount).toFixed(0)} | SignageCMS`,
+      html: wrap(body),
+    });
+    console.log(`[Email] Wallet credit email sent to ${u.email} — ₹${amount}`);
+  } catch (err) {
+    console.error('[Email] sendWalletCreditEmail error:', err.message);
   }
 }
 
@@ -208,29 +486,50 @@ async function sendDailyPoPReport() {
     if (!summary.length) return;
 
     const totalPlays = summary.reduce((s, r) => s + parseInt(r.plays), 0);
+    const totalScreens = summary.reduce((s, r) => s + parseInt(r.screens), 0);
 
-    const rows = summary.map(r => `
-      <div class="row">
-        <span class="rl">${r.campaign_code} · ${r.title}</span>
-        <span class="rv">${r.plays} plays · ${r.screens} screens</span>
+    const campRows = summary.map(r => `
+      <div class="camp-card">
+        <div class="camp-plays">
+          <div class="camp-plays-num">${parseInt(r.plays).toLocaleString('en-IN')}</div>
+          <div class="camp-plays-label">Plays</div>
+        </div>
+        <div class="camp-info">
+          <div style="margin-bottom:4px"><span class="code-badge">${r.campaign_code}</span></div>
+          <div class="camp-title">${r.title}</div>
+          <div class="camp-meta">${r.business_name || ''} &middot; ${r.screens} screen(s)</div>
+        </div>
       </div>`).join('');
 
     const body = `
-      <div class="tag">Daily PoP Report</div>
-      <h2>Proof of Play — ${today}</h2>
-      <p>Here is a summary of all campaign plays recorded today across the SignageCMS network.</p>
-      <div class="card">
-        <div class="row"><span class="rl">Date</span><span class="rv">${today}</span></div>
-        <div class="row"><span class="rl">Active Campaigns</span><span class="rv">${summary.length}</span></div>
-        <div class="row"><span class="rl">Total Plays Today</span><span class="rv" style="color:#ff5c00;font-size:16px">${totalPlays.toLocaleString()}</span></div>
+      <div class="tag">Daily PoP Report · ${today}</div>
+      <h2>Proof of Play</h2>
+      <p class="sub">Daily campaign play summary across the SignageCMS network.</p>
+
+      <div class="stats-row cols-3">
+        <div class="stat-card">
+          <div class="stat-num orange">${totalPlays.toLocaleString('en-IN')}</div>
+          <div class="stat-label">Total Plays</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">${summary.length}</div>
+          <div class="stat-label">Campaigns</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">${totalScreens}</div>
+          <div class="stat-label">Screens</div>
+        </div>
       </div>
-      <div class="card">${rows}</div>
+
+      <div class="section-label">Campaign Breakdown</div>
+      ${campRows}
+
       <a class="btn" href="${process.env.APP_URL || 'https://signagecrm-production.up.railway.app'}/admin">View Admin Dashboard</a>`;
 
     await sendMail({
       to: adminEmail,
-      subject: `Daily PoP Report – ${today} · ${totalPlays} plays | SignageCMS`,
-      html: wrap('Daily PoP Report', body),
+      subject: `Daily PoP – ${today} · ${totalPlays.toLocaleString('en-IN')} plays | SignageCMS`,
+      html: wrap(body),
     });
     console.log(`[Email] Daily PoP report sent — ${today}, ${totalPlays} plays`);
   } catch (err) {
@@ -244,7 +543,7 @@ async function sendDailyPoPEmailToUser(userId, dateStr) {
     const today = dateStr || new Date().toISOString().slice(0, 10);
     const { rows } = await query(`
       SELECT u.first_name, u.last_name, u.business_name, u.email,
-             c.title, c.campaign_code,
+             c.title, c.campaign_code, c.start_date, c.end_date,
              COALESCE(SUM(pl.play_count), 0) AS plays,
              COUNT(DISTINCT pl.screen_id) AS screens
       FROM users u
@@ -254,7 +553,7 @@ async function sendDailyPoPEmailToUser(userId, dateStr) {
       WHERE u.id = $1 AND c.status IN ('live','completed')
         AND c.start_date <= $2::date AND c.end_date >= $2::date
       GROUP BY u.first_name, u.last_name, u.business_name, u.email,
-               c.title, c.campaign_code
+               c.title, c.campaign_code, c.start_date, c.end_date
       ORDER BY plays DESC
     `, [userId, today]);
 
@@ -262,30 +561,51 @@ async function sendDailyPoPEmailToUser(userId, dateStr) {
     const { first_name, last_name, business_name, email } = rows[0];
     const name = business_name || `${first_name} ${last_name}`.trim() || 'Advertiser';
     const totalPlays = rows.reduce((s, r) => s + parseInt(r.plays), 0);
+    const totalScreens = rows.reduce((s, r) => s + parseInt(r.screens), 0);
 
-    const campaignRows = rows.map(r => `
-      <div class="row">
-        <span class="rl">${r.campaign_code} · ${r.title}</span>
-        <span class="rv">${parseInt(r.plays).toLocaleString()} plays · ${r.screens} screen(s)</span>
+    const campRows = rows.map(r => `
+      <div class="camp-card">
+        <div class="camp-plays">
+          <div class="camp-plays-num">${parseInt(r.plays).toLocaleString('en-IN')}</div>
+          <div class="camp-plays-label">Plays</div>
+        </div>
+        <div class="camp-info">
+          <div style="margin-bottom:4px"><span class="code-badge">${r.campaign_code}</span></div>
+          <div class="camp-title">${r.title}</div>
+          <div class="camp-meta">${r.screens} screen(s) &middot; ${fmtDate(r.start_date)} – ${fmtDate(r.end_date)}</div>
+        </div>
       </div>`).join('');
 
     const body = `
-      <div class="tag">Daily Proof of Play</div>
-      <h2>Aaj Ka Report — ${today}</h2>
-      <p>Hi ${name}, yeh raha aapka aaj ka ad performance summary.</p>
-      <div class="card">
-        <div class="row"><span class="rl">Date</span><span class="rv">${today}</span></div>
-        <div class="row"><span class="rl">Active Campaigns</span><span class="rv">${rows.length}</span></div>
-        <div class="row"><span class="rl" style="font-weight:700;color:#1e1e1e">Total Plays Today</span><span class="rv" style="color:#ff5c00;font-size:16px">${totalPlays.toLocaleString('en-IN')}</span></div>
+      <div class="tag">Proof of Play · ${today}</div>
+      <h2>Aaj Ka Ad Report</h2>
+      <p class="sub">${name} — daily performance summary</p>
+
+      <div class="stats-row cols-3">
+        <div class="stat-card">
+          <div class="stat-num orange">${totalPlays.toLocaleString('en-IN')}</div>
+          <div class="stat-label">Total Plays</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">${rows.length}</div>
+          <div class="stat-label">Campaigns</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">${totalScreens}</div>
+          <div class="stat-label">Screens</div>
+        </div>
       </div>
-      <div class="card">${campaignRows}</div>
-      <p style="font-size:13px;color:#aaa;">Detailed analytics aur screen-wise breakdown ke liye dashboard check karein.</p>
+
+      <div class="section-label">Campaign-wise Breakdown</div>
+      ${campRows}
+
+      <p style="font-size:13px;color:#bbb;margin-top:16px">Screen-wise analytics ke liye dashboard check karein.</p>
       <a class="btn" href="${process.env.APP_URL || 'https://signagecrm-production.up.railway.app'}">Dashboard Dekhein</a>`;
 
     await sendMail({
       to: email,
-      subject: `Aaj Ka Proof of Play — ${today} · ${totalPlays.toLocaleString('en-IN')} plays | SignageCMS`,
-      html: wrap('Daily Proof of Play', body),
+      subject: `Aaj Ka Report – ${totalPlays.toLocaleString('en-IN')} plays today | SignageCMS`,
+      html: wrap(body),
     });
     console.log(`[Email] Daily PoP sent to ${email} — ${today}, ${totalPlays} plays`);
   } catch (err) {
@@ -318,179 +638,33 @@ async function sendNewUserAlertEmail({ first_name, last_name, email, mobile, bus
     const adminEmail = process.env.ADMIN_EMAIL || process.env.GMAIL_USER;
     if (!adminEmail) return;
     const name = business_name || `${first_name} ${last_name}`.trim() || 'New User';
-    const joinedAt = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', hour12: true });
+    const joinedAt = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', hour12: true, day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
 
     const body = `
       <div class="tag">New Signup</div>
-      <h2>Naya User Register Hua! 👤</h2>
-      <p>Ek naya advertiser aapke platform pe register hua hai. Details yahan hain:</p>
-      <div class="card">
-        <div class="row"><span class="rl">Name</span><span class="rv">${name}</span></div>
-        ${business_name ? `<div class="row"><span class="rl">Business</span><span class="rv">${business_name}</span></div>` : ''}
-        ${business_type ? `<div class="row"><span class="rl">Type</span><span class="rv">${business_type}</span></div>` : ''}
-        <div class="row"><span class="rl">Email</span><span class="rv">${email}</span></div>
-        <div class="row"><span class="rl">Mobile</span><span class="rv">+91 ${mobile}</span></div>
-        ${city ? `<div class="row"><span class="rl">City</span><span class="rv">${city}</span></div>` : ''}
-        <div class="row"><span class="rl">Joined At</span><span class="rv">${joinedAt}</span></div>
+      <h2>New Advertiser Registered</h2>
+      <p class="sub">A new advertiser has registered on SignageCMS.</p>
+
+      <div class="info-card">
+        <div class="info-row"><span class="ir-label">Name</span><span class="ir-value">${name}</span></div>
+        ${business_name ? `<div class="info-row"><span class="ir-label">Business</span><span class="ir-value">${business_name}</span></div>` : ''}
+        ${business_type ? `<div class="info-row"><span class="ir-label">Type</span><span class="ir-value">${business_type}</span></div>` : ''}
+        <div class="info-row"><span class="ir-label">Email</span><span class="ir-value">${email}</span></div>
+        <div class="info-row"><span class="ir-label">Mobile</span><span class="ir-value">+91 ${mobile}</span></div>
+        ${city ? `<div class="info-row"><span class="ir-label">City</span><span class="ir-value">${city}</span></div>` : ''}
+        <div class="info-row"><span class="ir-label">Joined At</span><span class="ir-value">${joinedAt}</span></div>
       </div>
-      <p>Admin dashboard pe jaake is user ka account manage karo.</p>
-      <a class="btn" href="${process.env.APP_URL || 'https://signagecrm-production.up.railway.app'}/admin">Admin Dashboard</a>`;
+
+      <a class="btn" href="${process.env.APP_URL || 'https://signagecrm-production.up.railway.app'}/admin">View in Admin Dashboard</a>`;
 
     await sendMail({
       to: adminEmail,
       subject: `New Signup: ${name} (${email}) | SignageCMS`,
-      html: wrap('New User Signup', body),
+      html: wrap(body),
     });
     console.log(`[Email] New user alert sent to admin — ${email}`);
   } catch (err) {
     console.error('[Email] sendNewUserAlertEmail error:', err.message);
-  }
-}
-
-// ── Campaign paused email ─────────────────────────────────────────────────
-async function sendPausedEmail(campaignId) {
-  try {
-    const { rows } = await query(
-      `SELECT c.title, c.campaign_code, c.start_date, c.end_date,
-              u.email, u.first_name, u.last_name, u.business_name
-       FROM campaigns c JOIN users u ON u.id = c.user_id WHERE c.id = $1`,
-      [campaignId]
-    );
-    if (!rows.length) return;
-    const c = rows[0];
-    const name = c.business_name || `${c.first_name} ${c.last_name}`;
-
-    const body = `
-      <div class="tag">Campaign Paused</div>
-      <h2>Campaign Paused ⏸</h2>
-      <p>Hi ${name}, your campaign has been temporarily paused.</p>
-      <div class="card">
-        <div class="row"><span class="rl">Campaign</span><span class="rv">${c.title}</span></div>
-        <div class="row"><span class="rl">Code</span><span class="rv">${c.campaign_code}</span></div>
-        <div class="row"><span class="rl">Period</span><span class="rv">${c.start_date} – ${c.end_date}</span></div>
-        <div class="row"><span class="rl">Status</span><span class="rv" style="color:#f59e0b;font-weight:700">PAUSED ⏸</span></div>
-      </div>
-      <p>You can resume your campaign anytime from your dashboard. While paused, your ad will not be displayed on screens.</p>
-      <a class="btn" href="${process.env.APP_URL || 'https://signagecrm-production.up.railway.app'}">Manage Campaign</a>`;
-
-    await sendMail({
-      to: c.email,
-      subject: `Campaign Paused – ${c.campaign_code} | SignageCMS`,
-      html: wrap('Campaign Paused', body),
-    });
-    console.log(`[Email] Paused email sent to ${c.email} — ${c.campaign_code}`);
-  } catch (err) {
-    console.error('[Email] sendPausedEmail error:', err.message);
-  }
-}
-
-// ── Campaign resumed email ────────────────────────────────────────────────
-async function sendResumedEmail(campaignId) {
-  try {
-    const { rows } = await query(
-      `SELECT c.title, c.campaign_code, c.start_date, c.end_date,
-              u.email, u.first_name, u.last_name, u.business_name
-       FROM campaigns c JOIN users u ON u.id = c.user_id WHERE c.id = $1`,
-      [campaignId]
-    );
-    if (!rows.length) return;
-    const c = rows[0];
-    const name = c.business_name || `${c.first_name} ${c.last_name}`;
-
-    const body = `
-      <div class="tag">Campaign Resumed</div>
-      <h2>Campaign is Live Again! ▶️</h2>
-      <p>Hi ${name}, your campaign has been resumed and is now live on our screens.</p>
-      <div class="card">
-        <div class="row"><span class="rl">Campaign</span><span class="rv">${c.title}</span></div>
-        <div class="row"><span class="rl">Code</span><span class="rv">${c.campaign_code}</span></div>
-        <div class="row"><span class="rl">Period</span><span class="rv">${c.start_date} – ${c.end_date}</span></div>
-        <div class="row"><span class="rl">Status</span><span class="rv status-ok">LIVE ▶</span></div>
-      </div>
-      <p>Your ad is now being displayed on screens. Track live impressions from your dashboard.</p>
-      <a class="btn" href="${process.env.APP_URL || 'https://signagecrm-production.up.railway.app'}">View Live Campaign</a>`;
-
-    await sendMail({
-      to: c.email,
-      subject: `Campaign Resumed – ${c.campaign_code} is live again | SignageCMS`,
-      html: wrap('Campaign Resumed', body),
-    });
-    console.log(`[Email] Resumed email sent to ${c.email} — ${c.campaign_code}`);
-  } catch (err) {
-    console.error('[Email] sendResumedEmail error:', err.message);
-  }
-}
-
-// ── Campaign on-hold email (admin-initiated) ──────────────────────────────
-async function sendOnHoldEmail(campaignId, reason) {
-  try {
-    const { rows } = await query(
-      `SELECT c.title, c.campaign_code, c.start_date, c.end_date,
-              u.email, u.first_name, u.last_name, u.business_name
-       FROM campaigns c JOIN users u ON u.id = c.user_id WHERE c.id = $1`,
-      [campaignId]
-    );
-    if (!rows.length) return;
-    const c = rows[0];
-    const name = c.business_name || `${c.first_name} ${c.last_name}`;
-
-    const body = `
-      <div class="tag">Campaign On Hold</div>
-      <h2>Campaign Placed On Hold 🔔</h2>
-      <p>Hi ${name}, your campaign has been placed on hold by our team. Please review the details below.</p>
-      <div class="card">
-        <div class="row"><span class="rl">Campaign</span><span class="rv">${c.title}</span></div>
-        <div class="row"><span class="rl">Code</span><span class="rv">${c.campaign_code}</span></div>
-        <div class="row"><span class="rl">Status</span><span class="rv" style="color:#f59e0b;font-weight:700">ON HOLD 🔔</span></div>
-        ${reason ? `<div class="row"><span class="rl">Reason</span><span class="rv" style="color:#dc2626">${reason}</span></div>` : ''}
-      </div>
-      <p>Please contact us or update your campaign details. We will review and resume your campaign as soon as possible.</p>
-      <a class="btn" href="${process.env.APP_URL || 'https://signagecrm-production.up.railway.app'}">Contact Support</a>`;
-
-    await sendMail({
-      to: c.email,
-      subject: `Campaign On Hold – ${c.campaign_code} | SignageCMS`,
-      html: wrap('Campaign On Hold', body),
-    });
-    console.log(`[Email] On-hold email sent to ${c.email} — ${c.campaign_code}`);
-  } catch (err) {
-    console.error('[Email] sendOnHoldEmail error:', err.message);
-  }
-}
-
-// ── Wallet balance update email ───────────────────────────────────────────
-async function sendWalletCreditEmail(userId, amount, newBalance, description) {
-  try {
-    const { rows } = await query(
-      `SELECT email, first_name, last_name, business_name FROM users WHERE id = $1`,
-      [userId]
-    );
-    if (!rows.length || !rows[0].email) return;
-    const u = rows[0];
-    const name = u.business_name || `${u.first_name} ${u.last_name}`.trim() || 'Advertiser';
-    const creditedAt = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', hour12: true });
-
-    const body = `
-      <div class="tag">Wallet Credited</div>
-      <h2>Wallet Balance Updated 💰</h2>
-      <p>Hi ${name}, your SignageCMS wallet has been credited.</p>
-      <div class="card">
-        <div class="row"><span class="rl">Amount Credited</span><span class="rv" style="color:#16a34a;font-size:16px">+₹${parseFloat(amount).toFixed(2)}</span></div>
-        <div class="row"><span class="rl">New Balance</span><span class="rv" style="color:#ff5c00;font-size:16px">₹${parseFloat(newBalance).toFixed(2)}</span></div>
-        ${description ? `<div class="row"><span class="rl">Description</span><span class="rv">${description}</span></div>` : ''}
-        <div class="row"><span class="rl">Credited At</span><span class="rv">${creditedAt}</span></div>
-      </div>
-      <p>Use your wallet balance to pay for your next campaign at checkout.</p>
-      <a class="btn" href="${process.env.APP_URL || 'https://signagecrm-production.up.railway.app'}">Use Wallet</a>`;
-
-    await sendMail({
-      to: u.email,
-      subject: `Wallet Credited ₹${parseFloat(amount).toFixed(2)} | SignageCMS`,
-      html: wrap('Wallet Credited', body),
-    });
-    console.log(`[Email] Wallet credit email sent to ${u.email} — ₹${amount}`);
-  } catch (err) {
-    console.error('[Email] sendWalletCreditEmail error:', err.message);
   }
 }
 
