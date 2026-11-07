@@ -1998,57 +1998,63 @@ function loadPreset(key){
 <!-- Venue Partner Card -->
 <section style="background:var(--surface);padding:0 0 64px;">
   <div class="wrap">
-    <div class="venue-card" data-reveal>
-      <!-- Left content -->
-      <div style="display:flex;flex-direction:column;gap:14px;max-width:58ch;">
-        <h3 style="font-family:'Magra',sans-serif;font-size:clamp(22px,2.4vw,34px);font-weight:700;color:#fff;line-height:1.15;margin:0;letter-spacing:-.02em;text-wrap:balance;">Apni screen register karo – apna ad FREE chalao</h3>
-        <p style="font-size:15px;color:rgba(255,255,255,.82);margin:0;max-width:46ch;line-height:1.6;">Koi rent nahi, koi fees nahi. Sirf apni screen register karo – aur apna promotion Ahmedabad ke digital screens pe free mein chalao.</p>
-        <div>
-          <a href="#" onclick="openVenuePartner();return false;" style="display:inline-flex;align-items:center;gap:8px;background:#fff;color:var(--dark);border-radius:999px;padding:11px 22px;font-size:14px;font-weight:600;text-decoration:none;transition:box-shadow .2s;cursor:pointer;" onmouseover="this.style.boxShadow='0 8px 24px rgba(0,0,0,.18)'" onmouseout="this.style.boxShadow='none'">Venue partner bano &rarr;</a>
-        </div>
-      </div>
-      <!-- Right: venue image carousel -->
-      <div class="venue-img-carousel" id="venueCarousel">
-        <div class="vic-track" id="vicTrack">
+    <div class="venue-card venue-card--fullimg" data-reveal>
+      <!-- Full-bleed BG image carousel -->
+      <div class="vic-bg">
+        <div class="vic-bg-track" id="vicTrack">
           <img src="/img/venue-cafe-screen.webp" alt="Cafe screen" loading="lazy">
           <img src="/img/venue-clinic-screen.webp" alt="Clinic screen" loading="lazy">
           <img src="/img/venue-lobby-screen.webp" alt="Lobby screen" loading="lazy">
           <img src="/img/venue-electronics-screen.webp" alt="Electronics store screen" loading="lazy">
           <img src="/img/venue-fashion-screen.webp" alt="Fashion store screen" loading="lazy">
         </div>
-        <div class="vic-dots" id="vicDots">
-          <span class="vic-dot active"></span>
-          <span class="vic-dot"></span>
-          <span class="vic-dot"></span>
-          <span class="vic-dot"></span>
-          <span class="vic-dot"></span>
+      </div>
+      <!-- Left-to-right fade overlay -->
+      <div class="vic-fade"></div>
+      <!-- Text content -->
+      <div class="vic-content">
+        <h3 style="font-family:'Magra',sans-serif;font-size:clamp(22px,2.4vw,34px);font-weight:700;color:#fff;line-height:1.15;margin:0;letter-spacing:-.02em;text-wrap:balance;">Apni screen register karo – apna ad FREE chalao</h3>
+        <p style="font-size:15px;color:rgba(255,255,255,.82);margin:0;max-width:46ch;line-height:1.6;">Koi rent nahi, koi fees nahi. Sirf apni screen register karo – aur apna promotion Ahmedabad ke digital screens pe free mein chalao.</p>
+        <div>
+          <a href="#" onclick="openVenuePartner();return false;" style="display:inline-flex;align-items:center;gap:8px;background:#fff;color:var(--dark);border-radius:999px;padding:11px 22px;font-size:14px;font-weight:600;text-decoration:none;transition:box-shadow .2s;cursor:pointer;" onmouseover="this.style.boxShadow='0 8px 24px rgba(0,0,0,.18)'" onmouseout="this.style.boxShadow='none'">Venue partner bano &rarr;</a>
         </div>
       </div>
-      <style>
-        .venue-img-carousel{flex:none;width:160px;height:160px;border-radius:14px;overflow:hidden;position:relative;box-shadow:0 8px 28px rgba(0,0,0,.28);}
-        .vic-track{display:flex;width:100%;height:100%;transition:transform .6s cubic-bezier(.4,0,.2,1);}
-        .vic-track img{flex:none;width:160px;height:160px;object-fit:cover;}
-        .vic-dots{position:absolute;bottom:7px;left:0;right:0;display:flex;justify-content:center;gap:5px;}
-        .vic-dot{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.45);transition:background .3s;}
-        .vic-dot.active{background:#fff;}
-        @media(max-width:640px){.venue-img-carousel{display:none;}}
-      </style>
-      <script>
-        (function(){
-          var idx=0, total=5;
-          var track=document.getElementById('vicTrack');
-          var dots=document.querySelectorAll('.vic-dot');
-          function go(n){
-            idx=n%total;
-            track.style.transform='translateX(-'+(idx*160)+'px)';
-            dots.forEach(function(d,i){d.classList.toggle('active',i===idx);});
-          }
-          setInterval(function(){go(idx+1);},3500);
-        })();
-      </script>
+      <!-- Dot indicators -->
+      <div class="vic-dots" id="vicDots">
+        <span class="vic-dot active"></span>
+        <span class="vic-dot"></span>
+        <span class="vic-dot"></span>
+        <span class="vic-dot"></span>
+        <span class="vic-dot"></span>
+      </div>
     </div>
   </div>
 </section>
+<style>
+  .venue-card--fullimg{background:#111 !important;padding:0 !important;overflow:hidden;position:relative;min-height:220px;align-items:stretch !important;}
+  .vic-bg{position:absolute;inset:0;overflow:hidden;}
+  .vic-bg-track{display:flex;height:100%;width:500%;transition:transform .75s cubic-bezier(.4,0,.2,1);}
+  .vic-bg-track img{flex:none;width:20%;height:100%;object-fit:cover;}
+  .vic-fade{position:absolute;inset:0;z-index:1;background:linear-gradient(to right,#111 25%,rgba(17,17,17,.82) 48%,rgba(17,17,17,.3) 70%,transparent 100%);}
+  .vic-content{position:relative;z-index:2;padding:44px 48px;display:flex;flex-direction:column;gap:14px;max-width:52ch;}
+  .vic-dots{position:absolute;bottom:16px;right:20px;z-index:3;display:flex;gap:6px;}
+  .vic-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.35);transition:background .3s,transform .3s;}
+  .vic-dot.active{background:#fff;transform:scale(1.25);}
+  @media(max-width:640px){.venue-card--fullimg{min-height:180px;}.vic-content{padding:28px 24px;}.vic-fade{background:linear-gradient(to right,#111 50%,rgba(17,17,17,.4) 80%,transparent 100%);}}
+</style>
+<script>
+  (function(){
+    var idx=0,total=5;
+    var track=document.getElementById('vicTrack');
+    var dots=document.querySelectorAll('#vicDots .vic-dot');
+    function go(n){
+      idx=n%total;
+      track.style.transform='translateX(-'+(idx*20)+'%)';
+      dots.forEach(function(d,i){d.classList.toggle('active',i===idx);});
+    }
+    setInterval(function(){go(idx+1);},3500);
+  })();
+</script>
 
 
 <!-- DEMO SIMULATOR REMOVED -->
