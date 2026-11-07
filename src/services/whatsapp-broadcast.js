@@ -98,7 +98,9 @@ async function baileys() {
 // ── PostgreSQL auth state (persist creds across restarts) ──────────────────
 
 async function makePostgresAuthState(userId) {
-  const { proto } = await baileys();
+  const mod = await baileys();
+  // BufferJSON is a top-level export, not nested under proto
+  const { BufferJSON } = mod;
 
   async function readData(key) {
     const r = await query(
@@ -107,12 +109,12 @@ async function makePostgresAuthState(userId) {
     );
     if (!r.rows.length || r.rows[0].val == null) return null;
     const val = r.rows[0].val;
-    // Baileys expects BufferJSON decode for binary keys
-    return JSON.parse(JSON.stringify(val), proto.BufferJSON?.reviver ?? null);
+    // Revive {type:'Buffer',data:[...]} objects back to Buffer instances
+    return JSON.parse(JSON.stringify(val), BufferJSON.reviver);
   }
 
   async function writeData(key, value) {
-    const serialized = JSON.stringify(value, proto.BufferJSON?.replacer ?? null);
+    const serialized = JSON.stringify(value, BufferJSON.replacer);
     await query(
       `INSERT INTO wa_sessions (user_id, auth_state, status, updated_at)
        VALUES ($1, jsonb_build_object($2::text, $3::jsonb), 'connected', NOW())
@@ -141,7 +143,7 @@ async function makePostgresAuthState(userId) {
     return r.rows[0].auth_state;
   }
 
-  const { initAuthCreds } = await baileys();
+  const { initAuthCreds } = mod;
 
   // Load or init creds
   let creds;
