@@ -305,14 +305,18 @@ async function postCampaignToGoogle(campaignId) {
 
   if (!locationId) return; // No location to post to
 
-  const payload = JSON.stringify({
-    title: row.title || 'ExtrraVenue Campaign Live',
+  const gbpBody = {
     summary: `${row.title || 'Campaign'} is now live on ExtrraVenue digital screens in Ahmedabad!`,
-    image_url: (row.content_type === 'image' && row.file_url) ? row.file_url : null,
-    campaign_code: row.campaign_code,
+    topicType: 'STANDARD'
+  };
+  if (row.content_type === 'image' && row.file_url) {
+    gbpBody.media = [{ mediaFormat: 'PHOTO', sourceUrl: row.file_url }];
+  }
+
+  const payload = JSON.stringify({
     access_token: accessToken,
-    account_id: accountId,
-    location_id: locationId
+    location_id: locationId,
+    gbp_body: JSON.stringify(gbpBody)
   });
 
   return new Promise((resolve) => {
