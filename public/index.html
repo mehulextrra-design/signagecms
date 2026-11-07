@@ -2263,7 +2263,7 @@ async function waDisclaimerProceed(){
   try{
     await fetch('/api/wa/disclaimer-accept',{
       method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':'Bearer '+localStorage.getItem('token')},
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+localStorage.getItem('scms_token')},
       body:JSON.stringify({version:'v1'})
     });
   }catch(e){}
@@ -2335,7 +2335,7 @@ async function waImportContacts(){
         }
       }
       if(!list.length){toast('Koi valid number nahi mila','error');return;}
-      const r=await fetch('/api/wa/contacts',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+localStorage.getItem('token')},body:JSON.stringify({contacts:list})});
+      const r=await fetch('/api/wa/contacts',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+localStorage.getItem('scms_token')},body:JSON.stringify({contacts:list})});
       const d=await r.json();
       if(r.ok){toast((d.added||list.length)+' contacts import ho gaye','success');loadWaContacts();}
       else toast(d.error||'Import failed','error');
@@ -2360,7 +2360,7 @@ async function waImportCSV(input){
 }
 
 async function fetchFormData(path,fd){
-  const token=localStorage.getItem('token');
+  const token=localStorage.getItem('scms_token');
   const res=await fetch('/api'+path,{method:'POST',headers:{Authorization:'Bearer '+token},body:fd});
   const json=await res.json();
   if(!res.ok)throw new Error(json.error||res.statusText);
