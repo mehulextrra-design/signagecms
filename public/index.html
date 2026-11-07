@@ -2180,21 +2180,13 @@ async function loadGoogleStatus(){
     const loc=document.getElementById('gbp-location');
     if(!btn)return;
     if(s.connected){
-      const isPending=s.account_id==='pending'||!s.location_id;
-      name.textContent=s.business_name||'Google Business Profile';
-      loc.textContent=isPending?'Connected — tap Reconnect to verify your listing':'Location connected';
+      name.textContent=s.business_name&&s.business_name!=='Google Business (pending)'?s.business_name:'Google Business Profile';
+      loc.textContent='Connected – auto-posting active';
       btn.textContent='Disconnect';btn.style.background='#e53e3e';
       btn.onclick=disconnectGoogle;
-      // Show reconnect button if pending (fresh OAuth, not just API retry)
-      let retryBtn=document.getElementById('gbp-retry-btn');
-      if(isPending&&!retryBtn){
-        retryBtn=document.createElement('button');
-        retryBtn.id='gbp-retry-btn';
-        retryBtn.textContent='Reconnect';
-        retryBtn.style.cssText='padding:6px 10px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:none;background:#38a169;color:#fff;white-space:nowrap;flex-shrink:0;margin-right:6px;';
-        btn.parentNode.insertBefore(retryBtn,btn);
-        retryBtn.onclick=reconnectGoogle;
-      }else if(!isPending&&retryBtn){retryBtn.remove();}
+      // Remove any stale retry button
+      const retryBtn=document.getElementById('gbp-retry-btn');
+      if(retryBtn)retryBtn.remove();
     }else{
       name.textContent='Google Business Profile';loc.textContent='Not connected';
       btn.textContent='Connect';btn.style.background='#4285F4';
@@ -2203,12 +2195,6 @@ async function loadGoogleStatus(){
   }catch(_){}
 }
 
-async function reconnectGoogle(){
-  const btn=document.getElementById('gbp-retry-btn');
-  if(btn){btn.textContent='Connecting...';btn.disabled=true;}
-  try{ await connectGoogle(); }
-  catch(e){ if(btn){btn.textContent='Reconnect';btn.disabled=false;} }
-}
 
 async function connectGoogle(){
   try{
@@ -2222,8 +2208,7 @@ async function connectGoogle(){
           clearInterval(timer);
           await loadGoogleStatus();
           const st=await api('/auth/google/status');
-          if(st.connected&&st.account_id!=='pending'&&st.location_id) toast('Google Business Profile connected!','success');
-          else if(st.connected) toast('Account linked! Listing verification may take a moment.','success');
+          if(st.connected) toast('Google Business Profile connected!','success');
           else toast('Connection failed. Please try again.','error');
         }
       }catch(ex){}
