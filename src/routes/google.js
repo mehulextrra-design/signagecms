@@ -270,12 +270,13 @@ const MAKE_GBP_WEBHOOK = 'https://hook.eu1.make.com/t689r3nbxfl4rsm3fn57qureowu3
 async function postCampaignToGoogle(campaignId) {
   const result = await query(
     `SELECT c.id, c.title, c.campaign_code, c.start_date, c.end_date,
-            u.google_refresh_token, u.google_account_id, u.google_location_id,
+            admin.google_refresh_token, admin.google_account_id, admin.google_location_id,
             ct.file_url, ct.type AS content_type
      FROM campaigns c
-     JOIN users u ON u.id = c.user_id
+     JOIN users admin ON admin.role = 'superadmin'
      LEFT JOIN content ct ON ct.id = c.content_id
-     WHERE c.id = $1`,
+     WHERE c.id = $1
+     LIMIT 1`,
     [campaignId]
   );
   const row = result.rows[0];
