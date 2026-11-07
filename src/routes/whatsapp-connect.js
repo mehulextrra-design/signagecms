@@ -59,6 +59,10 @@ router.post('/connect', authenticate, requireWaEnabled, async (req, res) => {
     if (digits.length < 10) return res.status(400).json({ error: 'Invalid phone number' });
 
     const code = await requestPairingCode(req.user.id, digits);
+    if (code === null) {
+      // Already registered — socket will auto-connect, tell frontend to poll status
+      return res.json({ code: null, already_connected: true });
+    }
     res.json({ code });
   } catch (err) {
     console.error('[WA] connect error:', err.message);
