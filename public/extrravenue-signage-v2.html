@@ -1999,8 +1999,16 @@ function loadPreset(key){
 <section style="background:var(--surface);padding:0 0 64px;">
   <div class="wrap">
     <div class="venue-card venue-card--fullimg" data-reveal>
-      <!-- Full-bleed BG image carousel -->
-      <div class="vic-bg">
+      <!-- Left text panel -->
+      <div class="vic-left">
+        <h3 style="font-family:'Magra',sans-serif;font-size:clamp(22px,2.4vw,34px);font-weight:700;color:#fff;line-height:1.15;margin:0;letter-spacing:-.02em;text-wrap:balance;">Apni screen register karo – apna ad FREE chalao</h3>
+        <p style="font-size:15px;color:rgba(255,255,255,.82);margin:0;max-width:46ch;line-height:1.6;">Koi rent nahi, koi fees nahi. Sirf apni screen register karo – aur apna promotion Ahmedabad ke digital screens pe free mein chalao.</p>
+        <div>
+          <a href="#" onclick="openVenuePartner();return false;" style="display:inline-flex;align-items:center;gap:8px;background:#fff;color:var(--dark);border-radius:999px;padding:11px 22px;font-size:14px;font-weight:600;text-decoration:none;transition:box-shadow .2s;cursor:pointer;" onmouseover="this.style.boxShadow='0 8px 24px rgba(0,0,0,.18)'" onmouseout="this.style.boxShadow='none'">Venue partner bano &rarr;</a>
+        </div>
+      </div>
+      <!-- Right image carousel — 1:1 aspect ratio so full image visible without crop -->
+      <div class="vic-right">
         <div class="vic-bg-track" id="vicTrack">
           <img src="/img/venue-cafe-screen.webp" alt="Cafe screen" loading="lazy">
           <img src="/img/venue-clinic-screen.webp" alt="Clinic screen" loading="lazy">
@@ -2008,39 +2016,29 @@ function loadPreset(key){
           <img src="/img/venue-electronics-screen.webp" alt="Electronics store screen" loading="lazy">
           <img src="/img/venue-fashion-screen.webp" alt="Fashion store screen" loading="lazy">
         </div>
-      </div>
-      <!-- Left-to-right fade overlay -->
-      <div class="vic-fade"></div>
-      <!-- Text content -->
-      <div class="vic-content">
-        <h3 style="font-family:'Magra',sans-serif;font-size:clamp(22px,2.4vw,34px);font-weight:700;color:#fff;line-height:1.15;margin:0;letter-spacing:-.02em;text-wrap:balance;">Apni screen register karo – apna ad FREE chalao</h3>
-        <p style="font-size:15px;color:rgba(255,255,255,.82);margin:0;max-width:46ch;line-height:1.6;">Koi rent nahi, koi fees nahi. Sirf apni screen register karo – aur apna promotion Ahmedabad ke digital screens pe free mein chalao.</p>
-        <div>
-          <a href="#" onclick="openVenuePartner();return false;" style="display:inline-flex;align-items:center;gap:8px;background:#fff;color:var(--dark);border-radius:999px;padding:11px 22px;font-size:14px;font-weight:600;text-decoration:none;transition:box-shadow .2s;cursor:pointer;" onmouseover="this.style.boxShadow='0 8px 24px rgba(0,0,0,.18)'" onmouseout="this.style.boxShadow='none'">Venue partner bano &rarr;</a>
+        <div class="vic-left-blend"></div>
+        <div class="vic-dots" id="vicDots">
+          <span class="vic-dot active"></span>
+          <span class="vic-dot"></span>
+          <span class="vic-dot"></span>
+          <span class="vic-dot"></span>
+          <span class="vic-dot"></span>
         </div>
-      </div>
-      <!-- Dot indicators -->
-      <div class="vic-dots" id="vicDots">
-        <span class="vic-dot active"></span>
-        <span class="vic-dot"></span>
-        <span class="vic-dot"></span>
-        <span class="vic-dot"></span>
-        <span class="vic-dot"></span>
       </div>
     </div>
   </div>
 </section>
 <style>
-  .venue-card--fullimg{background:#111 !important;padding:0 !important;overflow:hidden;position:relative;min-height:520px;align-items:stretch !important;}
-  .vic-bg{position:absolute;inset:0;overflow:hidden;}
+  .venue-card--fullimg{background:#111 !important;padding:0 !important;overflow:hidden;align-items:stretch !important;}
+  .vic-left{flex:1;padding:44px 48px;display:flex;flex-direction:column;justify-content:center;gap:14px;background:#111;}
+  .vic-right{flex:none;width:46%;aspect-ratio:1/1;position:relative;overflow:hidden;}
   .vic-bg-track{display:flex;height:100%;width:500%;transition:transform .75s cubic-bezier(.4,0,.2,1);}
-  .vic-bg-track img{flex:none;width:20%;height:100%;object-fit:cover;object-position:center 20%;}
-  .vic-fade{position:absolute;inset:0;z-index:1;background:linear-gradient(to right,rgba(17,17,17,.92) 18%,rgba(17,17,17,.55) 42%,rgba(17,17,17,.12) 65%,transparent 100%);}
-  .vic-content{position:relative;z-index:2;padding:44px 48px;display:flex;flex-direction:column;gap:14px;max-width:52ch;}
-  .vic-dots{position:absolute;bottom:16px;right:20px;z-index:3;display:flex;gap:6px;}
-  .vic-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.35);transition:background .3s,transform .3s;}
+  .vic-bg-track img{flex:none;width:20%;height:100%;object-fit:cover;}
+  .vic-left-blend{position:absolute;top:0;left:0;bottom:0;width:72px;background:linear-gradient(to right,#111,transparent);z-index:1;pointer-events:none;}
+  .vic-dots{position:absolute;bottom:12px;right:14px;z-index:2;display:flex;gap:6px;}
+  .vic-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.4);transition:background .3s,transform .3s;}
   .vic-dot.active{background:#fff;transform:scale(1.25);}
-  @media(max-width:640px){.venue-card--fullimg{min-height:260px;}.vic-content{padding:28px 24px;}.vic-fade{background:linear-gradient(to right,rgba(17,17,17,.95) 45%,rgba(17,17,17,.4) 75%,transparent 100%);}}
+  @media(max-width:640px){.venue-card--fullimg{flex-direction:column !important;}.vic-left{padding:28px 24px;}.vic-right{width:100%;aspect-ratio:4/3;}}
 </style>
 <script>
   (function(){
