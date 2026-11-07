@@ -672,9 +672,124 @@ async function sendNewUserAlertEmail({ first_name, last_name, email, mobile, bus
   }
 }
 
+// ── Expiry reminder email (2 days / 1 day before end) ────────────────────
+async function sendExpiryReminderEmail(campaignId, daysLeft) {
+  try {
+    const { rows } = await query(
+      `SELECT c.title, c.campaign_code, c.start_date, c.end_date,
+              u.email, u.first_name, u.last_name, u.business_name
+       FROM campaigns c JOIN users u ON u.id = c.user_id WHERE c.id = $1`,
+      [campaignId]
+    );
+    if (!rows.length) return;
+    const c = rows[0];
+    const name = c.business_name || `${c.first_name} ${c.last_name}`.trim();
+    const isLastDay = daysLeft === 1;
+
+    const body = `
+      <div class="tag">${isLastDay ? 'Last Day' : '2 Days Left'}</div>
+      <h2>${isLastDay ? 'Campaign Ends Tomorrow!' : 'Campaign Ending in 2 Days'}</h2>
+      <p class="sub">Hi ${name}, your campaign is about to end. Renew now to stay on screens.</p>
+
+      <div class="stats-row cols-2">
+        <div class="stat-card">
+          <div class="stat-num ${isLastDay ? 'red' : 'amber'}" style="font-size:40px">${daysLeft}</div>
+          <div class="stat-label">${isLastDay ? 'Day Left' : 'Days Left'}</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" style="font-size:16px;padding-top:4px"><span class="code-badge" style="font-size:13px">${c.campaign_code}</span></div>
+          <div class="stat-label">Campaign Code</div>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <div class="info-row"><span class="ir-label">Campaign</span><span class="ir-value">${c.title}</span></div>
+        <div class="info-row"><span class="ir-label">End Date</span><span class="ir-value" style="color:${isLastDay ? '#dc2626' : '#d97706'};font-weight:700">${fmtDate(c.end_date)}</span></div>
+      </div>
+
+      <p style="font-size:14px;color:#aaa">${isLastDay ? 'Your ad will stop displaying after today. Contact us immediately to extend your campaign.' : 'Your ad will stop displaying in 2 days. Book a renewal now to avoid any gap in display.'}</p>
+      <a class="btn" href="${process.env.APP_URL || 'https://signagecrm-production.up.railway.app'}">Renew Campaign</a>`;
+
+    await sendMail({
+      to: c.email,
+      subject: `${isLastDay ? 'Last Day!' : '2 Days Left'} – ${c.campaign_code} ends ${fmtDate(c.end_date)} | SignageCMS`,
+      html: wrap(body),
+    });
+    console.log(`[Email] Expiry reminder (${daysLeft}d) sent to ${c.email} — ${c.campaign_code}`);
+  } catch (err) {
+    console.error('[Email] sendExpiryReminderEmail error:', err.message);
+  }
+}
+
+// ── Campaign completed email ──────────────────────────────────────────────
+async function sendCampaignCompletedEmail(campaignId) {
+  try {
+    const { rows } = await query(
+      `SELECT c.title, c.campaign_code, c.start_date, c.end_date,
+              c.amount_total,
+              COALESCE(SUM(pl.play_count), 0) AS total_plays,
+              COUNT(DISTINCT pl.screen_id) AS total_screens
+       FROM campaigns c
+       LEFT JOIN play_logs pl ON pl.campaign_id = c.id
+       WHERE c.id = $1
+       GROUP BY c.id, c.title, c.campaign_code, c.start_date, c.end_date, c.amount_total`,
+      [campaignId]
+    );
+    const { rows: uRows } = await query(
+      `SELECT u.email, u.first_name, u.last_name, u.business_name
+       FROM campaigns c JOIN users u ON u.id = c.user_id WHERE c.id = $1`,
+      [campaignId]
+    );
+    if (!rows.length || !uRows.length) return;
+    const c = rows[0];
+    const u = uRows[0];
+    const name = u.business_name || `${u.first_name} ${u.last_name}`.trim();
+
+    const body = `
+      <div class="tag">Campaign Completed</div>
+      <h2>Campaign Successfully Completed!</h2>
+      <p class="sub">Hi ${name}, your campaign has successfully run its full duration.</p>
+
+      <div class="stats-row cols-3">
+        <div class="stat-card">
+          <div class="stat-num brand">${parseInt(c.total_plays).toLocaleString('en-IN')}</div>
+          <div class="stat-label">Total Plays</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num dark">${c.total_screens}</div>
+          <div class="stat-label">Screens</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num green">&#10003;</div>
+          <div class="stat-label">Completed</div>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <div class="info-row"><span class="ir-label">Campaign</span><span class="ir-value">${c.title}</span></div>
+        <div class="info-row"><span class="ir-label">Code</span><span class="ir-value"><span class="code-badge">${c.campaign_code}</span></span></div>
+        <div class="info-row"><span class="ir-label">Duration</span><span class="ir-value">${fmtDate(c.start_date)} – ${fmtDate(c.end_date)}</span></div>
+        <div class="info-row"><span class="ir-label">Total Investment</span><span class="ir-value">₹${parseFloat(c.amount_total).toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</span></div>
+      </div>
+
+      <p style="font-size:14px;color:#aaa">Thank you for advertising with SignageCMS. View your complete proof of play report from the dashboard.</p>
+      <a class="btn" href="${process.env.APP_URL || 'https://signagecrm-production.up.railway.app'}">View Full Report</a>`;
+
+    await sendMail({
+      to: u.email,
+      subject: `Campaign Completed – ${c.campaign_code} | ${parseInt(c.total_plays).toLocaleString('en-IN')} total plays | SignageCMS`,
+      html: wrap(body),
+    });
+    console.log(`[Email] Completed email sent to ${u.email} — ${c.campaign_code}, ${c.total_plays} plays`);
+  } catch (err) {
+    console.error('[Email] sendCampaignCompletedEmail error:', err.message);
+  }
+}
+
 module.exports = {
   sendInvoiceEmail, sendApprovedEmail, sendRejectedEmail,
   sendPausedEmail, sendResumedEmail, sendOnHoldEmail,
   sendWalletCreditEmail,
+  sendExpiryReminderEmail, sendCampaignCompletedEmail,
   sendDailyPoPReport, sendDailyPoPEmailAll, sendNewUserAlertEmail,
 };

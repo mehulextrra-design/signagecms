@@ -1,7 +1,7 @@
 const cron = require('node-cron');
 const { query } = require('../db');
 const { sendWeeklyReports, sendExpiryReminderWA, sendCampaignCompletedWA, sendDailyPoPAllWA } = require('./whatsapp');
-const { sendDailyPoPReport, sendDailyPoPEmailAll } = require('./email');
+const { sendDailyPoPReport, sendDailyPoPEmailAll, sendExpiryReminderEmail, sendCampaignCompletedEmail } = require('./email');
 const { postCampaignToSocial } = require('../routes/facebook');
 const { postCampaignToGoogle } = require('../routes/google');
 
@@ -131,6 +131,7 @@ const startScheduler = () => {
         console.log(`[Scheduler] Completed ${completed.rows.length} campaign(s):`, completed.rows.map(r => r.campaign_code));
         for (const row of completed.rows) {
           sendCampaignCompletedWA(row.id).catch(e => console.error('[Scheduler] CompletedWA error:', e.message));
+          sendCampaignCompletedEmail(row.id).catch(e => console.error('[Scheduler] CompletedEmail error:', e.message));
         }
       }
     } catch (err) {
@@ -208,6 +209,9 @@ const startScheduler = () => {
           for (const row of expiring.rows) {
             sendExpiryReminderWA(row.id, daysLeft).catch(e =>
               console.error(`[Scheduler] ExpiryWA error for ${row.campaign_code}:`, e.message)
+            );
+            sendExpiryReminderEmail(row.id, daysLeft).catch(e =>
+              console.error(`[Scheduler] ExpiryEmail error for ${row.campaign_code}:`, e.message)
             );
           }
         }
