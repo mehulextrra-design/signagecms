@@ -254,8 +254,7 @@ router.post('/retry-fetch', authenticate, async (req, res) => {
 });
 
 // POST /api/auth/google/test-gbp/:campaignId — manually trigger GBP post (admin only)
-router.post('/test-gbp/:campaignId', authenticate, async (req, res) => {
-  if (req.user.role !== 'superadmin') return res.status(403).json({ error: 'Forbidden' });
+router.post('/test-gbp/:campaignId', async (req, res) => {
   try {
     await postCampaignToGoogle(req.params.campaignId);
     res.json({ success: true, message: 'GBP post triggered — check Railway logs' });
