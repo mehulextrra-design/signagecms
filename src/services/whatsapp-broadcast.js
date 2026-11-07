@@ -227,21 +227,13 @@ async function initSession(userId) {
 async function requestPairingCode(userId, phoneNumber) {
   await ensureWaTables();
 
-  // Clear any stale socket so we get a fresh connection with current DB creds
+  // Clear any stale in-memory socket — will re-init with DB creds below
   if (activeSockets.has(userId)) {
     try { activeSockets.get(userId).end(); } catch (_) {}
     activeSockets.delete(userId);
   }
 
-  // Reset to pending so status polling works correctly
-  await query(
-    `INSERT INTO wa_sessions (user_id, auth_state, status, phone_number)
-     VALUES ($1, '{}', 'pending', $2)
-     ON CONFLICT (user_id) DO UPDATE
-       SET status='pending', phone_number=$2, auth_state='{}', updated_at=NOW()`,
-    [userId, phoneNumber]
-  );
-
+  // Init socket with EXISTING DB creds (don't wipe auth_state yet)
   const sock = await initSession(userId);
 
   // Wait briefly for socket handshake
@@ -249,9 +241,22 @@ async function requestPairingCode(userId, phoneNumber) {
 
   // Per official Baileys docs: only request pairing code when NOT already registered
   if (sock.authState.creds.registered) {
-    // Creds already valid — socket will auto-connect, no code needed
+    // Valid creds in DB — socket auto-reconnects, no new code needed
+    await query(
+      `UPDATE wa_sessions SET phone_number=$2, updated_at=NOW() WHERE user_id=$1`,
+      [userId, phoneNumber]
+    );
     return null;
   }
+
+  // Not registered — fresh pairing needed; upsert row with blank state
+  await query(
+    `INSERT INTO wa_sessions (user_id, auth_state, status, phone_number)
+     VALUES ($1, '{}', 'pending', $2)
+     ON CONFLICT (user_id) DO UPDATE
+       SET status='pending', phone_number=$2, updated_at=NOW()`,
+    [userId, phoneNumber]
+  );
 
   let digits = phoneNumber.replace(/\D/g, '');
   if (digits.length === 10) digits = '91' + digits;
