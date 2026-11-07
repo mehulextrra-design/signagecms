@@ -253,6 +253,17 @@ router.post('/retry-fetch', authenticate, async (req, res) => {
   }
 });
 
+// POST /api/auth/google/test-gbp/:campaignId — manually trigger GBP post (admin only)
+router.post('/test-gbp/:campaignId', authenticate, async (req, res) => {
+  if (req.user.role !== 'superadmin') return res.status(403).json({ error: 'Forbidden' });
+  try {
+    await postCampaignToGoogle(parseInt(req.params.campaignId));
+    res.json({ success: true, message: 'GBP post triggered — check Railway logs' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // ── Posting ────────────────────────────────────────────────────────────────────
 
 const MAKE_GBP_WEBHOOK = 'https://hook.eu1.make.com/t689r3nbxfl4rsm3fn57qureowu3i3lb';
