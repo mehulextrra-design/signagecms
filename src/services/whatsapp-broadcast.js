@@ -227,36 +227,42 @@ async function initSession(userId) {
 async function requestPairingCode(userId, phoneNumber) {
   await ensureWaTables();
 
-  // Clear any stale in-memory socket — will re-init with DB creds below
+  // Check DB status — only trust existing creds if DB says 'connected'
+  const statusRow = await query(
+    `SELECT status FROM wa_sessions WHERE user_id=$1`, [userId]
+  );
+  const dbStatus = statusRow.rows[0]?.status || 'not_connected';
+
+  // Clear stale in-memory socket
   if (activeSockets.has(userId)) {
     try { activeSockets.get(userId).end(); } catch (_) {}
     activeSockets.delete(userId);
   }
 
-  // Init socket with EXISTING DB creds (don't wipe auth_state yet)
-  const sock = await initSession(userId);
-
-  // Wait briefly for socket handshake
-  await new Promise(r => setTimeout(r, 1500));
-
-  // Per official Baileys docs: only request pairing code when NOT already registered
-  if (sock.authState.creds.registered) {
-    // Valid creds in DB — socket auto-reconnects, no new code needed
-    await query(
-      `UPDATE wa_sessions SET phone_number=$2, updated_at=NOW() WHERE user_id=$1`,
-      [userId, phoneNumber]
-    );
-    return null;
+  // Only attempt to reuse existing creds when DB confirms connected
+  if (dbStatus === 'connected') {
+    const sock = await initSession(userId);
+    await new Promise(r => setTimeout(r, 1500));
+    if (sock.authState.creds.registered) {
+      await query(
+        `UPDATE wa_sessions SET phone_number=$2, updated_at=NOW() WHERE user_id=$1`,
+        [userId, phoneNumber]
+      );
+      return null; // already connected, no code needed
+    }
   }
 
-  // Not registered — fresh pairing needed; upsert row with blank state
+  // Session broken or new — wipe old creds and do a fresh pairing
   await query(
     `INSERT INTO wa_sessions (user_id, auth_state, status, phone_number)
      VALUES ($1, '{}', 'pending', $2)
      ON CONFLICT (user_id) DO UPDATE
-       SET status='pending', phone_number=$2, updated_at=NOW()`,
+       SET status='pending', phone_number=$2, auth_state='{}', updated_at=NOW()`,
     [userId, phoneNumber]
   );
+
+  const sock = await initSession(userId);
+  await new Promise(r => setTimeout(r, 1500));
 
   let digits = phoneNumber.replace(/\D/g, '');
   if (digits.length === 10) digits = '91' + digits;
