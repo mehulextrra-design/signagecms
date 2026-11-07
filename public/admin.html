@@ -2910,6 +2910,7 @@ function renderAdvertisers(data) {
           ? `<button class="btn btn-danger btn-xs" style="margin-left:4px;" onclick="suspendUser('${u.id}')">Suspend</button>`
           : `<button class="btn btn-success btn-xs" style="margin-left:4px;" onclick="activateUser('${u.id}')">Activate</button>`
         }
+        <button class="btn btn-xs" style="margin-left:4px;background:${u.wa_enabled?'#25d366':'var(--bg3)'};color:${u.wa_enabled?'#fff':'var(--text2)'};" title="${u.wa_enabled?'WA Broadcast ON':'WA Broadcast OFF'}" onclick="toggleWa('${u.id}')">WA</button>
       </td>
     </tr>`).join('');
 }
@@ -2934,6 +2935,14 @@ async function activateUser(id) {
   try {
     await api(`/users/${id}/activate`, { method: 'POST' });
     showToast('User activated', 'success');
+    loadAdvertisers();
+  } catch(e) { showToast('Error: ' + e.message, 'error'); }
+}
+
+async function toggleWa(id) {
+  try {
+    const r = await api(`/users/${id}/wa-toggle`, { method: 'POST' });
+    showToast(`WA Broadcast ${r.wa_enabled ? 'enabled' : 'disabled'}`, 'success');
     loadAdvertisers();
   } catch(e) { showToast('Error: ' + e.message, 'error'); }
 }

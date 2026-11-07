@@ -168,7 +168,7 @@ router.post('/', authenticate, async (req, res, next) => {
   const client = await getClient();
   try {
     await client.query('BEGIN');
-    const { screen_ids, content_id, title, start_date, end_date, start_time, end_time, coupon_code, package_name, wallet_amount } = req.body;
+    const { screen_ids, content_id, title, start_date, end_date, start_time, end_time, coupon_code, package_name, wallet_amount, wa_broadcast_enabled } = req.body;
 
     if (!screen_ids?.length) throw { status: 400, message: 'At least one screen required' };
 
@@ -243,10 +243,10 @@ router.post('/', authenticate, async (req, res, next) => {
     const code = await generateCampaignCode();
     const campResult = await client.query(
       `INSERT INTO campaigns (campaign_code, user_id, content_id, title, start_date, end_date, start_time, end_time,
-        amount_base, amount_gst, amount_total, wallet_used, coupon_code, discount_amount, slot_duration_sec, package_name, status)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,'pending_payment') RETURNING *`,
+        amount_base, amount_gst, amount_total, wallet_used, coupon_code, discount_amount, slot_duration_sec, package_name, wa_broadcast_enabled, status)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,'pending_payment') RETURNING *`,
       [code, req.user.id, content_id, title, start_date, end_date, start_time || '00:00:00', end_time || '23:59:59',
-       amount_base, amount_gst, amount_total, walletUsed, coupon_code, discount, slot_duration_sec, pkg.name]
+       amount_base, amount_gst, amount_total, walletUsed, coupon_code, discount, slot_duration_sec, pkg.name, wa_broadcast_enabled || false]
     );
     const campaign = campResult.rows[0];
 

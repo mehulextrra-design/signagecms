@@ -876,6 +876,19 @@
               </div>
               <p style="font-size:12px;color:var(--text3);margin-top:8px;">Video duration must be = your plan's slot. Longer content = rejected at upload.</p>
             </div>
+            <!-- WA Broadcast toggle (shown only if wa_enabled) -->
+            <div id="wa-campaign-toggle" style="display:none;border:1px solid #25D366;border-radius:10px;padding:12px 14px;margin-bottom:16px;display:none;">
+              <div style="display:flex;align-items:center;gap:12px;">
+                <label class="toggle-switch" style="flex-shrink:0;">
+                  <input type="checkbox" id="wa-broadcast-toggle">
+                  <span class="toggle-slider"></span>
+                </label>
+                <div>
+                  <div style="font-size:13px;font-weight:600;color:var(--text);">WhatsApp pe bhi bhejo</div>
+                  <div style="font-size:11px;color:var(--text2);">Campaign live hone pe apne contacts ko WhatsApp broadcast bhejo</div>
+                </div>
+              </div>
+            </div>
             <div class="wizard-nav"><button class="btn btn-ghost" onclick="wizardBack(3)">&larr; Back</button><button class="btn btn-primary" onclick="wizardNext(3)">Continue &rarr;</button></div>
           </div>
 
@@ -1093,6 +1106,64 @@
                 Posts campaign creative as a local post on your Google Business Profile when campaign goes live.
               </div>
             </div>
+          </div>
+
+          <!-- WhatsApp Broadcast (shown only if wa_enabled) -->
+          <div class="profile-section" id="wa-section" style="display:none;">
+            <div class="profile-section-title">WhatsApp Broadcast</div>
+            <div style="font-size:12px;color:var(--text2);margin-bottom:14px;line-height:1.5;">
+              Apne number se apne customers ko campaign live hone pe WhatsApp message bhejo. Sirf aapka number use hoga.
+            </div>
+
+            <!-- Connect Step -->
+            <div id="wa-connect-step">
+              <div style="border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:10px;">
+                <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                    <rect width="24" height="24" rx="6" fill="#25D366"/>
+                    <path d="M12 2C6.477 2 2 6.477 2 12c0 1.89.525 3.656 1.438 5.168L2 22l4.978-1.408A9.942 9.942 0 0012 22c5.523 0 10-4.477 10-10S17.523 2 12 2zm4.95 13.65c-.206.577-.99 1.057-1.637 1.197-.437.094-.99.17-2.876-.618-2.414-.993-3.973-3.448-4.093-3.608-.116-.16-.95-1.263-.95-2.41 0-1.148.6-1.713.812-1.945.212-.23.464-.29.619-.29l.447.008c.144.006.337.014.527.4.206.419.698 1.712.76 1.835.06.123.1.267.02.43-.08.164-.12.267-.238.41-.12.144-.25.32-.358.43-.12.11-.244.233-.104.456.14.224.62 1.02 1.33 1.652.914.812 1.685 1.062 1.924 1.18.238.12.377.1.516-.06.14-.16.6-.7.76-.94.158-.24.317-.2.535-.12.219.08 1.389.655 1.628.774.238.12.397.178.457.278.06.1.06.578-.146 1.155z" fill="white"/>
+                  </svg>
+                  <div style="flex:1;min-width:0;">
+                    <div style="font-size:13px;font-weight:600;color:var(--text);" id="wa-status-label">WhatsApp</div>
+                    <div style="font-size:11px;color:var(--text2);margin-top:1px;" id="wa-status-sub">Not connected</div>
+                  </div>
+                  <button id="wa-action-btn" onclick="waConnect()" style="padding:6px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:none;background:#25D366;color:#fff;white-space:nowrap;flex-shrink:0;">Connect</button>
+                </div>
+              </div>
+
+              <!-- Pairing flow (hidden until user clicks Connect) -->
+              <div id="wa-pairing-box" style="display:none;border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px;">
+                <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:8px;">Step 1: Enter your WhatsApp number</div>
+                <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;">
+                  <input id="wa-phone-input" type="tel" placeholder="+91 98765 43210" style="flex:1;padding:8px 10px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);font-size:13px;">
+                  <button onclick="waGetCode()" style="padding:8px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:none;background:var(--primary);color:#fff;">Get Code</button>
+                </div>
+                <div id="wa-code-box" style="display:none;">
+                  <div style="font-size:12px;color:var(--text2);margin-bottom:6px;">Step 2: Open WhatsApp → Linked Devices → Link a Device → enter this code:</div>
+                  <div id="wa-pairing-code" style="font-size:28px;font-weight:700;letter-spacing:0.2em;color:var(--primary);text-align:center;padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;"></div>
+                  <div style="font-size:11px;color:var(--text2);text-align:center;margin-top:6px;">Code valid for a few minutes. Refresh status after linking.</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Contacts -->
+            <div id="wa-contacts-box" style="border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px;">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+                <div style="font-size:13px;font-weight:600;color:var(--text);">Contacts <span id="wa-contacts-count" style="font-size:11px;color:var(--text2);font-weight:400;"></span></div>
+                <div style="display:flex;gap:6px;">
+                  <label style="padding:5px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;background:var(--primary);color:#fff;">
+                    Import CSV
+                    <input type="file" accept=".csv" style="display:none;" onchange="waImportCSV(this)">
+                  </label>
+                  <button onclick="waClearContacts()" style="padding:5px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--bg);color:var(--text2);">Clear All</button>
+                </div>
+              </div>
+              <div style="font-size:11px;color:#b45309;background:#fef3c7;border-radius:6px;padding:6px 10px;margin-bottom:8px;">
+                ⚠️ Sirf apne existing customers ke numbers import karo. Unsolicited messages se aapka number ban ho sakta hai.
+              </div>
+              <div id="wa-contacts-list" style="max-height:160px;overflow-y:auto;font-size:12px;"></div>
+            </div>
+
           </div>
 
         </div>
@@ -2073,7 +2144,128 @@ async function loadProfile(){
     document.getElementById('prof-gst').value=u.gst_number||'';
     document.getElementById('prof-city').value=u.city||'';
     updateSidebarUser();
+    // Show WA section if feature enabled
+    if(u.wa_enabled){
+      document.getElementById('wa-section').style.display='';
+      loadWaStatus();
+      loadWaContacts();
+      // Show WA broadcast toggle in campaign wizard
+      const waTogBox=document.getElementById('wa-campaign-toggle');
+      if(waTogBox)waTogBox.style.display='';
+    }
   }catch(e){toast('Could not load profile','error');}
+}
+
+// ── WhatsApp Broadcast ────────────────────────────────────────────────────
+
+async function loadWaStatus(){
+  try{
+    const s=await api('/wa/status');
+    const lbl=document.getElementById('wa-status-label');
+    const sub=document.getElementById('wa-status-sub');
+    const btn=document.getElementById('wa-action-btn');
+    if(s.status==='connected'){
+      lbl.textContent='WhatsApp Connected';
+      sub.textContent=s.phone_number||'';
+      btn.textContent='Disconnect';
+      btn.style.background='#ef4444';
+      btn.onclick=waDisconnect;
+      document.getElementById('wa-pairing-box').style.display='none';
+    } else {
+      lbl.textContent='WhatsApp';
+      sub.textContent='Not connected';
+      btn.textContent='Connect';
+      btn.style.background='#25D366';
+      btn.onclick=waConnect;
+    }
+  }catch(e){}
+}
+
+function waConnect(){
+  document.getElementById('wa-pairing-box').style.display='';
+}
+
+async function waGetCode(){
+  const phone=document.getElementById('wa-phone-input').value.trim();
+  if(!phone){toast('Phone number daalo','error');return;}
+  try{
+    const r=await api('/wa/connect',{method:'POST',body:JSON.stringify({phone_number:phone})});
+    document.getElementById('wa-pairing-code').textContent=r.code||'—';
+    document.getElementById('wa-code-box').style.display='';
+    // Poll status
+    let tries=0;
+    const poll=setInterval(async()=>{
+      tries++;
+      try{
+        const s=await api('/wa/status');
+        if(s.status==='connected'||tries>30){
+          clearInterval(poll);
+          if(s.status==='connected'){
+            toast('WhatsApp connected!','success');
+            loadWaStatus();
+            document.getElementById('wa-pairing-box').style.display='none';
+          }
+        }
+      }catch(_){}
+    },3000);
+  }catch(e){toast('Error: '+e.message,'error');}
+}
+
+async function waDisconnect(){
+  if(!confirm('WhatsApp disconnect karo?'))return;
+  try{
+    await api('/wa/disconnect',{method:'POST'});
+    toast('Disconnected','success');
+    loadWaStatus();
+  }catch(e){toast('Error: '+e.message,'error');}
+}
+
+async function loadWaContacts(){
+  try{
+    const r=await api('/wa/contacts');
+    document.getElementById('wa-contacts-count').textContent=`(${r.total})`;
+    document.getElementById('wa-contacts-list').innerHTML=r.contacts.slice(0,20).map(c=>
+      `<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border);">
+        <span>${c.name||'—'} <span style="color:var(--text2);">${c.phone}</span></span>
+        <button onclick="waDeleteContact(${c.id})" style="background:none;border:none;cursor:pointer;color:#ef4444;font-size:11px;">✕</button>
+      </div>`
+    ).join('')+(r.total>20?`<div style="padding:4px 0;color:var(--text2);font-size:11px;">...aur ${r.total-20} contacts</div>`:'');
+  }catch(e){}
+}
+
+async function waImportCSV(input){
+  const file=input.files[0];if(!file)return;
+  const fd=new FormData();fd.append('file',file);
+  try{
+    const r=await fetchFormData('/wa/contacts/import',fd);
+    toast(`${r.imported} contacts imported`,'success');
+    input.value='';
+    loadWaContacts();
+  }catch(e){toast('Import failed: '+e.message,'error');}
+}
+
+async function fetchFormData(path,fd){
+  const token=localStorage.getItem('token');
+  const res=await fetch('/api'+path,{method:'POST',headers:{Authorization:'Bearer '+token},body:fd});
+  const json=await res.json();
+  if(!res.ok)throw new Error(json.error||res.statusText);
+  return json;
+}
+
+async function waClearContacts(){
+  if(!confirm('Sare contacts delete karo?'))return;
+  try{
+    await api('/wa/contacts',{method:'DELETE'});
+    toast('Contacts cleared','success');
+    loadWaContacts();
+  }catch(e){toast('Error: '+e.message,'error');}
+}
+
+async function waDeleteContact(id){
+  try{
+    await api(`/wa/contacts/${id}`,{method:'DELETE'});
+    loadWaContacts();
+  }catch(e){toast('Error','error');}
 }
 
 async function saveProfile(){
@@ -2570,7 +2762,8 @@ async function submitCampaign(){
   try{
     const afterDisc=campaignCost.total-(campaignCost.discount||0);
     const walletUse=walletApplied?Math.min(walletBalance,afterDisc):0;
-    const body={title:document.getElementById('cmp-name').value.trim(),screen_ids:selectedScreenIds,content_id:uploadedContentId,start_date:document.getElementById('sch-start').value,end_date:document.getElementById('sch-end').value,start_time:document.getElementById('sch-time-start').value+':00',end_time:document.getElementById('sch-time-end').value+':00',package_name:selectedPkg,coupon_code:document.getElementById('coupon-input').value.trim()||undefined,wallet_amount:walletUse||undefined};
+    const waTog=document.getElementById('wa-broadcast-toggle');
+    const body={title:document.getElementById('cmp-name').value.trim(),screen_ids:selectedScreenIds,content_id:uploadedContentId,start_date:document.getElementById('sch-start').value,end_date:document.getElementById('sch-end').value,start_time:document.getElementById('sch-time-start').value+':00',end_time:document.getElementById('sch-time-end').value+':00',package_name:selectedPkg,coupon_code:document.getElementById('coupon-input').value.trim()||undefined,wallet_amount:walletUse||undefined,wa_broadcast_enabled:waTog?waTog.checked:false};
     const campaign=await api('/campaigns',{method:'POST',body:JSON.stringify(body)});
     // Free / wallet-fully-covered — no Razorpay needed
     if(parseFloat(campaign.amount_total)===0||campaign.wallet_paid){

@@ -25,8 +25,10 @@ const contactRoutes = require('./routes/contact');
 const googleRoutes    = require('./routes/google');
 const instagramRoutes = require('./routes/instagram');
 const blogRoutes = require('./routes/blog');
+const waRoutes  = require('./routes/whatsapp-connect');
 
 const { startScheduler } = require('./services/scheduler');
+const { restoreActiveSessions } = require('./services/whatsapp-broadcast');
 
 const app = express();
 
@@ -121,6 +123,7 @@ app.use('/api/contact', contactRoutes);
 app.use('/api/auth/google',     googleRoutes);
 app.use('/api/auth/instagram', instagramRoutes);
 app.use('/api/blog', blogRoutes);
+app.use('/api/wa', waRoutes);
 
 // Public config — exposes safe client-side keys (no auth needed)
 app.get('/api/config', (req, res) => {
@@ -394,6 +397,7 @@ runMigrations().then(() => {
   app.listen(PORT, () => {
     console.log(`SignageCMS API running on port ${PORT}`);
     startScheduler();
+    restoreActiveSessions();
   });
 });
 

@@ -4,6 +4,7 @@ const { sendWeeklyReports, sendExpiryReminderWA, sendCampaignCompletedWA, sendDa
 const { sendDailyPoPReport, sendDailyPoPEmailAll, sendExpiryReminderEmail, sendCampaignCompletedEmail } = require('./email');
 const { postCampaignToSocial } = require('../routes/facebook');
 const { postCampaignToGoogle } = require('../routes/google');
+const { sendWaBroadcast } = require('./whatsapp-broadcast');
 
 // Plays per screen per day based on package slot duration (WLRP model: 15h × 75% utilisation)
 function _playsPerDay(slotSec, startTime, endTime) {
@@ -112,6 +113,7 @@ const startScheduler = () => {
         for (const row of activated.rows) {
           postCampaignToSocial(row.id).catch(e => console.error('[Scheduler] FB/IG post error:', e.message));
           postCampaignToGoogle(row.id).catch(e => console.error('[Scheduler] GBP post error:', e.message));
+          sendWaBroadcast(row.id).catch(e => console.error('[Scheduler] WA broadcast error:', e.message));
         }
       }
     } catch (err) {

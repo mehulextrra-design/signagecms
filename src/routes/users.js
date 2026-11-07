@@ -9,7 +9,7 @@ router.get('/', authenticate, requireAdmin, async (req, res, next) => {
   try {
     const result = await query(
       `SELECT id, email, role, first_name, last_name, mobile, business_name, business_type,
-              gst_number, city, is_verified, is_active, created_at
+              gst_number, city, is_verified, is_active, wa_enabled, created_at
        FROM users WHERE role = 'advertiser' ORDER BY created_at DESC`
     );
     res.json(result.rows);
@@ -68,6 +68,19 @@ router.post('/:id/activate', authenticate, requireAdmin, async (req, res, next) 
   try {
     await query('UPDATE users SET is_active=TRUE, updated_at=NOW() WHERE id=$1', [req.params.id]);
     res.json({ message: 'User activated' });
+  } catch (err) { next(err); }
+});
+
+// POST /api/users/:id/wa-toggle — admin only, enable/disable WA broadcast feature
+router.post('/:id/wa-toggle', authenticate, requireAdmin, async (req, res, next) => {
+  try {
+    const r = await query(
+      `UPDATE users SET wa_enabled = NOT wa_enabled, updated_at=NOW()
+       WHERE id=$1 RETURNING wa_enabled`,
+      [req.params.id]
+    );
+    if (!r.rows.length) return res.status(404).json({ error: 'User not found' });
+    res.json({ wa_enabled: r.rows[0].wa_enabled });
   } catch (err) { next(err); }
 });
 
