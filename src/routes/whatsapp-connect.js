@@ -106,8 +106,8 @@ router.post('/contacts/import', authenticate, requireWaEnabled, upload.single('f
     // Accept columns: Name/name/NAME, Phone/phone/PHONE/mobile/Mobile/number/Number
     let imported = 0;
     for (const row of records) {
-      const name  = row.Name || row.name || row.NAME || null;
-      const phone = (row.Phone || row.phone || row.PHONE || row.mobile || row.Mobile || row.number || row.Number || '').replace(/\D/g, '');
+      const name  = row.Name || row.name || row.NAME || row['Full Name'] || row['full name'] || row['Customer Name'] || null;
+      const phone = (row.Phone || row.phone || row.PHONE || row.mobile || row.Mobile || row.number || row.Number || row['Contact Number'] || row['contact number'] || row['Phone Number'] || row['phone number'] || row['WhatsApp'] || row['whatsapp'] || '').replace(/\D/g, '');
       if (!phone || phone.length < 10) continue;
 
       await query(
