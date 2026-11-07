@@ -73,6 +73,8 @@ app.get('/extrravenue-signage.html', (req, res) => res.redirect(301, '/extrraven
 app.get('/', (req, res, next) => {
   const host = req.hostname;
   if (host === 'www.extrravenue.com' || host === 'extrravenue.com') {
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
     return res.sendFile(path.join(__dirname, '../public/extrravenue-signage-v2.html'));
   }
   next();
