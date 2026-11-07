@@ -357,6 +357,14 @@ async function applyCriticalFixes(pool) {
   } catch (err) {
     console.warn('[DB] Critical fix warn:', err.message);
   }
+  // WA broadcast columns (migration 025)
+  try {
+    await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS wa_enabled BOOLEAN NOT NULL DEFAULT FALSE`);
+    await pool.query(`ALTER TABLE campaigns ADD COLUMN IF NOT EXISTS wa_broadcast_enabled BOOLEAN NOT NULL DEFAULT FALSE`);
+    console.log('[DB] WA columns ensured');
+  } catch (err) {
+    console.warn('[DB] WA column fix warn:', err.message);
+  }
   console.log('[DB] Critical column fixes done');
 }
 
