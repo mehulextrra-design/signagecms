@@ -269,7 +269,10 @@ async function postCampaignToGoogle(campaignId) {
     [campaignId]
   );
   const row = result.rows[0];
-  if (!row || !row.google_refresh_token) return;
+  if (!row || !row.google_refresh_token) {
+    console.log(`[GBP] skipped campaign ${campaignId} — no refresh_token (row=${!!row})`);
+    return;
+  }
 
   // Refresh access token server-side
   let accessToken = null;
