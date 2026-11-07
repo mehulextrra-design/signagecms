@@ -2288,6 +2288,8 @@ async function waGetCode(){
             toast('WhatsApp connected!','success');
             loadWaStatus();
             document.getElementById('wa-pairing-box').style.display='none';
+          } else if(tries>30){
+            toast('Code expire ho gaya — dobara try karo','error');
           }
         }
       }catch(_){}
@@ -2332,11 +2334,11 @@ async function waImportContacts(){
           if(digits.length===10)list.push({name,phone:digits});
         }
       }
-      if(!list.length){showToast('Koi valid number nahi mila');return;}
+      if(!list.length){toast('Koi valid number nahi mila','error');return;}
       const r=await fetch('/api/wa/contacts',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+localStorage.getItem('token')},body:JSON.stringify({contacts:list})});
       const d=await r.json();
-      if(r.ok){showToast((d.added||list.length)+' contacts import ho gaye');loadWaContacts();}
-      else showToast(d.error||'Import failed');
+      if(r.ok){toast((d.added||list.length)+' contacts import ho gaye','success');loadWaContacts();}
+      else toast(d.error||'Import failed','error');
       return;
     }catch(e){
       // User cancelled or API not available — fall through to CSV

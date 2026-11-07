@@ -122,19 +122,38 @@ router.post('/contacts/import', authenticate, requireWaEnabled, upload.single('f
   }
 });
 
-// POST /api/wa/contacts  — add single contact
+// POST /api/wa/contacts  — add single OR bulk contacts
+// Single: {name, phone}   Bulk: {contacts: [{name, phone}]}
 router.post('/contacts', authenticate, requireWaEnabled, async (req, res) => {
   try {
     await ensureWaTables();
+
+    // Bulk insert (mobile contact picker)
+    if (Array.isArray(req.body.contacts)) {
+      let added = 0;
+      for (const c of req.body.contacts) {
+        const digits = (c.phone || '').replace(/\D/g, '');
+        if (!digits || digits.length < 10) continue;
+        await query(
+          `INSERT INTO wa_contacts (user_id, name, phone) VALUES ($1, $2, $3)
+           ON CONFLICT DO NOTHING`,
+          [req.user.id, c.name || null, digits]
+        );
+        added++;
+      }
+      return res.json({ ok: true, added });
+    }
+
+    // Single insert
     const { name, phone } = req.body;
     const digits = (phone || '').replace(/\D/g, '');
     if (!digits || digits.length < 10) return res.status(400).json({ error: 'Invalid phone number' });
-
     await query(
-      `INSERT INTO wa_contacts (user_id, name, phone) VALUES ($1, $2, $3)`,
+      `INSERT INTO wa_contacts (user_id, name, phone) VALUES ($1, $2, $3)
+       ON CONFLICT DO NOTHING`,
       [req.user.id, name || null, digits]
     );
-    res.json({ ok: true });
+    res.json({ ok: true, added: 1 });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

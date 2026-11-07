@@ -30,6 +30,7 @@ async function ensureWaTables() {
     created_at TIMESTAMPTZ DEFAULT NOW()
   )`);
   await query(`CREATE INDEX IF NOT EXISTS wa_contacts_user_idx ON wa_contacts(user_id)`);
+  await query(`CREATE UNIQUE INDEX IF NOT EXISTS wa_contacts_unique_phone ON wa_contacts(user_id, phone)`);
   await query(`CREATE TABLE IF NOT EXISTS wa_broadcasts (
     id             SERIAL PRIMARY KEY,
     campaign_id    INTEGER,
@@ -212,8 +213,9 @@ async function requestPairingCode(userId, phoneNumber) {
   // Wait briefly for socket to register
   await new Promise(r => setTimeout(r, 1500));
 
-  // phone must be digits only, with country code (e.g. 919876543210)
-  const digits = phoneNumber.replace(/\D/g, '');
+  // phone must be digits only with country code (e.g. 919876543210)
+  let digits = phoneNumber.replace(/\D/g, '');
+  if (digits.length === 10) digits = '91' + digits;  // prepend India code
   const code = await sock.requestPairingCode(digits);
   return code;
 }
