@@ -4,7 +4,7 @@ const Razorpay = require('razorpay');
 const { query, getClient } = require('../db');
 const { authenticate, requireAdmin } = require('../middleware/auth');
 const { reviewCampaign } = require('../services/aiReview');
-const { sendInvoiceEmail, sendApprovedEmail, sendRejectedEmail } = require('../services/email');
+const { sendInvoiceEmail, sendApprovedEmail, sendRejectedEmail, sendPausedEmail, sendResumedEmail, sendOnHoldEmail, sendWalletCreditEmail } = require('../services/email');
 const { sendCampaignApprovedWA, sendInvoiceConfirmedWA } = require('../services/whatsapp');
 const { creditWallet, debitWallet } = require('../services/wallet');
 const { postCampaignToSocial } = require('./facebook');
@@ -409,6 +409,12 @@ router.post('/:id/reject', authenticate, requireAdmin, async (req, res, next) =>
     await client.query('COMMIT');
     res.json({ ...campaign, refunded: refundAmt > 0 ? refundAmt : 0 });
     sendRejectedEmail(campaign.id, reason).catch(() => {});
+    if (refundAmt > 0 && campaign.payment_status === 'paid') {
+      // Notify user their wallet was refunded (get new balance separately since client is released)
+      query(`SELECT balance FROM user_wallets WHERE user_id = $1`, [campaign.user_id])
+        .then(r => sendWalletCreditEmail(campaign.user_id, refundAmt, parseFloat(r.rows[0]?.balance || 0), `Refund for rejected campaign ${campaign.campaign_code}`))
+        .catch(e => console.error('[Email] Refund wallet email failed:', e.message));
+    }
   } catch (err) { await client.query('ROLLBACK'); next(err); }
   finally { client.release(); }
 });
@@ -440,7 +446,9 @@ router.post('/:id/pause', authenticate, async (req, res, next) => {
       [req.params.id, req.user.id, isAdmin]
     );
     if (!result.rows.length) return res.status(404).json({ error: 'Campaign not found or not live' });
-    res.json(result.rows[0]);
+    const campaign = result.rows[0];
+    res.json(campaign);
+    sendPausedEmail(campaign.id).catch(e => console.error('[Email] Paused email failed:', e.message));
   } catch (err) { next(err); }
 });
 
@@ -454,7 +462,25 @@ router.post('/:id/resume', authenticate, async (req, res, next) => {
       [req.params.id, req.user.id, isAdmin]
     );
     if (!result.rows.length) return res.status(404).json({ error: 'Campaign not found or not paused' });
-    res.json(result.rows[0]);
+    const campaign = result.rows[0];
+    res.json(campaign);
+    sendResumedEmail(campaign.id).catch(e => console.error('[Email] Resumed email failed:', e.message));
+  } catch (err) { next(err); }
+});
+
+// POST /api/campaigns/:id/hold — admin only: put live/approved campaign on hold
+router.post('/:id/hold', authenticate, requireAdmin, async (req, res, next) => {
+  try {
+    const { reason } = req.body;
+    const result = await query(
+      `UPDATE campaigns SET status='on_hold', notes=$1, updated_at=NOW()
+       WHERE id=$2 AND status IN ('live','approved') RETURNING *`,
+      [reason || null, req.params.id]
+    );
+    if (!result.rows.length) return res.status(404).json({ error: 'Campaign not found or cannot be held' });
+    const campaign = result.rows[0];
+    res.json(campaign);
+    sendOnHoldEmail(campaign.id, reason).catch(e => console.error('[Email] Hold email failed:', e.message));
   } catch (err) { next(err); }
 });
 

@@ -347,4 +347,156 @@ async function sendNewUserAlertEmail({ first_name, last_name, email, mobile, bus
   }
 }
 
-module.exports = { sendInvoiceEmail, sendApprovedEmail, sendRejectedEmail, sendDailyPoPReport, sendDailyPoPEmailAll, sendNewUserAlertEmail };
+// ── Campaign paused email ─────────────────────────────────────────────────
+async function sendPausedEmail(campaignId) {
+  try {
+    const { rows } = await query(
+      `SELECT c.title, c.campaign_code, c.start_date, c.end_date,
+              u.email, u.first_name, u.last_name, u.business_name
+       FROM campaigns c JOIN users u ON u.id = c.user_id WHERE c.id = $1`,
+      [campaignId]
+    );
+    if (!rows.length) return;
+    const c = rows[0];
+    const name = c.business_name || `${c.first_name} ${c.last_name}`;
+
+    const body = `
+      <div class="tag">Campaign Paused</div>
+      <h2>Campaign Paused ⏸</h2>
+      <p>Hi ${name}, your campaign has been temporarily paused.</p>
+      <div class="card">
+        <div class="row"><span class="rl">Campaign</span><span class="rv">${c.title}</span></div>
+        <div class="row"><span class="rl">Code</span><span class="rv">${c.campaign_code}</span></div>
+        <div class="row"><span class="rl">Period</span><span class="rv">${c.start_date} – ${c.end_date}</span></div>
+        <div class="row"><span class="rl">Status</span><span class="rv" style="color:#f59e0b;font-weight:700">PAUSED ⏸</span></div>
+      </div>
+      <p>You can resume your campaign anytime from your dashboard. While paused, your ad will not be displayed on screens.</p>
+      <a class="btn" href="${process.env.APP_URL || 'https://signagecrm-production.up.railway.app'}">Manage Campaign</a>`;
+
+    await sendMail({
+      to: c.email,
+      subject: `Campaign Paused – ${c.campaign_code} | SignageCMS`,
+      html: wrap('Campaign Paused', body),
+    });
+    console.log(`[Email] Paused email sent to ${c.email} — ${c.campaign_code}`);
+  } catch (err) {
+    console.error('[Email] sendPausedEmail error:', err.message);
+  }
+}
+
+// ── Campaign resumed email ────────────────────────────────────────────────
+async function sendResumedEmail(campaignId) {
+  try {
+    const { rows } = await query(
+      `SELECT c.title, c.campaign_code, c.start_date, c.end_date,
+              u.email, u.first_name, u.last_name, u.business_name
+       FROM campaigns c JOIN users u ON u.id = c.user_id WHERE c.id = $1`,
+      [campaignId]
+    );
+    if (!rows.length) return;
+    const c = rows[0];
+    const name = c.business_name || `${c.first_name} ${c.last_name}`;
+
+    const body = `
+      <div class="tag">Campaign Resumed</div>
+      <h2>Campaign is Live Again! ▶️</h2>
+      <p>Hi ${name}, your campaign has been resumed and is now live on our screens.</p>
+      <div class="card">
+        <div class="row"><span class="rl">Campaign</span><span class="rv">${c.title}</span></div>
+        <div class="row"><span class="rl">Code</span><span class="rv">${c.campaign_code}</span></div>
+        <div class="row"><span class="rl">Period</span><span class="rv">${c.start_date} – ${c.end_date}</span></div>
+        <div class="row"><span class="rl">Status</span><span class="rv status-ok">LIVE ▶</span></div>
+      </div>
+      <p>Your ad is now being displayed on screens. Track live impressions from your dashboard.</p>
+      <a class="btn" href="${process.env.APP_URL || 'https://signagecrm-production.up.railway.app'}">View Live Campaign</a>`;
+
+    await sendMail({
+      to: c.email,
+      subject: `Campaign Resumed – ${c.campaign_code} is live again | SignageCMS`,
+      html: wrap('Campaign Resumed', body),
+    });
+    console.log(`[Email] Resumed email sent to ${c.email} — ${c.campaign_code}`);
+  } catch (err) {
+    console.error('[Email] sendResumedEmail error:', err.message);
+  }
+}
+
+// ── Campaign on-hold email (admin-initiated) ──────────────────────────────
+async function sendOnHoldEmail(campaignId, reason) {
+  try {
+    const { rows } = await query(
+      `SELECT c.title, c.campaign_code, c.start_date, c.end_date,
+              u.email, u.first_name, u.last_name, u.business_name
+       FROM campaigns c JOIN users u ON u.id = c.user_id WHERE c.id = $1`,
+      [campaignId]
+    );
+    if (!rows.length) return;
+    const c = rows[0];
+    const name = c.business_name || `${c.first_name} ${c.last_name}`;
+
+    const body = `
+      <div class="tag">Campaign On Hold</div>
+      <h2>Campaign Placed On Hold 🔔</h2>
+      <p>Hi ${name}, your campaign has been placed on hold by our team. Please review the details below.</p>
+      <div class="card">
+        <div class="row"><span class="rl">Campaign</span><span class="rv">${c.title}</span></div>
+        <div class="row"><span class="rl">Code</span><span class="rv">${c.campaign_code}</span></div>
+        <div class="row"><span class="rl">Status</span><span class="rv" style="color:#f59e0b;font-weight:700">ON HOLD 🔔</span></div>
+        ${reason ? `<div class="row"><span class="rl">Reason</span><span class="rv" style="color:#dc2626">${reason}</span></div>` : ''}
+      </div>
+      <p>Please contact us or update your campaign details. We will review and resume your campaign as soon as possible.</p>
+      <a class="btn" href="${process.env.APP_URL || 'https://signagecrm-production.up.railway.app'}">Contact Support</a>`;
+
+    await sendMail({
+      to: c.email,
+      subject: `Campaign On Hold – ${c.campaign_code} | SignageCMS`,
+      html: wrap('Campaign On Hold', body),
+    });
+    console.log(`[Email] On-hold email sent to ${c.email} — ${c.campaign_code}`);
+  } catch (err) {
+    console.error('[Email] sendOnHoldEmail error:', err.message);
+  }
+}
+
+// ── Wallet balance update email ───────────────────────────────────────────
+async function sendWalletCreditEmail(userId, amount, newBalance, description) {
+  try {
+    const { rows } = await query(
+      `SELECT email, first_name, last_name, business_name FROM users WHERE id = $1`,
+      [userId]
+    );
+    if (!rows.length || !rows[0].email) return;
+    const u = rows[0];
+    const name = u.business_name || `${u.first_name} ${u.last_name}`.trim() || 'Advertiser';
+    const creditedAt = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', hour12: true });
+
+    const body = `
+      <div class="tag">Wallet Credited</div>
+      <h2>Wallet Balance Updated 💰</h2>
+      <p>Hi ${name}, your SignageCMS wallet has been credited.</p>
+      <div class="card">
+        <div class="row"><span class="rl">Amount Credited</span><span class="rv" style="color:#16a34a;font-size:16px">+₹${parseFloat(amount).toFixed(2)}</span></div>
+        <div class="row"><span class="rl">New Balance</span><span class="rv" style="color:#ff5c00;font-size:16px">₹${parseFloat(newBalance).toFixed(2)}</span></div>
+        ${description ? `<div class="row"><span class="rl">Description</span><span class="rv">${description}</span></div>` : ''}
+        <div class="row"><span class="rl">Credited At</span><span class="rv">${creditedAt}</span></div>
+      </div>
+      <p>Use your wallet balance to pay for your next campaign at checkout.</p>
+      <a class="btn" href="${process.env.APP_URL || 'https://signagecrm-production.up.railway.app'}">Use Wallet</a>`;
+
+    await sendMail({
+      to: u.email,
+      subject: `Wallet Credited ₹${parseFloat(amount).toFixed(2)} | SignageCMS`,
+      html: wrap('Wallet Credited', body),
+    });
+    console.log(`[Email] Wallet credit email sent to ${u.email} — ₹${amount}`);
+  } catch (err) {
+    console.error('[Email] sendWalletCreditEmail error:', err.message);
+  }
+}
+
+module.exports = {
+  sendInvoiceEmail, sendApprovedEmail, sendRejectedEmail,
+  sendPausedEmail, sendResumedEmail, sendOnHoldEmail,
+  sendWalletCreditEmail,
+  sendDailyPoPReport, sendDailyPoPEmailAll, sendNewUserAlertEmail,
+};

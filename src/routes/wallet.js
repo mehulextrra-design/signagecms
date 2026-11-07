@@ -2,6 +2,7 @@ const express = require('express');
 const { query, getClient } = require('../db');
 const { authenticate, requireAdmin } = require('../middleware/auth');
 const { getOrCreateWallet, creditWallet } = require('../services/wallet');
+const { sendWalletCreditEmail } = require('../services/email');
 
 const router = express.Router();
 
@@ -52,6 +53,7 @@ router.post('/admin-credit', authenticate, requireAdmin, async (req, res, next) 
     if (!user_id || !amount || amount <= 0) return res.status(400).json({ error: 'user_id and amount required' });
     const newBalance = await creditWallet(user_id, parseFloat(amount), 'admin_credit', null, description || 'Admin credit');
     res.json({ message: 'Wallet credited', new_balance: newBalance });
+    sendWalletCreditEmail(user_id, parseFloat(amount), newBalance, description || 'Admin credit').catch(e => console.error('[Email] Wallet credit email failed:', e.message));
   } catch (err) { next(err); }
 });
 
