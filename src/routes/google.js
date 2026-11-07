@@ -257,7 +257,7 @@ router.post('/retry-fetch', authenticate, async (req, res) => {
 router.post('/test-gbp/:campaignId', authenticate, async (req, res) => {
   if (req.user.role !== 'superadmin') return res.status(403).json({ error: 'Forbidden' });
   try {
-    await postCampaignToGoogle(parseInt(req.params.campaignId));
+    await postCampaignToGoogle(req.params.campaignId);
     res.json({ success: true, message: 'GBP post triggered — check Railway logs' });
   } catch (err) {
     res.status(500).json({ error: err.message });
