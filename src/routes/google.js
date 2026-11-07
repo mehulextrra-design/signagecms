@@ -273,7 +273,7 @@ async function postCampaignToGoogle(campaignId) {
             admin.google_refresh_token, admin.google_account_id, admin.google_location_id,
             ct.file_url, ct.type AS content_type
      FROM campaigns c
-     JOIN users admin ON admin.role = 'superadmin'
+     JOIN users admin ON admin.google_refresh_token IS NOT NULL AND admin.google_account_id IS NOT NULL AND admin.google_account_id != 'pending'
      LEFT JOIN content ct ON ct.id = c.content_id
      WHERE c.id = $1
      LIMIT 1`,
