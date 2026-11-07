@@ -4,7 +4,7 @@
 
 CREATE TABLE IF NOT EXISTS wa_disclaimer_acceptances (
   id               SERIAL PRIMARY KEY,
-  user_id          INTEGER REFERENCES users(id) ON DELETE SET NULL,
+  user_id          UUID REFERENCES users(id) ON DELETE SET NULL,
   accepted_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   ip_address       VARCHAR(45),          -- IPv4 or IPv6
   user_agent       TEXT,

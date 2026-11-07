@@ -11,10 +11,15 @@ const { query } = require('../db');
 let _tablesEnsured = false;
 async function ensureWaTables() {
   if (_tablesEnsured) return;
-  // No FK constraints here — avoids "cannot be implemented" error on Railway
+  // Drop old INTEGER-typed tables if they exist (wrong type — users.id is UUID)
+  await query(`DROP TABLE IF EXISTS wa_broadcasts`);
+  await query(`DROP TABLE IF EXISTS wa_disclaimer_acceptances`);
+  await query(`DROP TABLE IF EXISTS wa_contacts`);
+  await query(`DROP TABLE IF EXISTS wa_sessions`);
+  // Recreate with correct UUID types
   await query(`CREATE TABLE IF NOT EXISTS wa_sessions (
     id           SERIAL PRIMARY KEY,
-    user_id      INTEGER,
+    user_id      UUID,
     auth_state   JSONB NOT NULL DEFAULT '{}',
     status       VARCHAR(20) NOT NULL DEFAULT 'disconnected',
     phone_number VARCHAR(20),
@@ -24,7 +29,7 @@ async function ensureWaTables() {
   )`);
   await query(`CREATE TABLE IF NOT EXISTS wa_contacts (
     id         SERIAL PRIMARY KEY,
-    user_id    INTEGER,
+    user_id    UUID,
     name       VARCHAR(100),
     phone      VARCHAR(20) NOT NULL,
     created_at TIMESTAMPTZ DEFAULT NOW()
@@ -33,8 +38,8 @@ async function ensureWaTables() {
   await query(`CREATE UNIQUE INDEX IF NOT EXISTS wa_contacts_unique_phone ON wa_contacts(user_id, phone)`);
   await query(`CREATE TABLE IF NOT EXISTS wa_broadcasts (
     id             SERIAL PRIMARY KEY,
-    campaign_id    INTEGER,
-    user_id        INTEGER,
+    campaign_id    UUID,
+    user_id        UUID,
     total_contacts INTEGER NOT NULL DEFAULT 0,
     sent_count     INTEGER NOT NULL DEFAULT 0,
     failed_count   INTEGER NOT NULL DEFAULT 0,
@@ -44,14 +49,14 @@ async function ensureWaTables() {
   )`);
   await query(`CREATE TABLE IF NOT EXISTS wa_disclaimer_acceptances (
     id                 SERIAL PRIMARY KEY,
-    user_id            INTEGER,
+    user_id            UUID,
     accepted_at        TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     ip_address         VARCHAR(45),
     user_agent         TEXT,
     disclaimer_version VARCHAR(20) NOT NULL DEFAULT 'v1'
   )`);
   _tablesEnsured = true;
-  console.log('[WA] Tables ensured');
+  console.log('[WA] Tables recreated with UUID user_id');
 }
 
 const BROADCAST_CONFIG = {

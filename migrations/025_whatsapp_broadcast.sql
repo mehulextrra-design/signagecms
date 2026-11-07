@@ -9,7 +9,7 @@ ALTER TABLE campaigns
 
 CREATE TABLE IF NOT EXISTS wa_sessions (
   id           SERIAL PRIMARY KEY,
-  user_id      INTEGER REFERENCES users(id) ON DELETE CASCADE,
+  user_id      UUID REFERENCES users(id) ON DELETE CASCADE,
   auth_state   JSONB NOT NULL DEFAULT '{}',
   status       VARCHAR(20) NOT NULL DEFAULT 'disconnected',
   phone_number VARCHAR(20),
@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS wa_sessions (
 
 CREATE TABLE IF NOT EXISTS wa_contacts (
   id         SERIAL PRIMARY KEY,
-  user_id    INTEGER REFERENCES users(id) ON DELETE CASCADE,
+  user_id    UUID REFERENCES users(id) ON DELETE CASCADE,
   name       VARCHAR(100),
   phone      VARCHAR(20) NOT NULL,
   created_at TIMESTAMPTZ DEFAULT NOW()
@@ -30,8 +30,8 @@ CREATE INDEX IF NOT EXISTS wa_contacts_user_idx ON wa_contacts(user_id);
 
 CREATE TABLE IF NOT EXISTS wa_broadcasts (
   id             SERIAL PRIMARY KEY,
-  campaign_id    INTEGER REFERENCES campaigns(id) ON DELETE SET NULL,
-  user_id        INTEGER REFERENCES users(id) ON DELETE SET NULL,
+  campaign_id    UUID REFERENCES campaigns(id) ON DELETE SET NULL,
+  user_id        UUID REFERENCES users(id) ON DELETE SET NULL,
   total_contacts INTEGER NOT NULL DEFAULT 0,
   sent_count     INTEGER NOT NULL DEFAULT 0,
   failed_count   INTEGER NOT NULL DEFAULT 0,
