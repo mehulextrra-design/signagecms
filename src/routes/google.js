@@ -336,8 +336,8 @@ async function postCampaignToGoogle(campaignId) {
     gbpBody.media = [{ mediaFormat: 'PHOTO', sourceUrl: row.file_url }];
   }
 
-  // Call GBP Postings API directly from backend
-  const postUrl = `https://mybusinesspostings.googleapis.com/v1/${locationId}/localPosts`;
+  // Call GBP API directly from backend (v4 format used by Make.com native module)
+  const postUrl = `https://mybusiness.googleapis.com/v4/${locationId}/localPosts`;
   console.log(`[GBP] Calling: POST ${postUrl}`);
   try {
     const result = await googlePost(postUrl, accessToken, gbpBody);
