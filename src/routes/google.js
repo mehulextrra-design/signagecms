@@ -271,19 +271,48 @@ async function postCampaignToGoogle(campaignId) {
   const row = result.rows[0];
   if (!row || !row.google_refresh_token) return;
 
-  // Refresh access token server-side — only the short-lived token goes to Make.com
+  // Refresh access token server-side
   let accessToken = null;
   try {
     const refreshed = await refreshAccessToken(row.google_refresh_token);
     if (refreshed.access_token) accessToken = refreshed.access_token;
   } catch (_) {}
 
+  if (!accessToken) return; // Can't post without a valid token
+
+  // If account/location were saved as pending, try to fetch them now
+  let accountId   = (row.google_account_id && row.google_account_id !== 'pending') ? row.google_account_id : null;
+  let locationId  = row.google_location_id || null;
+
+  if (!accountId) {
+    try {
+      const accounts = await googleGet('https://mybusinessaccountmanagement.googleapis.com/v1/accounts', accessToken);
+      if (accounts.accounts && accounts.accounts.length) {
+        accountId = accounts.accounts[0].name;
+      }
+    } catch (_) {}
+  }
+
+  if (accountId && !locationId) {
+    try {
+      const locs = await googleGet(
+        `https://mybusinessbusinessinformation.googleapis.com/v1/${accountId}/locations?readMask=name,title`,
+        accessToken
+      );
+      if (locs.locations && locs.locations.length) locationId = locs.locations[0].name;
+    } catch (_) {}
+  }
+
+  if (!locationId) return; // No location to post to
+
   const payload = JSON.stringify({
     title: row.title || 'ExtrraVenue Campaign Live',
     summary: `${row.title || 'Campaign'} is now live on ExtrraVenue digital screens in Ahmedabad!`,
     image_url: (row.content_type === 'image' && row.file_url) ? row.file_url : null,
     campaign_code: row.campaign_code,
-    access_token: accessToken
+    access_token: accessToken,
+    account_id: accountId,
+    location_id: locationId
   });
 
   return new Promise((resolve) => {
