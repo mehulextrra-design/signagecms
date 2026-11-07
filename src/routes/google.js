@@ -260,7 +260,7 @@ const MAKE_GBP_WEBHOOK = 'https://hook.eu1.make.com/t689r3nbxfl4rsm3fn57qureowu3
 async function postCampaignToGoogle(campaignId) {
   const result = await query(
     `SELECT c.id, c.title, c.campaign_code, c.start_date, c.end_date,
-            u.google_refresh_token,
+            u.google_refresh_token, u.google_account_id, u.google_location_id,
             ct.file_url, ct.type AS content_type
      FROM campaigns c
      JOIN users u ON u.id = c.user_id
@@ -271,11 +271,19 @@ async function postCampaignToGoogle(campaignId) {
   const row = result.rows[0];
   if (!row || !row.google_refresh_token) return;
 
+  // Refresh access token server-side — only the short-lived token goes to Make.com
+  let accessToken = null;
+  try {
+    const refreshed = await refreshAccessToken(row.google_refresh_token);
+    if (refreshed.access_token) accessToken = refreshed.access_token;
+  } catch (_) {}
+
   const payload = JSON.stringify({
     title: row.title || 'ExtrraVenue Campaign Live',
     summary: `${row.title || 'Campaign'} is now live on ExtrraVenue digital screens in Ahmedabad!`,
     image_url: (row.content_type === 'image' && row.file_url) ? row.file_url : null,
-    campaign_code: row.campaign_code
+    campaign_code: row.campaign_code,
+    access_token: accessToken
   });
 
   return new Promise((resolve) => {
