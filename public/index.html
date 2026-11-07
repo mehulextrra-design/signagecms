@@ -2202,16 +2202,28 @@ async function connectGoogle(){
     const data=await api('/auth/google/connect');
     if(!popup){toast('Allow popups for this site and try again','error');return;}
     popup.location.href=data.url;
-    const timer=setInterval(async()=>{
-      try{
-        if(!popup||popup.closed){
-          clearInterval(timer);
-          await loadGoogleStatus();
-          const st=await api('/auth/google/status');
-          if(st.connected) toast('Google Business Profile connected!','success');
-          else toast('Connection failed. Please try again.','error');
-        }
-      }catch(ex){}
+
+    // Listen for postMessage from OAuth callback — fires as soon as DB write is done
+    function onGbpMessage(e){
+      if(e.data==='gbp_connected'){
+        window.removeEventListener('message',onGbpMessage);
+        loadGoogleStatus();
+        toast('Google Business Profile connected!','success');
+      } else if(typeof e.data==='string'&&e.data.startsWith('gbp_error:')){
+        window.removeEventListener('message',onGbpMessage);
+        loadGoogleStatus();
+        toast('Connection failed: '+decodeURIComponent(e.data.replace('gbp_error:','')),'error');
+      }
+    }
+    window.addEventListener('message',onGbpMessage);
+
+    // Fallback: if popup closes without postMessage (e.g. user closes manually)
+    const timer=setInterval(()=>{
+      if(!popup||popup.closed){
+        clearInterval(timer);
+        window.removeEventListener('message',onGbpMessage);
+        loadGoogleStatus();
+      }
     },1000);
   }catch(e){toast('Could not start Google login: '+(e.message||e),'error');}
 }
