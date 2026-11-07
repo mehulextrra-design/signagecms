@@ -115,12 +115,12 @@ async function makePostgresAuthState(userId) {
 
   async function writeData(key, value) {
     const serialized = JSON.stringify(value, BufferJSON.replacer);
+    // Do NOT set status here — status is managed only by connection.update event
     await query(
-      `INSERT INTO wa_sessions (user_id, auth_state, status, updated_at)
-       VALUES ($1, jsonb_build_object($2::text, $3::jsonb), 'connected', NOW())
+      `INSERT INTO wa_sessions (user_id, auth_state, updated_at)
+       VALUES ($1, jsonb_build_object($2::text, $3::jsonb), NOW())
        ON CONFLICT (user_id) DO UPDATE
          SET auth_state = wa_sessions.auth_state || jsonb_build_object($2::text, $3::jsonb),
-             status = 'connected',
              updated_at = NOW()`,
       [userId, key, serialized]
     );
