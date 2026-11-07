@@ -2787,7 +2787,7 @@ function toggleMobileMenu(){/* kept for compatibility — sidebar hidden on mobi
 
 function toast(msg,type='info'){
   const el=document.createElement('div');el.className=`toast toast-${type}`;
-  const icons={success:'?',error:'?',info:'?'};el.innerHTML=`<span>${icons[type]||'?'}</span> ${msg}`;
+  const icons={success:'✓',error:'✕',info:'ℹ'};el.innerHTML=`<span>${icons[type]||'ℹ'}</span> ${msg}`;
   document.getElementById('toast-area').appendChild(el);setTimeout(()=>el.remove(),4000);
 }
 
