@@ -253,13 +253,65 @@ router.post('/retry-fetch', authenticate, async (req, res) => {
   }
 });
 
-// ── Posting (placeholder — implement when Make.com native GBP module is set up) ──
+// ── Posting via Make.com native GBP module ────────────────────────────────────
 
 async function postCampaignToGoogle(campaignId) {
-  // TODO: Implement using Make.com native GBP module with master ops account
-  // Each shopkeeper adds ops@extrravenue.com as GBP Manager during onboarding
-  // Make.com maps location_id dynamically from webhook payload
-  console.log(`[GBP] posting not yet implemented for campaign ${campaignId}`);
+  const webhookUrl = process.env.MAKE_GBP_WEBHOOK;
+  if (!webhookUrl) {
+    console.log('[GBP] MAKE_GBP_WEBHOOK not set, skipping');
+    return;
+  }
+
+  const result = await query(
+    `SELECT c.id, c.title, c.campaign_code,
+            u.google_location_id,
+            ct.file_url, ct.type AS content_type
+     FROM campaigns c
+     JOIN users u ON u.id = c.user_id
+     LEFT JOIN content ct ON ct.id = c.content_id
+     WHERE c.id = $1`,
+    [campaignId]
+  );
+
+  const row = result.rows[0];
+  if (!row?.google_location_id) {
+    console.log(`[GBP] skipped campaign ${campaignId} — user has no google_location_id`);
+    return;
+  }
+
+  const payload = JSON.stringify({
+    location_id: row.google_location_id,
+    title:       row.title || 'Campaign Live',
+    summary:     `${row.title} is now live on ExtrraVenue digital screens in Ahmedabad!`,
+    image_url:   row.content_type === 'image' ? row.file_url : null,
+    cta_url:     'https://extrravenue.com',
+  });
+
+  return new Promise((resolve) => {
+    const parsed = new URL(webhookUrl);
+    const req = https.request({
+      hostname: parsed.hostname,
+      path:     parsed.pathname + parsed.search,
+      method:   'POST',
+      headers: {
+        'Content-Type':   'application/json',
+        'Content-Length': Buffer.byteLength(payload),
+      }
+    }, res => {
+      let data = '';
+      res.on('data', d => data += d);
+      res.on('end', () => {
+        console.log(`[GBP] Make webhook ${res.statusCode} for ${row.campaign_code}: ${data.slice(0, 100)}`);
+        resolve();
+      });
+    });
+    req.on('error', err => {
+      console.error(`[GBP] Make webhook error for ${row.campaign_code}:`, err.message);
+      resolve();
+    });
+    req.write(payload);
+    req.end();
+  });
 }
 
 module.exports = router;
