@@ -2218,16 +2218,20 @@ async function retryGoogleFetch(){
 
 async function connectGoogle(){
   try{
+    const popup=window.open('','google_oauth','width=520,height=620,top=100,left=200');
     const data=await api('/auth/google/connect');
-    const popup=window.open(data.url,'google_oauth','width=520,height=620,top=100,left=200');
+    if(!popup){toast('Allow popups for this site and try again','error');return;}
+    popup.location.href=data.url;
     const timer=setInterval(()=>{
-      if(!popup||popup.closed){
-        clearInterval(timer);
-        loadGoogleStatus();
-        toast('Google Business Profile connected!','success');
-      }
+      try{
+        if(!popup||popup.closed){
+          clearInterval(timer);
+          loadGoogleStatus();
+          toast('Google Business Profile connected!','success');
+        }
+      }catch(ex){}
     },1000);
-  }catch(e){toast('Could not start Google login','error');}
+  }catch(e){toast('Could not start Google login: '+(e.message||e),'error');}
 }
 
 async function disconnectGoogle(){
