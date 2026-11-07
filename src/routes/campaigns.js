@@ -7,6 +7,8 @@ const { reviewCampaign } = require('../services/aiReview');
 const { sendInvoiceEmail, sendApprovedEmail, sendRejectedEmail } = require('../services/email');
 const { sendCampaignApprovedWA, sendInvoiceConfirmedWA } = require('../services/whatsapp');
 const { creditWallet, debitWallet } = require('../services/wallet');
+const { postCampaignToSocial } = require('./facebook');
+const { postCampaignToGoogle } = require('./google');
 
 const getRzp = () => {
   if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
@@ -361,9 +363,19 @@ router.post('/:id/approve', authenticate, requireAdmin, async (req, res, next) =
       [req.user.id, req.params.id]
     );
     if (!result.rows.length) return res.status(404).json({ error: 'Campaign not found or not pending approval' });
-    res.json(result.rows[0]);
-    sendApprovedEmail(result.rows[0].id).catch(e => console.error('[Email] Approved email failed:', e.message));
-    sendCampaignApprovedWA(result.rows[0].id).catch(e => console.error('[WA] Approved WA failed:', e.message));
+    const campaign = result.rows[0];
+    res.json(campaign);
+    sendApprovedEmail(campaign.id).catch(e => console.error('[Email] Approved email failed:', e.message));
+    sendCampaignApprovedWA(campaign.id).catch(e => console.error('[WA] Approved WA failed:', e.message));
+    // If start_date is today or past, immediately go live and post to social/GBP
+    if (campaign.start_date && new Date(campaign.start_date) <= new Date()) {
+      query(`UPDATE campaigns SET status='live', updated_at=NOW() WHERE id=$1`, [campaign.id])
+        .then(() => {
+          postCampaignToSocial(campaign.id).catch(e => console.error('[FB/IG] post error:', e.message));
+          postCampaignToGoogle(campaign.id).catch(e => console.error('[GBP] post error:', e.message));
+        })
+        .catch(e => console.error('[Approve] live update error:', e.message));
+    }
   } catch (err) { next(err); }
 });
 
