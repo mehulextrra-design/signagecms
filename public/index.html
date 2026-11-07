@@ -450,7 +450,7 @@
     <div class="form-group"><label class="form-label">Email</label><input type="email" id="admin-email" class="form-input" placeholder="admin@signagecms.in"></div>
     <div class="form-group"><label class="form-label">Password</label><input type="password" id="admin-password" class="form-input" placeholder="••••••••"></div>
     <button class="btn btn-primary btn-full" id="admin-login-btn" onclick="doAdminLogin()">Sign in</button>
-    <div style="text-align:center;margin-top:8px;"><a onclick="showLogin()" style="font-size:12px;color:var(--text2);cursor:pointer;">← Back to OTP login</a></div>
+    <div style="text-align:center;margin-top:8px;"><a onclick="showLogin()" style="font-size:12px;color:var(--text2);cursor:pointer;">&larr; Back to OTP login</a></div>
   </div>
 
   <div id="register-card" class="auth-card hidden" style="max-width:520px">
@@ -738,7 +738,7 @@
               <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.05em;">Individual Screens</div>
             </div>
             <div id="wizard-screens-grid" class="screens-grid" style="margin-bottom:16px;"><div style="grid-column:1/-1;text-align:center;padding:24px;color:var(--text2);">Loading screens…</div></div>
-            <div class="wizard-nav"><div></div><button class="btn btn-primary" onclick="wizardNext(1)" id="btn-next-1" disabled>Continue →</button></div>
+            <div class="wizard-nav"><div></div><button class="btn btn-primary" onclick="wizardNext(1)" id="btn-next-1" disabled>Continue &rarr;</button></div>
           </div>
 
           <!-- Step 2 -->
@@ -784,7 +784,7 @@
               <div style="flex:1;min-width:0;"><div class="upload-preview-name" id="preview-name" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">—</div><div class="upload-preview-size" id="preview-size">—</div></div>
               <button onclick="clearFile()" style="margin-left:auto;background:none;border:none;cursor:pointer;color:var(--text2);font-size:20px;flex-shrink:0;">×</button>
             </div>
-            <div class="wizard-nav"><button class="btn btn-ghost" onclick="wizardBack(2)">← Back</button><button class="btn btn-primary" onclick="wizardNext(2)" id="btn-next-2" disabled>Continue →</button></div>
+            <div class="wizard-nav"><button class="btn btn-ghost" onclick="wizardBack(2)">&larr; Back</button><button class="btn btn-primary" onclick="wizardNext(2)" id="btn-next-2" disabled>Continue &rarr;</button></div>
           </div>
 
           <!-- Step 3 -->
@@ -876,7 +876,7 @@
               </div>
               <p style="font-size:12px;color:var(--text3);margin-top:8px;">Video duration must be = your plan's slot. Longer content = rejected at upload.</p>
             </div>
-            <div class="wizard-nav"><button class="btn btn-ghost" onclick="wizardBack(3)">← Back</button><button class="btn btn-primary" onclick="wizardNext(3)">Continue →</button></div>
+            <div class="wizard-nav"><button class="btn btn-ghost" onclick="wizardBack(3)">&larr; Back</button><button class="btn btn-primary" onclick="wizardNext(3)">Continue &rarr;</button></div>
           </div>
 
           <!-- Step 4 -->
@@ -903,7 +903,7 @@
                 <div id="coupon-msg" style="font-size:12px;margin-top:6px;"></div>
               </div>
             </div>
-            <div class="wizard-nav"><button class="btn btn-ghost" onclick="wizardBack(4)">← Back</button><button class="btn btn-primary" id="btn-submit-campaign" onclick="submitCampaign()">Confirm &amp; Pay →</button></div>
+            <div class="wizard-nav"><button class="btn btn-ghost" onclick="wizardBack(4)">&larr; Back</button><button class="btn btn-primary" id="btn-submit-campaign" onclick="submitCampaign()">Confirm &amp; Pay →</button></div>
           </div>
         </div>
       </div>
