@@ -1174,53 +1174,52 @@
 </div>
 
 <!-- WA DISCLAIMER MODAL -->
-<div id="wa-disclaimer-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:1200;align-items:center;justify-content:center;padding:16px;">
-  <div style="background:var(--surface);border-radius:16px;max-width:440px;width:100%;box-shadow:0 24px 60px rgba(0,0,0,.3);overflow:hidden;">
+<div id="wa-disclaimer-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:1200;align-items:center;justify-content:center;padding:16px;">
+  <div style="background:var(--surface);border-radius:16px;max-width:460px;width:100%;box-shadow:0 24px 60px rgba(0,0,0,.35);overflow:hidden;">
     <!-- Header -->
-    <div style="background:linear-gradient(135deg,#25d366,#128c7e);padding:20px 22px 16px;">
+    <div style="padding:20px 22px 16px;border-bottom:1px solid var(--border);">
       <div style="display:flex;align-items:center;gap:10px;">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="white"><path d="M12 2C6.477 2 2 6.477 2 12c0 1.89.525 3.656 1.438 5.168L2 22l4.978-1.408A9.942 9.942 0 0012 22c5.523 0 10-4.477 10-10S17.523 2 12 2zm4.95 13.65c-.206.577-.99 1.057-1.637 1.197-.437.094-.99.17-2.876-.618-2.414-.993-3.973-3.448-4.093-3.608-.116-.16-.95-1.263-.95-2.41 0-1.148.6-1.713.812-1.945.212-.23.464-.29.619-.29l.447.008c.144.006.337.014.527.4.206.419.698 1.712.76 1.835.06.123.1.267.02.43-.08.164-.12.267-.238.41-.12.144-.25.32-.358.43-.12.11-.244.233-.104.456.14.224.62 1.02 1.33 1.652.914.812 1.685 1.062 1.924 1.18.238.12.377.1.516-.06.14-.16.6-.7.76-.94.158-.24.317-.2.535-.12.219.08 1.389.655 1.628.774.238.12.397.178.457.278.06.1.06.578-.146 1.155z"/></svg>
+        <div style="width:38px;height:38px;border-radius:10px;background:#fff3cd;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">⚠️</div>
         <div>
-          <div style="color:#fff;font-size:15px;font-weight:700;">WhatsApp Connect</div>
-          <div style="color:rgba(255,255,255,.8);font-size:11px;margin-top:1px;">Pehle yeh padho — zaroori hai</div>
+          <div style="font-size:15px;font-weight:700;color:var(--text);">Important Disclosure & Terms of Use</div>
+          <div style="font-size:11px;color:var(--text2);margin-top:1px;">WhatsApp Broadcast Feature — Please read carefully before proceeding</div>
         </div>
       </div>
     </div>
     <!-- Body -->
-    <div style="padding:20px 22px;">
-      <!-- Risk points -->
-      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:18px;">
-        <div style="display:flex;gap:10px;align-items:flex-start;">
-          <span style="font-size:16px;flex-shrink:0;">⚠️</span>
-          <div style="font-size:13px;color:var(--text);line-height:1.5;"><strong>Unofficial library</strong> — Yeh WhatsApp Business API nahi hai. Baileys library ka use hota hai jo WhatsApp Web ke zariye connect hoti hai.</div>
-        </div>
-        <div style="display:flex;gap:10px;align-items:flex-start;">
-          <span style="font-size:16px;flex-shrink:0;">📵</span>
-          <div style="font-size:13px;color:var(--text);line-height:1.5;"><strong>Number ban ka risk</strong> — Agar aap bahut zyada messages bhejte hain ya recipients report karte hain, to <strong>aapka personal/business WhatsApp number ban ho sakta hai</strong>.</div>
-        </div>
-        <div style="display:flex;gap:10px;align-items:flex-start;">
-          <span style="font-size:16px;flex-shrink:0;">🏢</span>
-          <div style="font-size:13px;color:var(--text);line-height:1.5;"><strong>Karv Adtech LLP / ExtrraVenue</strong> ki koi zimmedari nahi — number ban hone, messages fail hone, ya kisi bhi loss ke liye company responsible nahi hogi.</div>
-        </div>
-        <div style="display:flex;gap:10px;align-items:flex-start;">
-          <span style="font-size:16px;flex-shrink:0;">👥</span>
-          <div style="font-size:13px;color:var(--text);line-height:1.5;"><strong>Sirf existing customers</strong> — Sirf unhe bhejo jo aapke actual customers hain. Anjaan logon ko bhejne se ban probability bahut badh jaati hai.</div>
-        </div>
-      </div>
+    <div style="padding:18px 22px;max-height:60vh;overflow-y:auto;">
+
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text2);margin-bottom:10px;">Nature of Service</div>
+      <p style="font-size:12.5px;color:var(--text);line-height:1.7;margin:0 0 14px;">This feature uses an unofficial third-party library (<strong>Baileys</strong>) to connect your personal or business WhatsApp number via WhatsApp Web. This is <strong>not</strong> the official WhatsApp Business API. Use of this service is entirely at your own risk and discretion.</p>
+
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text2);margin-bottom:10px;">Risk of Account Suspension</div>
+      <p style="font-size:12.5px;color:var(--text);line-height:1.7;margin:0 0 14px;">Meta (WhatsApp) may <strong>permanently ban or restrict</strong> your WhatsApp number if it detects bulk or automated messaging activity. This risk is inherent to the nature of this feature and cannot be eliminated. The User acknowledges and accepts this risk in full.</p>
+
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text2);margin-bottom:10px;">Limitation of Liability</div>
+      <p style="font-size:12.5px;color:var(--text);line-height:1.7;margin:0 0 14px;"><strong>Karv Adtech LLP</strong> and its platform <strong>ExtrraVenue</strong> shall not be liable for any loss, damage, account suspension, business interruption, or any other consequence arising from the use of this feature, including but not limited to suspension of your WhatsApp number by Meta.</p>
+
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text2);margin-bottom:10px;">Compliance Obligations</div>
+      <p style="font-size:12.5px;color:var(--text);line-height:1.7;margin:0 0 4px;">By using this feature, you agree to:</p>
+      <ul style="font-size:12.5px;color:var(--text);line-height:1.8;margin:0 0 14px;padding-left:18px;">
+        <li>Send messages only to individuals who have <strong>explicitly consented</strong> to receive communications from you.</li>
+        <li>Comply with applicable laws including the <strong>Digital Personal Data Protection Act, 2023 (DPDP Act)</strong> and TRAI regulations.</li>
+        <li>Not use this feature for spam, unsolicited bulk messaging, or any unlawful purpose.</li>
+        <li>Ensure all contact data imported has been collected lawfully with the data principal's consent.</li>
+      </ul>
 
       <!-- Checkbox agreement -->
-      <label style="display:flex;gap:10px;align-items:flex-start;cursor:pointer;padding:12px;background:var(--bg2);border:1.5px solid var(--border);border-radius:10px;margin-bottom:16px;" id="wa-disclaimer-label">
-        <input type="checkbox" id="wa-disclaimer-check" style="margin-top:2px;width:16px;height:16px;cursor:pointer;accent-color:#25d366;flex-shrink:0;" onchange="const b=document.getElementById('wa-disclaimer-proceed');b.disabled=!this.checked;b.style.opacity=this.checked?'1':'0.5';">
-        <span style="font-size:12px;color:var(--text);line-height:1.6;">
-          Maine upar di gayi saari baatein padh li hain. Mujhe samajh aa gaya hai ki <strong>number ban ka poora risk mera hai</strong>, aur <strong>Karv Adtech LLP / ExtrraVenue</strong> kisi bhi nuksan ke liye zimmedar nahi hai. Main apne existing customers ko hi message karoonga.
+      <label style="display:flex;gap:10px;align-items:flex-start;cursor:pointer;padding:13px 14px;background:rgba(37,211,102,.07);border:1.5px solid rgba(37,211,102,.35);border-radius:10px;margin-top:4px;">
+        <input type="checkbox" id="wa-disclaimer-check" style="margin-top:2px;width:15px;height:15px;cursor:pointer;accent-color:#25d366;flex-shrink:0;" onchange="const b=document.getElementById('wa-disclaimer-proceed');b.disabled=!this.checked;b.style.opacity=this.checked?'1':'0.45';">
+        <span style="font-size:12px;color:var(--text);line-height:1.65;">
+          I have read and understood the above disclosure. I acknowledge that <strong>Karv Adtech LLP / ExtrraVenue</strong> bears no liability for any consequences arising from my use of this feature, and I accept full responsibility for compliance with applicable laws and WhatsApp's terms of service.
         </span>
       </label>
+    </div>
 
-      <!-- Buttons -->
-      <div style="display:flex;gap:10px;">
-        <button onclick="waDisclaimerClose()" style="flex:1;padding:11px;border-radius:8px;border:1px solid var(--border);background:var(--bg2);color:var(--text2);font-size:13px;font-weight:600;cursor:pointer;">Cancel</button>
-        <button id="wa-disclaimer-proceed" disabled onclick="waDisclaimerProceed()" style="flex:1;padding:11px;border-radius:8px;border:none;background:#25d366;color:#fff;font-size:13px;font-weight:700;cursor:pointer;opacity:0.5;transition:opacity .2s;" onmouseover="if(!this.disabled)this.style.background='#1da851'" onmouseout="this.style.background='#25d366'">Samjha, Connect Karo →</button>
-      </div>
+    <!-- Footer buttons -->
+    <div style="padding:14px 22px;border-top:1px solid var(--border);display:flex;gap:10px;">
+      <button onclick="waDisclaimerClose()" style="flex:1;padding:10px;border-radius:8px;border:1px solid var(--border);background:var(--bg2);color:var(--text2);font-size:13px;font-weight:600;cursor:pointer;">Cancel</button>
+      <button id="wa-disclaimer-proceed" disabled onclick="waDisclaimerProceed()" style="flex:2;padding:10px;border-radius:8px;border:none;background:#25d366;color:#fff;font-size:13px;font-weight:700;cursor:pointer;opacity:0.45;transition:opacity .2s;">I Agree &amp; Connect</button>
     </div>
   </div>
 </div>
