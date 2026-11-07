@@ -2222,12 +2222,14 @@ async function connectGoogle(){
     const data=await api('/auth/google/connect');
     if(!popup){toast('Allow popups for this site and try again','error');return;}
     popup.location.href=data.url;
-    const timer=setInterval(()=>{
+    const timer=setInterval(async()=>{
       try{
         if(!popup||popup.closed){
           clearInterval(timer);
-          loadGoogleStatus();
-          toast('Google Business Profile connected!','success');
+          await loadGoogleStatus();
+          const st=await api('/auth/google/status');
+          if(st.connected) toast('Google Business Profile connected!','success');
+          else toast('Connection failed. Please try again.','error');
         }
       }catch(ex){}
     },1000);
