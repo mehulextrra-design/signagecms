@@ -2243,6 +2243,7 @@ function initWizard(){
   window._preselectedScreenIds=null;
   uploadedFile=null;uploadedContentId=null;
   campaignCost={base:0,gst:0,total:0,discount:0};
+  const sb=document.getElementById('btn-submit-campaign');if(sb){sb.innerHTML='Confirm &amp; Pay &rarr;';sb.disabled=false;}
   updateWizardUI(1);renderWizardScreens();
   document.getElementById('cmp-name').value='';
   document.getElementById('upload-preview').style.display='none';
@@ -2351,7 +2352,10 @@ function updateWizardUI(step){
   wizardStep=step;
 }
 
-function wizardBack(step){updateWizardUI(step-1);}
+function wizardBack(step){
+  updateWizardUI(step-1);
+  if(step===4){const b=document.getElementById('btn-submit-campaign');if(b){b.innerHTML='Confirm &amp; Pay &rarr;';b.disabled=false;}}
+}
 
 async function wizardNext(step){
   if(step===1){
@@ -2585,7 +2589,7 @@ async function submitCampaign(){
       toast('Campaign saved! Complete payment from My Campaigns.','info');
       setTimeout(()=>navigate('campaigns'),1200);
     }
-  }catch(e){toast(e.message,'error');btn.innerHTML='Confirm & Pay ?';btn.disabled=false;}
+  }catch(e){toast(e.message,'error');btn.innerHTML='Confirm &amp; Pay &rarr;';btn.disabled=false;}
 }
 
 function openRazorpay(campaign,btn,btnLabel,onSuccess){
