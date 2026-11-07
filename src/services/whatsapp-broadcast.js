@@ -7,6 +7,51 @@
 
 const { query } = require('../db');
 
+// Ensure WA tables exist on first use (failsafe if migrations didn't run)
+let _tablesEnsured = false;
+async function ensureWaTables() {
+  if (_tablesEnsured) return;
+  await query(`CREATE TABLE IF NOT EXISTS wa_sessions (
+    id           SERIAL PRIMARY KEY,
+    user_id      INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    auth_state   JSONB NOT NULL DEFAULT '{}',
+    status       VARCHAR(20) NOT NULL DEFAULT 'disconnected',
+    phone_number VARCHAR(20),
+    connected_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at   TIMESTAMPTZ DEFAULT NOW(),
+    UNIQUE (user_id)
+  )`);
+  await query(`CREATE TABLE IF NOT EXISTS wa_contacts (
+    id         SERIAL PRIMARY KEY,
+    user_id    INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    name       VARCHAR(100),
+    phone      VARCHAR(20) NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+  )`);
+  await query(`CREATE INDEX IF NOT EXISTS wa_contacts_user_idx ON wa_contacts(user_id)`);
+  await query(`CREATE TABLE IF NOT EXISTS wa_broadcasts (
+    id             SERIAL PRIMARY KEY,
+    campaign_id    INTEGER REFERENCES campaigns(id) ON DELETE SET NULL,
+    user_id        INTEGER REFERENCES users(id) ON DELETE SET NULL,
+    total_contacts INTEGER NOT NULL DEFAULT 0,
+    sent_count     INTEGER NOT NULL DEFAULT 0,
+    failed_count   INTEGER NOT NULL DEFAULT 0,
+    status         VARCHAR(20) NOT NULL DEFAULT 'pending',
+    started_at     TIMESTAMPTZ,
+    completed_at   TIMESTAMPTZ
+  )`);
+  await query(`CREATE TABLE IF NOT EXISTS wa_disclaimer_acceptances (
+    id               SERIAL PRIMARY KEY,
+    user_id          INTEGER REFERENCES users(id) ON DELETE SET NULL,
+    accepted_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    ip_address       VARCHAR(45),
+    user_agent       TEXT,
+    disclaimer_version VARCHAR(20) NOT NULL DEFAULT 'v1'
+  )`);
+  _tablesEnsured = true;
+  console.log('[WA] Tables ensured');
+}
+
 const BROADCAST_CONFIG = {
   delayMs:        4000,  // 4s between messages
   maxPerCampaign: 300,   // max contacts per broadcast
@@ -151,6 +196,7 @@ async function initSession(userId) {
 // ── Pairing code flow ───────────────────────────────────────────────────────
 
 async function requestPairingCode(userId, phoneNumber) {
+  await ensureWaTables();
   // Ensure row exists
   await query(
     `INSERT INTO wa_sessions (user_id, auth_state, status, phone_number)
@@ -174,6 +220,7 @@ async function requestPairingCode(userId, phoneNumber) {
 // ── Status ──────────────────────────────────────────────────────────────────
 
 async function getSessionStatus(userId) {
+  await ensureWaTables();
   const r = await query(
     `SELECT status, phone_number FROM wa_sessions WHERE user_id=$1`,
     [userId]
@@ -207,6 +254,7 @@ async function sendMessage(sock, phone, imageUrl, caption) {
 // ── Broadcast ───────────────────────────────────────────────────────────────
 
 async function sendWaBroadcast(campaignId) {
+  await ensureWaTables();
   // Get campaign + user
   const campResult = await query(
     `SELECT c.id, c.user_id, c.name, c.caption, c.wa_broadcast_enabled,
@@ -290,6 +338,7 @@ async function sendWaBroadcast(campaignId) {
 
 async function restoreActiveSessions() {
   try {
+    await ensureWaTables();
     const r = await query(
       `SELECT user_id FROM wa_sessions WHERE status='connected'`
     );
@@ -310,4 +359,5 @@ module.exports = {
   disconnectSession,
   sendWaBroadcast,
   restoreActiveSessions,
+  ensureWaTables,
 };

@@ -13,6 +13,7 @@ const {
   requestPairingCode,
   getSessionStatus,
   disconnectSession,
+  ensureWaTables,
 } = require('../services/whatsapp-broadcast');
 
 const router = express.Router();
@@ -32,6 +33,7 @@ async function requireWaEnabled(req, res, next) {
 // Called BEFORE connect; no wa_enabled guard needed (just auth)
 router.post('/disclaimer-accept', authenticate, async (req, res) => {
   try {
+    await ensureWaTables();
     const ip = (req.headers['x-forwarded-for'] || req.socket.remoteAddress || '').split(',')[0].trim();
     const ua = req.headers['user-agent'] || '';
     const version = req.body.version || 'v1';
@@ -123,6 +125,7 @@ router.post('/contacts/import', authenticate, requireWaEnabled, upload.single('f
 // POST /api/wa/contacts  — add single contact
 router.post('/contacts', authenticate, requireWaEnabled, async (req, res) => {
   try {
+    await ensureWaTables();
     const { name, phone } = req.body;
     const digits = (phone || '').replace(/\D/g, '');
     if (!digits || digits.length < 10) return res.status(400).json({ error: 'Invalid phone number' });
@@ -140,6 +143,7 @@ router.post('/contacts', authenticate, requireWaEnabled, async (req, res) => {
 // GET /api/wa/contacts
 router.get('/contacts', authenticate, requireWaEnabled, async (req, res) => {
   try {
+    await ensureWaTables();
     const r = await query(
       `SELECT id, name, phone, created_at FROM wa_contacts
        WHERE user_id=$1 ORDER BY created_at DESC LIMIT 500`,
