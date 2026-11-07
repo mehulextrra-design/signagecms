@@ -514,7 +514,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
           <button class="btn btn-primary" onclick="openGroupModal()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>New Group</button>
         </div>
         <div class="table-card">
-          <div class="table-wrap"><table><thead><tr><th>Group Name</th><th>Screens</th><th>Total ?/Day</th><th>Actions</th></tr></thead><tbody id="groups-table"></tbody></table></div>
+          <div class="table-wrap"><table><thead><tr><th>Group Name</th><th>Screens</th><th>Total ₹/Day</th><th>Actions</th></tr></thead><tbody id="groups-table"></tbody></table></div>
         </div>
       </div>
 
@@ -570,7 +570,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
             <div id="filler-drop-zone" onclick="document.getElementById('filler-file-input').click()"
                  style="border:2px dashed var(--border);border-radius:8px;padding:24px 16px;text-align:center;cursor:pointer;transition:border-color 0.2s;"
                  onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='var(--border)'">
-              <div style="font-size:28px;margin-bottom:8px;">??</div>
+              <div style="font-size:28px;margin-bottom:8px;">📁</div>
               <div style="font-weight:600;font-size:14px;" id="filler-file-name">Click to choose file</div>
               <div style="font-size:12px;color:var(--text3);margin-top:4px;">Video or image (max 200 MB)</div>
             </div>
@@ -875,7 +875,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
   <div class="modal" style="max-width:560px;width:95%;">
     <div class="modal-header">
       <span class="modal-title" id="venue-modal-title">Add Venue Partner</span>
-      <button class="modal-close" onclick="closeModal('venue-modal')">?</button>
+      <button class="modal-close" onclick="closeModal('venue-modal')">&times;</button>
     </div>
     <div class="modal-body">
       <input type="hidden" id="venue-edit-id">
@@ -931,7 +931,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
         </div>
       </div>
       <div id="vn-cred-box" style="display:none;margin-top:12px;background:var(--surface2);border:1.5px solid var(--primary);border-radius:8px;padding:12px;">
-        <div style="font-size:11px;font-weight:700;color:var(--primary);margin-bottom:6px;">? Venue Portal Credentials — Share with venue:</div>
+        <div style="font-size:11px;font-weight:700;color:var(--primary);margin-bottom:6px;">🔑 Venue Portal Credentials — Share with venue:</div>
         <div style="font-size:12px;color:var(--text);line-height:2;">
           Portal URL: <strong id="vn-cred-url"></strong><br>
           Email: <strong id="vn-cred-email"></strong><br>
@@ -951,7 +951,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
   <div class="modal" style="max-width:520px;width:95%;">
     <div class="modal-header">
       <span class="modal-title" id="vrm-title">Revenue Details</span>
-      <button class="modal-close" onclick="closeModal('venue-revenue-modal')">?</button>
+      <button class="modal-close" onclick="closeModal('venue-revenue-modal')">&times;</button>
     </div>
     <div class="modal-body" id="vrm-body">Loading…</div>
   </div>
@@ -973,7 +973,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
   <div class="modal" style="max-width:680px;width:95%;">
     <div class="modal-header">
       <span class="modal-title" id="cdm-title">Campaign Detail</span>
-      <button class="modal-close" onclick="closeModal('camp-detail-modal')">?</button>
+      <button class="modal-close" onclick="closeModal('camp-detail-modal')">&times;</button>
     </div>
     <div class="modal-body" style="padding:0;">
       <!-- Creative preview -->
@@ -987,8 +987,8 @@ textarea.form-input{resize:vertical;min-height:80px;}
           <div id="cdm-pending-name" style="font-size:11px;color:var(--text2);margin-top:2px;"></div>
         </div>
         <div style="display:flex;gap:8px;">
-          <button class="btn btn-success btn-xs" id="cdm-approve-creative-btn">? Approve</button>
-          <button class="btn btn-ghost btn-xs" id="cdm-reject-creative-btn">? Reject</button>
+          <button class="btn btn-success btn-xs" id="cdm-approve-creative-btn">✓ Approve</button>
+          <button class="btn btn-ghost btn-xs" id="cdm-reject-creative-btn">✗ Reject</button>
         </div>
       </div>
       <div style="padding:20px;display:grid;grid-template-columns:1fr 1fr;gap:16px;">
@@ -1046,7 +1046,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
   <div class="modal" style="max-width:460px;width:95%;">
     <div class="modal-header">
       <span class="modal-title">Replace Campaign Creative</span>
-      <button class="modal-close" onclick="closeModal('edit-media-modal')">?</button>
+      <button class="modal-close" onclick="closeModal('edit-media-modal')">&times;</button>
     </div>
     <div class="modal-body" style="padding:20px;display:flex;flex-direction:column;gap:16px;">
       <input type="hidden" id="edit-media-campaign-id">
@@ -1068,7 +1068,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
     </div>
     <div style="padding:14px 20px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end;">
       <button class="btn btn-ghost" onclick="closeModal('edit-media-modal')">Cancel</button>
-      <button class="btn btn-primary" id="edit-media-save-btn" onclick="saveEditMedia()">? Upload &amp; Save</button>
+      <button class="btn btn-primary" id="edit-media-save-btn" onclick="saveEditMedia()">↑ Upload &amp; Save</button>
     </div>
   </div>
 </div>
@@ -1077,7 +1077,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
   <div class="modal" style="max-width:560px;">
     <div class="modal-header">
       <span class="modal-title">Reject Campaign</span>
-      <button class="modal-close" onclick="closeModal('reject-modal')">?</button>
+      <button class="modal-close" onclick="closeModal('reject-modal')">&times;</button>
     </div>
     <div class="modal-body">
       <p style="font-size:13px;color:var(--text2);margin-bottom:14px;">Select a reason or write a custom one. This will be shown to the advertiser.</p>
@@ -1132,7 +1132,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
   <div class="modal" style="max-width:560px;">
     <div class="modal-header">
       <span class="modal-title" id="device-register-title">Connect Device</span>
-      <button class="modal-close" onclick="closeModal('device-register-modal')">?</button>
+      <button class="modal-close" onclick="closeModal('device-register-modal')">&times;</button>
     </div>
     <div class="modal-body" id="device-register-body" style="max-height:75vh;overflow-y:auto;"></div>
     <div class="modal-footer">
@@ -1146,7 +1146,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
   <div class="modal" style="max-width:700px;">
     <div class="modal-header">
       <span class="modal-title" id="schedule-preview-title">Schedule Preview</span>
-      <button class="modal-close" onclick="closeModal('schedule-preview-modal')">?</button>
+      <button class="modal-close" onclick="closeModal('schedule-preview-modal')">&times;</button>
     </div>
     <div class="modal-body" id="schedule-preview-body" style="max-height:70vh;overflow-y:auto;"></div>
     <div class="modal-footer">
@@ -1159,7 +1159,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
   <div class="modal">
     <div class="modal-header">
       <span class="modal-title" id="screen-modal-title">Add Screen</span>
-      <button class="modal-close" onclick="closeModal('screen-modal')">?</button>
+      <button class="modal-close" onclick="closeModal('screen-modal')">&times;</button>
     </div>
     <div class="modal-body">
       <div class="form-row">
@@ -1194,7 +1194,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
         <div class="form-group"><label class="form-label">Approx. Footfall / Day</label><input type="number" class="form-input" id="sc-footfall" value="0" placeholder="e.g. 500"></div>
       </div>
       <div class="form-row">
-        <div class="form-group"><label class="form-label">Price / Day (?)</label><input type="number" class="form-input" id="sc-price" value="900"></div>
+        <div class="form-group"><label class="form-label">Price / Day (₹)</label><input type="number" class="form-input" id="sc-price" value="900"></div>
         <div class="form-group"><label class="form-label">Daily Impressions</label><input type="number" class="form-input" id="sc-impressions" value="5000"></div>
       </div>
       <div class="form-row">
@@ -1226,7 +1226,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
   <div class="modal">
     <div class="modal-header">
       <span class="modal-title" id="group-modal-title">New Screen Group</span>
-      <button class="modal-close" onclick="closeModal('group-modal')">?</button>
+      <button class="modal-close" onclick="closeModal('group-modal')">&times;</button>
     </div>
     <div class="modal-body">
       <div class="form-group"><label class="form-label">Group Name *</label><input type="text" class="form-input" id="grp-name" placeholder="e.g. Vasna Cluster, SG Highway Zone"></div>
@@ -1249,7 +1249,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
   <div class="modal">
     <div class="modal-header">
       <span class="modal-title" id="coupon-modal-title">Create Coupon</span>
-      <button class="modal-close" onclick="closeModal('coupon-modal')">?</button>
+      <button class="modal-close" onclick="closeModal('coupon-modal')">&times;</button>
     </div>
     <div class="modal-body">
       <div class="form-row">
@@ -1260,10 +1260,10 @@ textarea.form-input{resize:vertical;min-height:80px;}
       </div>
       <div class="form-row">
         <div class="form-group"><label class="form-label">Discount Value *</label><input type="number" class="form-input" id="cpn-value" placeholder="20"></div>
-        <div class="form-group"><label class="form-label">Max Discount (?, optional)</label><input type="number" class="form-input" id="cpn-max" placeholder="Leave blank for unlimited"></div>
+        <div class="form-group"><label class="form-label">Max Discount (₹, optional)</label><input type="number" class="form-input" id="cpn-max" placeholder="Leave blank for unlimited"></div>
       </div>
       <div class="form-row">
-        <div class="form-group"><label class="form-label">Min Order Amount (?)</label><input type="number" class="form-input" id="cpn-min" value="0"></div>
+        <div class="form-group"><label class="form-label">Min Order Amount (₹)</label><input type="number" class="form-input" id="cpn-min" value="0"></div>
         <div class="form-group"><label class="form-label">Usage Limit (optional)</label><input type="number" class="form-input" id="cpn-limit" placeholder="e.g. 100"></div>
       </div>
       <div class="form-row">
@@ -1285,7 +1285,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
   <div class="modal" style="max-width:560px;">
     <div class="modal-header">
       <span class="modal-title" id="adv-modal-title">Advertiser Details</span>
-      <button class="modal-close" onclick="closeModal('adv-modal')">?</button>
+      <button class="modal-close" onclick="closeModal('adv-modal')">&times;</button>
     </div>
     <div class="modal-body" id="adv-modal-body"></div>
     <div class="modal-footer">
@@ -1299,7 +1299,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
   <div class="modal" style="max-width:520px;">
     <div class="modal-header">
       <span class="modal-title">New Advertiser</span>
-      <button class="modal-close" onclick="closeModal('create-adv-modal')">?</button>
+      <button class="modal-close" onclick="closeModal('create-adv-modal')">&times;</button>
     </div>
     <div class="modal-body">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
@@ -1491,8 +1491,8 @@ async function loadVenues() {
         : '<span class="badge" style="background:var(--surface2);color:var(--text2);font-size:10px;">Inactive</span>';
       const quotaMins = Math.round((v.filler_quota_sec||3600)/60);
       const approveRejectBtns = v.approval_status === 'pending' ? `
-        <button class="btn btn-xs" style="background:#16a34a;color:#fff;font-size:10px;padding:2px 7px;border-radius:4px;border:none;cursor:pointer;" onclick="approveVenue('${v.id}','${v.business_name.replace(/'/g,"\\'")}')">? Approve</button>
-        <button class="btn btn-xs" style="background:#dc2626;color:#fff;font-size:10px;padding:2px 7px;border-radius:4px;border:none;cursor:pointer;margin-left:2px;" onclick="rejectVenue('${v.id}','${v.business_name.replace(/'/g,"\\'")}')">? Reject</button>` : '';
+        <button class="btn btn-xs" style="background:#16a34a;color:#fff;font-size:10px;padding:2px 7px;border-radius:4px;border:none;cursor:pointer;" onclick="approveVenue('${v.id}','${v.business_name.replace(/'/g,"\\'")}')">✓ Approve</button>
+        <button class="btn btn-xs" style="background:#dc2626;color:#fff;font-size:10px;padding:2px 7px;border-radius:4px;border:none;cursor:pointer;margin-left:2px;" onclick="rejectVenue('${v.id}','${v.business_name.replace(/'/g,"\\'")}')">✗ Reject</button>` : '';
       return `
       <tr style="${v.approval_status==='pending'?'background:rgba(245,158,11,0.04);':''}">
         <td>
@@ -2148,27 +2148,27 @@ async function openCampaignDetail(id) {
       const today = new Date().toISOString().slice(0,10);
       const isFuture = startDate > today;
       footer.innerHTML = `
-        <button class="btn btn-success" onclick="approveQuick('${id}');closeModal('camp-detail-modal');">? Approve</button>
+        <button class="btn btn-success" onclick="approveQuick('${id}');closeModal('camp-detail-modal');">✓ Approve</button>
         ${isFuture ? `<button class="btn btn-primary" style="font-size:12px;" onclick="approveQuick('${id}',true);closeModal('camp-detail-modal');">? Approve &amp; Start Today</button>` : ''}
-        <button class="btn btn-ghost" onclick="closeModal('camp-detail-modal');openRejectModal('${id}','${c.package_name||''}');">? Reject</button>`;
+        <button class="btn btn-ghost" onclick="closeModal('camp-detail-modal');openRejectModal('${id}','${c.package_name||''}');">✗ Reject</button>`;
     } else if (c.status === 'approved' || c.status === 'live') {
       const startDate = (c.start_date||'').slice(0,10);
       const today = new Date().toISOString().slice(0,10);
       footer.innerHTML = `
-        ${startDate > today ? `<button class="btn btn-primary" style="font-size:12px;" onclick="forceLiveCampaign('${id}')">? Force Live Now</button>` : ''}
+        ${startDate > today ? `<button class="btn btn-primary" style="font-size:12px;" onclick="forceLiveCampaign('${id}')">⚡ Force Live Now</button>` : ''}
         ${c.status === 'live' ? `<button class="btn" style="background:#f59e0b;color:#fff;font-size:13px;" onclick="pauseCampaign('${id}');closeModal('camp-detail-modal');">? Pause</button>` : ''}
-        <button class="btn btn-ghost" style="font-size:13px;" onclick="openEditMedia('${id}')">? Edit Media</button>
+        <button class="btn btn-ghost" style="font-size:13px;" onclick="openEditMedia('${id}')">✏ Edit Media</button>
         <button class="btn" style="background:#ef4444;color:#fff;font-size:13px;" onclick="closeModal('camp-detail-modal');cancelCampaignPrompt('${id}')">? Cancel</button>
         <button class="btn btn-ghost" onclick="closeModal('camp-detail-modal')">Close</button>`;
     } else if (c.status === 'paused') {
       footer.innerHTML = `
         <button class="btn btn-success" onclick="resumeCampaign('${id}');closeModal('camp-detail-modal');">? Resume</button>
-        <button class="btn btn-ghost" style="font-size:13px;" onclick="openEditMedia('${id}')">? Edit Media</button>
+        <button class="btn btn-ghost" style="font-size:13px;" onclick="openEditMedia('${id}')">✏ Edit Media</button>
         <button class="btn" style="background:#ef4444;color:#fff;font-size:13px;" onclick="closeModal('camp-detail-modal');cancelCampaignPrompt('${id}')">? Cancel</button>
         <button class="btn btn-ghost" onclick="closeModal('camp-detail-modal')">Close</button>`;
     } else if (!['cancelled','completed'].includes(c.status)) {
       footer.innerHTML = `
-        <button class="btn btn-ghost" style="font-size:13px;" onclick="openEditMedia('${id}')">? Edit Media</button>
+        <button class="btn btn-ghost" style="font-size:13px;" onclick="openEditMedia('${id}')">✏ Edit Media</button>
         <button class="btn btn-ghost" onclick="closeModal('camp-detail-modal')">Close</button>`;
     } else {
       footer.innerHTML = `<button class="btn btn-ghost" onclick="closeModal('camp-detail-modal')">Close</button>`;
@@ -2588,7 +2588,7 @@ async function previewSchedule(screenId, screenCode) {
           <div style="font-size:11px;color:var(--text3);margin-top:2px;">Filler Items</div>
         </div>
         <div style="background:var(--surface2);border-radius:8px;padding:12px;text-align:center;">
-          <div style="font-size:14px;font-weight:600;">${d.diagnosis.screen_online ? '?? Online' : '?? Offline'}</div>
+          <div style="font-size:14px;font-weight:600;">${d.diagnosis.screen_online ? '🟢 Online' : '🔴 Offline'}</div>
           <div style="font-size:10px;color:var(--text3);margin-top:2px;">Last heartbeat: ${hbStr}</div>
         </div>
       </div>`;
@@ -2957,7 +2957,7 @@ async function viewAdvertiser(id) {
       <div class="info-item"><label>Business Type</label><span>${u.business_type||'—'}</span></div>
       <div class="info-item"><label>GST Number</label><span style="font-family:monospace;">${u.gst_number||'—'}</span></div>
       <div class="info-item"><label>Status</label><span class="badge ${u.is_active?'badge-green':'badge-red'}">${u.is_active?'Active':'Suspended'}</span></div>
-      <div class="info-item"><label>Verified</label><span>${u.is_verified?'? Yes':'? No'}</span></div>
+      <div class="info-item"><label>Verified</label><span>${u.is_verified?'✓ Yes':'✗ No'}</span></div>
       <div class="info-item"><label>Joined</label><span>${fmtDate(u.created_at)}</span></div>
     </div>`;
   document.getElementById('adv-modal').classList.remove('hidden');
