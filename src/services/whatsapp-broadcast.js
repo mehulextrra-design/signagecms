@@ -11,52 +11,72 @@ const { query } = require('../db');
 let _tablesEnsured = false;
 async function ensureWaTables() {
   if (_tablesEnsured) return;
-  // Drop old INTEGER-typed tables if they exist (wrong type — users.id is UUID)
-  await query(`DROP TABLE IF EXISTS wa_broadcasts`);
-  await query(`DROP TABLE IF EXISTS wa_disclaimer_acceptances`);
-  await query(`DROP TABLE IF EXISTS wa_contacts`);
-  await query(`DROP TABLE IF EXISTS wa_sessions`);
-  // Recreate with correct UUID types
-  await query(`CREATE TABLE IF NOT EXISTS wa_sessions (
-    id           SERIAL PRIMARY KEY,
-    user_id      UUID,
-    auth_state   JSONB NOT NULL DEFAULT '{}',
-    status       VARCHAR(20) NOT NULL DEFAULT 'disconnected',
-    phone_number VARCHAR(20),
-    connected_at TIMESTAMPTZ DEFAULT NOW(),
-    updated_at   TIMESTAMPTZ DEFAULT NOW(),
-    UNIQUE (user_id)
-  )`);
-  await query(`CREATE TABLE IF NOT EXISTS wa_contacts (
-    id         SERIAL PRIMARY KEY,
-    user_id    UUID,
-    name       VARCHAR(100),
-    phone      VARCHAR(20) NOT NULL,
-    created_at TIMESTAMPTZ DEFAULT NOW()
-  )`);
-  await query(`CREATE INDEX IF NOT EXISTS wa_contacts_user_idx ON wa_contacts(user_id)`);
-  await query(`CREATE UNIQUE INDEX IF NOT EXISTS wa_contacts_unique_phone ON wa_contacts(user_id, phone)`);
-  await query(`CREATE TABLE IF NOT EXISTS wa_broadcasts (
-    id             SERIAL PRIMARY KEY,
-    campaign_id    UUID,
-    user_id        UUID,
-    total_contacts INTEGER NOT NULL DEFAULT 0,
-    sent_count     INTEGER NOT NULL DEFAULT 0,
-    failed_count   INTEGER NOT NULL DEFAULT 0,
-    status         VARCHAR(20) NOT NULL DEFAULT 'pending',
-    started_at     TIMESTAMPTZ,
-    completed_at   TIMESTAMPTZ
-  )`);
-  await query(`CREATE TABLE IF NOT EXISTS wa_disclaimer_acceptances (
-    id                 SERIAL PRIMARY KEY,
-    user_id            UUID,
-    accepted_at        TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    ip_address         VARCHAR(45),
-    user_agent         TEXT,
-    disclaimer_version VARCHAR(20) NOT NULL DEFAULT 'v1'
-  )`);
+
+  // Check if wa_sessions exists and has correct UUID type
+  const col = await query(`
+    SELECT data_type FROM information_schema.columns
+    WHERE table_name='wa_sessions' AND column_name='user_id'
+  `);
+
+  if (col.rows.length > 0 && col.rows[0].data_type === 'integer') {
+    // One-time migration: old tables had INTEGER user_id, need to recreate with UUID
+    // Safe because no valid data was ever inserted (all prior inserts failed with type errors)
+    console.log('[WA] Migrating INTEGER tables to UUID...');
+    await query(`DELETE FROM wa_broadcasts WHERE 1=1`);
+    await query(`DELETE FROM wa_disclaimer_acceptances WHERE 1=1`);
+    await query(`DELETE FROM wa_contacts WHERE 1=1`);
+    await query(`DELETE FROM wa_sessions WHERE 1=1`);
+    await query(`ALTER TABLE wa_sessions ALTER COLUMN user_id TYPE UUID USING NULL`);
+    await query(`ALTER TABLE wa_contacts ALTER COLUMN user_id TYPE UUID USING NULL`);
+    await query(`ALTER TABLE wa_broadcasts ALTER COLUMN user_id TYPE UUID USING NULL`);
+    await query(`ALTER TABLE wa_broadcasts ALTER COLUMN campaign_id TYPE UUID USING NULL`);
+    await query(`ALTER TABLE wa_disclaimer_acceptances ALTER COLUMN user_id TYPE UUID USING NULL`);
+    console.log('[WA] Migration to UUID done');
+  } else if (col.rows.length === 0) {
+    // Tables don't exist yet — create fresh with UUID
+    await query(`CREATE TABLE IF NOT EXISTS wa_sessions (
+      id           SERIAL PRIMARY KEY,
+      user_id      UUID,
+      auth_state   JSONB NOT NULL DEFAULT '{}',
+      status       VARCHAR(20) NOT NULL DEFAULT 'disconnected',
+      phone_number VARCHAR(20),
+      connected_at TIMESTAMPTZ DEFAULT NOW(),
+      updated_at   TIMESTAMPTZ DEFAULT NOW(),
+      UNIQUE (user_id)
+    )`);
+    await query(`CREATE TABLE IF NOT EXISTS wa_contacts (
+      id         SERIAL PRIMARY KEY,
+      user_id    UUID,
+      name       VARCHAR(100),
+      phone      VARCHAR(20) NOT NULL,
+      created_at TIMESTAMPTZ DEFAULT NOW()
+    )`);
+    await query(`CREATE INDEX IF NOT EXISTS wa_contacts_user_idx ON wa_contacts(user_id)`);
+    await query(`CREATE UNIQUE INDEX IF NOT EXISTS wa_contacts_unique_phone ON wa_contacts(user_id, phone)`);
+    await query(`CREATE TABLE IF NOT EXISTS wa_broadcasts (
+      id             SERIAL PRIMARY KEY,
+      campaign_id    UUID,
+      user_id        UUID,
+      total_contacts INTEGER NOT NULL DEFAULT 0,
+      sent_count     INTEGER NOT NULL DEFAULT 0,
+      failed_count   INTEGER NOT NULL DEFAULT 0,
+      status         VARCHAR(20) NOT NULL DEFAULT 'pending',
+      started_at     TIMESTAMPTZ,
+      completed_at   TIMESTAMPTZ
+    )`);
+    await query(`CREATE TABLE IF NOT EXISTS wa_disclaimer_acceptances (
+      id                 SERIAL PRIMARY KEY,
+      user_id            UUID,
+      accepted_at        TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      ip_address         VARCHAR(45),
+      user_agent         TEXT,
+      disclaimer_version VARCHAR(20) NOT NULL DEFAULT 'v1'
+    )`);
+    console.log('[WA] Tables created with UUID user_id');
+  }
+  // else: tables already exist with correct UUID type — nothing to do
+
   _tablesEnsured = true;
-  console.log('[WA] Tables recreated with UUID user_id');
 }
 
 const BROADCAST_CONFIG = {

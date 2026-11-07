@@ -365,61 +365,56 @@ async function applyCriticalFixes(pool) {
   } catch (err) {
     console.warn('[DB] WA column fix warn:', err.message);
   }
-  // WA tables (migration 025) — guaranteed creation
+  // WA tables (migration 025+026) — smart UUID migration, safe on every restart
   try {
-    // Drop INTEGER-typed WA tables and recreate with UUID (users.id is UUID)
-    await pool.query(`DROP TABLE IF EXISTS wa_broadcasts`);
-    await pool.query(`DROP TABLE IF EXISTS wa_disclaimer_acceptances`);
-    await pool.query(`DROP TABLE IF EXISTS wa_contacts`);
-    await pool.query(`DROP TABLE IF EXISTS wa_sessions`);
-    await pool.query(`CREATE TABLE IF NOT EXISTS wa_sessions (
-      id           SERIAL PRIMARY KEY,
-      user_id      UUID,
-      auth_state   JSONB NOT NULL DEFAULT '{}',
-      status       VARCHAR(20) NOT NULL DEFAULT 'disconnected',
-      phone_number VARCHAR(20),
-      connected_at TIMESTAMPTZ DEFAULT NOW(),
-      updated_at   TIMESTAMPTZ DEFAULT NOW(),
-      UNIQUE (user_id)
-    )`);
-    await pool.query(`CREATE TABLE IF NOT EXISTS wa_contacts (
-      id         SERIAL PRIMARY KEY,
-      user_id    UUID,
-      name       VARCHAR(100),
-      phone      VARCHAR(20) NOT NULL,
-      created_at TIMESTAMPTZ DEFAULT NOW()
-    )`);
-    await pool.query(`CREATE INDEX IF NOT EXISTS wa_contacts_user_idx ON wa_contacts(user_id)`);
-    await pool.query(`CREATE UNIQUE INDEX IF NOT EXISTS wa_contacts_unique_phone ON wa_contacts(user_id, phone)`);
-    await pool.query(`CREATE TABLE IF NOT EXISTS wa_broadcasts (
-      id             SERIAL PRIMARY KEY,
-      campaign_id    UUID,
-      user_id        UUID,
-      total_contacts INTEGER NOT NULL DEFAULT 0,
-      sent_count     INTEGER NOT NULL DEFAULT 0,
-      failed_count   INTEGER NOT NULL DEFAULT 0,
-      status         VARCHAR(20) NOT NULL DEFAULT 'pending',
-      started_at     TIMESTAMPTZ,
-      completed_at   TIMESTAMPTZ
-    )`);
-    console.log('[DB] WA tables ensured');
+    const col = await pool.query(`
+      SELECT data_type FROM information_schema.columns
+      WHERE table_name='wa_sessions' AND column_name='user_id'
+    `);
+    if (col.rows.length === 0) {
+      // Tables don't exist yet
+      await pool.query(`CREATE TABLE IF NOT EXISTS wa_sessions (
+        id           SERIAL PRIMARY KEY, user_id UUID,
+        auth_state   JSONB NOT NULL DEFAULT '{}',
+        status       VARCHAR(20) NOT NULL DEFAULT 'disconnected',
+        phone_number VARCHAR(20),
+        connected_at TIMESTAMPTZ DEFAULT NOW(), updated_at TIMESTAMPTZ DEFAULT NOW(),
+        UNIQUE (user_id)
+      )`);
+      await pool.query(`CREATE TABLE IF NOT EXISTS wa_contacts (
+        id SERIAL PRIMARY KEY, user_id UUID, name VARCHAR(100),
+        phone VARCHAR(20) NOT NULL, created_at TIMESTAMPTZ DEFAULT NOW()
+      )`);
+      await pool.query(`CREATE INDEX IF NOT EXISTS wa_contacts_user_idx ON wa_contacts(user_id)`);
+      await pool.query(`CREATE UNIQUE INDEX IF NOT EXISTS wa_contacts_unique_phone ON wa_contacts(user_id, phone)`);
+      await pool.query(`CREATE TABLE IF NOT EXISTS wa_broadcasts (
+        id SERIAL PRIMARY KEY, campaign_id UUID, user_id UUID,
+        total_contacts INTEGER NOT NULL DEFAULT 0, sent_count INTEGER NOT NULL DEFAULT 0,
+        failed_count INTEGER NOT NULL DEFAULT 0, status VARCHAR(20) NOT NULL DEFAULT 'pending',
+        started_at TIMESTAMPTZ, completed_at TIMESTAMPTZ
+      )`);
+      await pool.query(`CREATE TABLE IF NOT EXISTS wa_disclaimer_acceptances (
+        id SERIAL PRIMARY KEY, user_id UUID, accepted_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        ip_address VARCHAR(45), user_agent TEXT, disclaimer_version VARCHAR(20) NOT NULL DEFAULT 'v1'
+      )`);
+      console.log('[DB] WA tables created with UUID');
+    } else if (col.rows[0].data_type === 'integer') {
+      // One-time migration: ALTER INTEGER columns to UUID (no valid data existed)
+      await pool.query(`DELETE FROM wa_broadcasts WHERE 1=1`);
+      await pool.query(`DELETE FROM wa_disclaimer_acceptances WHERE 1=1`);
+      await pool.query(`DELETE FROM wa_contacts WHERE 1=1`);
+      await pool.query(`DELETE FROM wa_sessions WHERE 1=1`);
+      await pool.query(`ALTER TABLE wa_sessions ALTER COLUMN user_id TYPE UUID USING NULL`);
+      await pool.query(`ALTER TABLE wa_contacts ALTER COLUMN user_id TYPE UUID USING NULL`);
+      await pool.query(`ALTER TABLE wa_broadcasts ALTER COLUMN user_id TYPE UUID USING NULL`);
+      await pool.query(`ALTER TABLE wa_broadcasts ALTER COLUMN campaign_id TYPE UUID USING NULL`);
+      await pool.query(`ALTER TABLE wa_disclaimer_acceptances ALTER COLUMN user_id TYPE UUID USING NULL`);
+      console.log('[DB] WA tables migrated INTEGER -> UUID');
+    } else {
+      console.log('[DB] WA tables OK (UUID)');
+    }
   } catch (err) {
     console.warn('[DB] WA tables fix warn:', err.message);
-  }
-  // WA disclaimer acceptance audit log (migration 026)
-  try {
-    await pool.query(`CREATE TABLE IF NOT EXISTS wa_disclaimer_acceptances (
-      id                 SERIAL PRIMARY KEY,
-      user_id            UUID,
-      accepted_at        TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-      ip_address         VARCHAR(45),
-      user_agent         TEXT,
-      disclaimer_version VARCHAR(20) NOT NULL DEFAULT 'v1'
-    )`);
-    await pool.query(`CREATE INDEX IF NOT EXISTS wa_disclaimer_user_idx ON wa_disclaimer_acceptances(user_id)`);
-    console.log('[DB] wa_disclaimer_acceptances ensured');
-  } catch (err) {
-    console.warn('[DB] WA disclaimer table fix warn:', err.message);
   }
   console.log('[DB] Critical column fixes done');
 }
