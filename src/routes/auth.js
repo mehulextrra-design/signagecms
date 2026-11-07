@@ -175,7 +175,7 @@ router.post('/login', [
 router.get('/me', authenticate, async (req, res, next) => {
   try {
     const result = await query(
-      'SELECT id, email, role, first_name, last_name, mobile, business_name, business_type, gst_number, city, created_at FROM users WHERE id = $1',
+      'SELECT id, email, role, first_name, last_name, mobile, business_name, business_type, gst_number, city, wa_enabled, created_at FROM users WHERE id = $1',
       [req.user.id]
     );
     res.json(result.rows[0]);
