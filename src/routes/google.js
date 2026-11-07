@@ -336,20 +336,23 @@ async function postCampaignToGoogle(campaignId) {
     gbpBody.media = [{ mediaFormat: 'PHOTO', sourceUrl: row.file_url }];
   }
 
-  // Extract numeric location ID for postings API (needs just the numeric part)
-  const locationNumericId = locationId.includes('/locations/')
-    ? locationId.split('/locations/')[1]
-    : locationId;
-
-  // Send gbpBody as object (not stringified) so Make.com receives proper JSON
-  const payload = JSON.stringify({
-    access_token: accessToken,
-    location_id: locationNumericId,
-    gbp_body: gbpBody
-  });
+  // Call GBP Postings API directly from backend
+  const postUrl = `https://mybusinesspostings.googleapis.com/v1/${locationId}/localPosts`;
+  console.log(`[GBP] Calling: POST ${postUrl}`);
+  try {
+    const result = await googlePost(postUrl, accessToken, gbpBody);
+    if (result.error) {
+      console.error(`[GBP] API error for ${row.campaign_code}:`, JSON.stringify(result.error));
+    } else {
+      console.log(`[GBP] Post created for ${row.campaign_code}:`, JSON.stringify(result).slice(0, 300));
+    }
+  } catch (err) {
+    console.error(`[GBP] Post failed for ${row.campaign_code}:`, err.message);
+  }
 
   return new Promise((resolve) => {
     const parsed = new URL(MAKE_GBP_WEBHOOK);
+    const payload = JSON.stringify({ info: 'GBP called directly from backend' });
     const req = https.request({
       hostname: parsed.hostname,
       path: parsed.pathname,
