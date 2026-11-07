@@ -325,15 +325,16 @@ async function postCampaignToGoogle(campaignId) {
     gbpBody.media = [{ mediaFormat: 'PHOTO', sourceUrl: row.file_url }];
   }
 
-  // Postings API needs "locations/{id}" format, not full "accounts/.../locations/{id}"
-  const locationPath = locationId.includes('/locations/')
-    ? 'locations/' + locationId.split('/locations/')[1]
+  // Extract numeric location ID for postings API (needs just the numeric part)
+  const locationNumericId = locationId.includes('/locations/')
+    ? locationId.split('/locations/')[1]
     : locationId;
 
+  // Send gbpBody as object (not stringified) so Make.com receives proper JSON
   const payload = JSON.stringify({
     access_token: accessToken,
-    location_path: locationPath,
-    gbp_body: JSON.stringify(gbpBody)
+    location_id: locationNumericId,
+    gbp_body: gbpBody
   });
 
   return new Promise((resolve) => {
