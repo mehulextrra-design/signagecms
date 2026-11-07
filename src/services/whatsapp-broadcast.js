@@ -304,7 +304,7 @@ async function sendWaBroadcast(campaignId) {
   await ensureWaTables();
   // Get campaign + user
   const campResult = await query(
-    `SELECT c.id, c.user_id, c.name, c.caption, c.wa_broadcast_enabled,
+    `SELECT c.id, c.user_id, c.title AS name, c.caption, c.wa_broadcast_enabled,
             u.wa_enabled,
             con.media_url AS image_url, u.business_name
      FROM campaigns c
