@@ -305,6 +305,8 @@ async function postCampaignToGoogle(campaignId) {
 
   if (!locationId) return; // No location to post to
 
+  console.log(`[GBP] campaign ${row.campaign_code} content_type=${row.content_type} file_url=${row.file_url}`);
+
   const gbpBody = {
     summary: `${row.title || 'Campaign'} is now live on ExtrraVenue digital screens in Ahmedabad!`,
     topicType: 'STANDARD'
