@@ -32,11 +32,15 @@ async function sendMail({ to, subject, html, attachments = [] }) {
 }
 
 // ── Shared CSS + HTML shell ───────────────────────────────────────────────
+// Brand colors from landing page: --orange:#7b68c8, grad: #c94baa→#7b68c8→#2ca6d4
+const BRAND   = '#7b68c8';
+const BRAND_G = 'linear-gradient(135deg,#c94baa 0%,#7b68c8 55%,#2ca6d4 100%)';
+
 const CSS = `
   body{margin:0;padding:0;background:#f2efe9;font-family:'Helvetica Neue',Arial,sans-serif;}
   .shell{max-width:560px;margin:32px auto;background:#fff;border-radius:16px;overflow:hidden;border:1px solid #e0dbd3;}
   .hd{background:#1e1e1e;padding:22px 32px;display:flex;align-items:center;gap:10px;}
-  .hd-dot{width:28px;height:28px;background:#ff5c00;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .hd-dot{width:28px;height:28px;background:${BRAND_G};border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
   .hd-name{color:#fafafa;font-size:17px;font-weight:700;letter-spacing:-.5px;}
   .bd{padding:28px 32px;}
   .tag{display:inline-block;background:#ebe6dd;border-radius:8px;padding:4px 10px;font-size:12px;font-weight:600;color:#787068;letter-spacing:.03em;text-transform:uppercase;margin-bottom:16px;}
@@ -48,7 +52,7 @@ const CSS = `
   .stats-row.cols-3{grid-template-columns:1fr 1fr 1fr;}
   .stat-card{background:#f7f4ef;border-radius:12px;padding:14px 16px;text-align:center;}
   .stat-num{font-size:28px;font-weight:700;color:#1e1e1e;line-height:1;}
-  .stat-num.orange{color:#ff5c00;}
+  .stat-num.brand{color:${BRAND};}
   .stat-num.green{color:#16a34a;}
   .stat-num.red{color:#dc2626;}
   .stat-num.amber{color:#d97706;}
@@ -61,13 +65,13 @@ const CSS = `
   .code-badge{display:inline-block;background:#ebe6dd;border-radius:6px;padding:3px 9px;font-size:11px;font-weight:700;color:#9e9890;letter-spacing:.04em;}
   .camp-card{background:#f7f4ef;border-radius:12px;padding:16px 20px;margin-bottom:10px;display:flex;align-items:center;gap:16px;}
   .camp-plays{text-align:center;min-width:70px;}
-  .camp-plays-num{font-size:26px;font-weight:700;color:#ff5c00;line-height:1;}
+  .camp-plays-num{font-size:26px;font-weight:700;color:${BRAND};line-height:1;}
   .camp-plays-label{font-size:11px;color:#aaa;text-transform:uppercase;letter-spacing:.04em;font-weight:600;margin-top:2px;}
   .camp-info{flex:1;min-width:0;border-left:2px solid #e8e4de;padding-left:16px;}
   .camp-title{font-size:15px;font-weight:700;color:#1e1e1e;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .camp-meta{font-size:12px;color:#aaa8a2;}
   .section-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#bbb;margin:0 0 10px;}
-  .btn{display:inline-block;background:#ff5c00;color:#fff;text-decoration:none;padding:12px 28px;border-radius:100px;font-size:15px;font-weight:600;margin-top:8px;}
+  .btn{display:inline-block;background:${BRAND_G};color:#fff;text-decoration:none;padding:12px 28px;border-radius:100px;font-size:15px;font-weight:600;margin-top:8px;}
   .divider{border:none;border-top:1px solid #f0ece6;margin:20px 0;}
   .ft{padding:18px 32px;border-top:1px solid #f0ece6;font-size:12px;color:#b0aba4;text-align:center;}
   .status-badge{display:inline-flex;align-items:center;gap:6px;border-radius:8px;padding:6px 14px;font-size:13px;font-weight:700;letter-spacing:.02em;}
@@ -119,7 +123,7 @@ async function sendInvoiceEmail(campaignId, invoiceNumber) {
 
       <div class="stats-row cols-2">
         <div class="stat-card">
-          <div class="stat-num orange">₹${parseFloat(c.amount_total).toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</div>
+          <div class="stat-num brand">₹${parseFloat(c.amount_total).toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</div>
           <div class="stat-label">Total Paid</div>
         </div>
         <div class="stat-card">
@@ -134,7 +138,7 @@ async function sendInvoiceEmail(campaignId, invoiceNumber) {
         ${c.coupon_code ? `<div class="info-row"><span class="ir-label">Coupon (${c.coupon_code})</span><span class="ir-value" style="color:#16a34a">−₹${parseFloat(c.discount_amount).toFixed(2)}</span></div>` : ''}
         <div class="info-row"><span class="ir-label">Subtotal</span><span class="ir-value">₹${parseFloat(c.amount_base).toFixed(2)}</span></div>
         <div class="info-row"><span class="ir-label">GST (18%)</span><span class="ir-value">₹${parseFloat(c.amount_gst).toFixed(2)}</span></div>
-        <div class="info-row"><span class="ir-label" style="font-weight:700;color:#1e1e1e">Total</span><span class="ir-value" style="color:#ff5c00;font-size:16px">₹${parseFloat(c.amount_total).toFixed(2)}</span></div>
+        <div class="info-row"><span class="ir-label" style="font-weight:700;color:#1e1e1e">Total</span><span class="ir-value" style="color:#7b68c8;font-size:16px">₹${parseFloat(c.amount_total).toFixed(2)}</span></div>
       </div>
 
       <p style="font-size:14px;color:#aaa">Your campaign is now under review. You'll get another email once it's approved and goes live.</p>
@@ -439,7 +443,7 @@ async function sendWalletCreditEmail(userId, amount, newBalance, description) {
           <div class="stat-label">Amount Credited</div>
         </div>
         <div class="stat-card">
-          <div class="stat-num orange">₹${parseFloat(newBalance).toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</div>
+          <div class="stat-num brand">₹${parseFloat(newBalance).toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</div>
           <div class="stat-label">New Balance</div>
         </div>
       </div>
@@ -508,7 +512,7 @@ async function sendDailyPoPReport() {
 
       <div class="stats-row cols-3">
         <div class="stat-card">
-          <div class="stat-num orange">${totalPlays.toLocaleString('en-IN')}</div>
+          <div class="stat-num brand">${totalPlays.toLocaleString('en-IN')}</div>
           <div class="stat-label">Total Plays</div>
         </div>
         <div class="stat-card">
@@ -583,7 +587,7 @@ async function sendDailyPoPEmailToUser(userId, dateStr) {
 
       <div class="stats-row cols-3">
         <div class="stat-card">
-          <div class="stat-num orange">${totalPlays.toLocaleString('en-IN')}</div>
+          <div class="stat-num brand">${totalPlays.toLocaleString('en-IN')}</div>
           <div class="stat-label">Total Plays</div>
         </div>
         <div class="stat-card">
