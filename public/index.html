@@ -852,24 +852,24 @@
                 <div class="pkg-opt" data-pkg="starter" onclick="selectPkg('starter')">
                   <div class="pkg-name">Starter</div>
                   <div class="pkg-slot">10 sec</div>
-                  <div class="pkg-price">?1,499<span style="font-size:11px;font-weight:400;color:var(--text3)">/mo</span></div>
-                  <div class="pkg-ppd">˜ ?50/day</div>
+                  <div class="pkg-price">₹1,499<span style="font-size:11px;font-weight:400;color:var(--text3)">/mo</span></div>
+                  <div class="pkg-ppd">˜ ₹50/day</div>
                   <div id="pkg-imp-starter" class="pkg-imp"></div>
                   <div class="pkg-desc"><span style="color:var(--text3);font-size:10px;">Best suited for:</span><br>Tea shops, salons, tuition</div>
                 </div>
                 <div class="pkg-opt selected" data-pkg="complete" onclick="selectPkg('complete')">
                   <div class="pkg-name">Complete ?</div>
                   <div class="pkg-slot">15 sec</div>
-                  <div class="pkg-price">?3,499<span style="font-size:11px;font-weight:400;color:var(--text3)">/mo</span></div>
-                  <div class="pkg-ppd">˜ ?117/day</div>
+                  <div class="pkg-price">₹3,499<span style="font-size:11px;font-weight:400;color:var(--text3)">/mo</span></div>
+                  <div class="pkg-ppd">˜ ₹117/day</div>
                   <div id="pkg-imp-complete" class="pkg-imp"></div>
                   <div class="pkg-desc"><span style="color:var(--text3);font-size:10px;">Best suited for:</span><br>Restaurants, clinics, coaching</div>
                 </div>
                 <div class="pkg-opt" data-pkg="growth" onclick="selectPkg('growth')">
                   <div class="pkg-name">Growth</div>
                   <div class="pkg-slot">20 sec</div>
-                  <div class="pkg-price">?5,999<span style="font-size:11px;font-weight:400;color:var(--text3)">/mo</span></div>
-                  <div class="pkg-ppd">˜ ?200/day</div>
+                  <div class="pkg-price">₹5,999<span style="font-size:11px;font-weight:400;color:var(--text3)">/mo</span></div>
+                  <div class="pkg-ppd">˜ ₹200/day</div>
                   <div id="pkg-imp-growth" class="pkg-imp"></div>
                   <div class="pkg-desc"><span style="color:var(--text3);font-size:10px;">Best suited for:</span><br>Real estate, jewellers, hospitals</div>
                 </div>
@@ -2484,7 +2484,7 @@ function updateNetworkSummary(){
     impDay=playsPerScreen*n; impMo=impDay*30;
   }
   const dur=parseInt(document.getElementById('sch-duration')?.value)||30;
-  const pkgRateLabel=rate.fixedDays?'FREE (₹0)':`?${rate.monthly.toLocaleString('en-IN')}/mo`;
+  const pkgRateLabel=rate.fixedDays?'FREE (₹0)':`₹${rate.monthly.toLocaleString('en-IN')}/mo`;
   document.getElementById('sum-screens').textContent=rate.fixedDays?'Filler network':n+' screens';
   document.getElementById('sum-impressions').textContent='~'+impDay.toLocaleString('en-IN');
   document.getElementById('sum-impressions-mo').textContent='~'+impMo.toLocaleString('en-IN');
@@ -2538,19 +2538,19 @@ function renderPricing(){
     walletRow.style.display='block';
     availLbl.textContent='₹'+walletBalance.toLocaleString('en-IN',{minimumFractionDigits:2});
     if(walletApplied){
-      hintEl.textContent=walletUse===afterDisc?'Full amount covered by wallet — no payment needed!':`?${walletUse.toLocaleString('en-IN')} from wallet, ?${due.toLocaleString('en-IN')} via Razorpay`;
+      hintEl.textContent=walletUse===afterDisc?'Full amount covered by wallet — no payment needed!':`₹${walletUse.toLocaleString('en-IN')} from wallet, ₹${due.toLocaleString('en-IN')} via Razorpay`;
       applyBtn.textContent='Remove';applyBtn.style.color='var(--danger)';
     } else {
-      hintEl.textContent=`Apply ?${Math.min(walletBalance,afterDisc).toLocaleString('en-IN')} from wallet to reduce payment`;
+      hintEl.textContent=`Apply ₹${Math.min(walletBalance,afterDisc).toLocaleString('en-IN')} from wallet to reduce payment`;
       applyBtn.textContent='Apply';applyBtn.style.color='';
     }
   } else { walletRow.style.display='none'; }
   document.getElementById('review-pricing').innerHTML=`
-    <div class="review-row"><span class="review-key">Subtotal</span><span class="review-val">?${campaignCost.base.toLocaleString('en-IN')}</span></div>
-    ${disc?`<div class="review-row"><span class="review-key" style="color:var(--success);">Coupon</span><span class="review-val" style="color:var(--success);">-?${disc.toLocaleString('en-IN')}</span></div>`:''}
-    <div class="review-row"><span class="review-key">GST (18%)</span><span class="review-val">?${campaignCost.gst.toLocaleString('en-IN')}</span></div>
-    ${walletUse>0?`<div class="review-row"><span class="review-key" style="color:var(--primary);">Wallet</span><span class="review-val" style="color:var(--primary);">-?${walletUse.toLocaleString('en-IN')}</span></div>`:''}
-    <div class="review-total"><span>${due===0?'Total (Wallet)':'Total Due'}</span><span style="color:var(--primary);">?${due.toLocaleString('en-IN')}</span></div>`;
+    <div class="review-row"><span class="review-key">Subtotal</span><span class="review-val">₹${campaignCost.base.toLocaleString('en-IN')}</span></div>
+    ${disc?`<div class="review-row"><span class="review-key" style="color:var(--success);">Coupon</span><span class="review-val" style="color:var(--success);">-₹${disc.toLocaleString('en-IN')}</span></div>`:''}
+    <div class="review-row"><span class="review-key">GST (18%)</span><span class="review-val">₹${campaignCost.gst.toLocaleString('en-IN')}</span></div>
+    ${walletUse>0?`<div class="review-row"><span class="review-key" style="color:var(--primary);">Wallet</span><span class="review-val" style="color:var(--primary);">-₹${walletUse.toLocaleString('en-IN')}</span></div>`:''}
+    <div class="review-total"><span>${due===0?'Total (Wallet)':'Total Due'}</span><span style="color:var(--primary);">₹${due.toLocaleString('en-IN')}</span></div>`;
 }
 
 function toggleWalletApply(){
@@ -2564,8 +2564,8 @@ async function applyCoupon(){
   try{
     const data=await api('/coupons/validate',{method:'POST',body:JSON.stringify({code,amount:campaignCost.base})});
     const disc=data.discount_amount||0;campaignCost.discount=disc;campaignCost.gst=Math.round((campaignCost.base-disc)*0.18);
-    renderPricing();document.getElementById('coupon-msg').innerHTML=`<span style="color:var(--success);">? Saved ?${disc.toLocaleString('en-IN')}</span>`;
-    toast(`Coupon applied! ?${disc.toLocaleString('en-IN')} off`,'success');
+    renderPricing();document.getElementById('coupon-msg').innerHTML=`<span style="color:var(--success);">? Saved ₹${disc.toLocaleString('en-IN')}</span>`;
+    toast(`Coupon applied! ₹${disc.toLocaleString('en-IN')} off`,'success');
   }catch(e){document.getElementById('coupon-msg').innerHTML=`<span style="color:var(--danger);">${e.message}</span>`;}
 }
 
@@ -2922,7 +2922,7 @@ async function loadWallet(){
             <td style="font-size:12px;">${fmtDate(t.created_at)}</td>
             <td><span style="font-size:12px;font-weight:500;color:${typeColor[t.type]||'var(--text)'};">${typeLabel[t.type]||t.type}</span></td>
             <td style="font-size:12px;color:var(--text2);">${t.campaign_code||'—'}</td>
-            <td style="font-weight:700;color:${isCredit?'var(--success)':'var(--error)'};">${isCredit?'+':''}?${Math.abs(amt).toLocaleString('en-IN',{minimumFractionDigits:2})}</td>
+            <td style="font-weight:700;color:${isCredit?'var(--success)':'var(--error)'};">${isCredit?'+':''}₹${Math.abs(amt).toLocaleString('en-IN',{minimumFractionDigits:2})}</td>
           </tr>`;
         }).join('')
       }</tbody></table></div>`;
@@ -2976,7 +2976,7 @@ async function campaignPause(id, btn){
   try{
     const data = await api(`/campaigns/${id}/pause`,{method:'POST',body:JSON.stringify({})});
     const credited = parseFloat(data.wallet_credited||0);
-    toast(credited>0?`Campaign paused. ?${credited.toLocaleString('en-IN',{minimumFractionDigits:2})} credited to wallet.`:'Campaign paused.','success');
+    toast(credited>0?`Campaign paused. ₹${credited.toLocaleString('en-IN',{minimumFractionDigits:2})} credited to wallet.`:'Campaign paused.','success');
     document.getElementById('sidebar-wallet-bal').textContent='₹'+fmtNum(walletBalance+credited);
     walletBalance+=credited;
     await loadCampaigns();
@@ -2988,7 +2988,7 @@ async function campaignResume(id, btn){
   try{
     const data = await api(`/campaigns/${id}/resume`,{method:'POST',body:JSON.stringify({})});
     const debited = parseFloat(data.wallet_debited||0);
-    toast(debited>0?`Campaign resumed. ?${debited.toLocaleString('en-IN',{minimumFractionDigits:2})} deducted from wallet.`:'Campaign resumed.','success');
+    toast(debited>0?`Campaign resumed. ₹${debited.toLocaleString('en-IN',{minimumFractionDigits:2})} deducted from wallet.`:'Campaign resumed.','success');
     walletBalance = Math.max(0, walletBalance - debited);
     document.getElementById('sidebar-wallet-bal').textContent='₹'+fmtNum(walletBalance);
     await loadCampaigns();
@@ -3001,7 +3001,7 @@ async function campaignCancel(id, title){
   try{
     const data = await api(`/campaigns/${id}`,{method:'DELETE',body:JSON.stringify({reason:'Cancelled by advertiser'})});
     const credited = parseFloat(data.wallet_credited||0);
-    toast(credited>0?`Campaign cancelled. ?${credited.toLocaleString('en-IN',{minimumFractionDigits:2})} credited to wallet.`:'Campaign cancelled.','success');
+    toast(credited>0?`Campaign cancelled. ₹${credited.toLocaleString('en-IN',{minimumFractionDigits:2})} credited to wallet.`:'Campaign cancelled.','success');
     walletBalance+=credited;
     document.getElementById('sidebar-wallet-bal').textContent='₹'+fmtNum(walletBalance);
     await loadCampaigns();
