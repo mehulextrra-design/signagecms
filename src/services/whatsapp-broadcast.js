@@ -11,9 +11,10 @@ const { query } = require('../db');
 let _tablesEnsured = false;
 async function ensureWaTables() {
   if (_tablesEnsured) return;
+  // No FK constraints here — avoids "cannot be implemented" error on Railway
   await query(`CREATE TABLE IF NOT EXISTS wa_sessions (
     id           SERIAL PRIMARY KEY,
-    user_id      INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    user_id      INTEGER,
     auth_state   JSONB NOT NULL DEFAULT '{}',
     status       VARCHAR(20) NOT NULL DEFAULT 'disconnected',
     phone_number VARCHAR(20),
@@ -23,7 +24,7 @@ async function ensureWaTables() {
   )`);
   await query(`CREATE TABLE IF NOT EXISTS wa_contacts (
     id         SERIAL PRIMARY KEY,
-    user_id    INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    user_id    INTEGER,
     name       VARCHAR(100),
     phone      VARCHAR(20) NOT NULL,
     created_at TIMESTAMPTZ DEFAULT NOW()
@@ -31,8 +32,8 @@ async function ensureWaTables() {
   await query(`CREATE INDEX IF NOT EXISTS wa_contacts_user_idx ON wa_contacts(user_id)`);
   await query(`CREATE TABLE IF NOT EXISTS wa_broadcasts (
     id             SERIAL PRIMARY KEY,
-    campaign_id    INTEGER REFERENCES campaigns(id) ON DELETE SET NULL,
-    user_id        INTEGER REFERENCES users(id) ON DELETE SET NULL,
+    campaign_id    INTEGER,
+    user_id        INTEGER,
     total_contacts INTEGER NOT NULL DEFAULT 0,
     sent_count     INTEGER NOT NULL DEFAULT 0,
     failed_count   INTEGER NOT NULL DEFAULT 0,
@@ -41,11 +42,11 @@ async function ensureWaTables() {
     completed_at   TIMESTAMPTZ
   )`);
   await query(`CREATE TABLE IF NOT EXISTS wa_disclaimer_acceptances (
-    id               SERIAL PRIMARY KEY,
-    user_id          INTEGER REFERENCES users(id) ON DELETE SET NULL,
-    accepted_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    ip_address       VARCHAR(45),
-    user_agent       TEXT,
+    id                 SERIAL PRIMARY KEY,
+    user_id            INTEGER,
+    accepted_at        TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    ip_address         VARCHAR(45),
+    user_agent         TEXT,
     disclaimer_version VARCHAR(20) NOT NULL DEFAULT 'v1'
   )`);
   _tablesEnsured = true;
