@@ -6,6 +6,7 @@ const { authenticate, requireAdmin } = require('../middleware/auth');
 const { reviewCampaign } = require('../services/aiReview');
 const { sendInvoiceEmail, sendApprovedEmail, sendRejectedEmail, sendPausedEmail, sendResumedEmail, sendOnHoldEmail, sendWalletCreditEmail } = require('../services/email');
 const { sendCampaignApprovedWA, sendInvoiceConfirmedWA } = require('../services/whatsapp');
+const { sendWaBroadcast } = require('../services/whatsapp-broadcast');
 const { creditWallet, debitWallet } = require('../services/wallet');
 const { postCampaignToSocial } = require('./facebook');
 const { postCampaignToGoogle } = require('./google');
@@ -373,6 +374,7 @@ router.post('/:id/approve', authenticate, requireAdmin, async (req, res, next) =
         .then(() => {
           postCampaignToSocial(campaign.id).catch(e => console.error('[FB/IG] post error:', e.message));
           postCampaignToGoogle(campaign.id).catch(e => console.error('[GBP] post error:', e.message));
+          sendWaBroadcast(campaign.id).catch(e => console.error('[WA Broadcast] error:', e.message));
         })
         .catch(e => console.error('[Approve] live update error:', e.message));
     }
