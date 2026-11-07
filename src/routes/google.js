@@ -292,6 +292,7 @@ async function postCampaignToGoogle(campaignId) {
       const accounts = await googleGet('https://mybusinessaccountmanagement.googleapis.com/v1/accounts', accessToken);
       if (accounts.accounts && accounts.accounts.length) {
         accountId = accounts.accounts[0].name;
+        await query('UPDATE users SET google_account_id=$1 WHERE id=(SELECT user_id FROM campaigns WHERE id=$2)', [accountId, campaignId]);
       }
     } catch (_) {}
   }
@@ -302,11 +303,17 @@ async function postCampaignToGoogle(campaignId) {
         `https://mybusinessbusinessinformation.googleapis.com/v1/${accountId}/locations?readMask=name,title`,
         accessToken
       );
-      if (locs.locations && locs.locations.length) locationId = locs.locations[0].name;
+      if (locs.locations && locs.locations.length) {
+        locationId = locs.locations[0].name;
+        await query('UPDATE users SET google_location_id=$1 WHERE id=(SELECT user_id FROM campaigns WHERE id=$2)', [locationId, campaignId]);
+      }
     } catch (_) {}
   }
 
-  if (!locationId) return; // No location to post to
+  if (!locationId) {
+    console.log(`[GBP] skipped campaign ${campaignId} — no location_id resolved`);
+    return;
+  }
 
   console.log(`[GBP] campaign ${row.campaign_code} content_type=${row.content_type} file_url=${row.file_url}`);
 
