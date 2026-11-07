@@ -759,8 +759,8 @@ textarea.form-input{resize:vertical;min-height:80px;}
               <div class="form-group">
                 <label class="form-label">Target</label>
                 <select class="form-select" id="notif-target" onchange="toggleNotifUser()">
-                  <option value="broadcast">?? Broadcast to All Advertisers</option>
-                  <option value="user">?? Specific User</option>
+                  <option value="broadcast">📢 Broadcast to All Advertisers</option>
+                  <option value="user">👤 Specific User</option>
                 </select>
               </div>
               <div class="form-group hidden" id="notif-user-group">
@@ -770,10 +770,10 @@ textarea.form-input{resize:vertical;min-height:80px;}
               <div class="form-group">
                 <label class="form-label">Type</label>
                 <select class="form-select" id="notif-type">
-                  <option value="info">?? Info</option>
+                  <option value="info">ℹ️ Info</option>
                   <option value="success">? Success</option>
-                  <option value="warning">?? Warning</option>
-                  <option value="action_required">?? Action Required</option>
+                  <option value="warning">⚠️ Warning</option>
+                  <option value="action_required">🔔 Action Required</option>
                 </select>
               </div>
               <div class="form-group">
@@ -1723,7 +1723,7 @@ async function loadFiller() {
     tbody.innerHTML = items.map(f => {
       const isVideo = f.type === 'video';
       const thumb = isVideo
-        ? `<div style="width:60px;height:38px;background:var(--surface2);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:18px;">??</div>`
+        ? `<div style="width:60px;height:38px;background:var(--surface2);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:18px;">▶</div>`
         : `<img src="${f.file_url}" style="width:60px;height:38px;object-fit:cover;border-radius:4px;background:var(--surface2);" onerror="this.style.background='var(--surface2)'">`;
       const sids = f.screen_ids || [];
       const screensBadge = sids.length === 0
@@ -2222,7 +2222,7 @@ function renderApprovals(arr) {
       const creativeTd = c.creative_url && c.creative_type === 'image'
         ? `<td onclick="event.stopPropagation()" style="width:70px;"><img src="${c.creative_url}" alt="creative" style="width:64px;height:48px;object-fit:cover;border-radius:6px;border:1px solid var(--border);cursor:zoom-in;" onclick="openLightbox('${c.creative_url}','${(c.creative_name||'').replace(/'/g,"\\'")}','image')" title="Click to preview"></td>`
         : c.creative_url && c.creative_type === 'video'
-        ? `<td onclick="event.stopPropagation()" style="width:70px;"><div style="width:64px;height:48px;background:var(--surface2);border-radius:6px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:24px;cursor:zoom-in;" onclick="openLightbox('${c.creative_url}','${(c.creative_name||'').replace(/'/g,"\\'")}','video')" title="Click to preview">??</div></td>`
+        ? `<td onclick="event.stopPropagation()" style="width:70px;"><div style="width:64px;height:48px;background:var(--surface2);border-radius:6px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:24px;cursor:zoom-in;" onclick="openLightbox('${c.creative_url}','${(c.creative_name||'').replace(/'/g,"\\'")}','video')" title="Click to preview">▶</div></td>`
         : `<td onclick="event.stopPropagation()" style="width:70px;"><div style="width:64px;height:48px;background:var(--surface2);border-radius:6px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:11px;">—</div></td>`;
       return `<tr style="cursor:pointer;" onclick="openCampaignDetail('${c.id}')">
         <td><code style="font-size:11px;background:var(--surface2);padding:2px 6px;border-radius:4px;">${c.campaign_code}</code></td>
@@ -2261,7 +2261,7 @@ async function approveQuick(id, forceStartToday) {
 
   if (startDate && startDate > today && forceStartToday === undefined) {
     const choice = confirm(
-      `?? Campaign start date is ${fmtDate(startDate)} (future date).\n\n` +
+      `⚠️ Campaign start date is ${fmtDate(startDate)} (future date).\n\n` +
       `Player will NOT show this campaign until that date.\n\n` +
       `Click OK ? Override start date to TODAY (run immediately)\n` +
       `Click Cancel ? Keep original date (${fmtDate(startDate)})`
@@ -2595,7 +2595,7 @@ async function previewSchedule(screenId, screenCode) {
 
     if (d.active_campaigns_in_schedule.length === 0) {
       html += `<div style="background:#fff3cd;border:1px solid #ffc107;border-radius:8px;padding:12px;margin-bottom:16px;color:#856404;">
-        <strong>?? No active campaigns for today (${d.today})</strong><br>
+        <strong>📋 No active campaigns for today (${d.today})</strong><br>
         <small>Either no campaigns are assigned to this screen, or assigned campaigns have future/past dates.</small>
       </div>`;
     } else {
@@ -2868,7 +2868,7 @@ function renderContent(arr) {
       <td style="width:72px;">
         ${c.type==='image'
           ? `<img src="${c.file_url}" style="width:64px;height:40px;object-fit:cover;border-radius:4px;background:var(--surface2);cursor:zoom-in;" onclick="openLightbox('${c.file_url}','${(c.original_name||'').replace(/'/g,"\\'")}','image')" onerror="this.style.display='none'" title="Click to preview">`
-          : `<div style="width:64px;height:40px;background:var(--surface2);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:20px;cursor:zoom-in;" onclick="openLightbox('${c.file_url}','${(c.original_name||'').replace(/'/g,"\\'")}','video')" title="Click to preview">??</div>`}
+          : `<div style="width:64px;height:40px;background:var(--surface2);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:20px;cursor:zoom-in;" onclick="openLightbox('${c.file_url}','${(c.original_name||'').replace(/'/g,"\\'")}','video')" title="Click to preview">▶</div>`}
       </td>
       <td style="font-weight:500;font-size:13px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${c.original_name}">${c.original_name}</td>
       <td><span class="badge ${c.type==='video'?'badge-blue':'badge-green'}">${c.type||'—'}</span></td>

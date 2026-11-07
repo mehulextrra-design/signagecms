@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-<title>Venue Partner Portal — SignageCMS</title>
+<title>Venue Partner Portal â€” SignageCMS</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -153,7 +153,7 @@ body { font-family:'Inter',system-ui,sans-serif; background:var(--bg); color:var
     </div>
     <div class="form-group">
       <label class="form-label">Password</label>
-      <input type="password" id="login-pass" class="form-input" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+      <input type="password" id="login-pass" class="form-input" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢" onkeydown="if(event.key==='Enter')doLogin()">
     </div>
     <button class="btn btn-primary" onclick="doLogin()">Sign In</button>
     <div class="login-error" id="login-err"></div>
@@ -170,7 +170,7 @@ body { font-family:'Inter',system-ui,sans-serif; background:var(--bg); color:var
     </div>
     <div class="topbar-user">
       <div>
-        <div class="topbar-biz" id="tb-biz">—</div>
+        <div class="topbar-biz" id="tb-biz">â€”</div>
         <div class="topbar-role">Venue Partner</div>
       </div>
       <button class="btn btn-ghost btn-sm" onclick="logout()">Sign Out</button>
@@ -187,20 +187,20 @@ body { font-family:'Inter',system-ui,sans-serif; background:var(--bg); color:var
     <!-- OVERVIEW TAB -->
     <div class="tab-panel active" id="tab-overview">
       <div class="stat-row" id="overview-stats">
-        <div class="stat-box"><div class="stat-label">My Screens</div><div class="stat-val primary" id="ov-screens">—</div></div>
-        <div class="stat-box"><div class="stat-label">Revenue Earned</div><div class="stat-val primary" id="ov-revenue">—</div></div>
-        <div class="stat-box"><div class="stat-label">Pending Settlement</div><div class="stat-val" id="ov-pending">—</div></div>
-        <div class="stat-box"><div class="stat-label">My Content Files</div><div class="stat-val" id="ov-content">—</div></div>
+        <div class="stat-box"><div class="stat-label">My Screens</div><div class="stat-val primary" id="ov-screens">â€”</div></div>
+        <div class="stat-box"><div class="stat-label">Revenue Earned</div><div class="stat-val primary" id="ov-revenue">â€”</div></div>
+        <div class="stat-box"><div class="stat-label">Pending Settlement</div><div class="stat-val" id="ov-pending">â€”</div></div>
+        <div class="stat-box"><div class="stat-label">My Content Files</div><div class="stat-val" id="ov-content">â€”</div></div>
       </div>
 
       <div class="card-title" style="margin-bottom:10px;">My Screens</div>
-      <div id="screens-list"><div class="empty">Loading screens…</div></div>
+      <div id="screens-list"><div class="empty">Loading screensâ€¦</div></div>
 
       <!-- Airtime split info -->
       <div class="card" style="margin-top:16px;">
         <div class="card-title">How Your Screen's Airtime is Split</div>
         <div id="airtime-split-info">
-          <div style="font-size:13px;color:var(--text2);">Loading…</div>
+          <div style="font-size:13px;color:var(--text2);">Loadingâ€¦</div>
         </div>
       </div>
     </div>
@@ -217,7 +217,7 @@ body { font-family:'Inter',system-ui,sans-serif; background:var(--bg); color:var
           <div class="upload-zone" onclick="triggerUpload('venue_own')">
             <div class="upload-icon"><svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="#ca8a04"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg></div>
             <div class="upload-title" style="font-size:13px;">Upload Your Content</div>
-            <div class="upload-sub">JPG · PNG · MP4 · max 200 MB</div>
+            <div class="upload-sub">JPG Â· PNG Â· MP4 Â· max 200 MB</div>
           </div>
         </div>
 
@@ -242,25 +242,25 @@ body { font-family:'Inter',system-ui,sans-serif; background:var(--bg); color:var
         <div style="height:4px;background:var(--border);border-radius:3px;overflow:hidden;">
           <div id="upload-prog-fill" style="height:100%;background:var(--primary);width:0%;transition:width 0.3s;"></div>
         </div>
-        <div style="font-size:11px;color:var(--text2);margin-top:4px;" id="upload-prog-text">Uploading…</div>
+        <div style="font-size:11px;color:var(--text2);margin-top:4px;" id="upload-prog-text">Uploadingâ€¦</div>
       </div>
 
       <div class="card-title" style="margin-top:4px;margin-bottom:10px;">All My Content</div>
-      <div id="content-grid" class="content-grid"><div class="empty">Loading content…</div></div>
+      <div id="content-grid" class="content-grid"><div class="empty">Loading contentâ€¦</div></div>
     </div>
 
     <!-- REVENUE TAB -->
     <div class="tab-panel" id="tab-revenue">
       <div class="stat-row" style="margin-bottom:20px;">
-        <div class="stat-box"><div class="stat-label">Total Earned</div><div class="stat-val primary" id="rv-total">—</div><div class="stat-sub">From paid campaigns on your screen</div></div>
-        <div class="stat-box"><div class="stat-label">Settled</div><div class="stat-val" style="color:var(--success);" id="rv-settled">—</div></div>
-        <div class="stat-box"><div class="stat-label">Pending</div><div class="stat-val" style="color:var(--warning);" id="rv-pending-amt">—</div><div class="stat-sub">Next settlement upcoming</div></div>
+        <div class="stat-box"><div class="stat-label">Total Earned</div><div class="stat-val primary" id="rv-total">â€”</div><div class="stat-sub">From paid campaigns on your screen</div></div>
+        <div class="stat-box"><div class="stat-label">Settled</div><div class="stat-val" style="color:var(--success);" id="rv-settled">â€”</div></div>
+        <div class="stat-box"><div class="stat-label">Pending</div><div class="stat-val" style="color:var(--warning);" id="rv-pending-amt">â€”</div><div class="stat-sub">Next settlement upcoming</div></div>
       </div>
 
       <div class="card">
         <div class="card-title">Monthly Revenue</div>
         <div id="rev-monthly-wrap">
-          <div class="empty">Loading…</div>
+          <div class="empty">Loadingâ€¦</div>
         </div>
         <div style="font-size:11px;color:var(--text3);margin-top:12px;">Revenue is credited monthly via bank transfer / UPI. Contact your account manager for settlement queries.</div>
       </div>
@@ -345,7 +345,7 @@ function loadOverview() {
 
   // Render screens
   const container = document.getElementById('screens-list');
-  if (!screens.length) { container.innerHTML = '<div class="empty">No screens linked yet — contact your account manager.</div>'; return; }
+  if (!screens.length) { container.innerHTML = '<div class="empty">No screens linked yet â€” contact your account manager.</div>'; return; }
   container.innerHTML = screens.map(s => {
     const dotClass = s.status==='online' ? 'online' : s.status==='maintenance' ? 'maintenance' : 'offline';
     const paid = s.paid_pct||75, own=s.venue_own_pct||15, cross=s.cross_pct||8;
@@ -353,7 +353,7 @@ function loadOverview() {
       <div class="screen-status-dot ${dotClass}"></div>
       <div class="screen-info">
         <div class="screen-name">${s.name}</div>
-        <div class="screen-loc">${s.location||''} ${s.city?'· '+s.city:''}</div>
+        <div class="screen-loc">${s.location||''} ${s.city?'Â· '+s.city:''}</div>
         <div class="screen-meta">${s.screen_code}</div>
       </div>
       <div class="screen-airtime">
@@ -363,7 +363,7 @@ function loadOverview() {
           <div style="width:${own}%;background:#ca8a04;"></div>
           <div style="width:${cross}%;background:#2563EB;"></div>
         </div>
-        <div style="font-size:9.5px;color:var(--text3);">${own}% your content · ${cross}% your ad</div>
+        <div style="font-size:9.5px;color:var(--text3);">${own}% your content Â· ${cross}% your ad</div>
       </div>
     </div>`;
   }).join('');
@@ -380,17 +380,17 @@ function loadOverview() {
 
 async function loadContent() {
   const grid = document.getElementById('content-grid');
-  grid.innerHTML = '<div class="empty">Loading…</div>';
+  grid.innerHTML = '<div class="empty">Loadingâ€¦</div>';
   try {
     const items = await api('/venue-partners/' + _vpData.id + '/content');
     document.getElementById('ov-content').textContent = items.length;
-    if (!items.length) { grid.innerHTML = '<div class="empty">No content yet — upload your first file above.</div>'; return; }
+    if (!items.length) { grid.innerHTML = '<div class="empty">No content yet â€” upload your first file above.</div>'; return; }
     grid.innerHTML = items.map(c => {
       const isVideo = c.type === 'video';
       const tierLabel = c.content_tier === 'venue_cross' ? '<span class="content-tier tier-venue-cross">City-wide ad</span>' : '<span class="content-tier tier-venue-own">Screen content</span>';
       return `<div class="content-item">
         ${isVideo
-          ? `<div class="content-thumb-video">??</div>`
+          ? `<div class="content-thumb-video">â–¶</div>`
           : `<img class="content-thumb" src="${c.file_url}" onerror="this.style.background='var(--surface2)'" alt="">`}
         <div class="content-meta">
           <div class="content-name" title="${c.original_name}">${c.original_name}</div>
@@ -413,7 +413,7 @@ async function loadRevenue() {
     document.getElementById('rv-pending-amt').textContent = '?'+fmt(s.pending_settlement);
 
     const wrap = document.getElementById('rev-monthly-wrap');
-    if (!r.monthly.length) { wrap.innerHTML = '<div class="empty">No revenue yet — revenue is generated when paid campaigns run on your screen.</div>'; return; }
+    if (!r.monthly.length) { wrap.innerHTML = '<div class="empty">No revenue yet â€” revenue is generated when paid campaigns run on your screen.</div>'; return; }
     wrap.innerHTML = `<table class="rev-table"><thead><tr><th>Month</th><th>Plays Served</th><th>Revenue Earned</th><th>Status</th></tr></thead><tbody>
       ${r.monthly.map(m=>`<tr>
         <td style="font-weight:600;">${m.month}</td>
@@ -439,7 +439,7 @@ async function handleFileUpload(e) {
   const text = document.getElementById('upload-prog-text');
   prog.style.display = 'block';
   fill.style.width = '10%';
-  text.textContent = 'Uploading ' + file.name + '…';
+  text.textContent = 'Uploading ' + file.name + 'â€¦';
 
   const fd = new FormData();
   fd.append('file', file);

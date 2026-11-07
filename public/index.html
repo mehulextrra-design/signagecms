@@ -780,7 +780,7 @@
             <!-- Shared preview -->
             <div id="upload-preview" style="display:none;" class="upload-preview">
               <img id="preview-thumb" src="" alt="" style="width:56px;height:42px;object-fit:cover;border-radius:6px;border:1px solid var(--border);display:none;">
-              <div id="preview-icon-wrap" style="width:56px;height:42px;background:var(--primary-light);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:22px;">??</div>
+              <div id="preview-icon-wrap" style="width:56px;height:42px;background:var(--primary-light);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:22px;">🎬</div>
               <div style="flex:1;min-width:0;"><div class="upload-preview-name" id="preview-name" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">—</div><div class="upload-preview-size" id="preview-size">—</div></div>
               <button onclick="clearFile()" style="margin-left:auto;background:none;border:none;cursor:pointer;color:var(--text2);font-size:20px;flex-shrink:0;">×</button>
             </div>
@@ -1775,7 +1775,7 @@ function renderCampaignsTable(campaigns){
         ${c.creative_url&&c.creative_type==='image'
           ?`<img src="${c.creative_url}" alt="${c.creative_name||'creative'}" style="width:56px;height:42px;object-fit:cover;border-radius:4px;border:1px solid var(--border);cursor:zoom-in;" onclick="openLightbox('${c.creative_url}','${(c.creative_name||'').replace(/'/g,"\\'")}','image')" title="Click to preview">`
           :c.creative_url&&c.creative_type==='video'
-          ?`<div style="width:56px;height:42px;background:var(--surface2);border-radius:4px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:20px;cursor:zoom-in;" onclick="openLightbox('${c.creative_url}','${(c.creative_name||'').replace(/'/g,"\\'")}','video')" title="Click to preview">??</div>`
+          ?`<div style="width:56px;height:42px;background:var(--surface2);border-radius:4px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:20px;cursor:zoom-in;" onclick="openLightbox('${c.creative_url}','${(c.creative_name||'').replace(/'/g,"\\'")}','video')" title="Click to preview">&#x1F3AC;</div>`
           :'<div style="width:56px;height:42px;background:var(--surface2);border-radius:4px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:10px;">—</div>'}
       </td>
       <td>
@@ -2719,7 +2719,7 @@ function selectFromLibrary(id,name,type,url){
   if(type==='image'&&url){
     thumb.src=url;thumb.style.display='';iconWrap.style.display='none';
   }else{
-    thumb.style.display='none';iconWrap.style.display='flex';iconWrap.textContent='??';
+    thumb.style.display='none';iconWrap.style.display='flex';iconWrap.textContent='🎬';
   }
   document.getElementById('preview-name').textContent=name;
   document.getElementById('preview-size').textContent='From library';
@@ -2742,7 +2742,7 @@ function setUploadFile(file){
   }else{
     thumb.style.display='none';
     iconWrap.style.display='flex';
-    iconWrap.textContent='??';
+    iconWrap.textContent='🎬';
   }
   document.getElementById('preview-name').textContent=file.name;
   document.getElementById('preview-size').textContent=formatBytes(file.size);
@@ -2815,7 +2815,7 @@ function renderNotifBadge(){
 function renderNotifList(){
   const list=document.getElementById('notif-list');
   if(!allNotifications.length){
-    list.innerHTML=`<div style="padding:48px 20px;text-align:center;"><div style="font-size:32px;margin-bottom:10px;">??</div><div style="font-size:14px;font-weight:600;margin-bottom:4px;">All caught up!</div><div style="font-size:12px;color:var(--text2);">No notifications yet</div></div>`;
+    list.innerHTML=`<div style="padding:48px 20px;text-align:center;"><div style="font-size:32px;margin-bottom:10px;">🔔</div><div style="font-size:14px;font-weight:600;margin-bottom:4px;">All caught up!</div><div style="font-size:12px;color:var(--text2);">No notifications yet</div></div>`;
     return;
   }
   list.innerHTML=allNotifications.map(n=>`
