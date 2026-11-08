@@ -105,6 +105,36 @@ router.post('/upload', authenticate, upload.single('file'), async (req, res, nex
   } catch (err) { next(err); }
 });
 
+// PATCH /api/content/:id — set content_tier (venue_own / venue_cross)
+router.patch('/:id', authenticate, async (req, res, next) => {
+  const { content_tier } = req.body;
+  if (!content_tier) return res.status(400).json({ error: 'content_tier required' });
+
+  try {
+    // Venue partners: only 1 active venue_own media at a time
+    if (req.user.role === 'venue_partner' && content_tier === 'venue_own') {
+      const conflict = await query(
+        `SELECT id, original_name, file_url FROM content
+         WHERE user_id = $1 AND content_tier = 'venue_own' AND status = 'active' AND id != $2`,
+        [req.user.id, req.params.id]
+      );
+      if (conflict.rows.length) {
+        return res.status(409).json({
+          error: 'one_active_limit',
+          existing: conflict.rows[0]
+        });
+      }
+    }
+
+    const result = await query(
+      `UPDATE content SET content_tier = $1 WHERE id = $2 AND user_id = $3 RETURNING *`,
+      [content_tier, req.params.id, req.user.id]
+    );
+    if (!result.rows.length) return res.status(404).json({ error: 'Not found' });
+    res.json(result.rows[0]);
+  } catch (err) { next(err); }
+});
+
 // DELETE /api/content/:id
 router.delete('/:id', authenticate, async (req, res, next) => {
   try {

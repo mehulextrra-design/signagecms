@@ -284,10 +284,33 @@ body { font-family:'Inter',system-ui,sans-serif; background:var(--bg); color:var
   </div>
 </div>
 
+<!-- ONE ACTIVE LIMIT MODAL -->
+<div id="one-limit-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;display:none;align-items:center;justify-content:center;padding:16px;">
+  <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:14px;padding:24px;width:100%;max-width:400px;">
+    <div style="font-size:15px;font-weight:800;margin-bottom:8px;">Already Running Media</div>
+    <div style="font-size:13px;color:var(--text2);margin-bottom:6px;">Currently active on your screen:</div>
+    <div style="background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;padding:10px 14px;margin-bottom:16px;font-size:13px;font-weight:600;" id="olm-existing-name">—</div>
+    <div style="font-size:13px;color:var(--text2);margin-bottom:18px;">You can run <strong>only one screen media</strong> at a time. What would you like to do?</div>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <button class="btn btn-primary" style="text-align:left;padding:12px 16px;" onclick="olmReplace()">
+        <div style="font-size:13px;font-weight:700;">&#10227; Replace Current Media</div>
+        <div style="font-size:11px;font-weight:400;opacity:0.8;margin-top:2px;">Deactivate existing and run the new one</div>
+      </button>
+      <button class="btn" style="background:var(--primary-light);color:var(--primary);border:1.5px solid var(--primary);text-align:left;padding:12px 16px;" onclick="olmRegisterAdvertiser()">
+        <div style="font-size:13px;font-weight:700;">&#9733; Register as Advertiser</div>
+        <div style="font-size:11px;font-weight:400;opacity:0.8;margin-top:2px;">Schedule multiple campaigns with timing control</div>
+      </button>
+      <button class="btn btn-ghost btn-sm" onclick="olmCancel()" style="margin-top:4px;">Cancel</button>
+    </div>
+  </div>
+</div>
+
 <script>
 const BASE = '';
 let _token = localStorage.getItem('vp_token') || '';
 let _vpData = null;
+let _olmNewContentId = null;
+let _olmNewTier = null;
 
 function api(path, opts={}) {
   return fetch(BASE + '/api' + path, {
@@ -466,6 +489,55 @@ function triggerUpload(tier) {
   document.getElementById('file-input-venue').click();
 }
 
+async function olmReplace() {
+  if (!_olmNewContentId) return;
+  document.getElementById('one-limit-overlay').style.display = 'none';
+  try {
+    // Delete existing venue_own content(s) for this user
+    const existing = await api('/content');
+    const toDelete = existing.filter(c => c.content_tier === 'venue_own' && c.id !== _olmNewContentId);
+    for (const c of toDelete) {
+      await fetch('/api/content/' + c.id, {
+        method:'DELETE',
+        headers:{'Authorization':'Bearer '+_token}
+      });
+    }
+    // Now set tier on the new content
+    await fetch('/api/content/' + _olmNewContentId, {
+      method:'PATCH',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+_token},
+      body: JSON.stringify({ content_tier: _olmNewTier })
+    });
+    _olmNewContentId = null; _olmNewTier = null;
+    loadContent();
+  } catch(e) { alert('Error: ' + e.message); }
+}
+
+function olmRegisterAdvertiser() {
+  document.getElementById('one-limit-overlay').style.display = 'none';
+  if (!_olmNewContentId) return;
+  // Delete the newly uploaded file (not needed as advertiser registers fresh)
+  fetch('/api/content/' + _olmNewContentId, {
+    method:'DELETE',
+    headers:{'Authorization':'Bearer '+_token}
+  }).catch(()=>{});
+  _olmNewContentId = null; _olmNewTier = null;
+  // Redirect to main advertiser portal
+  window.open('/?register=advertiser', '_blank');
+}
+
+function olmCancel() {
+  document.getElementById('one-limit-overlay').style.display = 'none';
+  if (_olmNewContentId) {
+    // Clean up the uploaded file
+    fetch('/api/content/' + _olmNewContentId, {
+      method:'DELETE',
+      headers:{'Authorization':'Bearer '+_token}
+    }).catch(()=>{});
+  }
+  _olmNewContentId = null; _olmNewTier = null;
+}
+
 async function handleFileUpload(e) {
   const file = e.target.files[0];
   if (!file) return;
@@ -491,15 +563,29 @@ async function handleFileUpload(e) {
       if (xhr.status >= 200 && xhr.status < 300) {
         const res = JSON.parse(xhr.responseText);
         // Update content_tier
-        await fetch('/api/content/' + res.id, {
+        const patchRes = await fetch('/api/content/' + res.id, {
           method:'PATCH',
           headers:{'Content-Type':'application/json','Authorization':'Bearer '+_token},
           body: JSON.stringify({ content_tier: tier })
         });
-        fill.style.width = '100%';
-        text.textContent = '? Uploaded successfully';
-        setTimeout(()=>{ prog.style.display='none'; fill.style.width='0%'; }, 2000);
-        loadContent();
+        if (patchRes.status === 409) {
+          const patchData = await patchRes.json();
+          prog.style.display = 'none';
+          fill.style.width = '0%';
+          _olmNewContentId = res.id;
+          _olmNewTier = tier;
+          document.getElementById('olm-existing-name').textContent = patchData.existing?.original_name || 'Unknown file';
+          document.getElementById('one-limit-overlay').style.display = 'flex';
+        } else if (patchRes.ok) {
+          fill.style.width = '100%';
+          text.textContent = '&#10003; Uploaded successfully';
+          setTimeout(()=>{ prog.style.display='none'; fill.style.width='0%'; }, 2000);
+          loadContent();
+        } else {
+          const pErr = await patchRes.json().catch(()=>({}));
+          text.textContent = 'Error: ' + (pErr.error||'Failed to set content type');
+          setTimeout(()=>prog.style.display='none',3000);
+        }
       } else {
         const err = JSON.parse(xhr.responseText);
         text.textContent = 'Error: ' + (err.error||'Upload failed');
