@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>extrravenue — Inspector</title>
+<style>
+:root {
+  --primary: #7b68c8;
+  --primary-dark: #6355b0;
+  --grad: linear-gradient(135deg,#c94baa 0%,#7b68c8 55%,#2ca6d4 100%);
+  --bg: #f5f5f7;
+  --surface: #fff;
+  --border: #e2e2e8;
+  --text: #1a1a2e;
+  --text2: #555570;
+  --text3: #9090a8;
+  --success: #16a34a;
+  --danger: #dc2626;
+  --warning: #d97706;
+  --radius: 14px;
+  --radius-sm: 8px;
+  --shadow: 0 2px 12px rgba(0,0,0,.08);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); font-size: 14px; min-height: 100vh; }
+
+/* AUTH */
+#auth-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 24px; }
+.auth-card { background: var(--surface); border-radius: var(--radius); padding: 32px 24px; width: 100%; max-width: 380px; box-shadow: var(--shadow); }
+.auth-logo { text-align: center; margin-bottom: 24px; }
+.auth-logo span { font-size: 22px; font-weight: 800; background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.auth-logo p { font-size: 12px; color: var(--text3); margin-top: 4px; }
+.form-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--text3); margin-bottom: 6px; display: block; }
+.form-input { width: 100%; padding: 11px 14px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-size: 14px; color: var(--text); background: var(--surface); outline: none; transition: border-color .15s; }
+.form-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(123,104,200,.12); }
+.form-group { margin-bottom: 14px; }
+.btn { display: inline-flex; align-items: center; gap: 6px; padding: 10px 18px; border-radius: var(--radius-sm); border: none; font-size: 13px; font-weight: 600; cursor: pointer; transition: all .15s; }
+.btn-primary { background: var(--grad); color: #fff; }
+.btn-primary:hover { opacity: .9; }
+.btn-ghost { background: transparent; color: var(--text2); border: 1.5px solid var(--border); }
+.btn-ghost:hover { background: var(--bg); }
+.btn-danger { background: #fee2e2; color: var(--danger); border: none; }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+.btn-full { width: 100%; justify-content: center; }
+.error-msg { color: var(--danger); font-size: 12px; margin-top: 8px; display: none; }
+
+/* APP */
+#app-screen { display: none; }
+
+/* HEADER */
+.app-header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+.header-brand { font-size: 16px; font-weight: 800; background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.header-user { font-size: 11px; color: var(--text3); text-align: right; }
+.header-user strong { display: block; color: var(--text2); font-size: 12px; }
+
+/* TOOLBAR */
+.toolbar { padding: 12px 16px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; background: var(--surface); border-bottom: 1px solid var(--border); }
+.search-input { flex: 1; min-width: 140px; padding: 8px 12px; border: 1.5px solid var(--border); border-radius: 20px; font-size: 13px; outline: none; background: var(--bg); color: var(--text); }
+.search-input:focus { border-color: var(--primary); background: var(--surface); }
+.filter-select { padding: 7px 10px; border: 1.5px solid var(--border); border-radius: 20px; font-size: 12px; background: var(--bg); color: var(--text); outline: none; }
+
+/* LEAD CARDS */
+.leads-container { padding: 12px 16px; }
+.lead-card { background: var(--surface); border-radius: var(--radius); padding: 14px; margin-bottom: 10px; box-shadow: var(--shadow); cursor: pointer; border: 1.5px solid transparent; transition: border-color .15s; }
+.lead-card:active { border-color: var(--primary); }
+.lead-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+.lead-biz { font-weight: 700; font-size: 15px; }
+.lead-owner { font-size: 12px; color: var(--text3); margin-top: 1px; }
+.lead-meta { display: flex; gap: 10px; margin-top: 8px; flex-wrap: wrap; }
+.lead-meta-item { font-size: 11px; color: var(--text2); }
+.lead-meta-item span { font-weight: 600; }
+.badge { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .4px; }
+.badge-yellow { background: #fef9c3; color: #854d0e; }
+.badge-blue { background: #dbeafe; color: #1e40af; }
+.badge-green { background: #dcfce7; color: #166534; }
+.badge-red { background: #fee2e2; color: #991b1b; }
+.badge-teal { background: #ccfbf1; color: #0f766e; }
+.badge-gray { background: #f1f5f9; color: #475569; }
+.badge-purple { background: #ede9fe; color: #5b21b6; }
+
+/* DRAWER */
+.drawer-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.4); z-index: 200; display: none; }
+.drawer { position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface); border-radius: 20px 20px 0 0; z-index: 201; max-height: 92vh; display: none; flex-direction: column; }
+.drawer-handle { width: 36px; height: 4px; background: var(--border); border-radius: 2px; margin: 10px auto 0; }
+.drawer-header { padding: 12px 16px 10px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+.drawer-title { font-size: 16px; font-weight: 700; }
+.drawer-close { font-size: 20px; color: var(--text3); cursor: pointer; padding: 4px; }
+.drawer-body { overflow-y: auto; padding: 14px 16px; flex: 1; }
+.section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; color: var(--text3); margin-bottom: 8px; margin-top: 16px; }
+.section-label:first-child { margin-top: 0; }
+.info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.info-item label { font-size: 10px; font-weight: 600; text-transform: uppercase; color: var(--text3); display: block; margin-bottom: 2px; }
+.info-item p { font-size: 13px; font-weight: 500; }
+
+/* STATUS SELECT */
+.status-select { width: 100%; padding: 10px 12px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-size: 13px; background: var(--bg); color: var(--text); outline: none; }
+.status-select:focus { border-color: var(--primary); }
+
+/* ACTIVITY */
+.activity-item { border-left: 2px solid var(--border); padding: 6px 10px; margin-bottom: 8px; }
+.activity-time { font-size: 10px; color: var(--text3); }
+.activity-type { font-size: 12px; font-weight: 600; margin-top: 1px; }
+.activity-note { font-size: 12px; color: var(--text2); margin-top: 2px; }
+
+/* PHOTOS */
+.photos-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.photo-thumb { position: relative; aspect-ratio: 1; border-radius: 8px; overflow: hidden; background: var(--bg); }
+.photo-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.photo-del { position: absolute; top: 3px; right: 3px; background: rgba(0,0,0,.6); color: #fff; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 11px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.photo-add { aspect-ratio: 1; border-radius: 8px; border: 2px dashed var(--border); display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; color: var(--text3); font-size: 11px; gap: 4px; background: var(--bg); transition: border-color .15s; }
+.photo-add:hover { border-color: var(--primary); color: var(--primary); }
+
+/* NOTE TEXTAREA */
+.note-input { width: 100%; padding: 10px 12px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-size: 13px; resize: vertical; min-height: 72px; font-family: inherit; background: var(--bg); color: var(--text); outline: none; }
+.note-input:focus { border-color: var(--primary); background: var(--surface); }
+
+/* BOTTOM NAV */
+.bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface); border-top: 1px solid var(--border); display: flex; z-index: 100; padding-bottom: env(safe-area-inset-bottom, 0); }
+.nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 10px 4px 8px; font-size: 10px; font-weight: 600; color: var(--text3); cursor: pointer; border: none; background: none; gap: 3px; transition: color .15s; }
+.nav-btn.active { color: var(--primary); }
+.nav-btn svg { width: 20px; height: 20px; stroke: currentColor; }
+.page-pad { padding-bottom: 72px; }
+
+/* TOAST */
+#toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: #1a1a2e; color: #fff; padding: 10px 20px; border-radius: 20px; font-size: 13px; z-index: 999; opacity: 0; transition: opacity .25s; pointer-events: none; white-space: nowrap; }
+#toast.show { opacity: 1; }
+
+/* MODAL */
+.modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 300; display: none; align-items: flex-end; }
+.modal-backdrop.open { display: flex; }
+.modal-sheet { background: var(--surface); border-radius: 20px 20px 0 0; width: 100%; max-height: 90vh; overflow-y: auto; padding: 20px 16px 32px; }
+.modal-title { font-size: 16px; font-weight: 700; margin-bottom: 16px; }
+
+/* AGREEMENT PRINT */
+@media print {
+  body > *:not(#agreement-print) { display: none !important; }
+  #agreement-print { display: block !important; padding: 20px; }
+}
+#agreement-print { display: none; }
+
+/* EMPTY STATE */
+.empty-state { text-align: center; padding: 48px 24px; color: var(--text3); }
+.empty-state svg { width: 48px; height: 48px; margin-bottom: 12px; opacity: .4; }
+.empty-state p { font-size: 14px; }
+
+/* LOADING */
+.spinner { width: 32px; height: 32px; border: 3px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin .7s linear infinite; margin: 40px auto; }
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<!-- AUTH SCREEN -->
+<div id="auth-screen">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <span>extrravenue</span>
+      <p>Inspector Portal</p>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Email</label>
+      <input type="email" id="login-email" class="form-input" placeholder="your@email.com" autocomplete="email">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Password</label>
+      <input type="password" id="login-password" class="form-input" placeholder="Password" autocomplete="current-password">
+    </div>
+    <div id="login-error" class="error-msg"></div>
+    <button class="btn btn-primary btn-full" id="login-btn" onclick="doLogin()" style="margin-top:4px;">Sign In</button>
+  </div>
+</div>
+
+<!-- APP SCREEN -->
+<div id="app-screen">
+
+  <!-- HEADER -->
+  <div class="app-header">
+    <div class="header-brand">extrravenue</div>
+    <div class="header-user">
+      <strong id="hdr-name">—</strong>
+      Inspector
+    </div>
+  </div>
+
+  <!-- LEADS PAGE -->
+  <div id="page-leads" class="page-pad">
+    <div class="toolbar">
+      <input type="text" class="search-input" id="leads-search" placeholder="Search leads…" oninput="filterLeads()">
+      <select class="filter-select" id="leads-filter" onchange="filterLeads()">
+        <option value="">All</option>
+        <option value="new">New</option>
+        <option value="assigned">Assigned</option>
+        <option value="contacted">Contacted</option>
+        <option value="meeting_scheduled">Meeting Scheduled</option>
+        <option value="meeting_done">Meeting Done</option>
+        <option value="site_visited">Site Visited</option>
+        <option value="agreement_pending">Agreement Pending</option>
+        <option value="agreement_signed">Agreement Signed</option>
+        <option value="installation_pending">Install Pending</option>
+        <option value="installation_done">Install Done</option>
+        <option value="live">Live</option>
+        <option value="dropped">Dropped</option>
+      </select>
+      <button class="btn btn-primary" onclick="openNewLead()" style="padding:8px 14px;border-radius:20px;font-size:12px;">+ New Lead</button>
+    </div>
+    <div class="leads-container" id="leads-list">
+      <div class="spinner"></div>
+    </div>
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <div class="bottom-nav">
+    <button class="nav-btn active" id="nav-leads" onclick="showPage('leads')">
+      <svg fill="none" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+      My Leads
+    </button>
+    <button class="nav-btn" id="nav-logout" onclick="doLogout()">
+      <svg fill="none" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+      Logout
+    </button>
+  </div>
+
+</div>
+
+<!-- LEAD DRAWER -->
+<div class="drawer-backdrop" id="drawer-backdrop" onclick="closeDrawer()"></div>
+<div class="drawer" id="lead-drawer">
+  <div class="drawer-handle"></div>
+  <div class="drawer-header">
+    <div class="drawer-title" id="drawer-title">Lead</div>
+    <div class="drawer-close" onclick="closeDrawer()">&times;</div>
+  </div>
+  <div class="drawer-body" id="drawer-body">
+    <div class="spinner"></div>
+  </div>
+</div>
+
+<!-- NEW LEAD MODAL -->
+<div class="modal-backdrop" id="new-lead-modal">
+  <div class="modal-sheet">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+      <div class="modal-title">New Lead</div>
+      <span style="font-size:22px;color:var(--text3);cursor:pointer;" onclick="closeNewLead()">&times;</span>
+    </div>
+    <div class="form-group"><label class="form-label">Business Name *</label><input id="nl-biz" class="form-input" type="text" placeholder="Life Gym"></div>
+    <div class="form-group"><label class="form-label">Owner Name</label><input id="nl-owner" class="form-input" type="text" placeholder="Ramesh Shah"></div>
+    <div class="form-group"><label class="form-label">Phone *</label><input id="nl-phone" class="form-input" type="tel" placeholder="9876543210"></div>
+    <div class="form-group"><label class="form-label">City</label><input id="nl-city" class="form-input" type="text" placeholder="Ahmedabad"></div>
+    <div class="form-group">
+      <label class="form-label">Category</label>
+      <select id="nl-cat" class="form-input">
+        <option value="gym">Gym / Fitness</option>
+        <option value="restaurant">Restaurant</option>
+        <option value="cafe">Cafe</option>
+        <option value="salon">Salon</option>
+        <option value="clinic">Clinic</option>
+        <option value="retail">Retail</option>
+        <option value="hotel">Hotel</option>
+        <option value="society">Society</option>
+        <option value="office">Office</option>
+        <option value="education">Education</option>
+        <option value="other">Other</option>
+      </select>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+      <div class="form-group"><label class="form-label">Footfall/day</label><input id="nl-footfall" class="form-input" type="number" placeholder="200"></div>
+      <div class="form-group"><label class="form-label">Screens</label><input id="nl-screens" class="form-input" type="number" placeholder="1" value="1"></div>
+    </div>
+    <div class="form-group"><label class="form-label">Notes</label><textarea id="nl-notes" class="note-input" placeholder="Any extra info…"></textarea></div>
+    <button class="btn btn-primary btn-full" id="nl-save-btn" onclick="saveNewLead()">Create Lead</button>
+  </div>
+</div>
+
+<!-- AGREEMENT PRINT -->
+<div id="agreement-print"></div>
+
+<div id="toast"></div>
+
+<script>
+const API = 'https://www.extrravenue.com/api';
+let token = null, currentUser = null, _allLeads = [], _currentLeadId = null;
+
+const STATUS_LABELS = {
+  new:'New', assigned:'Assigned', contacted:'Contacted',
+  meeting_scheduled:'Meeting Scheduled', meeting_done:'Meeting Done',
+  site_visited:'Site Visited', site_rejected:'Site Rejected',
+  agreement_pending:'Agreement Pending', agreement_signed:'Agreement Signed',
+  installation_pending:'Install Pending', installation_done:'Install Done',
+  live:'Live', dropped:'Dropped'
+};
+const STATUS_BADGE = {
+  new:'badge-yellow', assigned:'badge-blue', contacted:'badge-blue',
+  meeting_scheduled:'badge-purple', meeting_done:'badge-purple',
+  site_visited:'badge-teal', agreement_pending:'badge-blue',
+  agreement_signed:'badge-teal', installation_pending:'badge-blue',
+  installation_done:'badge-teal', live:'badge-green',
+  dropped:'badge-red', site_rejected:'badge-red'
+};
+const CAT_LABELS = {
+  gym:'Gym', restaurant:'Restaurant', cafe:'Cafe', salon:'Salon',
+  clinic:'Clinic', retail:'Retail', hotel:'Hotel', society:'Society',
+  office:'Office', education:'Education', other:'Other'
+};
+
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function showToast(msg, type='info') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.background = type === 'error' ? '#dc2626' : type === 'success' ? '#16a34a' : '#1a1a2e';
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+async function api(path, opts = {}) {
+  const res = await fetch(API + path, {
+    ...opts,
+    headers: { ...(opts.headers || {}), ...(opts.body && !(opts.body instanceof FormData) ? {'Content-Type':'application/json'} : {}), Authorization: `Bearer ${token}` }
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || data.message || 'Error');
+  return data;
+}
+
+// ── AUTH ─────────────────────────────────────────────────────────────────────
+async function doLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+  const errEl = document.getElementById('login-error');
+  const btn = document.getElementById('login-btn');
+  errEl.style.display = 'none';
+  if (!email || !password) { errEl.textContent = 'Email and password required'; errEl.style.display = 'block'; return; }
+  btn.disabled = true; btn.textContent = 'Signing in…';
+  try {
+    const res = await fetch(`${API}/auth/login`, {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({email, password})
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Login failed');
+    if (!['venue_inspector','admin','superadmin'].includes(data.user?.role)) {
+      throw new Error('Access denied. Inspector credentials required.');
+    }
+    token = data.token;
+    currentUser = data.user;
+    try { localStorage.setItem('insp_token', token); localStorage.setItem('insp_user', JSON.stringify(currentUser)); } catch(e) {}
+    startApp();
+  } catch(e) {
+    errEl.textContent = e.message;
+    errEl.style.display = 'block';
+  } finally { btn.disabled = false; btn.textContent = 'Sign In'; }
+}
+
+document.getElementById('login-password').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+
+function doLogout() {
+  token = null; currentUser = null;
+  try { localStorage.removeItem('insp_token'); localStorage.removeItem('insp_user'); } catch(e) {}
+  document.getElementById('app-screen').style.display = 'none';
+  document.getElementById('auth-screen').style.display = 'flex';
+}
+
+function startApp() {
+  document.getElementById('auth-screen').style.display = 'none';
+  document.getElementById('app-screen').style.display = 'block';
+  document.getElementById('hdr-name').textContent = currentUser.name || currentUser.email;
+  loadLeads();
+}
+
+// Auto-login from localStorage
+(function() {
+  try {
+    const t = localStorage.getItem('insp_token');
+    const u = JSON.parse(localStorage.getItem('insp_user') || 'null');
+    if (t && u && ['venue_inspector','admin','superadmin'].includes(u.role)) {
+      token = t; currentUser = u; startApp();
+    }
+  } catch(e) {}
+})();
+
+// ── LEADS ────────────────────────────────────────────────────────────────────
+async function loadLeads() {
+  document.getElementById('leads-list').innerHTML = '<div class="spinner"></div>';
+  try {
+    _allLeads = await api('/leads');
+    filterLeads();
+  } catch(e) {
+    document.getElementById('leads-list').innerHTML = `<div class="empty-state"><p>Failed to load: ${esc(e.message)}</p></div>`;
+  }
+}
+
+function filterLeads() {
+  const q = document.getElementById('leads-search').value.toLowerCase();
+  const status = document.getElementById('leads-filter').value;
+  let filtered = _allLeads.filter(l =>
+    (!q || (l.business_name||'').toLowerCase().includes(q) || (l.phone||'').includes(q) || (l.owner_name||'').toLowerCase().includes(q)) &&
+    (!status || l.status === status)
+  );
+  const list = document.getElementById('leads-list');
+  if (!filtered.length) {
+    list.innerHTML = `<div class="empty-state"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg><p>No leads found</p></div>`;
+    return;
+  }
+  list.innerHTML = filtered.map(l => `
+    <div class="lead-card" onclick="openDrawer('${l.id}')">
+      <div class="lead-card-top">
+        <div>
+          <div class="lead-biz">${esc(l.business_name)}</div>
+          ${l.owner_name ? `<div class="lead-owner">${esc(l.owner_name)}</div>` : ''}
+        </div>
+        <span class="badge ${STATUS_BADGE[l.status]||'badge-gray'}">${STATUS_LABELS[l.status]||l.status}</span>
+      </div>
+      <div class="lead-meta">
+        <div class="lead-meta-item"><span>${esc(l.phone)}</span></div>
+        ${l.city ? `<div class="lead-meta-item">📍 ${esc(l.city)}</div>` : ''}
+        ${l.venue_category ? `<div class="lead-meta-item">${CAT_LABELS[l.venue_category]||l.venue_category}</div>` : ''}
+      </div>
+    </div>
+  `).join('');
+}
+
+// ── DRAWER ───────────────────────────────────────────────────────────────────
+async function openDrawer(id) {
+  _currentLeadId = id;
+  document.getElementById('drawer-backdrop').style.display = 'block';
+  const dr = document.getElementById('lead-drawer');
+  dr.style.display = 'flex';
+  document.getElementById('drawer-body').innerHTML = '<div class="spinner"></div>';
+  try {
+    const l = await api(`/leads/${id}`);
+    document.getElementById('drawer-title').textContent = l.business_name;
+    const photos = l.photos || [];
+    const photoHtml = `
+      <div class="photos-grid" id="photos-grid">
+        ${photos.map((p,i) => `
+          <div class="photo-thumb">
+            <img src="${esc(p.url)}" loading="lazy" onclick="viewPhoto('${esc(p.url)}')">
+            <button class="photo-del" onclick="deletePhoto(${i})">×</button>
+          </div>`).join('')}
+        ${photos.length < 7 ? `
+          <label class="photo-add" for="photo-upload-input">
+            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+            Add Photo
+          </label>` : ''}
+      </div>
+      <input type="file" id="photo-upload-input" accept="image/*" capture="environment" style="display:none" onchange="uploadPhoto(this)">
+    `;
+    const activities = (l.activities||[]).map(a => `
+      <div class="activity-item">
+        <div class="activity-time">${new Date(a.created_at).toLocaleString('en-IN')}</div>
+        <div class="activity-type">${(a.activity_type||'').replace('_',' ')}</div>
+        ${a.old_status&&a.new_status ? `<div class="activity-note" style="color:var(--text3)">${STATUS_LABELS[a.old_status]||a.old_status} → ${STATUS_LABELS[a.new_status]||a.new_status}</div>` : ''}
+        ${a.note ? `<div class="activity-note">${esc(a.note)}</div>` : ''}
+      </div>`).join('') || '<div style="color:var(--text3);font-size:12px;">No activity yet</div>';
+
+    document.getElementById('drawer-body').innerHTML = `
+      <div class="info-grid">
+        <div class="info-item"><label>Phone</label><p>${esc(l.phone)}</p></div>
+        <div class="info-item"><label>City</label><p>${esc(l.city||'—')}</p></div>
+        <div class="info-item"><label>Category</label><p>${CAT_LABELS[l.venue_category]||l.venue_category||'—'}</p></div>
+        <div class="info-item"><label>Footfall</label><p>${l.footfall_estimate||'—'}/day</p></div>
+        <div class="info-item"><label>Screens</label><p>${l.screen_count||0}</p></div>
+        <div class="info-item"><label>Source</label><p>${l.source||'—'}</p></div>
+      </div>
+
+      <div class="section-label">Status</div>
+      <select class="status-select" id="drawer-status" onchange="updateStatus('${l.id}', this.value)">
+        ${Object.entries(STATUS_LABELS).map(([v,t]) => `<option value="${v}" ${l.status===v?'selected':''}>${t}</option>`).join('')}
+      </select>
+
+      <div class="section-label" style="margin-top:16px;">Site Photos (${photos.length}/7)</div>
+      ${photoHtml}
+
+      <div class="section-label">Add Note</div>
+      <textarea class="note-input" id="drawer-note" placeholder="Call log, meeting notes, observations…"></textarea>
+      <div style="display:flex;gap:8px;margin-top:8px;">
+        <button class="btn btn-primary" style="flex:1;" onclick="saveNote('${l.id}')">Save Note</button>
+        <button class="btn btn-ghost" style="flex:1;" onclick="generateAgreement('${l.id}')">📄 Agreement</button>
+      </div>
+
+      <div class="section-label">Activity Log</div>
+      ${activities}
+    `;
+  } catch(e) {
+    document.getElementById('drawer-body').innerHTML = `<div style="color:var(--danger);text-align:center;padding:24px;">${esc(e.message)}</div>`;
+  }
+}
+
+function closeDrawer() {
+  document.getElementById('drawer-backdrop').style.display = 'none';
+  document.getElementById('lead-drawer').style.display = 'none';
+  _currentLeadId = null;
+}
+
+async function updateStatus(id, status) {
+  try {
+    await api(`/leads/${id}`, { method:'PATCH', body: JSON.stringify({status}) });
+    showToast('Status updated', 'success');
+    await loadLeads();
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+async function saveNote(id) {
+  const note = document.getElementById('drawer-note').value.trim();
+  if (!note) return;
+  try {
+    await api(`/leads/${id}/activity`, { method:'POST', body: JSON.stringify({activity_type:'note', note}) });
+    showToast('Note saved', 'success');
+    openDrawer(id);
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+// ── PHOTOS ───────────────────────────────────────────────────────────────────
+async function uploadPhoto(input) {
+  if (!input.files[0] || !_currentLeadId) return;
+  const fd = new FormData();
+  fd.append('photo', input.files[0]);
+  showToast('Uploading…');
+  try {
+    await api(`/leads/${_currentLeadId}/photos`, { method:'POST', body: fd });
+    showToast('Photo uploaded!', 'success');
+    openDrawer(_currentLeadId);
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+async function deletePhoto(idx) {
+  if (!_currentLeadId) return;
+  if (!confirm('Delete this photo?')) return;
+  try {
+    await api(`/leads/${_currentLeadId}/photos/${idx}`, { method:'DELETE' });
+    showToast('Photo deleted', 'success');
+    openDrawer(_currentLeadId);
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+function viewPhoto(url) {
+  window.open(url, '_blank');
+}
+
+// ── NEW LEAD ─────────────────────────────────────────────────────────────────
+function openNewLead() {
+  document.getElementById('new-lead-modal').classList.add('open');
+}
+function closeNewLead() {
+  document.getElementById('new-lead-modal').classList.remove('open');
+}
+
+async function saveNewLead() {
+  const btn = document.getElementById('nl-save-btn');
+  const business_name = document.getElementById('nl-biz').value.trim();
+  const phone = document.getElementById('nl-phone').value.trim();
+  if (!business_name || !phone) { showToast('Business name and phone required', 'error'); return; }
+  btn.disabled = true; btn.textContent = 'Saving…';
+  try {
+    await api('/leads', { method:'POST', body: JSON.stringify({
+      business_name,
+      owner_name: document.getElementById('nl-owner').value.trim() || undefined,
+      phone,
+      city: document.getElementById('nl-city').value.trim() || undefined,
+      venue_category: document.getElementById('nl-cat').value,
+      footfall_estimate: document.getElementById('nl-footfall').value || undefined,
+      screen_count: document.getElementById('nl-screens').value || 1,
+      notes: document.getElementById('nl-notes').value.trim() || undefined,
+      source: 'field_visit'
+    })});
+    showToast('Lead created!', 'success');
+    closeNewLead();
+    ['nl-biz','nl-owner','nl-phone','nl-city','nl-footfall','nl-notes'].forEach(id => document.getElementById(id).value = '');
+    loadLeads();
+  } catch(e) { showToast(e.message, 'error'); }
+  finally { btn.disabled = false; btn.textContent = 'Create Lead'; }
+}
+
+// ── AGREEMENT ────────────────────────────────────────────────────────────────
+async function generateAgreement(id) {
+  try {
+    const l = await api(`/leads/${id}`);
+    const today = new Date().toLocaleDateString('en-IN', {day:'2-digit', month:'long', year:'numeric'});
+    const agr = document.getElementById('agreement-print');
+    agr.innerHTML = `
+      <style>
+        @media print { body > *:not(#agreement-print) { display: none !important; } #agreement-print { display: block !important; } }
+        #agreement-print { font-family: 'Times New Roman', serif; max-width: 750px; margin: 0 auto; padding: 40px 48px; color: #111; line-height: 1.7; font-size: 13pt; }
+        #agreement-print h1 { text-align: center; font-size: 16pt; margin-bottom: 6px; }
+        #agreement-print .sub { text-align: center; font-size: 11pt; color: #555; margin-bottom: 32px; }
+        #agreement-print h2 { font-size: 13pt; margin-top: 24px; margin-bottom: 6px; }
+        #agreement-print p { margin-bottom: 10px; text-align: justify; }
+        #agreement-print .sig-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 48px; }
+        #agreement-print .sig-box p { border-top: 1px solid #333; margin-top: 48px; padding-top: 6px; font-size: 11pt; }
+        #agreement-print .print-btn { background: #7b68c8; color: #fff; border: none; padding: 10px 24px; border-radius: 8px; font-size: 13px; cursor: pointer; margin-bottom: 24px; }
+        @media print { #agreement-print .print-btn { display: none; } }
+      </style>
+      <button class="print-btn" onclick="window.print()">🖨️ Print / Save PDF</button>
+      <h1>Venue Partner Agreement</h1>
+      <div class="sub">Digital Signage Network Participation Agreement</div>
+
+      <p>This Agreement is entered into as of <strong>${today}</strong>, between:</p>
+      <p><strong>extrravenue</strong> (hereinafter referred to as <strong>"Company"</strong>), AND</p>
+      <p><strong>${esc(l.owner_name||'[Owner Name]')}</strong>, operating <strong>${esc(l.business_name)}</strong> located at <strong>${esc(l.city||'[City]')}</strong> (hereinafter referred to as <strong>"Venue Partner"</strong>).</p>
+
+      <h2>1. Screen &amp; Installation</h2>
+      <p>extrravenue shall connect the digital screen at the Venue Partner's premises to its Content Management System (CMS). If a new screen is required, cost and ownership shall be mutually agreed in writing. extrravenue retains ownership of its media player hardware installed at the premises.</p>
+
+      <h2>2. Content Slot Allocation</h2>
+      <p><strong>Venue Content:</strong> The Venue Partner is entitled to display their own promotional content (menus, announcements, offers) on their screen during all available Filler Slots — screen time not occupied by paid advertiser content.</p>
+      <p><strong>Cross-Network Promotion:</strong> Venue Partner content may also display across the extrravenue network during available Filler Slots on a best-effort basis. This is NOT guaranteed and reduces naturally as the paid advertiser network grows.</p>
+      <p><strong>Priority:</strong> Paid third-party advertiser content takes absolute scheduling priority. This is an inherent characteristic of the network model and does not constitute a breach of this Agreement.</p>
+
+      <h2>3. Utilities</h2>
+      <p>The Venue Partner shall bear all costs for electricity and internet connectivity at their premises required to operate the screen and media player.</p>
+
+      <h2>4. Content Guidelines</h2>
+      <p>The Venue Partner shall ensure all uploaded content complies with applicable Indian laws and does not contain defamatory, obscene, or legally prohibited material. extrravenue reserves the right to remove violating content without notice.</p>
+
+      <h2>5. Monetary Terms</h2>
+      <p>This Agreement is entered on a non-monetary, service-exchange basis. No revenue share, rental fee, or commission shall be payable by either Party. The Venue Partner receives digital signage infrastructure and CMS access in lieu of monetary compensation.</p>
+
+      <h2>6. Term &amp; Termination</h2>
+      <p>This Agreement is valid for <strong>ONE (1) YEAR</strong> from the date of signing and auto-renews unless either Party provides 30 days written notice of non-renewal. Either Party may terminate with <strong>7 days' written notice</strong>. extrravenue may terminate immediately in the event of content guideline violations, insolvency, or operational infeasibility.</p>
+
+      <h2>7. Equipment Liability</h2>
+      <p>The Venue Partner is responsible for protecting extrravenue's installed hardware from damage, theft, or vandalism occurring at their premises and shall bear the cost of repair or replacement resulting from negligence or inadequate security.</p>
+
+      <h2>8. Governing Law</h2>
+      <p>This Agreement shall be governed by the laws of India. Disputes shall first be resolved amicably within 15 days, failing which through arbitration under the Arbitration and Conciliation Act, 1996.</p>
+
+      <div class="sig-grid">
+        <div class="sig-box">
+          <p>For extrravenue<br>Name: ___________________<br>Designation: ____________<br>Date: ${today}</p>
+        </div>
+        <div class="sig-box">
+          <p>For Venue Partner<br>Name: ${esc(l.owner_name||'___________________')}<br>Business: ${esc(l.business_name)}<br>Date: ${today}</p>
+        </div>
+      </div>
+    `;
+    agr.style.display = 'block';
+    closeDrawer();
+    window.scrollTo(0, 0);
+    setTimeout(() => window.print(), 400);
+    setTimeout(() => { agr.style.display = 'none'; }, 3000);
+  } catch(e) { showToast('Failed to generate agreement', 'error'); }
+}
+
+function showPage(page) {
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(`nav-${page}`)?.classList.add('active');
+}
+</script>
+</body>
+</html>

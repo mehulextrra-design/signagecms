@@ -1,6 +1,20 @@
 const express = require('express');
+const multer = require('multer');
+const { v2: cloudinary } = require('cloudinary');
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const { query } = require('../db');
 const { authenticate, requireAdmin } = require('../middleware/auth');
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key:    process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+const photoStorage = new CloudinaryStorage({
+  cloudinary,
+  params: { folder: 'lead-photos', allowed_formats: ['jpg','jpeg','png','webp','heic'] },
+});
+const uploadPhoto = multer({ storage: photoStorage, limits: { fileSize: 20 * 1024 * 1024 } });
 
 const router = express.Router();
 
@@ -11,7 +25,7 @@ const VALID_STATUSES = [
 ];
 
 const VALID_CATEGORIES = [
-  'gym','restaurant','salon','clinic','retail','society','office','hotel','education','other'
+  'gym','restaurant','cafe','salon','clinic','retail','society','office','hotel','education','other'
 ];
 
 function requireInspectorOrAdmin(req, res, next) {
@@ -198,6 +212,42 @@ router.patch('/:id', authenticate, requireInspectorOrAdmin, async (req, res, nex
       );
     }
     res.json(result.rows[0]);
+  } catch (err) { next(err); }
+});
+
+// ── PHOTO UPLOAD (inspector + admin) ─────────────────────────────────────────
+router.post('/:id/photos', authenticate, requireInspectorOrAdmin, uploadPhoto.single('photo'), async (req, res, next) => {
+  if (!req.file) return res.status(400).json({ error: 'No photo uploaded' });
+  try {
+    const lead = await query('SELECT photos, assigned_to FROM leads WHERE id = $1', [req.params.id]);
+    if (!lead.rows.length) return res.status(404).json({ error: 'Not found' });
+    if (req.user.role === 'venue_inspector' && lead.rows[0].assigned_to !== req.user.id) {
+      return res.status(403).json({ error: 'Access denied' });
+    }
+    const photos = lead.rows[0].photos || [];
+    if (photos.length >= 7) return res.status(400).json({ error: 'Maximum 7 photos allowed' });
+    const newPhoto = { url: req.file.path, public_id: req.file.filename, uploaded_at: new Date().toISOString() };
+    photos.push(newPhoto);
+    await query('UPDATE leads SET photos = $1, updated_at = NOW() WHERE id = $2', [JSON.stringify(photos), req.params.id]);
+    res.json({ ok: true, photo: newPhoto, photos });
+  } catch (err) { next(err); }
+});
+
+// ── DELETE PHOTO ──────────────────────────────────────────────────────────────
+router.delete('/:id/photos/:idx', authenticate, requireInspectorOrAdmin, async (req, res, next) => {
+  try {
+    const lead = await query('SELECT photos, assigned_to FROM leads WHERE id = $1', [req.params.id]);
+    if (!lead.rows.length) return res.status(404).json({ error: 'Not found' });
+    if (req.user.role === 'venue_inspector' && lead.rows[0].assigned_to !== req.user.id) {
+      return res.status(403).json({ error: 'Access denied' });
+    }
+    const photos = lead.rows[0].photos || [];
+    const idx = parseInt(req.params.idx);
+    if (idx < 0 || idx >= photos.length) return res.status(400).json({ error: 'Invalid photo index' });
+    const removed = photos.splice(idx, 1)[0];
+    if (removed?.public_id) cloudinary.uploader.destroy(removed.public_id).catch(() => {});
+    await query('UPDATE leads SET photos = $1, updated_at = NOW() WHERE id = $2', [JSON.stringify(photos), req.params.id]);
+    res.json({ ok: true, photos });
   } catch (err) { next(err); }
 });
 
