@@ -786,10 +786,87 @@ async function sendCampaignCompletedEmail(campaignId) {
   }
 }
 
+// ── Venue Partner Welcome Email ───────────────────────────────────────────
+async function sendVenuePartnerWelcomeEmail({ to, businessName, contactName, email, password, city, approvedAt }) {
+  const today = new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' });
+  const startDate = approvedAt ? new Date(approvedAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' }) : today;
+  const endDate = (() => {
+    const d = approvedAt ? new Date(approvedAt) : new Date();
+    d.setFullYear(d.getFullYear() + 1);
+    return d.toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' });
+  })();
+  const portalUrl = 'https://www.extrravenue.com/venue';
+
+  const agreementHtml = `
+    <hr class="divider">
+    <div class="section-label" style="margin-top:8px;">Venue Partner Agreement</div>
+    <div class="info-card" style="font-size:13px;color:#3a3a56;line-height:1.75;">
+      <strong>Digital Signage Network Participation Agreement</strong><br><br>
+      This Agreement is entered into as of <strong>${today}</strong>, between <strong>extrravenue</strong> ("Company") AND <strong>${contactName || businessName}</strong>, operating <strong>${businessName}</strong> at <strong>${city || '—'}</strong> ("Venue Partner").<br><br>
+      <strong>1. Screen &amp; Installation</strong><br>
+      extrravenue shall connect the digital screen at Venue Partner's premises to its CMS. extrravenue retains ownership of its media player hardware installed at the premises.<br><br>
+      <strong>2. Content Slot Allocation</strong><br>
+      Venue Partner is entitled to display their own content during Filler Slots — time not occupied by paid advertiser content. Paid third-party advertiser content takes absolute scheduling priority.<br><br>
+      <strong>3. Utilities</strong><br>
+      Venue Partner bears all costs for electricity and internet connectivity at their premises required to operate the screen and media player.<br><br>
+      <strong>4. Content Guidelines</strong><br>
+      Venue Partner shall ensure all uploaded content complies with applicable Indian laws. extrravenue reserves the right to remove violating content without notice.<br><br>
+      <strong>5. Monetary Terms</strong><br>
+      Non-monetary, service-exchange basis. No revenue share, rental fee, or commission payable by either Party.<br><br>
+      <strong>6. Term &amp; Termination</strong><br>
+      Valid for <strong>ONE (1) YEAR</strong> (${startDate} to ${endDate}), auto-renews unless either Party provides 30 days written notice. Either Party may terminate with 7 days' written notice.<br><br>
+      <strong>7. Equipment Liability</strong><br>
+      Venue Partner is responsible for protecting extrravenue's installed hardware from damage, theft, or vandalism.<br><br>
+      <strong>8. Governing Law</strong><br>
+      Governed by laws of India. Disputes resolved amicably within 15 days, failing which through arbitration under the Arbitration and Conciliation Act, 1996.
+    </div>`;
+
+  const html = wrap(`
+    <div class="tag">Welcome</div>
+    <h2>extrravenue Network mein Swagat hai! 🎉</h2>
+    <p class="sub">Aapka venue partner account ban gaya hai. Neeche aapki login details aur agreement copy hai.</p>
+
+    <div class="section-label">Login Details</div>
+    <div class="info-card">
+      <div class="info-row">
+        <span class="ir-label">Portal URL</span>
+        <span class="ir-value"><a href="${portalUrl}" style="color:#7b68c8;">${portalUrl}</a></span>
+      </div>
+      <div class="info-row">
+        <span class="ir-label">Email</span>
+        <span class="ir-value">${email}</span>
+      </div>
+      <div class="info-row">
+        <span class="ir-label">Password</span>
+        <span class="ir-value" style="font-family:monospace;letter-spacing:.05em;">${password}</span>
+      </div>
+    </div>
+
+    <div class="section-label">Aapka Venue</div>
+    <div class="info-card">
+      <div class="info-row">
+        <span class="ir-label">Business</span>
+        <span class="ir-value">${businessName}</span>
+      </div>
+      <div class="info-row">
+        <span class="ir-label">City</span>
+        <span class="ir-value">${city || '—'}</span>
+      </div>
+    </div>
+
+    <a href="${portalUrl}" class="btn" style="display:block;text-align:center;margin-bottom:20px;">Portal Pe Login Karo →</a>
+    <p style="font-size:13px;color:#aaa8a2;text-align:center;">Pehli baar login karne ke baad password zaroor change karein.</p>
+    ${agreementHtml}
+  `);
+
+  return sendMail({ to, subject: `extrravenue — Aapka Venue Partner Account Ready Hai`, html });
+}
+
 module.exports = {
   sendInvoiceEmail, sendApprovedEmail, sendRejectedEmail,
   sendPausedEmail, sendResumedEmail, sendOnHoldEmail,
   sendWalletCreditEmail,
   sendExpiryReminderEmail, sendCampaignCompletedEmail,
   sendDailyPoPReport, sendDailyPoPEmailAll, sendNewUserAlertEmail,
+  sendVenuePartnerWelcomeEmail,
 };

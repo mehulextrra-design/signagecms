@@ -5,6 +5,7 @@ const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const { body, validationResult } = require('express-validator');
 const { query } = require('../db');
 const { authenticate, requireAdmin } = require('../middleware/auth');
+const { sendVenuePartnerWelcomeEmail } = require('../services/email');
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -324,6 +325,17 @@ router.post('/:id/create-venue-partner', authenticate, requireInspectorOrAdmin, 
        VALUES ($1,$2,'note',$3)`,
       [req.params.id, req.user.id, `Venue partner account created: ${email}`]
     );
+
+    // Send welcome email (fire-and-forget)
+    sendVenuePartnerWelcomeEmail({
+      to: email,
+      businessName: lead.business_name,
+      contactName: lead.contact_name || lead.business_name,
+      email,
+      password,
+      city: lead.city,
+      approvedAt: new Date().toISOString(),
+    }).catch(err => console.error('[VP Welcome Email]', err.message));
 
     res.status(201).json({ ok: true, email: userRes.rows[0].email, venue_partner_id: vpId });
   } catch (err) { next(err); }
