@@ -10,7 +10,7 @@ router.get('/', async (req, res, next) => {
     const { city, zone, status } = req.query;
     let sql = `SELECT id, screen_code, name, location, city, zone, latitude, longitude,
                width_px, height_px, status, last_heartbeat, price_per_day, daily_impressions, audio_enabled,
-               venue_type, approx_footfall
+               venue_type, approx_footfall, venue_partner_id
                FROM screens WHERE 1=1`;
     const params = [];
     if (city) { params.push(city); sql += ` AND city ILIKE $${params.length}`; }
