@@ -74,8 +74,8 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);font-
 
 /* -- BUTTONS -- */
 .btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--radius-sm);font-size:13px;font-weight:600;cursor:pointer;border:1.5px solid transparent;transition:all 0.15s;font-family:inherit;white-space:nowrap;}
-.btn-primary{background:var(--primary);color:#fff;border-color:var(--primary);}
-.btn-primary:hover{background:var(--primary-hover);border-color:var(--primary-hover);}
+.btn-primary{background:var(--grad);color:#fff;border-color:transparent;box-shadow:0 2px 10px rgba(123,104,200,.3);}
+.btn-primary:hover{opacity:.9;}
 .btn-ghost{background:transparent;color:var(--text2);border-color:var(--border);}
 .btn-ghost:hover{background:var(--surface2);color:var(--text);}
 .btn-danger{background:var(--danger);color:#fff;border-color:var(--danger);}
@@ -118,7 +118,7 @@ tr:hover td{background:var(--surface2);}
 .badge-green{background:var(--success-light);color:var(--success);}
 .badge-yellow{background:var(--warning-light);color:var(--warning);}
 .badge-red{background:var(--danger-light);color:var(--danger);}
-.badge-blue{background:rgba(37,99,235,0.1);color:#2563EB;}
+.badge-blue{background:var(--primary-light);color:var(--primary);}
 .badge-gray{background:var(--surface2);color:var(--text2);}
 .badge-teal{background:var(--primary-light);color:var(--primary);}
 .badge-dot{width:5px;height:5px;border-radius:50%;background:currentColor;}
