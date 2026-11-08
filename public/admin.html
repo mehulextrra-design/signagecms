@@ -1647,13 +1647,44 @@ async function openLeadDrawer(id) {
       </div>
       <div style="margin-bottom:14px;"><span class="badge ${badge}" style="font-size:12px;">${LEAD_STATUS_LABELS[l.status]||l.status}</span></div>
       ${l.notes?`<div style="background:var(--surface2);border-radius:8px;padding:10px 12px;font-size:13px;margin-bottom:14px;">${esc(l.notes)}</div>`:''}
+      <div style="margin-bottom:14px;border:1px solid var(--border);border-radius:8px;padding:12px;">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:8px;">Assign To</div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <select id="lead-assign-select" style="flex:1;padding:7px 10px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:13px;background:var(--bg);color:var(--text);">
+            <option value="">— Unassigned —</option>
+          </select>
+          <button class="btn btn-primary btn-sm" onclick="saveLeadAssign('${l.id}')">Save</button>
+        </div>
+      </div>
       <div style="font-size:12px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:8px;">Activity Log</div>
       ${activities||'<div style="font-size:12px;color:var(--text3);">No activity yet.</div>'}
       <div style="margin-top:16px;border-top:1px solid var(--border);padding-top:14px;">
         <textarea id="lead-note-input" placeholder="Add note…" style="width:100%;padding:10px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;background:var(--bg);color:var(--text);resize:vertical;min-height:64px;font-family:inherit;box-sizing:border-box;"></textarea>
         <button class="btn btn-primary btn-sm" style="margin-top:8px;" onclick="addLeadNote('${l.id}')">Save Note</button>
       </div>`;
+    // populate assign-to dropdown
+    try {
+      const users = await api('/users');
+      const sel = document.getElementById('lead-assign-select');
+      if (sel) {
+        sel.innerHTML = '<option value="">— Unassigned —</option>' +
+          users.filter(u=>['admin','superadmin','venue_inspector'].includes(u.role))
+               .map(u=>`<option value="${u.id}" ${l.assigned_to==u.id?'selected':''}>${esc([u.first_name,u.last_name].filter(Boolean).join(' ')||u.email)} (${u.role})</option>`)
+               .join('');
+      }
+    } catch(e) { /* silent — users endpoint may 403 for non-admins */ }
   } catch(e) { document.getElementById('drawer-body').innerHTML = '<div style="color:var(--danger)">Error loading lead.</div>'; }
+}
+
+async function saveLeadAssign(id) {
+  const sel = document.getElementById('lead-assign-select');
+  if (!sel) return;
+  const assigned_to = sel.value || null;
+  try {
+    await api(`/leads/${id}`, { method:'PATCH', body:JSON.stringify({assigned_to}) });
+    await loadLeads();
+    openLeadDrawer(id);
+  } catch(e) { alert('Assign failed: ' + e.message); }
 }
 
 async function addLeadNote(id) {
