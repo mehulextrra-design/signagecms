@@ -3152,6 +3152,10 @@ async function loadScreens() {
 }
 
 async function openScreenModal(screen = null) {
+  // Fetch full screen data (including registration_pin) when editing
+  if (screen?.id) {
+    try { screen = await api(`/screens/${screen.id}`); } catch(e) { /* use existing */ }
+  }
   document.getElementById('screen-modal-title').textContent = screen ? 'Edit Screen' : 'Add Screen';
   document.getElementById('sc-id').value = screen?.id || '';
   document.getElementById('sc-code').value = screen?.screen_code || '';
