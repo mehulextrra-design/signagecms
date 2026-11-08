@@ -3528,7 +3528,7 @@ async function campaignResume(id, btn){
     walletBalance = Math.max(0, walletBalance - debited);
     document.getElementById('sidebar-wallet-bal').textContent='₹'+fmtNum(walletBalance);
     await loadCampaigns();
-  }catch(e){toast(e.message||'Could not resume — check wallet balance','error');btn.disabled=false;btn.textContent='? Resume';}
+  }catch(e){toast(e.message||'Could not resume — check wallet balance','error');btn.disabled=false;btn.innerHTML='&#9654; Resume';}
 }
 
 async function campaignCancel(id, title){

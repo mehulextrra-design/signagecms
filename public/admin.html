@@ -2156,19 +2156,19 @@ async function openCampaignDetail(id) {
       const today = new Date().toISOString().slice(0,10);
       footer.innerHTML = `
         ${startDate > today ? `<button class="btn btn-primary" style="font-size:12px;" onclick="forceLiveCampaign('${id}')">⚡ Force Live Now</button>` : ''}
-        ${c.status === 'live' ? `<button class="btn" style="background:#f59e0b;color:#fff;font-size:13px;" onclick="pauseCampaign('${id}');closeModal('camp-detail-modal');">? Pause</button>` : ''}
-        <button class="btn btn-ghost" style="font-size:13px;" onclick="openEditMedia('${id}')">✏ Edit Media</button>
-        <button class="btn" style="background:#ef4444;color:#fff;font-size:13px;" onclick="closeModal('camp-detail-modal');cancelCampaignPrompt('${id}')">? Cancel</button>
+        ${c.status === 'live' ? `<button class="btn" style="background:#f59e0b;color:#fff;font-size:13px;" onclick="pauseCampaign('${id}');closeModal('camp-detail-modal');">&#9646;&#9646; Pause</button>` : ''}
+        <button class="btn btn-ghost" style="font-size:13px;" onclick="openEditMedia('${id}')">&#9999; Edit Media</button>
+        <button class="btn" style="background:#ef4444;color:#fff;font-size:13px;" onclick="closeModal('camp-detail-modal');cancelCampaignPrompt('${id}')">&#10005; Cancel</button>
         <button class="btn btn-ghost" onclick="closeModal('camp-detail-modal')">Close</button>`;
     } else if (c.status === 'paused') {
       footer.innerHTML = `
-        <button class="btn btn-success" onclick="resumeCampaign('${id}');closeModal('camp-detail-modal');">? Resume</button>
-        <button class="btn btn-ghost" style="font-size:13px;" onclick="openEditMedia('${id}')">✏ Edit Media</button>
-        <button class="btn" style="background:#ef4444;color:#fff;font-size:13px;" onclick="closeModal('camp-detail-modal');cancelCampaignPrompt('${id}')">? Cancel</button>
+        <button class="btn btn-success" onclick="resumeCampaign('${id}');closeModal('camp-detail-modal');">&#9654; Resume</button>
+        <button class="btn btn-ghost" style="font-size:13px;" onclick="openEditMedia('${id}')">&#9999; Edit Media</button>
+        <button class="btn" style="background:#ef4444;color:#fff;font-size:13px;" onclick="closeModal('camp-detail-modal');cancelCampaignPrompt('${id}')">&#10005; Cancel</button>
         <button class="btn btn-ghost" onclick="closeModal('camp-detail-modal')">Close</button>`;
     } else if (!['cancelled','completed'].includes(c.status)) {
       footer.innerHTML = `
-        <button class="btn btn-ghost" style="font-size:13px;" onclick="openEditMedia('${id}')">✏ Edit Media</button>
+        <button class="btn btn-ghost" style="font-size:13px;" onclick="openEditMedia('${id}')">&#9999; Edit Media</button>
         <button class="btn btn-ghost" onclick="closeModal('camp-detail-modal')">Close</button>`;
     } else {
       footer.innerHTML = `<button class="btn btn-ghost" onclick="closeModal('camp-detail-modal')">Close</button>`;
@@ -2263,8 +2263,8 @@ async function approveQuick(id, forceStartToday) {
     const choice = confirm(
       `⚠️ Campaign start date is ${fmtDate(startDate)} (future date).\n\n` +
       `Player will NOT show this campaign until that date.\n\n` +
-      `Click OK ? Override start date to TODAY (run immediately)\n` +
-      `Click Cancel ? Keep original date (${fmtDate(startDate)})`
+      `Click OK → Override start date to TODAY (run immediately)\n` +
+      `Click Cancel → Keep original date (${fmtDate(startDate)})`
     );
     startToday = choice;
   }
