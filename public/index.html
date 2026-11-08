@@ -4,30 +4,33 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-<title>SignageCMS — Advertiser Portal</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<title>extrravenue — Advertiser Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Magra:wght@400;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
-    --bg: #F8FAFC; --surface: #FFFFFF; --surface2: #F1F5F9; --border: #E2E8F0;
-    --text: #0F172A; --text2: #64748B; --text3: #94A3B8;
-    --primary: #0D9488; --primary-hover: #0F766E; --primary-light: #F0FDFA;
-    --success: #10B981; --success-light: #ECFDF5;
-    --warning: #F59E0B; --warning-light: #FFFBEB;
-    --danger: #EF4444; --danger-light: #FEF2F2;
-    --sidebar-bg: #0F2D2B; --sidebar-text: #94A3B8;
-    --sidebar-active-bg: rgba(13,148,136,0.18); --sidebar-hover: rgba(255,255,255,0.06);
+    --bg: #f0f0f5; --surface: #ffffff; --surface2: #eaeaf2; --border: #d8d8e4;
+    --text: #12122a; --text2: #3a3a56; --text3: #7070a0;
+    --primary: #7b68c8; --primary-hover: #6a58b8; --primary-light: #ede9fb;
+    --grad: linear-gradient(135deg,#c94baa 0%,#7b68c8 55%,#2ca6d4 100%);
+    --success: #16a34a; --success-light: #dcfce7;
+    --warning: #d97706; --warning-light: #fef3c7;
+    --danger: #dc2626; --danger-light: #fee2e2;
+    --sidebar-bg: #1a1535; --sidebar-text: #9090b0;
+    --sidebar-active-bg: rgba(123,104,200,0.2); --sidebar-hover: rgba(255,255,255,0.06);
     --shadow: 0 1px 3px rgba(0,0,0,0.1),0 1px 2px rgba(0,0,0,0.06);
     --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1),0 2px 4px -1px rgba(0,0,0,0.06);
     --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1),0 4px 6px -2px rgba(0,0,0,0.05);
-    --radius: 8px; --radius-sm: 6px; --radius-lg: 12px;
+    --radius: 10px; --radius-sm: 8px; --radius-lg: 14px;
   }
   html,body { height:100%; font-family:'Inter',-apple-system,sans-serif; font-size:14px; color:var(--text); background:var(--bg); overflow-x:hidden; }
   .hidden { display:none !important; }
 
   /* AUTH */
-  #auth-overlay { position:fixed;inset:0;z-index:1000;background:linear-gradient(135deg,#0A1F1E 0%,#134E4A 50%,#0A1F1E 100%);display:flex;align-items:center;justify-content:center;padding:24px; }
+  #auth-overlay { position:fixed;inset:0;z-index:1000;background:linear-gradient(135deg,#0d0a1f 0%,#1a1535 50%,#0d0a1f 100%);display:flex;align-items:center;justify-content:center;padding:24px; }
   #auth-overlay.hidden { display:none; }
   .auth-card { background:var(--surface);border-radius:var(--radius-lg);box-shadow:var(--shadow-lg);width:100%;max-width:440px;padding:40px;animation:slideUp 0.3s ease; }
   @keyframes slideUp { from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)} }
@@ -41,7 +44,7 @@
   .form-group { margin-bottom:16px; }
   .form-label { display:block;font-size:13px;font-weight:500;margin-bottom:6px; }
   .form-input { width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:14px;color:var(--text);background:var(--surface);transition:border-color 0.15s;font-family:inherit; }
-  .form-input:focus { outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(13,148,136,0.12); }
+  .form-input:focus { outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(123,104,200,0.12); }
   .form-input::placeholder { color:var(--text3); }
   .form-row { display:grid;grid-template-columns:1fr 1fr;gap:12px; }
   /* Campaign action icons */
@@ -49,7 +52,7 @@
   .ca-btn{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:7px;cursor:pointer;border:none;background:transparent;transition:background 0.15s,color 0.15s;color:var(--text2);position:relative;}
   .ca-btn:hover{background:var(--surface2);}
   .ca-btn[title]:hover::after{content:attr(title);position:absolute;bottom:calc(100% + 5px);left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.78);color:#fff;font-size:11px;white-space:nowrap;padding:3px 7px;border-radius:5px;pointer-events:none;z-index:99;font-family:inherit;}
-  .ca-primary{color:#0d9488;} .ca-primary:hover{background:rgba(13,148,136,0.12);}
+  .ca-primary{color:#7b68c8;} .ca-primary:hover{background:rgba(123,104,200,0.12);}
   .ca-purple{color:#7c3aed;}  .ca-purple:hover{background:rgba(139,92,246,0.12);}
   .ca-teal{color:#0891b2;}    .ca-teal:hover{background:rgba(6,182,212,0.12);}
   .ca-teal.ca-active{color:#0891b2;background:rgba(6,182,212,0.15);}
@@ -87,7 +90,7 @@
   .nav-item { display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:6px;cursor:pointer;color:var(--sidebar-text);font-size:13.5px;font-weight:500;transition:all 0.15s;margin-bottom:1px; }
   .nav-item:hover { background:var(--sidebar-hover);color:#fff; }
   .nav-item.active { background:var(--sidebar-active-bg);color:#fff; }
-  .nav-item.active .nav-icon { color:#0D9488; }
+  .nav-item.active .nav-icon { color:#7b68c8; }
   .nav-icon { width:18px;height:18px;flex-shrink:0;opacity:0.8; }
   .nav-item.active .nav-icon { opacity:1; }
   .sidebar-footer { padding:12px 8px;border-top:1px solid rgba(255,255,255,0.06); }
@@ -155,7 +158,7 @@
   .pkg-selector { display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:6px; }
   .pkg-opt { border:2px solid var(--border);border-radius:10px;padding:14px 10px;cursor:pointer;text-align:center;transition:all 0.15s;background:var(--surface); }
   .pkg-opt:hover { border-color:var(--primary);background:var(--surface2); }
-  .pkg-opt.selected { border-color:var(--primary);background:rgba(13,148,136,0.08); }
+  .pkg-opt.selected { border-color:var(--primary);background:rgba(123,104,200,0.08); }
   .pkg-opt .pkg-name { font-weight:700;font-size:14px;margin-bottom:4px; }
   .pkg-opt .pkg-slot { font-size:11px;font-weight:600;background:var(--surface2);border-radius:4px;padding:2px 6px;display:inline-block;color:var(--primary);margin-bottom:8px; }
   .pkg-opt .pkg-price { font-size:15px;font-weight:700;color:var(--primary); }
@@ -183,7 +186,7 @@
   .wizard-step:last-child { flex:0; }
   .ws-num { width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;transition:all 0.2s; }
   .ws-num.pending { background:var(--surface2);color:var(--text3);border:2px solid var(--border); }
-  .ws-num.active { background:var(--primary);color:#fff;border:2px solid var(--primary);box-shadow:0 0 0 3px rgba(13,148,136,0.2); }
+  .ws-num.active { background:var(--primary);color:#fff;border:2px solid var(--primary);box-shadow:0 0 0 3px rgba(123,104,200,0.2); }
   .ws-num.done { background:var(--success);color:#fff;border:2px solid var(--success); }
   .ws-label { font-size:12px;font-weight:600;color:var(--text2);transition:color 0.2s;white-space:nowrap; }
   .ws-label.active { color:var(--primary); }
@@ -302,7 +305,7 @@
   .prof-group:last-of-type { margin-bottom:0; }
   .prof-label { display:block;font-size:11px;font-weight:600;color:var(--text2);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.04em; }
   .prof-input { width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:13px;color:var(--text);background:var(--surface);font-family:inherit;transition:border-color 0.15s; }
-  .prof-input:focus { outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(13,148,136,0.1); }
+  .prof-input:focus { outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(123,104,200,0.1); }
 
   /* BAR CHART */
   .bar-chart { display:flex;align-items:flex-end;gap:10px;height:140px; }
@@ -365,7 +368,7 @@
   .bn-item svg { width:22px;height:22px; }
   .bn-item span { font-size:10px;font-weight:600;letter-spacing:0.01em; }
   .bn-fab-wrap { flex:1;display:flex;align-items:center;justify-content:center;cursor:pointer;border:none;background:none;padding:0; }
-  .bn-fab { width:50px;height:50px;background:var(--primary);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;box-shadow:0 4px 14px rgba(13,148,136,0.45);margin-top:-16px;border:3px solid var(--surface);transition:background 0.15s,transform 0.15s; }
+  .bn-fab { width:50px;height:50px;background:var(--primary);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;box-shadow:0 4px 14px rgba(123,104,200,0.45);margin-top:-16px;border:3px solid var(--surface);transition:background 0.15s,transform 0.15s; }
   .bn-fab:active { background:var(--primary-hover);transform:scale(0.95); }
 
   /* MORE BOTTOM SHEET */
@@ -420,9 +423,10 @@
 <!-- AUTH OVERLAY -->
 <div id="auth-overlay">
   <div id="login-card" class="auth-card">
-    <div class="auth-logo">
-      <div class="auth-logo-icon"><svg viewBox="0 0 24 24"><path d="M3 4h18v2H3V4zm0 7h12v2H3v-2zm0 7h18v2H3v-2z"/></svg></div>
-      <div><div class="auth-logo-name">SignageCMS</div><div class="auth-logo-tag">Digital Out-of-Home Platform</div></div>
+    <div class="auth-logo" style="text-align:center;justify-content:center;flex-direction:column;margin-bottom:28px;">
+      <div style="font-family:'Magra',sans-serif;font-weight:700;font-size:26px;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;display:inline-block;line-height:1.1;">extrravenue</div>
+      <div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-top:4px;">Advertiser Portal</div>
+      <div style="width:36px;height:3px;background:var(--grad);border-radius:2px;margin:8px auto 0;"></div>
     </div>
     <h2 class="auth-heading">Sign in</h2>
     <p class="auth-subtext">Welcome back — manage your campaigns</p>
@@ -447,9 +451,10 @@
 
   <!-- Admin password login (hidden by default) -->
   <div id="admin-login-card" class="auth-card hidden">
-    <div class="auth-logo">
-      <div class="auth-logo-icon"><svg viewBox="0 0 24 24"><path d="M3 4h18v2H3V4zm0 7h12v2H3v-2zm0 7h18v2H3v-2z"/></svg></div>
-      <div><div class="auth-logo-name">SignageCMS</div><div class="auth-logo-tag">Admin Login</div></div>
+    <div class="auth-logo" style="text-align:center;justify-content:center;flex-direction:column;margin-bottom:28px;">
+      <div style="font-family:'Magra',sans-serif;font-weight:700;font-size:26px;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;display:inline-block;line-height:1.1;">extrravenue</div>
+      <div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-top:4px;">Admin Login</div>
+      <div style="width:36px;height:3px;background:var(--grad);border-radius:2px;margin:8px auto 0;"></div>
     </div>
     <h2 class="auth-heading">Admin Sign in</h2>
     <div class="form-group"><label class="form-label">Email</label><input type="email" id="admin-email" class="form-input" placeholder="admin@signagecms.in"></div>
@@ -459,9 +464,10 @@
   </div>
 
   <div id="register-card" class="auth-card hidden" style="max-width:520px">
-    <div class="auth-logo">
-      <div class="auth-logo-icon"><svg viewBox="0 0 24 24"><path d="M3 4h18v2H3V4zm0 7h12v2H3v-2zm0 7h18v2H3v-2z"/></svg></div>
-      <div><div class="auth-logo-name">SignageCMS</div><div class="auth-logo-tag">Digital Out-of-Home Platform</div></div>
+    <div class="auth-logo" style="text-align:center;justify-content:center;flex-direction:column;margin-bottom:28px;">
+      <div style="font-family:'Magra',sans-serif;font-weight:700;font-size:26px;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;display:inline-block;line-height:1.1;">extrravenue</div>
+      <div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-top:4px;">Create Account</div>
+      <div style="width:36px;height:3px;background:var(--grad);border-radius:2px;margin:8px auto 0;"></div>
     </div>
     <h2 class="auth-heading">Create account</h2>
     <p class="auth-subtext">Start advertising on premium screens</p>
@@ -502,8 +508,10 @@
   </div>
   <nav class="sidebar">
     <div class="sidebar-header">
-      <div class="sidebar-logo-icon"><svg viewBox="0 0 24 24"><path d="M3 4h18v2H3V4zm0 7h12v2H3v-2zm0 7h18v2H3v-2z"/></svg></div>
-      <div><div class="sidebar-logo-name">SignageCMS</div><div class="sidebar-logo-tag">Advertiser Portal</div></div>
+      <div>
+        <div style="font-family:'Magra',sans-serif;font-weight:700;font-size:18px;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;display:inline-block;line-height:1.2;">extrravenue</div>
+        <div class="sidebar-logo-tag">Advertiser Portal</div>
+      </div>
     </div>
     <div class="sidebar-nav">
       <div class="nav-section-label">Overview</div>
@@ -539,7 +547,7 @@
       </div>
       <div class="nav-item" onclick="navigate('wallet')">
         <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
-        Wallet <span id="sidebar-wallet-bal" style="margin-left:auto;font-size:11px;background:rgba(13,148,136,0.2);color:#0D9488;border-radius:4px;padding:1px 6px;font-weight:600;"></span>
+        Wallet <span id="sidebar-wallet-bal" style="margin-left:auto;font-size:11px;background:rgba(123,104,200,0.2);color:#7b68c8;border-radius:4px;padding:1px 6px;font-weight:600;"></span>
       </div>
     </div>
     <div class="sidebar-footer">
@@ -576,7 +584,7 @@
       <div id="page-dashboard" class="page active">
         <div class="stat-grid" id="stat-grid">
           <div class="stat-card">
-            <div class="stat-icon" style="background:#F0FDFA;"><svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="#0D9488"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg></div>
+            <div class="stat-icon" style="background:#ede9fb;"><svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="#7b68c8"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg></div>
             <div class="stat-label">Active Campaigns</div><div class="stat-value" id="stat-active">—</div><div class="stat-change" id="stat-active-sub">Loading…</div>
           </div>
           <div class="stat-card">
@@ -803,7 +811,7 @@
             <!-- Upload tab -->
             <div id="creative-upload-section">
               <div class="upload-zone" id="upload-zone" onclick="document.getElementById('file-input').click()" ondragover="handleDragOver(event)" ondrop="handleDrop(event)" style="padding:22px 24px;">
-                <div class="upload-icon" style="width:40px;height:40px;margin:0 auto 8px;"><svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="#0D9488"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg></div>
+                <div class="upload-icon" style="width:40px;height:40px;margin:0 auto 8px;"><svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="#7b68c8"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg></div>
                 <div class="upload-title" style="font-size:14px;">Drag &amp; drop or click to browse</div>
                 <div class="upload-sub">MP4 · MOV · JPG · PNG · max 200 MB</div>
               </div>
@@ -950,7 +958,7 @@
               <div class="card card-body">
                 <div style="font-size:12px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:12px;">Order Summary</div>
                 <div id="review-pricing"></div>
-                <div id="wallet-apply-row" style="display:none;background:rgba(13,148,136,0.07);border:1px solid rgba(13,148,136,0.2);border-radius:8px;padding:10px 12px;margin-bottom:10px;">
+                <div id="wallet-apply-row" style="display:none;background:rgba(123,104,200,0.07);border:1px solid rgba(123,104,200,0.2);border-radius:8px;padding:10px 12px;margin-bottom:10px;">
                   <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
                     <div>
                       <div style="font-size:12px;font-weight:600;color:var(--primary);">₹ Wallet Balance: <span id="wallet-avail-lbl">₹0</span></div>
@@ -3156,7 +3164,7 @@ function openRazorpay(campaign,btn,btnLabel,onSuccess){
         name:'SignageCMS',
         description:campaign.title||campaign.campaign_code,
         prefill:{name:currentUser?.first_name||'',email:currentUser?.email||''},
-        theme:{color:'#0D9488'},
+        theme:{color:'#7b68c8'},
         handler:async function(response){
           try{
             await api(`/campaigns/${campaign.id}/confirm-payment`,{method:'POST',body:JSON.stringify({
@@ -3506,8 +3514,8 @@ function showConfirm({title,body,okLabel='Confirm',danger=false}){
       icon.innerHTML='<svg width="20" height="20" fill="none" stroke="#dc2626" stroke-width="2.5" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>';
       ok.style.background='#dc2626';
     }else{
-      icon.style.background='rgba(13,148,136,0.12)';
-      icon.innerHTML='<svg width="20" height="20" fill="none" stroke="#0d9488" stroke-width="2.5" viewBox="0 0 24 24"><path d="M10 9v6m4-6v6M9 3h6l1 3H8L9 3zM3 6h18M5 6l1 14a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2L19 6"/></svg>';
+      icon.style.background='rgba(123,104,200,0.12)';
+      icon.innerHTML='<svg width="20" height="20" fill="none" stroke="#7b68c8" stroke-width="2.5" viewBox="0 0 24 24"><path d="M10 9v6m4-6v6M9 3h6l1 3H8L9 3zM3 6h18M5 6l1 14a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2L19 6"/></svg>';
       ok.style.background='var(--primary)';
     }
     ok.textContent=okLabel;
@@ -3763,7 +3771,7 @@ async function saveQRSettings(){
 .qr-toggle-knob { position:absolute; top:3px; left:3px; width:18px; height:18px; background:#fff; border-radius:50%; transition:0.2s; box-shadow:0 1px 3px rgba(0,0,0,0.3); pointer-events:none; }
 .qr-toggle-on .qr-toggle-track { background:var(--primary); }
 .qr-toggle-on .qr-toggle-knob { transform:translateX(20px); }
-.qr-pos-btn.active { border-color: var(--primary) !important; background: rgba(13,148,136,0.1) !important; color: var(--primary) !important; font-weight: 600; }
+.qr-pos-btn.active { border-color: var(--primary) !important; background: rgba(123,104,200,0.1) !important; color: var(--primary) !important; font-weight: 600; }
 </style>
 
 <!-- CREATIVE CHANGE MODAL -->

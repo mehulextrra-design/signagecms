@@ -4,29 +4,31 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-<title>SignageCMS Admin</title>
+<title>extrravenue — Admin</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Magra:wght@400;700&family=Inter:wght@400;500;600;700;800&display=swap">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#F8FAFC;--surface:#FFFFFF;--surface2:#F1F5F9;--border:#E2E8F0;
-  --text:#0F172A;--text2:#64748B;--text3:#94A3B8;
-  --primary:#0D9488;--primary-hover:#0F766E;--primary-light:#F0FDFA;
-  --success:#10B981;--success-light:#ECFDF5;
-  --warning:#F59E0B;--warning-light:#FFFBEB;
-  --danger:#EF4444;--danger-light:#FEF2F2;
-  --sidebar-bg:#0F2D2B;--sidebar-text:#94A3B8;
-  --sidebar-active-bg:rgba(13,148,136,0.18);--sidebar-hover:rgba(255,255,255,0.06);
+  --bg:#f0f0f5;--surface:#ffffff;--surface2:#eaeaf2;--border:#d8d8e4;
+  --text:#12122a;--text2:#3a3a56;--text3:#7070a0;
+  --primary:#7b68c8;--primary-hover:#6a58b8;--primary-light:#ede9fb;
+  --grad:linear-gradient(135deg,#c94baa 0%,#7b68c8 55%,#2ca6d4 100%);
+  --success:#16a34a;--success-light:#dcfce7;
+  --warning:#d97706;--warning-light:#fef3c7;
+  --danger:#dc2626;--danger-light:#fee2e2;
+  --sidebar-bg:#1a1535;--sidebar-text:#9090b0;
+  --sidebar-active-bg:rgba(123,104,200,0.2);--sidebar-hover:rgba(255,255,255,0.06);
   --shadow:0 1px 3px rgba(0,0,0,0.1),0 1px 2px rgba(0,0,0,0.06);
   --shadow-md:0 4px 6px rgba(0,0,0,0.07),0 2px 4px rgba(0,0,0,0.06);
   --shadow-lg:0 10px 15px rgba(0,0,0,0.1),0 4px 6px rgba(0,0,0,0.05);
-  --radius:8px;--radius-sm:6px;--radius-lg:12px;
+  --radius:10px;--radius-sm:8px;--radius-lg:14px;
 }
 body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.5;height:100vh;overflow:hidden;display:flex;flex-direction:column;}
 
 /* -- AUTH -- */
-#auth-overlay{position:fixed;inset:0;background:linear-gradient(135deg,#0A1F1E 0%,#134E4A 50%,#0A1F1E 100%);display:flex;align-items:center;justify-content:center;z-index:1000;}
+#auth-overlay{position:fixed;inset:0;background:linear-gradient(135deg,#0d0a1f 0%,#1a1535 50%,#0d0a1f 100%);display:flex;align-items:center;justify-content:center;z-index:1000;}
 #auth-overlay.hidden{display:none;}
 .auth-card{background:#fff;border-radius:var(--radius-lg);padding:36px 32px;width:100%;max-width:400px;box-shadow:var(--shadow-lg);}
 .auth-logo{display:flex;align-items:center;gap:10px;margin-bottom:28px;}
@@ -38,7 +40,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);font-
 .form-group{margin-bottom:14px;}
 .form-label{display:block;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;color:var(--text2);margin-bottom:5px;}
 .form-input{width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:inherit;color:var(--text);background:var(--surface);transition:border-color 0.15s;}
-.form-input:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(13,148,136,0.12);}
+.form-input:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(123,104,200,0.12);}
 .auth-error{background:var(--danger-light);color:var(--danger);font-size:12px;padding:8px 12px;border-radius:var(--radius-sm);margin-bottom:14px;display:none;}
 
 /* -- LAYOUT -- */
@@ -47,7 +49,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);font-
 .sidebar-logo{display:flex;align-items:center;gap:10px;padding:18px 16px 14px;flex-wrap:nowrap;}
 .sidebar-logo-mark{width:34px;height:34px;background:var(--primary);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:13px;flex-shrink:0;}
 .sidebar-logo-name{font-size:15px;font-weight:800;color:#fff;white-space:nowrap;}
-.sidebar-logo-sub{font-size:10px;color:var(--primary);font-weight:600;background:rgba(13,148,136,0.2);border-radius:4px;padding:1px 5px;margin-left:2px;white-space:nowrap;}
+.sidebar-logo-sub{font-size:10px;color:var(--primary);font-weight:600;background:rgba(123,104,200,0.2);border-radius:4px;padding:1px 5px;margin-left:2px;white-space:nowrap;}
 .sidebar-section{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:rgba(148,163,184,0.6);padding:12px 16px 4px;}
 .sidebar-item{display:flex;align-items:center;gap:10px;padding:9px 16px;cursor:pointer;color:var(--sidebar-text);font-size:13px;font-weight:500;transition:background 0.12s,color 0.12s;border:none;background:none;width:100%;text-align:left;}
 .sidebar-item:hover{background:var(--sidebar-hover);color:#fff;}
@@ -121,7 +123,7 @@ tr:hover td{background:var(--surface2);}
 .badge-teal{background:var(--primary-light);color:var(--primary);}
 .badge-dot{width:5px;height:5px;border-radius:50%;background:currentColor;}
 .zone-tag{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:5px;font-size:11px;font-weight:700;letter-spacing:0.02em;}
-.zone-A{background:rgba(13,148,136,0.12);color:var(--primary);}
+.zone-A{background:rgba(123,104,200,0.12);color:var(--primary);}
 .zone-B{background:rgba(37,99,235,0.12);color:#2563EB;}
 .zone-C{background:rgba(124,58,237,0.12);color:#7c3aed;}
 
@@ -208,7 +210,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
 /* -- MOBILE TOPBAR -- */
 .mobile-topbar{display:none;position:fixed;top:0;left:0;right:0;height:52px;background:var(--sidebar-bg);z-index:300;align-items:center;padding:0 16px;gap:12px;}
 .mobile-topbar-title{font-size:15px;font-weight:700;color:#fff;flex:1;}
-.mobile-topbar-badge{font-size:9px;font-weight:700;background:rgba(13,148,136,0.3);color:var(--primary);border-radius:4px;padding:2px 6px;}
+.mobile-topbar-badge{font-size:9px;font-weight:700;background:rgba(123,104,200,0.3);color:var(--primary);border-radius:4px;padding:2px 6px;}
 .hamburger{width:36px;height:36px;border:none;background:rgba(255,255,255,0.08);border-radius:var(--radius-sm);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;flex-shrink:0;}
 .hamburger span{width:18px;height:2px;background:#fff;border-radius:1px;display:block;transition:all 0.2s;}
 
@@ -300,12 +302,10 @@ textarea.form-input{resize:vertical;min-height:80px;}
 <!-- AUTH OVERLAY -->
 <div id="auth-overlay">
   <div class="auth-card">
-    <div class="auth-logo">
-      <div class="auth-logo-mark">SC</div>
-      <div>
-        <span class="auth-logo-name">SignageCMS</span>
-        <span class="auth-logo-badge">ADMIN</span>
-      </div>
+    <div class="auth-logo" style="text-align:center;justify-content:center;flex-direction:column;margin-bottom:24px;">
+      <div style="font-family:'Magra',sans-serif;font-weight:700;font-size:26px;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;display:inline-block;line-height:1.1;">extrravenue</div>
+      <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-top:4px;">Admin Panel</div>
+      <div style="width:36px;height:3px;background:var(--grad);border-radius:2px;margin:8px auto 0;"></div>
     </div>
     <h2 class="auth-title">Admin Sign In</h2>
     <p class="auth-sub" id="auth-sub-title">Access restricted to platform administrators.</p>
@@ -392,9 +392,10 @@ textarea.form-input{resize:vertical;min-height:80px;}
   <!-- SIDEBAR -->
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-logo">
-      <div class="sidebar-logo-mark">SC</div>
-      <span class="sidebar-logo-name">SignageCMS</span>
-      <span class="sidebar-logo-sub">ADMIN</span>
+      <div>
+        <div style="font-family:'Magra',sans-serif;font-weight:700;font-size:18px;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;display:inline-block;line-height:1.2;">extrravenue</div>
+        <span class="sidebar-logo-sub">ADMIN</span>
+      </div>
     </div>
     <div class="sidebar-section">Overview</div>
     <button class="sidebar-item active" id="nav-dashboard" onclick="navigate('dashboard')">
