@@ -83,6 +83,7 @@
   .sidebar-logo-icon svg { width:16px;height:16px;fill:#fff; }
   .sidebar-logo-name { font-size:15px;font-weight:700;color:var(--text); }
   .sidebar-logo-tag { font-size:10px;color:var(--text3); }
+  .sidebar-logo-sub{font-size:10px;color:var(--primary);font-weight:600;background:rgba(123,104,200,0.2);border-radius:4px;padding:1px 5px;margin-left:2px;white-space:nowrap;}
   .sidebar-nav { flex:1;overflow-y:auto;padding:12px 8px; }
   .sidebar-nav::-webkit-scrollbar { width:4px; }
   .sidebar-nav::-webkit-scrollbar-thumb { background:rgba(123,104,200,0.15);border-radius:2px; }
@@ -512,9 +513,9 @@
   <nav class="sidebar">
     <div class="sidebar-header">
       <svg width="37" height="40" viewBox="0 0 37 40" fill="none" xmlns="http://www.w3.org/2000/svg" style="height:24px;width:auto;flex-shrink:0;"><defs><linearGradient id="evLgSb" x1="0" y1="0" x2="37" y2="40" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#D44A9A"/><stop offset=".6" stop-color="#8B6CC4"/><stop offset="1" stop-color="#1D91D3"/></linearGradient></defs><path fill="url(#evLgSb)" d="M22.7902 23.8891L22.7891 23.8881L22.495 23.8939L24.8744 27.9076C29.9747 27.1687 33.9869 23.3658 34.8234 18.571L29.891 18.6711C29.0116 21.6254 26.1874 23.8199 22.7902 23.8891Z"/><path fill="url(#evLgSb)" d="M19.3377 22.6215L19.331 22.6082C22.1529 22.3409 24.6852 21.1377 26.5791 19.3297C28.7264 17.2805 30.0539 14.4535 30.0539 11.3315C30.0539 11.1356 30.0489 10.9476 30.0406 10.7682H30.0378C29.7292 4.77186 24.5189 0 18.1352 0H0L2.34425 4.15641H17.6988C21.8661 4.15641 25.2449 7.36889 25.2449 11.3315C25.2449 15.2941 21.8655 18.5066 17.6977 18.5066L10.3714 18.6008L12.6057 22.6646L22.2322 39.8881H28.9591L19.3377 22.6215Z"/><path fill="url(#evLgSb)" d="M22.736 14.3246C23.0898 13.3184 23.2985 12.2488 23.3404 11.1388C23.3454 11.0025 23.3488 10.8662 23.3488 10.7288C23.3488 10.575 23.3454 10.4259 23.3404 10.2822V10.1666H5.67788L7.99701 14.3241L22.736 14.3246Z"/><path fill="url(#evLgSb)" d="M32.5528 10.1672C32.5544 10.205 32.5561 10.2438 32.5572 10.2827V11.1393C32.5159 12.2494 32.3067 13.3189 31.9529 14.3252H36.2619V10.1677L32.5528 10.1672Z"/></svg>
-      <div>
+      <div style="display:flex;align-items:center;flex-wrap:nowrap;">
         <div style="font-family:'Magra',sans-serif;font-weight:700;font-size:17px;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;display:inline-block;line-height:1.2;">extrravenue</div>
-        <div class="sidebar-logo-tag">Advertiser Portal</div>
+        <span class="sidebar-logo-sub">Advertiser Portal</span>
       </div>
     </div>
     <div class="sidebar-nav">
