@@ -892,6 +892,24 @@ async function sendPasswordExpiryReminderEmail({ to, name, resetUrl }) {
   return sendMail({ to, subject: 'extrravenue — Password Update Reminder', html });
 }
 
+async function sendDbBackupEmail({ to, backupUrl, dateStr, tables, totalRows }) {
+  const html = wrap(`
+    <div class="tag">DB Backup</div>
+    <h2>Weekly Database Backup</h2>
+    <p class="sub">Automated backup successfully create ho gaya — neeche link se download karo.</p>
+    <div class="info-card">
+      <div class="info-row"><span class="ir-label">Date</span><span class="ir-value">${dateStr}</span></div>
+      <div class="info-row"><span class="ir-label">Tables</span><span class="ir-value">${tables} tables</span></div>
+      <div class="info-row"><span class="ir-label">Total Rows</span><span class="ir-value">${totalRows.toLocaleString()} rows</span></div>
+      <div class="info-row"><span class="ir-label">Format</span><span class="ir-value">JSON (Cloudinary)</span></div>
+    </div>
+    <a href="${backupUrl}" class="btn">Download Backup &rarr;</a>
+    <hr class="divider">
+    <p style="font-size:13px;color:#aaa;">Yeh link 7 din ke liye valid hai. Secure jagah save kar lo.</p>
+  `);
+  return sendMail({ to, subject: `extrravenue — Weekly DB Backup ${dateStr}`, html });
+}
+
 module.exports = {
   sendInvoiceEmail, sendApprovedEmail, sendRejectedEmail,
   sendPausedEmail, sendResumedEmail, sendOnHoldEmail,
@@ -900,4 +918,5 @@ module.exports = {
   sendDailyPoPReport, sendDailyPoPEmailAll, sendNewUserAlertEmail,
   sendVenuePartnerWelcomeEmail,
   sendPasswordResetEmail, sendPasswordExpiryReminderEmail,
+  sendDbBackupEmail,
 };
