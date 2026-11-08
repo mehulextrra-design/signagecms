@@ -13,12 +13,13 @@ router.get('/proof-of-play', authenticate, async (req, res, next) => {
     let sql = `
       SELECT pl.id, pl.screen_id, pl.campaign_id, pl.content_id,
              pl.played_at,
-             (pl.played_at + (COALESCE(pl.duration_sec,0) || ' seconds')::interval) AS played_until,
-             pl.duration_sec, pl.play_count,
+             LEAST(pl.duration_sec, COALESCE(c.slot_duration_sec, pl.duration_sec)) AS duration_sec,
+             (pl.played_at + (COALESCE(LEAST(pl.duration_sec, COALESCE(c.slot_duration_sec, pl.duration_sec)),0) || ' seconds')::interval) AS played_until,
+             pl.play_count,
              COALESCE(pl.content_tier,'paid') AS content_tier,
              COALESCE(pl.source,'apk') AS source,
              s.screen_code, s.name AS screen_name, s.city AS screen_city,
-             c.title AS campaign_title, c.campaign_code,
+             c.title AS campaign_title, c.campaign_code, c.slot_duration_sec,
              u.first_name AS advertiser_name, u.email AS user_email
       FROM play_logs pl
       LEFT JOIN screens s ON s.id = pl.screen_id
