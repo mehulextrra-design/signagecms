@@ -101,8 +101,11 @@ router.post('/register-admin', authenticate, [
   const errors = validationResult(req);
   if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
 
-  const { email, first_name, last_name, mobile, password, business_name, business_type, gst_number, pan_number, city } = req.body;
+  const { email, first_name, last_name, mobile, password, business_name, business_type, gst_number, pan_number, city, role: reqRole } = req.body;
   const normalized = mobile.replace(/\D/g, '').slice(-10);
+  // Only superadmin can create admin; admin can create venue_inspector
+  const allowedRoles = req.user.role === 'superadmin' ? ['advertiser','venue_inspector','admin'] : ['advertiser','venue_inspector'];
+  const role = allowedRoles.includes(reqRole) ? reqRole : 'advertiser';
   try {
     const exists = await query('SELECT id FROM users WHERE email = $1', [email]);
     if (exists.rows.length) return res.status(409).json({ error: 'Email already registered' });
@@ -112,9 +115,9 @@ router.post('/register-admin', authenticate, [
 
     const password_hash = await bcrypt.hash(password, 12);
     const result = await query(
-      `INSERT INTO users (email, first_name, last_name, mobile, password_hash, business_name, business_type, gst_number, pan_number, city, mobile_verified)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,false) RETURNING id, email, role`,
-      [email, first_name, last_name, normalized, password_hash, business_name, business_type, gst_number, pan_number, city]
+      `INSERT INTO users (email, first_name, last_name, mobile, password_hash, business_name, business_type, gst_number, pan_number, city, role, mobile_verified)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,false) RETURNING id, email, role`,
+      [email, first_name, last_name, normalized, password_hash, business_name, business_type, gst_number, pan_number, city, role]
     );
     const user = result.rows[0];
     res.status(201).json({ user: { id: user.id, email: user.email, role: user.role } });
