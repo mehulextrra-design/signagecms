@@ -26,6 +26,7 @@ const googleRoutes    = require('./routes/google');
 const instagramRoutes = require('./routes/instagram');
 const blogRoutes = require('./routes/blog');
 const waRoutes  = require('./routes/whatsapp-connect');
+const leadRoutes = require('./routes/leads');
 
 const { startScheduler } = require('./services/scheduler');
 const { restoreActiveSessions } = require('./services/whatsapp-broadcast');
@@ -124,6 +125,7 @@ app.use('/api/auth/google',     googleRoutes);
 app.use('/api/auth/instagram', instagramRoutes);
 app.use('/api/blog', blogRoutes);
 app.use('/api/wa', waRoutes);
+app.use('/api/leads', leadRoutes);
 
 // Public config — exposes safe client-side keys (no auth needed)
 app.get('/api/config', (req, res) => {

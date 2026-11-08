@@ -3624,9 +3624,9 @@ body.vp-locked{overflow:hidden;}
   <div class="vp-cta">
     <div class="vp-wrap">
       <h2>Apni screen ko kaam pe lagao – aaj se</h2>
-      <p>Register karo – partner approval 24 ghante mein hoti hai.</p>
-      <a href="/venue" class="vp-btn" style="font-size:15px;padding:14px 32px;">Venue Portal pe Register Karo →</a>
-      <p class="vp-cta-note">Koi contract nahi – Koi fees nahi – Kabhi bhi exit</p>
+      <p>Interest form bharo – hamari team 24 ghante mein contact karegi.</p>
+      <button onclick="openVpLeadForm()" class="vp-btn" style="font-size:15px;padding:14px 32px;border:none;cursor:pointer;">Interested Hoon – Contact Karo &rarr;</button>
+      <p class="vp-cta-note">Koi contract nahi &ndash; Koi fees nahi &ndash; Kabhi bhi exit</p>
     </div>
   </div>
 
@@ -3646,8 +3646,143 @@ function closeVenuePartner(){
   document.getElementById('vp-overlay').classList.remove('vp-open');
   document.body.classList.remove('vp-locked');
 }
-document.addEventListener('keydown',function(e){if(e.key==='Escape')closeVenuePartner();});
+document.addEventListener('keydown',function(e){
+  if(e.key==='Escape'){ closeVenuePartner(); closeVpLeadForm(); }
+});
+
+/* ── Venue Partner Lead Form ── */
+function openVpLeadForm(){
+  document.getElementById('vp-lead-modal').style.display='flex';
+  document.getElementById('vp-lead-form').reset();
+  document.getElementById('vp-lead-err').textContent='';
+  document.getElementById('vp-lead-success').style.display='none';
+  document.getElementById('vp-lead-form').style.display='block';
+  document.getElementById('vp-lead-submit').disabled=false;
+  document.getElementById('vp-lead-submit').textContent='Submit Karo →';
+}
+function closeVpLeadForm(){
+  document.getElementById('vp-lead-modal').style.display='none';
+}
+async function submitVpLeadForm(e){
+  e.preventDefault();
+  const btn = document.getElementById('vp-lead-submit');
+  const err = document.getElementById('vp-lead-err');
+  err.textContent='';
+  btn.disabled=true; btn.textContent='Submitting…';
+  const data = {
+    business_name: document.getElementById('vpl-biz').value.trim(),
+    owner_name:    document.getElementById('vpl-name').value.trim(),
+    phone:         document.getElementById('vpl-phone').value.trim(),
+    city:          document.getElementById('vpl-city').value.trim(),
+    venue_category:document.getElementById('vpl-cat').value,
+    footfall_estimate: parseInt(document.getElementById('vpl-footfall').value)||null,
+    screen_count:  parseInt(document.getElementById('vpl-screens').value)||0,
+  };
+  try {
+    const res = await fetch('/api/leads/public', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(data)
+    });
+    const json = await res.json();
+    if (!res.ok) {
+      if (res.status === 409) {
+        // Already registered — treat as success
+        document.getElementById('vp-lead-form').style.display='none';
+        document.getElementById('vp-lead-success').style.display='block';
+        return;
+      }
+      throw new Error(json.error || 'Submit failed');
+    }
+    document.getElementById('vp-lead-form').style.display='none';
+    document.getElementById('vp-lead-success').style.display='block';
+  } catch(ex) {
+    err.textContent = ex.message;
+    btn.disabled=false; btn.textContent='Submit Karo →';
+  }
+}
 </script>
+
+<!-- Venue Partner Lead Form Modal -->
+<div id="vp-lead-modal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.6);align-items:center;justify-content:center;padding:16px;">
+  <div style="background:#f2efe9;border-radius:20px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;font-family:'Libre Franklin',system-ui,sans-serif;">
+    <!-- Header -->
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 24px 0;">
+      <div>
+        <div style="font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#7b68c8;margin-bottom:4px;">Venue Partner Program</div>
+        <div style="font-family:'Magra',sans-serif;font-size:20px;font-weight:700;color:#1a1714;">Apni Interest Register Karo</div>
+      </div>
+      <button onclick="closeVpLeadForm()" style="background:rgba(26,23,20,.08);border:none;border-radius:50%;width:34px;height:34px;cursor:pointer;font-size:18px;color:#1a1714;display:flex;align-items:center;justify-content:center;flex-shrink:0;">&times;</button>
+    </div>
+    <div style="padding:6px 24px 20px;font-size:13px;color:rgba(26,23,20,.55);">Form bharo – hamari team 24 ghante mein call ya WhatsApp karegi.</div>
+
+    <!-- Form -->
+    <form id="vp-lead-form" onsubmit="submitVpLeadForm(event)" style="padding:0 24px 24px;display:flex;flex-direction:column;gap:14px;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div>
+          <label style="display:block;font-size:11px;font-weight:700;color:rgba(26,23,20,.5);letter-spacing:.06em;text-transform:uppercase;margin-bottom:5px;">Business Name *</label>
+          <input id="vpl-biz" required placeholder="e.g. Fit Life Gym" style="width:100%;padding:10px 12px;border:1.5px solid rgba(26,23,20,.15);border-radius:10px;font-size:14px;background:#fff;outline:none;font-family:inherit;" onfocus="this.style.borderColor='#7b68c8'" onblur="this.style.borderColor='rgba(26,23,20,.15)'">
+        </div>
+        <div>
+          <label style="display:block;font-size:11px;font-weight:700;color:rgba(26,23,20,.5);letter-spacing:.06em;text-transform:uppercase;margin-bottom:5px;">Owner / Manager Name</label>
+          <input id="vpl-name" placeholder="Aapka naam" style="width:100%;padding:10px 12px;border:1.5px solid rgba(26,23,20,.15);border-radius:10px;font-size:14px;background:#fff;outline:none;font-family:inherit;" onfocus="this.style.borderColor='#7b68c8'" onblur="this.style.borderColor='rgba(26,23,20,.15)'">
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div>
+          <label style="display:block;font-size:11px;font-weight:700;color:rgba(26,23,20,.5);letter-spacing:.06em;text-transform:uppercase;margin-bottom:5px;">WhatsApp Number *</label>
+          <input id="vpl-phone" required type="tel" placeholder="98XXXXXXXX" style="width:100%;padding:10px 12px;border:1.5px solid rgba(26,23,20,.15);border-radius:10px;font-size:14px;background:#fff;outline:none;font-family:inherit;" onfocus="this.style.borderColor='#7b68c8'" onblur="this.style.borderColor='rgba(26,23,20,.15)'">
+        </div>
+        <div>
+          <label style="display:block;font-size:11px;font-weight:700;color:rgba(26,23,20,.5);letter-spacing:.06em;text-transform:uppercase;margin-bottom:5px;">City</label>
+          <input id="vpl-city" placeholder="Ahmedabad" style="width:100%;padding:10px 12px;border:1.5px solid rgba(26,23,20,.15);border-radius:10px;font-size:14px;background:#fff;outline:none;font-family:inherit;" onfocus="this.style.borderColor='#7b68c8'" onblur="this.style.borderColor='rgba(26,23,20,.15)'">
+        </div>
+      </div>
+      <div>
+        <label style="display:block;font-size:11px;font-weight:700;color:rgba(26,23,20,.5);letter-spacing:.06em;text-transform:uppercase;margin-bottom:5px;">Venue Type</label>
+        <select id="vpl-cat" style="width:100%;padding:10px 12px;border:1.5px solid rgba(26,23,20,.15);border-radius:10px;font-size:14px;background:#fff;outline:none;font-family:inherit;cursor:pointer;" onfocus="this.style.borderColor='#7b68c8'" onblur="this.style.borderColor='rgba(26,23,20,.15)'">
+          <option value="other">Select venue type…</option>
+          <option value="gym">Gym / Fitness Center</option>
+          <option value="restaurant">Restaurant / Cafe</option>
+          <option value="salon">Salon / Spa</option>
+          <option value="clinic">Medical / Clinic</option>
+          <option value="retail">Retail / Shop</option>
+          <option value="society">Society / Residential</option>
+          <option value="office">Office / Co-working</option>
+          <option value="hotel">Hotel / Hospitality</option>
+          <option value="education">Education / Coaching</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div>
+          <label style="display:block;font-size:11px;font-weight:700;color:rgba(26,23,20,.5);letter-spacing:.06em;text-transform:uppercase;margin-bottom:5px;">Daily Footfall (approx)</label>
+          <input id="vpl-footfall" type="number" min="1" placeholder="e.g. 200" style="width:100%;padding:10px 12px;border:1.5px solid rgba(26,23,20,.15);border-radius:10px;font-size:14px;background:#fff;outline:none;font-family:inherit;" onfocus="this.style.borderColor='#7b68c8'" onblur="this.style.borderColor='rgba(26,23,20,.15)'">
+        </div>
+        <div>
+          <label style="display:block;font-size:11px;font-weight:700;color:rgba(26,23,20,.5);letter-spacing:.06em;text-transform:uppercase;margin-bottom:5px;">Screens You Have</label>
+          <select id="vpl-screens" style="width:100%;padding:10px 12px;border:1.5px solid rgba(26,23,20,.15);border-radius:10px;font-size:14px;background:#fff;outline:none;font-family:inherit;cursor:pointer;" onfocus="this.style.borderColor='#7b68c8'" onblur="this.style.borderColor='rgba(26,23,20,.15)'">
+            <option value="0">No screen (ExtrraVenue install karega)</option>
+            <option value="1">1 screen</option>
+            <option value="2">2 screens</option>
+            <option value="3">3 screens</option>
+            <option value="4">4+ screens</option>
+          </select>
+        </div>
+      </div>
+      <div id="vp-lead-err" style="color:#c0392b;font-size:12px;min-height:16px;"></div>
+      <button id="vp-lead-submit" type="submit" style="background:linear-gradient(135deg,#c94baa,#7b68c8,#2ca6d4);color:#fff;border:none;border-radius:12px;padding:13px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;transition:filter .18s;" onmouseover="this.style.filter='brightness(.88)'" onmouseout="this.style.filter='none'">Submit Karo &rarr;</button>
+    </form>
+
+    <!-- Success state -->
+    <div id="vp-lead-success" style="display:none;padding:32px 24px;text-align:center;">
+      <div style="font-size:48px;margin-bottom:12px;">&#10003;</div>
+      <div style="font-family:'Magra',sans-serif;font-size:20px;font-weight:700;color:#1a1714;margin-bottom:8px;">Registered!</div>
+      <div style="font-size:14px;color:rgba(26,23,20,.58);line-height:1.6;margin-bottom:24px;">Hamari team aapko <strong>24 ghante</strong> mein WhatsApp ya call karegi.<br>Thank you for your interest!</div>
+      <button onclick="closeVpLeadForm()" style="background:#1a1714;color:#f2efe9;border:none;border-radius:12px;padding:11px 28px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;">Close</button>
+    </div>
+  </div>
+</div>
 
 <!-- WhatsApp FAB -->
 <a id="wa-fab" href="https://wa.me/919274744022" target="_blank" rel="noopener" aria-label="Chat on WhatsApp">
