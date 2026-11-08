@@ -204,8 +204,13 @@
   .screen-card.selected { border-color:var(--primary);background:var(--primary-light); }
   .screen-card.selected::after { content:'✓';position:absolute;top:8px;right:8px;width:18px;height:18px;background:var(--primary);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700; }
   /* Group chip */
-  .group-chip{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:20px;border:1.5px solid var(--primary);background:var(--primary-light);color:var(--primary);font-size:12.5px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.15s;}
-  .group-chip:hover{background:var(--primary);color:#fff;}
+  .group-pill-wrap{display:inline-flex;align-items:center;border-radius:20px;border:1.5px solid var(--primary);overflow:hidden;}
+  .group-chip{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;background:var(--primary-light);color:var(--primary);font-size:12.5px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.15s;border:none;}
+  .group-chip:hover,.group-pill-wrap:has(.group-chip:hover) .group-chip{background:var(--primary);color:#fff;}
+  .group-chip.active{background:var(--primary);color:#fff;}
+  .group-view-btn{display:inline-flex;align-items:center;justify-content:center;padding:6px 8px;background:var(--primary-light);color:var(--primary);cursor:pointer;font-family:inherit;transition:all 0.15s;border:none;border-left:1.5px solid var(--primary);}
+  .group-view-btn:hover{background:var(--primary);color:#fff;}
+  .group-view-btn.active{background:var(--primary);color:#fff;}
   /* View toggle */
   .view-toggle-btn{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:7px;border:1.5px solid var(--border);background:var(--surface);color:var(--text2);cursor:pointer;transition:all 0.15s;}
   .view-toggle-btn.active{background:var(--primary);border-color:var(--primary);color:#fff;}
@@ -759,10 +764,10 @@
             <div id="wizard-groups-wrap" style="display:none;margin-bottom:14px;">
               <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.05em;">Screen Groups</div>
               <div id="wizard-groups-list" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
-              <div style="height:1px;background:var(--border);margin:14px 0;"></div>
-              <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.05em;">Individual Screens</div>
+              <div id="wizard-screens-expand-row" style="display:none;height:1px;background:var(--border);margin:14px 0;"></div>
+              <div id="wizard-screens-expand-label" style="display:none;font-size:12px;font-weight:600;color:var(--text2);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.05em;">Individual Screens</div>
             </div>
-            <div id="wizard-screens-grid" class="screens-grid" style="margin-bottom:16px;"><div style="grid-column:1/-1;text-align:center;padding:24px;color:var(--text2);">Loading screens…</div></div>
+            <div id="wizard-screens-grid" class="screens-grid" style="display:none;margin-bottom:16px;"><div style="grid-column:1/-1;text-align:center;padding:24px;color:var(--text2);">Loading screens…</div></div>
             <div class="wizard-nav"><div></div><button class="btn btn-primary" onclick="wizardNext(1)" id="btn-next-1" disabled>Continue &rarr;</button></div>
           </div>
 
@@ -2724,6 +2729,9 @@ function initWizard(){
   document.getElementById('coupon-input').value='';
   document.getElementById('coupon-msg').innerHTML='';
   document.getElementById('selected-count').textContent='';
+  _expandedGroupId=null;
+  const grid=document.getElementById('wizard-screens-grid');
+  if(grid) grid.style.display='none';
   // checkTrialUsed(); // TEMP: disabled for testing
 }
 
@@ -2770,31 +2778,79 @@ async function renderWizardScreens(){
   if(allScreenGroups.length){
     groupsWrap.style.display='block';
     groupsList.innerHTML=allScreenGroups.map(g=>`
-      <button class="group-chip" onclick="selectGroup('${g.id}')" title="Select all ${g.screens.length} screens in this group">
-        <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-        ${g.name} <span style="opacity:0.65;font-weight:400;">(${g.screens.length})</span>
-      </button>`).join('');
+      <div class="group-pill-wrap" id="gpw-${g.id}">
+        <button class="group-chip" id="gchip-${g.id}" onclick="selectGroup('${g.id}')" title="Select all ${g.screens.length} screens in this group">
+          <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          ${g.name} <span style="opacity:0.65;font-weight:400;">(${g.screens.length})</span>
+        </button>
+        <button class="group-view-btn" id="gview-${g.id}" onclick="expandScreensForGroup(event,'${g.id}')" title="View individual screens">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+      </div>`).join('');
   } else {
     groupsWrap.style.display='none';
+    // No groups → show all screens directly
+    grid.style.display='grid';
   }
 
   grid.innerHTML=allScreens.map(s=>`<div class="screen-card ${selectedScreenIds.includes(s.id)?'selected':''}" id="sc-card-${s.id}" onclick="toggleScreen('${s.id}',this)"><div class="screen-name">${s.name}</div><div class="screen-loc">${s.location||s.city||'—'}</div><div style="display:flex;align-items:center;justify-content:space-between;"><div class="screen-price">${s.approx_footfall>0?'~'+s.approx_footfall.toLocaleString('en-IN')+' footfall/day':'—'}</div><div style="width:7px;height:7px;border-radius:50%;background:${s.status==='online'?'var(--success)':'var(--warning)'};"></div></div><div style="font-size:11px;color:var(--text2);margin-top:6px;">${s.venue_type||'Screen'} · ${s.zone||'A'} zone</div></div>`).join('');
 }
 
+let _expandedGroupId=null;
+
 function selectGroup(groupId){
   const group=allScreenGroups.find(g=>g.id===groupId);
   if(!group) return;
-  group.screens.forEach(s=>{
-    if(!selectedScreenIds.includes(s.id)){
-      selectedScreenIds.push(s.id);
+  const allSelected=group.screens.every(s=>selectedScreenIds.includes(s.id));
+  if(allSelected){
+    // Deselect all screens in group
+    group.screens.forEach(s=>{
+      const idx=selectedScreenIds.indexOf(s.id);
+      if(idx>-1) selectedScreenIds.splice(idx,1);
       const card=document.getElementById('sc-card-'+s.id);
-      if(card) card.classList.add('selected');
-    }
-  });
+      if(card) card.classList.remove('selected');
+    });
+    document.getElementById('gchip-'+groupId)?.classList.remove('active');
+  } else {
+    // Select all screens in group
+    group.screens.forEach(s=>{
+      if(!selectedScreenIds.includes(s.id)){
+        selectedScreenIds.push(s.id);
+        const card=document.getElementById('sc-card-'+s.id);
+        if(card) card.classList.add('selected');
+      }
+    });
+    document.getElementById('gchip-'+groupId)?.classList.add('active');
+    toast(`${group.name} — ${group.screens.length} screen${group.screens.length!==1?'s':''} selected`,'success');
+  }
   const cnt=selectedScreenIds.length;
   document.getElementById('selected-count').textContent=cnt?`${cnt} screen${cnt>1?'s':''} selected`:'';
   document.getElementById('btn-next-1').disabled=!cnt;
-  toast(`${group.name} — ${group.screens.length} screen${group.screens.length!==1?'s':''} selected`,'success');
+}
+
+function expandScreensForGroup(evt,groupId){
+  evt.stopPropagation();
+  const grid=document.getElementById('wizard-screens-grid');
+  const expandRow=document.getElementById('wizard-screens-expand-row');
+  const expandLabel=document.getElementById('wizard-screens-expand-label');
+  const viewBtn=document.getElementById('gview-'+groupId);
+  const isOpen=_expandedGroupId===groupId&&grid.style.display!=='none';
+  if(isOpen){
+    grid.style.display='none';
+    expandRow.style.display='none';
+    expandLabel.style.display='none';
+    document.querySelectorAll('.group-view-btn').forEach(b=>b.classList.remove('active'));
+    _expandedGroupId=null;
+  } else {
+    // Close previous if any
+    document.querySelectorAll('.group-view-btn').forEach(b=>b.classList.remove('active'));
+    grid.style.display='grid';
+    expandRow.style.display='block';
+    expandLabel.style.display='block';
+    if(viewBtn) viewBtn.classList.add('active');
+    _expandedGroupId=groupId;
+    grid.scrollIntoView({behavior:'smooth',block:'nearest'});
+  }
 }
 
 function toggleScreen(id,el){
