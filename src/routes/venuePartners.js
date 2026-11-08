@@ -292,7 +292,7 @@ router.get('/:id/content', authenticate, async (req, res, next) => {
     const vp = await query('SELECT user_id FROM venue_partners WHERE id = $1', [req.params.id]);
     if (!vp.rows.length) return res.status(404).json({ error: 'Not found' });
     const content = await query(
-      `SELECT * FROM content WHERE user_id = $1 AND status = 'active' ORDER BY created_at DESC`,
+      `SELECT * FROM content WHERE user_id = $1 AND status = 'active' AND content_tier IS NOT NULL ORDER BY created_at DESC`,
       [vp.rows[0].user_id]
     );
     res.json(content.rows);

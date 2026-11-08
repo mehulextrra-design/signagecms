@@ -124,6 +124,7 @@ router.get('/schedule', authenticatePlayer, async (req, res, next) => {
          JOIN venue_partners vp ON vp.id = u.venue_partner_id
          WHERE ct.content_tier = 'venue_cross'
            AND ct.status = 'active'
+           AND ct.approval_status = 'approved'
            AND vp.is_active = TRUE
            AND vp.id <> $1
            AND LOWER(TRIM(vp.city)) = $2
@@ -145,6 +146,7 @@ router.get('/schedule', authenticatePlayer, async (req, res, next) => {
          WHERE u.venue_partner_id = $1
            AND ct.content_tier = 'venue_own'
            AND ct.status = 'active'
+           AND ct.approval_status = 'approved'
          ORDER BY ct.created_at DESC`,
         [screen.venue_partner_id]
       );

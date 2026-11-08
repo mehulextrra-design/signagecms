@@ -126,12 +126,60 @@ router.patch('/:id', authenticate, async (req, res, next) => {
       }
     }
 
+    // Venue partner content needs admin approval before it plays on screens
+    const isVPTier = req.user.role === 'venue_partner' && ['venue_own', 'venue_cross'].includes(content_tier);
+    const approvalStatus = isVPTier ? 'pending_review' : 'approved';
+
     const result = await query(
-      `UPDATE content SET content_tier = $1 WHERE id = $2 AND user_id = $3 RETURNING *`,
-      [content_tier, req.params.id, req.user.id]
+      `UPDATE content SET content_tier = $1, approval_status = $4 WHERE id = $2 AND user_id = $3 RETURNING *`,
+      [content_tier, req.params.id, req.user.id, approvalStatus]
     );
     if (!result.rows.length) return res.status(404).json({ error: 'Not found' });
     res.json(result.rows[0]);
+  } catch (err) { next(err); }
+});
+
+// GET /api/content/pending — admin: list venue partner content awaiting approval
+router.get('/pending', authenticate, async (req, res, next) => {
+  if (!['admin', 'superadmin'].includes(req.user.role)) return res.status(403).json({ error: 'Admin only' });
+  try {
+    const result = await query(
+      `SELECT c.*, u.email, u.business_name, vp.contact_name, vp.city AS vp_city
+       FROM content c
+       JOIN users u ON u.id = c.user_id
+       LEFT JOIN venue_partners vp ON vp.id = u.venue_partner_id
+       WHERE c.approval_status = 'pending_review'
+         AND c.content_tier IN ('venue_own','venue_cross')
+         AND c.status = 'active'
+       ORDER BY c.created_at ASC`
+    );
+    res.json(result.rows);
+  } catch (err) { next(err); }
+});
+
+// POST /api/content/:id/approve — admin approves venue content
+router.post('/:id/approve', authenticate, async (req, res, next) => {
+  if (!['admin', 'superadmin'].includes(req.user.role)) return res.status(403).json({ error: 'Admin only' });
+  try {
+    const result = await query(
+      `UPDATE content SET approval_status = 'approved', approval_note = $2 WHERE id = $1 RETURNING *`,
+      [req.params.id, req.body.note || null]
+    );
+    if (!result.rows.length) return res.status(404).json({ error: 'Not found' });
+    res.json({ ok: true, ...result.rows[0] });
+  } catch (err) { next(err); }
+});
+
+// POST /api/content/:id/reject — admin rejects venue content
+router.post('/:id/reject', authenticate, async (req, res, next) => {
+  if (!['admin', 'superadmin'].includes(req.user.role)) return res.status(403).json({ error: 'Admin only' });
+  try {
+    const result = await query(
+      `UPDATE content SET approval_status = 'rejected', approval_note = $2 WHERE id = $1 RETURNING *`,
+      [req.params.id, req.body.note || null]
+    );
+    if (!result.rows.length) return res.status(404).json({ error: 'Not found' });
+    res.json({ ok: true, ...result.rows[0] });
   } catch (err) { next(err); }
 });
 

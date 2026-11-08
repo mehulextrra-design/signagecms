@@ -542,6 +542,12 @@ async function loadContent() {
       const tierBadge = c.content_tier === 'venue_cross'
         ? '<span class="content-tier-badge tier-cross">City-wide</span>'
         : '<span class="content-tier-badge tier-own">Screen</span>';
+      const ap = c.approval_status || 'approved';
+      const apBadge = ap === 'pending_review'
+        ? '<span class="content-tier-badge" style="background:#fef3c7;color:#b45309;">⏳ Pending Approval</span>'
+        : ap === 'rejected'
+        ? '<span class="content-tier-badge" style="background:#fee2e2;color:#dc2626;">✗ Rejected</span>'
+        : '<span class="content-tier-badge" style="background:#dcfce7;color:#16a34a;">✓ Approved</span>';
       return `<div class="content-item">
         ${isVid
           ? `<div class="content-thumb-vid">▶</div>`
@@ -549,6 +555,7 @@ async function loadContent() {
         <div class="content-meta">
           <div class="content-name" title="${esc(c.original_name)}">${esc(c.original_name)}</div>
           ${tierBadge}
+          ${apBadge}
         </div>
       </div>`;
     }).join('');
