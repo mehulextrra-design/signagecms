@@ -744,12 +744,8 @@ textarea.form-input{resize:vertical;min-height:80px;}
               <select id="pop-campaign" class="form-input" style="width:100%;"><option value="">All Campaigns</option></select>
             </div>
             <div style="flex:1;min-width:150px;">
-              <div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em;">Advertiser</div>
-              <select id="pop-user" class="form-input" style="width:100%;"><option value="">All Advertisers</option></select>
-            </div>
-            <div style="flex:1;min-width:150px;">
-              <div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em;">Venue Partner</div>
-              <select id="pop-venue-partner" class="form-input" style="width:100%;"><option value="">All Venues</option></select>
+              <div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em;">Advertiser / Venue</div>
+              <select id="pop-user" class="form-input" style="width:100%;"><option value="">All</option></select>
             </div>
             <div style="flex:1;min-width:130px;">
               <div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em;">Tier</div>
@@ -3755,19 +3751,20 @@ async function loadPop() {
 
   const start           = startEl.value;
   const end             = endEl.value;
-  const screenId        = document.getElementById('pop-screen').value;
-  const campaignId      = document.getElementById('pop-campaign').value;
-  const userId          = document.getElementById('pop-user').value;
-  const venuePartnerId  = document.getElementById('pop-venue-partner').value;
-  const tier            = document.getElementById('pop-tier').value;
+  const screenId   = document.getElementById('pop-screen').value;
+  const campaignId = document.getElementById('pop-campaign').value;
+  const userRaw    = document.getElementById('pop-user').value; // "vp:<id>" or plain user id
+  const tier       = document.getElementById('pop-tier').value;
   const params = new URLSearchParams();
-  if(start)           params.set('start', start);
-  if(end)             params.set('end', end);
-  if(screenId)        params.set('screen_id', screenId);
-  if(campaignId)      params.set('campaign_id', campaignId);
-  if(userId)          params.set('user_id', userId);
-  if(venuePartnerId)  params.set('venue_partner_id', venuePartnerId);
-  if(tier)            params.set('tier', tier);
+  if(start)      params.set('start', start);
+  if(end)        params.set('end', end);
+  if(screenId)   params.set('screen_id', screenId);
+  if(campaignId) params.set('campaign_id', campaignId);
+  if(userRaw) {
+    if(userRaw.startsWith('vp:')) params.set('venue_partner_id', userRaw.slice(3));
+    else                          params.set('user_id', userRaw);
+  }
+  if(tier) params.set('tier', tier);
   popLastParams = params;
 
   try {
@@ -3871,14 +3868,20 @@ async function populatePopFilters() {
     (Array.isArray(campaigns)?campaigns:[]).forEach(c => {
       cmpSel.innerHTML += `<option value="${c.id}">${c.campaign_code} — ${c.title}</option>`;
     });
+    // Unified Advertiser / Venue dropdown — advertisers first, then VPs with prefix
     const usrSel = document.getElementById('pop-user');
-    (Array.isArray(users)?users:[]).forEach(u => {
-      usrSel.innerHTML += `<option value="${u.id}">${u.first_name||''} ${u.last_name||''} (${u.email})</option>`;
-    });
-    const vpSel = document.getElementById('pop-venue-partner');
-    (Array.isArray(venues)?venues:[]).forEach(vp => {
-      vpSel.innerHTML += `<option value="${vp.id}">${vp.business_name||vp.contact_name||vp.id}</option>`;
-    });
+    const userList = Array.isArray(users)?users:[];
+    const vpList   = Array.isArray(venues)?venues:[];
+    if(userList.length) {
+      usrSel.innerHTML += `<optgroup label="Advertisers">` +
+        userList.map(u=>`<option value="${u.id}">${u.first_name||''} ${u.last_name||''} (${u.email})</option>`).join('') +
+        `</optgroup>`;
+    }
+    if(vpList.length) {
+      usrSel.innerHTML += `<optgroup label="Venue Partners">` +
+        vpList.map(vp=>`<option value="vp:${vp.id}">${vp.business_name||vp.contact_name||vp.id}</option>`).join('') +
+        `</optgroup>`;
+    }
   } catch(e) {}
 }
 
@@ -3888,7 +3891,6 @@ function resetPopFilters() {
   document.getElementById('pop-screen').value = '';
   document.getElementById('pop-campaign').value = '';
   document.getElementById('pop-user').value = '';
-  document.getElementById('pop-venue-partner').value = '';
   document.getElementById('pop-tier').value = '';
   loadPop();
 }
