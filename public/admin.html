@@ -1664,12 +1664,11 @@ async function openLeadDrawer(id) {
       </div>`;
     // populate assign-to dropdown
     try {
-      const users = await api('/users');
+      const users = await api('/leads/assignable-users');
       const sel = document.getElementById('lead-assign-select');
       if (sel) {
         sel.innerHTML = '<option value="">— Unassigned —</option>' +
-          users.filter(u=>['admin','superadmin','venue_inspector'].includes(u.role))
-               .map(u=>`<option value="${u.id}" ${l.assigned_to==u.id?'selected':''}>${esc([u.first_name,u.last_name].filter(Boolean).join(' ')||u.email)} (${u.role})</option>`)
+          users.map(u=>`<option value="${u.id}" ${l.assigned_to==u.id?'selected':''}>${esc([u.first_name,u.last_name].filter(Boolean).join(' ')||u.email)} (${u.role})</option>`)
                .join('');
       }
     } catch(e) { /* silent — users endpoint may 403 for non-admins */ }

@@ -52,6 +52,18 @@ router.post('/public', async (req, res, next) => {
   } catch (err) { next(err); }
 });
 
+// ── GET users who can be assigned leads (admin/superadmin/venue_inspector) ───
+router.get('/assignable-users', authenticate, requireInspectorOrAdmin, async (req, res, next) => {
+  try {
+    const result = await query(
+      `SELECT id, first_name, last_name, email, role
+       FROM users WHERE role IN ('admin','superadmin','venue_inspector') AND is_active = true
+       ORDER BY first_name, last_name`
+    );
+    res.json(result.rows);
+  } catch (err) { next(err); }
+});
+
 // ── LIST leads (admin + inspector) ───────────────────────────────────────────
 router.get('/', authenticate, requireInspectorOrAdmin, async (req, res, next) => {
   const { status, city, assigned_to, q } = req.query;
