@@ -153,7 +153,7 @@ router.put('/:id', authenticate, requireAdmin, async (req, res, next) => {
       `UPDATE screens SET name=$1, location=$2, city=$3, zone=$4, price_per_day=$5, daily_impressions=$6,
        status=$7, latitude=$8, longitude=$9, audio_enabled=$10, venue_type=$11, approx_footfall=$12,
        venue_partner_id=$13,
-       registration_pin = CASE WHEN $14 THEN $15 ELSE registration_pin END,
+       registration_pin = CASE WHEN $14 AND $15 IS NOT NULL THEN $15 ELSE registration_pin END,
        updated_at=NOW()
        WHERE id = $16 RETURNING *`,
       [name, location, city, zone, price_per_day, daily_impressions, status, latitude || null, longitude || null, audio_enabled || false, venue_type || 'Other', approx_footfall || 0, venue_partner_id || null, pinInRequest, pinValue, req.params.id]
