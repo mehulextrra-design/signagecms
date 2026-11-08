@@ -272,4 +272,60 @@ router.post('/:id/activity', authenticate, requireInspectorOrAdmin, async (req, 
   } catch (err) { next(err); }
 });
 
+// POST /leads/:id/create-venue-partner — convert lead to venue partner with login
+router.post('/:id/create-venue-partner', authenticate, requireInspectorOrAdmin, [
+  body('email').isEmail().normalizeEmail(),
+  body('password').isLength({ min: 8 }),
+], async (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) return res.status(400).json({ error: 'Valid email aur min 8 char password chahiye' });
+
+  try {
+    const leadRes = await query('SELECT * FROM leads WHERE id = $1', [req.params.id]);
+    if (!leadRes.rows.length) return res.status(404).json({ error: 'Lead not found' });
+    const lead = leadRes.rows[0];
+
+    // Inspector only sees own leads
+    if (req.user.role === 'venue_inspector' && lead.assigned_to !== req.user.id) {
+      return res.status(403).json({ error: 'Access denied' });
+    }
+
+    const { email, password } = req.body;
+
+    // Check email not already used
+    const existing = await query('SELECT id FROM users WHERE email = $1', [email]);
+    if (existing.rows.length) return res.status(409).json({ error: 'Yeh email already registered hai' });
+
+    const bcrypt = require('bcryptjs');
+    const hash = await bcrypt.hash(password, 12);
+
+    // Create venue_partner record
+    const vpRes = await query(
+      `INSERT INTO venue_partners (business_name, venue_category, city, address, contact_name, contact_phone, approval_status, is_active)
+       VALUES ($1,$2,$3,$4,$5,$6,'pending',false) RETURNING id`,
+      [lead.business_name, lead.category || 'other', lead.city, lead.address || null, lead.contact_name, lead.phone]
+    );
+    const vpId = vpRes.rows[0].id;
+
+    // Create user linked to venue_partner
+    const userRes = await query(
+      `INSERT INTO users (email, password_hash, role, first_name, business_name, city, is_verified, is_active, venue_partner_id)
+       VALUES ($1,$2,'venue_partner',$3,$4,$5,TRUE,FALSE,$6) RETURNING id, email`,
+      [email, hash, lead.contact_name || lead.business_name, lead.business_name, lead.city, vpId]
+    );
+
+    // Link user back to venue_partner
+    await query('UPDATE venue_partners SET user_id = $1 WHERE id = $2', [userRes.rows[0].id, vpId]);
+
+    // Log activity on lead
+    await query(
+      `INSERT INTO lead_activities (lead_id, actor_id, activity_type, note)
+       VALUES ($1,$2,'note',$3)`,
+      [req.params.id, req.user.id, `Venue partner account created: ${email}`]
+    );
+
+    res.status(201).json({ ok: true, email: userRes.rows[0].email, venue_partner_id: vpId });
+  } catch (err) { next(err); }
+});
+
 module.exports = router;

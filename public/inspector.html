@@ -748,6 +748,10 @@ async function openDrawer(id) {
       <select class="status-select" id="drawer-status" onchange="updateStatus('${l.id}', this.value)">
         ${Object.entries(STATUS_LABELS).map(([v,t]) => `<option value="${v}" ${l.status===v?'selected':''}>${t}</option>`).join('')}
       </select>
+      ${['installation_done','live'].includes(l.status) ? `
+      <button class="btn btn-primary" style="width:100%;margin-top:12px;padding:13px;justify-content:center;font-size:14px;" onclick="openVPModal('${l.id}')">
+        🔑 Venue Partner Login Banao
+      </button>` : ''}
 
       <div class="section-label">Site Photos (${photos.length}/7)</div>
       ${photoHtml}
@@ -896,6 +900,76 @@ async function generateAgreement(id) {
     setTimeout(()=>{ agr.style.display='none'; }, 3000);
   } catch(e) { showToast('Failed to generate agreement', 'error'); }
 }
+
+// ── VENUE PARTNER LOGIN ───────────────────────────────────────────
+let _vpLeadId = null;
+
+function openVPModal(leadId) {
+  _vpLeadId = leadId;
+  document.getElementById('vp-email').value = '';
+  document.getElementById('vp-pass').value = '';
+  document.getElementById('vp-err').style.display = 'none';
+  document.getElementById('vp-success').style.display = 'none';
+  document.getElementById('vp-modal').style.display = 'flex';
+}
+
+function closeVPModal() {
+  document.getElementById('vp-modal').style.display = 'none';
+  _vpLeadId = null;
+}
+
+async function createVPLogin() {
+  const email = document.getElementById('vp-email').value.trim();
+  const password = document.getElementById('vp-pass').value;
+  const errEl = document.getElementById('vp-err');
+  const btn = document.getElementById('vp-submit-btn');
+  errEl.style.display = 'none';
+
+  if (!email) { errEl.textContent = 'Email daalna zaroori hai'; errEl.style.display = 'block'; return; }
+  if (password.length < 8) { errEl.textContent = 'Password minimum 8 characters hona chahiye'; errEl.style.display = 'block'; return; }
+
+  btn.disabled = true; btn.textContent = 'Creating…';
+  try {
+    await api(`/leads/${_vpLeadId}/create-venue-partner`, {
+      method: 'POST',
+      body: JSON.stringify({ email, password })
+    });
+    document.getElementById('vp-success').innerHTML =
+      `✅ Account ban gaya!<br><strong>Email:</strong> ${esc(email)}<br><strong>Password:</strong> ${esc(password)}<br><br>Venue partner ko share karo: <strong>extrravenue.com/venue</strong>`;
+    document.getElementById('vp-success').style.display = 'block';
+    btn.style.display = 'none';
+  } catch(e) {
+    errEl.textContent = e.message; errEl.style.display = 'block';
+  } finally { btn.disabled = false; btn.textContent = 'Account Banao'; }
+}
 </script>
+
+<!-- VP LOGIN MODAL -->
+<div id="vp-modal" style="display:none;position:fixed;inset:0;background:rgba(10,10,30,.5);z-index:600;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(2px);">
+  <div style="background:var(--surface);border-radius:var(--radius);padding:28px 24px;width:100%;max-width:420px;box-shadow:0 20px 60px rgba(0,0,0,.2);">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+      <div style="font-size:16px;font-weight:700;color:var(--text);">🔑 Venue Partner Login</div>
+      <button onclick="closeVPModal()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text3);line-height:1;">×</button>
+    </div>
+    <div style="font-size:13px;color:var(--text2);margin-bottom:18px;background:var(--bg);border-radius:8px;padding:10px 12px;">
+      Business name, city, contact — sab lead se auto-fill hoga. Sirf email aur password daalo.
+    </div>
+    <div class="form-group">
+      <label class="form-label">Email</label>
+      <input type="email" id="vp-email" class="form-input" placeholder="venue@gmail.com" autocomplete="off">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Password (min 8 characters)</label>
+      <input type="text" id="vp-pass" class="form-input" placeholder="Yahan password daalo" autocomplete="off">
+    </div>
+    <div id="vp-err" style="display:none;color:var(--danger);font-size:13px;margin-bottom:12px;padding:9px 12px;background:#fee2e2;border-radius:8px;"></div>
+    <div id="vp-success" style="display:none;font-size:13px;color:var(--success);padding:12px 14px;background:#dcfce7;border-radius:8px;margin-bottom:14px;line-height:1.6;"></div>
+    <div style="display:flex;gap:10px;">
+      <button id="vp-submit-btn" class="btn btn-primary" style="flex:1;justify-content:center;padding:13px;" onclick="createVPLogin()">Account Banao</button>
+      <button class="btn btn-ghost" onclick="closeVPModal()" style="padding:13px 18px;">Cancel</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
