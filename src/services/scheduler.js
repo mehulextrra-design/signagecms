@@ -1,7 +1,7 @@
 const cron = require('node-cron');
 const { query } = require('../db');
 const { sendWeeklyReports, sendExpiryReminderWA, sendCampaignCompletedWA, sendDailyPoPAllWA } = require('./whatsapp');
-const { sendDailyPoPReport, sendDailyPoPEmailAll, sendExpiryReminderEmail, sendCampaignCompletedEmail } = require('./email');
+const { sendDailyPoPReport, sendDailyPoPEmailAll, sendExpiryReminderEmail, sendCampaignCompletedEmail, sendPasswordExpiryReminderEmail } = require('./email');
 const { postCampaignToSocial } = require('../routes/facebook');
 const { postCampaignToGoogle } = require('../routes/google');
 const { sendWaBroadcast } = require('./whatsapp-broadcast');
@@ -241,6 +241,49 @@ const startScheduler = () => {
       console.error('[Scheduler] Cleanup server logs error:', err.message);
     }
   }, 5000);
+
+  // Daily at 10:00 AM IST (04:30 UTC): send 45-day password expiry reminders
+  cron.schedule('30 4 * * *', async () => {
+    try {
+      const APP_URL = process.env.APP_URL || 'https://extrravenue.com';
+      const { v4: uuidv4 } = require('uuid');
+      // Find users whose password is 45+ days old and haven't been reminded in last 7 days
+      const users = await query(`
+        SELECT id, email, first_name, role
+        FROM users
+        WHERE role IN ('venue_partner','venue_inspector','admin')
+          AND password_hash IS NOT NULL
+          AND is_active = TRUE
+          AND (
+            password_changed_at IS NULL
+            OR password_changed_at < NOW() - INTERVAL '45 days'
+          )
+          AND (
+            password_expiry_notified_at IS NULL
+            OR password_expiry_notified_at < NOW() - INTERVAL '7 days'
+          )
+        LIMIT 100
+      `);
+      for (const u of users.rows) {
+        try {
+          const token = uuidv4();
+          const expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
+          await query(
+            `UPDATE users SET password_reset_token=$1, password_reset_expires=$2,
+             password_expiry_notified_at=NOW() WHERE id=$3`,
+            [token, expires, u.id]
+          );
+          const resetUrl = `${APP_URL}/venue.html?reset=${token}`;
+          await sendPasswordExpiryReminderEmail({ to: u.email, name: u.first_name || 'User', resetUrl });
+          console.log(`[Scheduler] Password expiry reminder sent: ${u.email}`);
+        } catch (e) {
+          console.error(`[Scheduler] Password reminder failed for ${u.email}:`, e.message);
+        }
+      }
+    } catch (err) {
+      console.error('[Scheduler] Password expiry cron error:', err.message);
+    }
+  });
 
   console.log('[Scheduler] All cron jobs started');
 };

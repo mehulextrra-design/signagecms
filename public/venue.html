@@ -271,6 +271,45 @@ body {
     </div>
     <div id="login-err" class="login-error"></div>
     <button class="btn btn-primary" id="login-btn" onclick="doLogin()" style="width:100%;justify-content:center;padding:14px;margin-top:4px;">Sign In</button>
+    <div style="text-align:center;margin-top:12px;">
+      <a href="#" onclick="showForgotPassword();return false;" style="font-size:13px;color:var(--primary);text-decoration:none;">Forgot password?</a>
+    </div>
+  </div>
+</div>
+
+<!-- FORGOT PASSWORD MODAL -->
+<div id="forgot-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;display:none;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:var(--surface);border-radius:16px;padding:28px 24px;max-width:380px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+    <h3 style="margin:0 0 6px;font-size:18px;font-weight:700;color:var(--text);">Password Reset</h3>
+    <p style="font-size:13px;color:var(--text3);margin:0 0 20px;">Apna registered email dalo — reset link bhejenge.</p>
+    <div class="form-group">
+      <label class="form-label">Email</label>
+      <input type="email" id="forgot-email" class="form-input" placeholder="you@yourvenue.in">
+    </div>
+    <div id="forgot-msg" style="font-size:13px;margin-bottom:12px;display:none;"></div>
+    <button class="btn btn-primary" id="forgot-btn" onclick="doForgotPassword()" style="width:100%;justify-content:center;padding:12px;">Reset Link Bhejo</button>
+    <button onclick="hideForgotPassword()" style="width:100%;margin-top:8px;background:none;border:none;color:var(--text3);font-size:13px;cursor:pointer;padding:8px;">Cancel</button>
+  </div>
+</div>
+
+<!-- RESET PASSWORD SCREEN -->
+<div id="reset-screen" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:999;display:none;align-items:center;justify-content:center;padding:20px;">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <span class="auth-brand">extrravenue</span>
+      <span class="auth-sub">New Password Set Karo</span>
+      <div class="auth-divider"></div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">New Password</label>
+      <input type="password" id="reset-pass" class="form-input" placeholder="Min 8 characters" autocomplete="new-password">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Confirm Password</label>
+      <input type="password" id="reset-pass2" class="form-input" placeholder="Same password again" autocomplete="new-password">
+    </div>
+    <div id="reset-msg" style="font-size:13px;margin-bottom:12px;display:none;"></div>
+    <button class="btn btn-primary" id="reset-btn" onclick="doResetPassword()" style="width:100%;justify-content:center;padding:14px;">Password Save Karo</button>
   </div>
 </div>
 
@@ -462,6 +501,74 @@ function api(path, opts={}) {
     if (!r.ok) throw new Error(d.error || r.statusText);
     return d;
   });
+}
+
+// ── FORGOT / RESET PASSWORD ───────────────────────────────────────
+function showForgotPassword() {
+  const m = document.getElementById('forgot-modal');
+  m.style.display = 'flex';
+  document.getElementById('forgot-email').value = document.getElementById('login-email').value || '';
+  document.getElementById('forgot-msg').style.display = 'none';
+}
+function hideForgotPassword() {
+  document.getElementById('forgot-modal').style.display = 'none';
+}
+async function doForgotPassword() {
+  const email = document.getElementById('forgot-email').value.trim();
+  const msgEl = document.getElementById('forgot-msg');
+  const btn = document.getElementById('forgot-btn');
+  if (!email) { msgEl.textContent = 'Email required'; msgEl.style.color = '#dc2626'; msgEl.style.display = 'block'; return; }
+  btn.disabled = true; btn.textContent = 'Sending…';
+  try {
+    await fetch('/api/auth/forgot-password', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({email})
+    });
+    msgEl.textContent = '✓ Reset link bhej diya gaya! Email check karo (spam bhi dekho).';
+    msgEl.style.color = '#16a34a'; msgEl.style.display = 'block';
+    btn.style.display = 'none';
+  } catch(e) {
+    msgEl.textContent = 'Kuch error hua. Dobara try karo.'; msgEl.style.color = '#dc2626'; msgEl.style.display = 'block';
+  } finally { btn.disabled = false; btn.textContent = 'Reset Link Bhejo'; }
+}
+
+let _resetToken = null;
+function checkResetToken() {
+  const params = new URLSearchParams(window.location.search);
+  const token = params.get('reset');
+  if (!token) return;
+  _resetToken = token;
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('reset-screen').style.display = 'flex';
+}
+async function doResetPassword() {
+  const pass = document.getElementById('reset-pass').value;
+  const pass2 = document.getElementById('reset-pass2').value;
+  const msgEl = document.getElementById('reset-msg');
+  const btn = document.getElementById('reset-btn');
+  msgEl.style.display = 'none';
+  if (pass.length < 8) { msgEl.textContent = 'Password kam se kam 8 characters ka hona chahiye'; msgEl.style.color = '#dc2626'; msgEl.style.display = 'block'; return; }
+  if (pass !== pass2) { msgEl.textContent = 'Dono passwords match nahi kar rahe'; msgEl.style.color = '#dc2626'; msgEl.style.display = 'block'; return; }
+  btn.disabled = true; btn.textContent = 'Saving…';
+  try {
+    const res = await fetch('/api/auth/reset-password', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({token: _resetToken, new_password: pass})
+    });
+    const d = await res.json();
+    if (!res.ok) throw new Error(d.error || 'Reset failed');
+    msgEl.textContent = '✓ ' + d.message;
+    msgEl.style.color = '#16a34a'; msgEl.style.display = 'block';
+    btn.style.display = 'none';
+    // Clear token from URL and go to login after 2s
+    setTimeout(() => {
+      history.replaceState({}, '', '/venue.html');
+      document.getElementById('reset-screen').style.display = 'none';
+      document.getElementById('login-screen').style.display = 'flex';
+    }, 2000);
+  } catch(e) {
+    msgEl.textContent = e.message; msgEl.style.color = '#dc2626'; msgEl.style.display = 'block';
+  } finally { btn.disabled = false; btn.textContent = 'Password Save Karo'; }
 }
 
 // ── AUTH ──────────────────────────────────────────────────────────
@@ -867,8 +974,12 @@ function esc(s) {
   return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-// Auto-login
+// Auto-login + reset token check
 (async()=>{
+  // Check for password reset token in URL first
+  checkResetToken();
+  if (document.getElementById('reset-screen').style.display === 'flex') return;
+
   if (_token) {
     try {
       const me = await api('/auth/me');

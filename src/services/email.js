@@ -862,6 +862,36 @@ async function sendVenuePartnerWelcomeEmail({ to, businessName, contactName, ema
   return sendMail({ to, subject: `extrravenue — Aapka Venue Partner Account Ready Hai`, html });
 }
 
+// ── Password Reset Email ───────────────────────────────────────────────────
+async function sendPasswordResetEmail({ to, name, resetUrl }) {
+  const html = wrap(`
+    <div class="tag">Password Reset</div>
+    <h2>Password Reset karo</h2>
+    <p class="sub">Hume aapki request mili — neeche diye button se apna password reset karo.</p>
+    <div class="info-card">
+      <div class="info-row"><span class="ir-label">Account</span><span class="ir-value">${to}</span></div>
+      <div class="info-row"><span class="ir-label">Link expires</span><span class="ir-value">1 ghante mein</span></div>
+    </div>
+    <a href="${resetUrl}" class="btn">New Password Set Karo &rarr;</a>
+    <hr class="divider">
+    <p style="font-size:13px;color:#aaa;">Agar aapne yeh request nahi ki, to is email ko ignore karo. Aapka account safe hai.</p>
+  `);
+  return sendMail({ to, subject: 'extrravenue — Password Reset Link', html });
+}
+
+// ── 45-Day Password Expiry Reminder ───────────────────────────────────────
+async function sendPasswordExpiryReminderEmail({ to, name, resetUrl }) {
+  const html = wrap(`
+    <div class="tag">Security</div>
+    <h2>Password Update karo</h2>
+    <p class="sub">Hi ${name}, aapka password 45 din purana ho gaya hai. Security ke liye please update karo.</p>
+    <a href="${resetUrl}" class="btn">Password Update Karo &rarr;</a>
+    <hr class="divider">
+    <p style="font-size:13px;color:#aaa;">Agar aap abhi update nahi karna chahte to ignore kar sakte hain, lekin hum recommend karte hain ki 45 din mein ek baar password zaroor update karein.</p>
+  `);
+  return sendMail({ to, subject: 'extrravenue — Password Update Reminder', html });
+}
+
 module.exports = {
   sendInvoiceEmail, sendApprovedEmail, sendRejectedEmail,
   sendPausedEmail, sendResumedEmail, sendOnHoldEmail,
@@ -869,4 +899,5 @@ module.exports = {
   sendExpiryReminderEmail, sendCampaignCompletedEmail,
   sendDailyPoPReport, sendDailyPoPEmailAll, sendNewUserAlertEmail,
   sendVenuePartnerWelcomeEmail,
+  sendPasswordResetEmail, sendPasswordExpiryReminderEmail,
 };

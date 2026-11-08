@@ -5,7 +5,8 @@ const { body, validationResult } = require('express-validator');
 const { query } = require('../db');
 const { authenticate } = require('../middleware/auth');
 const { sendWhatsApp } = require('../services/whatsapp');
-const { sendNewUserAlertEmail } = require('../services/email');
+const { sendNewUserAlertEmail, sendPasswordResetEmail } = require('../services/email');
+const { v4: uuidv4 } = require('uuid');
 
 const router = express.Router();
 const TPL_OTP = process.env.WA_TPL_OTP || 'signup_otp';
@@ -204,6 +205,69 @@ router.post('/reset-user-password', authenticate, [
     const hash = await bcrypt.hash(new_password, 12);
     await query('UPDATE users SET password_hash = $1, updated_at = NOW() WHERE id = $2', [hash, result.rows[0].id]);
     res.json({ ok: true, message: 'Password reset successfully' });
+  } catch (err) { next(err); }
+});
+
+// POST /api/auth/forgot-password — sends reset link to email (venue_partner, venue_inspector, admin)
+router.post('/forgot-password', [
+  body('email').isEmail().normalizeEmail(),
+], async (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) return res.status(400).json({ error: 'Valid email required' });
+  try {
+    const { email } = req.body;
+    const result = await query(
+      `SELECT id, first_name, role, is_active FROM users WHERE email = $1`, [email]
+    );
+    // Always return ok to avoid email enumeration
+    if (!result.rows.length || !result.rows[0].password_hash) {
+      return res.json({ ok: true });
+    }
+    const user = result.rows[0];
+    if (!['venue_partner', 'venue_inspector', 'admin', 'superadmin'].includes(user.role)) {
+      return res.json({ ok: true });
+    }
+
+    const token = uuidv4();
+    const expires = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+    await query(
+      `UPDATE users SET password_reset_token=$1, password_reset_expires=$2 WHERE id=$3`,
+      [token, expires, user.id]
+    );
+
+    const APP_URL = process.env.APP_URL || 'https://extrravenue.com';
+    const resetUrl = `${APP_URL}/venue.html?reset=${token}`;
+    await sendPasswordResetEmail({ to: email, name: user.first_name || 'User', resetUrl });
+    res.json({ ok: true });
+  } catch (err) { next(err); }
+});
+
+// POST /api/auth/reset-password — set new password using token from email
+router.post('/reset-password', [
+  body('token').notEmpty(),
+  body('new_password').isLength({ min: 8 }),
+], async (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) return res.status(400).json({ error: 'Token aur minimum 8 character ka password required hai' });
+  try {
+    const { token, new_password } = req.body;
+    const result = await query(
+      `SELECT id, role FROM users
+       WHERE password_reset_token = $1
+         AND password_reset_expires > NOW()`,
+      [token]
+    );
+    if (!result.rows.length) {
+      return res.status(400).json({ error: 'Reset link invalid ya expire ho gaya hai. Dobara try karo.' });
+    }
+    const hash = await bcrypt.hash(new_password, 12);
+    await query(
+      `UPDATE users SET password_hash=$1, password_reset_token=NULL,
+       password_reset_expires=NULL, password_changed_at=NOW(), updated_at=NOW()
+       WHERE id=$2`,
+      [hash, result.rows[0].id]
+    );
+    res.json({ ok: true, message: 'Password successfully reset ho gaya. Ab login karo.' });
   } catch (err) { next(err); }
 });
 
