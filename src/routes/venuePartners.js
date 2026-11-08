@@ -84,6 +84,80 @@ router.get('/:id', authenticate, async (req, res, next) => {
   } catch (err) { next(err); }
 });
 
+const CITY_CAP = 50; // max active venue partners per city
+
+// ── CITY CAPACITY check (admin) ───────────────────────────────────────────────
+router.get('/city-cap', authenticate, requireAdmin, async (req, res, next) => {
+  try {
+    const { city } = req.query;
+    if (!city) return res.json({ count: 0, cap: CITY_CAP, remaining: CITY_CAP });
+    const r = await query(
+      `SELECT COUNT(*) AS count FROM venue_partners
+       WHERE LOWER(TRIM(city)) = LOWER(TRIM($1))
+         AND approval_status IN ('pending','approved')`,
+      [city]
+    );
+    const count = parseInt(r.rows[0].count);
+    res.json({ count, cap: CITY_CAP, remaining: CITY_CAP - count, at_cap: count >= CITY_CAP });
+  } catch (err) { next(err); }
+});
+
+// ── DYNAMIC REACH estimate for a venue partner ────────────────────────────────
+router.get('/:id/reach', authenticate, async (req, res, next) => {
+  if (!['admin','superadmin'].includes(req.user.role) && req.user.venue_partner_id !== req.params.id) {
+    return res.status(403).json({ error: 'Access denied' });
+  }
+  try {
+    const vpRes = await query('SELECT city FROM venue_partners WHERE id = $1', [req.params.id]);
+    if (!vpRes.rows.length) return res.status(404).json({ error: 'Not found' });
+    const city = vpRes.rows[0].city;
+    if (!city) return res.json({ estimated_plays_day: null, reason: 'no_city' });
+
+    const SCREEN_RUNTIME = 54000; // 15h × 3600s
+    const VP_SLOT_SEC    = 10;    // each VP gets 10s in filler loop
+
+    const [screenRes, paidRes, vpCountRes] = await Promise.all([
+      // screens in this city
+      query(`SELECT COUNT(*) AS count FROM screens WHERE LOWER(TRIM(city)) = LOWER(TRIM($1))`, [city]),
+      // avg paid loop per screen in city (sum of active campaign slot durations per screen, averaged)
+      query(`
+        SELECT AVG(paid_loop) AS avg_paid_loop FROM (
+          SELECT s.id, COALESCE(SUM(c.slot_duration_sec), 0) AS paid_loop
+          FROM screens s
+          LEFT JOIN campaign_screens cs ON cs.screen_id = s.id
+          LEFT JOIN campaigns c ON c.id = cs.campaign_id
+            AND c.status IN ('approved','live')
+            AND c.start_date <= CURRENT_DATE AND c.end_date >= CURRENT_DATE
+          WHERE LOWER(TRIM(s.city)) = LOWER(TRIM($1))
+          GROUP BY s.id
+        ) t`, [city]),
+      // active venue partners in city (excluding self)
+      query(`
+        SELECT COUNT(*) AS count FROM venue_partners
+        WHERE LOWER(TRIM(city)) = LOWER(TRIM($1))
+          AND approval_status = 'approved' AND is_active = TRUE`, [city]),
+    ]);
+
+    const screen_count  = parseInt(screenRes.rows[0].count) || 0;
+    const avg_paid_loop = parseFloat(paidRes.rows[0].avg_paid_loop) || 0;
+    const vp_count      = Math.max(1, parseInt(vpCountRes.rows[0].count) || 1);
+
+    const free_time_per_screen = Math.max(0, SCREEN_RUNTIME - avg_paid_loop);
+    const vp_loop_sec          = vp_count * VP_SLOT_SEC;
+    const plays_per_screen     = vp_loop_sec > 0 ? Math.floor(free_time_per_screen / vp_loop_sec) : 0;
+    const estimated_plays_day  = plays_per_screen * screen_count;
+
+    res.json({
+      estimated_plays_day,
+      screen_count,
+      vp_count_in_city: vp_count,
+      free_time_per_screen_sec: Math.round(free_time_per_screen),
+      avg_paid_loop_sec: Math.round(avg_paid_loop),
+      city,
+    });
+  } catch (err) { next(err); }
+});
+
 // ── CREATE venue partner + user account (admin) ───────────────────────────────
 router.post('/', authenticate, requireAdmin, async (req, res, next) => {
   const {
@@ -100,6 +174,21 @@ router.post('/', authenticate, requireAdmin, async (req, res, next) => {
     // Check email not already used
     const existing = await query('SELECT id FROM users WHERE email = $1', [email]);
     if (existing.rows.length) return res.status(409).json({ error: 'Email already registered' });
+
+    // ── City cap check ────────────────────────────────────────────────────────
+    if (city) {
+      const capRes = await query(
+        `SELECT COUNT(*) AS count FROM venue_partners
+         WHERE LOWER(TRIM(city)) = LOWER(TRIM($1))
+           AND approval_status IN ('pending','approved')`,
+        [city]
+      );
+      if (parseInt(capRes.rows[0].count) >= CITY_CAP) {
+        return res.status(400).json({
+          error: `City capacity reached — ${CITY_CAP} venue partners already registered in ${city}. Contact admin to review waitlist.`
+        });
+      }
+    }
 
     const plain = password || Math.random().toString(36).slice(-8) + 'V1!';
     const hash = await bcrypt.hash(plain, 10);

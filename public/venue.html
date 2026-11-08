@@ -193,6 +193,21 @@ body { font-family:'Inter',system-ui,sans-serif; background:var(--bg); color:var
         <div class="stat-box"><div class="stat-label">My Content Files</div><div class="stat-val" id="ov-content">—</div></div>
       </div>
 
+      <!-- Estimated Reach card -->
+      <div class="card" id="reach-card" style="margin-bottom:16px;display:none;">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+          <div>
+            <div class="card-title" style="margin-bottom:4px;">Estimated Daily Reach</div>
+            <div id="reach-plays" style="font-size:28px;font-weight:700;color:var(--primary);">—</div>
+            <div id="reach-meta" style="font-size:12px;color:var(--text2);margin-top:3px;">Loading…</div>
+          </div>
+          <div id="reach-upsell" style="display:none;background:#fef3c7;border:1px solid #f59e0b;border-radius:8px;padding:10px 14px;max-width:260px;">
+            <div style="font-size:12px;font-weight:600;color:#b45309;">Reach kam ho rahi hai?</div>
+            <div style="font-size:11px;color:#92400e;margin-top:3px;">Network bhar raha hai. Guaranteed plays ke liye Starter plan try karein.</div>
+          </div>
+        </div>
+      </div>
+
       <div class="card-title" style="margin-bottom:10px;">My Screens</div>
       <div id="screens-list"><div class="empty">Loading screens…</div></div>
 
@@ -342,6 +357,7 @@ function loadOverview() {
   if (!_vpData) return;
   const screens = _vpData.screens || [];
   document.getElementById('ov-screens').textContent = screens.length;
+  loadEstimatedReach();
 
   // Render screens
   const container = document.getElementById('screens-list');
@@ -399,6 +415,26 @@ async function loadContent() {
       </div>`;
     }).join('');
   } catch(e) { grid.innerHTML = '<div class="empty" style="color:var(--danger);">'+e.message+'</div>'; }
+}
+
+async function loadEstimatedReach() {
+  try {
+    const d = await api('/venue-partners/' + _vpData.id + '/reach');
+    const card = document.getElementById('reach-card');
+    card.style.display = 'block';
+    if (d.estimated_plays_day == null) {
+      document.getElementById('reach-plays').textContent = '—';
+      document.getElementById('reach-meta').textContent = 'City not set — contact your account manager.';
+      return;
+    }
+    const plays = d.estimated_plays_day;
+    document.getElementById('reach-plays').textContent = '~' + plays.toLocaleString('en-IN') + ' plays/day';
+    const pct = d.free_time_per_screen_sec ? Math.round((d.free_time_per_screen_sec/54000)*100) : 0;
+    document.getElementById('reach-meta').textContent =
+      `${d.screen_count} screens · ${d.vp_count_in_city} venue partners in city · ${pct}% free airtime`;
+    // Show upsell if reach is low (< 500 plays/day)
+    document.getElementById('reach-upsell').style.display = plays < 500 ? 'block' : 'none';
+  } catch(e) { /* silently skip */ }
 }
 
 async function loadRevenue() {

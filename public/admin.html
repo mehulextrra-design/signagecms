@@ -898,8 +898,8 @@ textarea.form-input{resize:vertical;min-height:80px;}
           </select>
         </div>
         <div class="form-group">
-          <label class="form-label">City *</label>
-          <input type="text" id="vn-city" class="form-input" placeholder="Pune">
+          <label class="form-label">City * <span id="vn-city-cap-badge" style="display:none;font-size:10px;font-weight:600;padding:2px 7px;border-radius:10px;margin-left:6px;"></span></label>
+          <input type="text" id="vn-city" class="form-input" placeholder="Pune" oninput="checkVenueCityCap(this.value)">
         </div>
         <div class="form-group" style="grid-column:span 2;">
           <label class="form-label">Address</label>
@@ -913,13 +913,9 @@ textarea.form-input{resize:vertical;min-height:80px;}
           <label class="form-label">Contact Phone</label>
           <input type="text" id="vn-phone" class="form-input" placeholder="9876543210">
         </div>
-        <div class="form-group">
-          <label class="form-label">Ad Earnings Share %</label>
-          <input type="number" id="vn-revshare" class="form-input" placeholder="—" disabled style="opacity:0.45;cursor:not-allowed;background:var(--border);pointer-events:none;">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Filler Quota (min/day) <span style="color:var(--text3);font-weight:400;">default 60</span></label>
-          <input type="number" id="vn-filler-quota" class="form-input" value="60" min="0" max="1440" step="15" placeholder="60">
+        <div class="form-group" id="vn-reach-wrap" style="display:none;">
+          <label class="form-label">Estimated Reach</label>
+          <div id="vn-reach-display" style="padding:7px 10px;border:1.5px solid var(--border);border-radius:7px;background:var(--surface2);font-size:13px;color:var(--text2);">—</div>
         </div>
         <div class="form-group" id="vn-login-group">
           <label class="form-label">Login Email *</label>
@@ -1562,9 +1558,9 @@ function openVenueModal(id) {
   document.getElementById('vn-pass-group').style.display = isEdit ? 'none' : '';
   // clear fields
   ['vn-business','vn-city','vn-address','vn-contact','vn-phone','vn-email','vn-password'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('vn-revshare').value = 30;
-  document.getElementById('vn-filler-quota').value = 60;
   document.getElementById('vn-category').value = 'gym';
+  document.getElementById('vn-city-cap-badge').style.display='none';
+  document.getElementById('vn-reach-wrap').style.display='none';
 
   if (isEdit) {
     api('/venue-partners/'+id).then(v => {
@@ -1574,16 +1570,52 @@ function openVenueModal(id) {
       document.getElementById('vn-address').value = v.address || '';
       document.getElementById('vn-contact').value = v.contact_name || '';
       document.getElementById('vn-phone').value = v.contact_phone || '';
-      document.getElementById('vn-revshare').value = v.revenue_share_pct || 30;
-      document.getElementById('vn-filler-quota').value = Math.round((v.filler_quota_sec||3600)/60);
+      if (v.city) { checkVenueCityCap(v.city); loadVenueReach(id); }
     }).catch(e => showToast('Error: '+e.message,'error'));
   }
   document.getElementById('venue-modal').classList.remove('hidden');
 }
 
+let _vnCapTimer = null;
+async function checkVenueCityCap(city) {
+  const badge = document.getElementById('vn-city-cap-badge');
+  if (!city || city.length < 2) { badge.style.display='none'; return; }
+  clearTimeout(_vnCapTimer);
+  _vnCapTimer = setTimeout(async () => {
+    try {
+      const d = await api('/venue-partners/city-cap?city='+encodeURIComponent(city));
+      badge.style.display = 'inline';
+      if (d.at_cap) {
+        badge.textContent = `${d.count}/${d.cap} — FULL`;
+        badge.style.background = '#fee2e2'; badge.style.color = '#dc2626';
+      } else {
+        badge.textContent = `${d.count}/${d.cap} partners`;
+        badge.style.background = d.remaining <= 10 ? '#fef3c7' : 'var(--surface2)';
+        badge.style.color = d.remaining <= 10 ? '#d97706' : 'var(--text2)';
+      }
+    } catch(e) { badge.style.display='none'; }
+  }, 500);
+}
+
+async function loadVenueReach(id) {
+  try {
+    const d = await api('/venue-partners/'+id+'/reach');
+    const wrap = document.getElementById('vn-reach-wrap');
+    const disp = document.getElementById('vn-reach-display');
+    wrap.style.display = 'block';
+    if (d.estimated_plays_day == null) {
+      disp.innerHTML = '<span style="color:var(--text3);">— (no city set)</span>';
+    } else {
+      const plays = d.estimated_plays_day.toLocaleString('en-IN');
+      const pct = d.free_time_per_screen_sec ? Math.round((d.free_time_per_screen_sec/54000)*100) : 0;
+      disp.innerHTML = `<strong style="color:var(--primary);font-size:15px;">~${plays} plays/day</strong>
+        <span style="font-size:11px;color:var(--text2);margin-left:8px;">${d.screen_count} screens · ${d.vp_count_in_city} VPs in city · ${pct}% free airtime</span>`;
+    }
+  } catch(e) { document.getElementById('vn-reach-wrap').style.display='none'; }
+}
+
 async function saveVenuePartner() {
   const id = document.getElementById('venue-edit-id').value;
-  const fillerMins = parseInt(document.getElementById('vn-filler-quota').value) || 60;
   const body = {
     business_name: document.getElementById('vn-business').value.trim(),
     venue_category: document.getElementById('vn-category').value,
@@ -1591,7 +1623,6 @@ async function saveVenuePartner() {
     address: document.getElementById('vn-address').value.trim(),
     contact_name: document.getElementById('vn-contact').value.trim(),
     contact_phone: document.getElementById('vn-phone').value.trim(),
-    filler_quota_sec: fillerMins * 60,
   };
   if (!body.business_name) return showToast('Business name required','error');
 
@@ -1610,7 +1641,7 @@ async function saveVenuePartner() {
       document.getElementById('vn-cred-email').textContent = body.email;
       document.getElementById('vn-cred-pass').textContent = res.generated_password || '(password you set)';
       document.getElementById('vn-cred-box').style.display = 'block';
-      document.getElementById('vn-cred-box').innerHTML += '<div style="margin-top:8px;font-size:11px;color:#b45309;background:#fef3c7;border-radius:6px;padding:6px 10px;">? Account is PENDING — click Approve in the list to activate portal access.</div>';
+      document.getElementById('vn-cred-box').innerHTML += '<div style="margin-top:8px;font-size:11px;color:#b45309;background:#fef3c7;border-radius:6px;padding:6px 10px;">&#9432; Account is PENDING — click Approve in the list to activate portal access.</div>';
       document.getElementById('vn-save-btn').textContent = 'Done';
       document.getElementById('vn-save-btn').onclick = () => { closeModal('venue-modal'); loadVenues(); };
       showToast('Venue partner created — pending approval','success');
