@@ -1366,6 +1366,10 @@ textarea.form-input{resize:vertical;min-height:80px;}
           <span style="font-size:13px;color:var(--text2);">Enable audio on this screen <span style="color:var(--warning);font-size:11px;">(default: muted)</span></span>
         </label>
       </div>
+      <div class="form-group">
+        <label class="form-label">Registration PIN <span style="font-weight:400;color:var(--text2);font-size:12px;">(4–8 digits — APK must enter this to register)</span></label>
+        <input type="text" class="form-input" id="sc-pin" placeholder="Leave blank for no PIN" maxlength="8" inputmode="numeric" pattern="\d{4,8}">
+      </div>
       <input type="hidden" id="sc-id">
     </div>
     <div class="modal-footer">
@@ -3164,6 +3168,7 @@ async function openScreenModal(screen = null) {
   document.getElementById('sc-audio').checked = screen?.audio_enabled || false;
   document.getElementById('sc-venue-type').value = screen?.venue_type || 'Other';
   document.getElementById('sc-footfall').value = screen?.approx_footfall || 0;
+  document.getElementById('sc-pin').value = screen?.registration_pin || '';
   // Load venue partners into dropdown
   try {
     const vps = await api('/venue-partners');
@@ -3318,8 +3323,10 @@ async function saveScreen() {
     venue_type: document.getElementById('sc-venue-type').value,
     approx_footfall: parseInt(document.getElementById('sc-footfall').value) || 0,
     venue_partner_id: document.getElementById('sc-venue-partner').value || null,
+    registration_pin: document.getElementById('sc-pin').value.trim() || null,
   };
   if(!body.screen_code || !body.name) { showToast('Screen Code and Name required', 'error'); return; }
+  if(body.registration_pin && !/^\d{4,8}$/.test(body.registration_pin)) { showToast('PIN must be 4–8 digits', 'error'); return; }
   const btn = document.getElementById('sc-save-btn');
   btn.disabled = true; btn.textContent = 'Saving…';
   try {

@@ -50,7 +50,17 @@ app.use(helmet({
     }
   }
 }));
-app.use(cors({ origin: process.env.CMS_ORIGIN || '*', credentials: true }));
+const _allowedOrigins = (process.env.CMS_ORIGIN || '')
+  .split(',').map(o => o.trim()).filter(Boolean);
+app.use(cors({
+  origin: _allowedOrigins.length
+    ? (origin, cb) => {
+        if (!origin || _allowedOrigins.includes(origin)) return cb(null, true);
+        cb(new Error('CORS: origin not allowed'));
+      }
+    : '*',
+  credentials: true,
+}));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
@@ -101,9 +111,17 @@ app.use(express.static(path.join(__dirname, '../public'), {
 // Rate limiting
 const apiLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 200 });
 const authLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 20, message: { error: 'Too many attempts, try again later' } });
+// Stricter limiter for password login — 5 attempts per 15 min per IP
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, max: 5,
+  message: { error: 'Too many login attempts. 15 minutes baad try karo.' },
+  skipSuccessfulRequests: true,
+});
 
 app.use('/api/', apiLimiter);
 app.use('/api/auth/', authLimiter);
+app.use('/api/auth/login', loginLimiter);
+app.use('/api/auth/reset-password', loginLimiter);
 
 // Routes
 app.use('/api/auth', authRoutes);

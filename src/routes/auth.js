@@ -1,12 +1,15 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 const { body, validationResult } = require('express-validator');
 const { query } = require('../db');
 const { authenticate } = require('../middleware/auth');
 const { sendWhatsApp } = require('../services/whatsapp');
 const { sendNewUserAlertEmail, sendPasswordResetEmail } = require('../services/email');
 const { v4: uuidv4 } = require('uuid');
+
+const hashToken = t => crypto.createHash('sha256').update(t).digest('hex');
 
 const router = express.Router();
 const TPL_OTP = process.env.WA_TPL_OTP || 'signup_otp';
@@ -229,10 +232,11 @@ router.post('/forgot-password', [
     }
 
     const token = uuidv4();
+    const tokenHash = hashToken(token);
     const expires = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
     await query(
       `UPDATE users SET password_reset_token=$1, password_reset_expires=$2 WHERE id=$3`,
-      [token, expires, user.id]
+      [tokenHash, expires, user.id]
     );
 
     const APP_URL = process.env.APP_URL || 'https://extrravenue.com';
@@ -253,11 +257,12 @@ router.post('/reset-password', [
   if (!errors.isEmpty()) return res.status(400).json({ error: 'Token aur minimum 8 character ka password required hai' });
   try {
     const { token, new_password } = req.body;
+    const tokenHash = hashToken(token);
     const result = await query(
       `SELECT id, role FROM users
        WHERE password_reset_token = $1
          AND password_reset_expires > NOW()`,
-      [token]
+      [tokenHash]
     );
     if (!result.rows.length) {
       return res.status(400).json({ error: 'Reset link invalid ya expire ho gaya hai. Dobara try karo.' });

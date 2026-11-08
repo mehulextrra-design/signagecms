@@ -1,5 +1,7 @@
 const cron = require('node-cron');
+const crypto = require('crypto');
 const { query } = require('../db');
+const hashToken = t => crypto.createHash('sha256').update(t).digest('hex');
 const { sendWeeklyReports, sendExpiryReminderWA, sendCampaignCompletedWA, sendDailyPoPAllWA } = require('./whatsapp');
 const { sendDailyPoPReport, sendDailyPoPEmailAll, sendExpiryReminderEmail, sendCampaignCompletedEmail, sendPasswordExpiryReminderEmail, sendDbBackupEmail, sendDbBackupFailedEmail } = require('./email');
 const { v2: cloudinary } = require('cloudinary');
@@ -326,11 +328,12 @@ const startScheduler = () => {
       for (const u of users.rows) {
         try {
           const token = uuidv4();
+          const tokenHash = hashToken(token);
           const expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
           await query(
             `UPDATE users SET password_reset_token=$1, password_reset_expires=$2,
              password_expiry_notified_at=NOW() WHERE id=$3`,
-            [token, expires, u.id]
+            [tokenHash, expires, u.id]
           );
           const resetPage = u.role === 'venue_inspector' ? 'inspector.html'
             : ['admin', 'superadmin'].includes(u.role) ? 'admin.html' : 'venue.html';

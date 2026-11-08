@@ -136,14 +136,22 @@ router.get('/:id/availability', authenticate, async (req, res, next) => {
 
 // PUT /api/screens/:id
 router.put('/:id', authenticate, requireAdmin, async (req, res, next) => {
-  const { name, location, city, zone, latitude, longitude, price_per_day, daily_impressions, status, audio_enabled, venue_type, approx_footfall, venue_partner_id } = req.body;
+  const { name, location, city, zone, latitude, longitude, price_per_day, daily_impressions, status, audio_enabled, venue_type, approx_footfall, venue_partner_id, registration_pin } = req.body;
+  // PIN must be 4–8 digits if provided
+  if (registration_pin !== undefined && registration_pin !== null && registration_pin !== '') {
+    if (!/^\d{4,8}$/.test(String(registration_pin))) {
+      return res.status(400).json({ error: 'registration_pin must be 4–8 digits' });
+    }
+  }
   try {
+    const pinValue = (registration_pin !== undefined && registration_pin !== null && registration_pin !== '')
+      ? String(registration_pin) : null;
     const result = await query(
       `UPDATE screens SET name=$1, location=$2, city=$3, zone=$4, price_per_day=$5, daily_impressions=$6,
        status=$7, latitude=$8, longitude=$9, audio_enabled=$10, venue_type=$11, approx_footfall=$12,
-       venue_partner_id=$13, updated_at=NOW()
-       WHERE id = $14 RETURNING *`,
-      [name, location, city, zone, price_per_day, daily_impressions, status, latitude || null, longitude || null, audio_enabled || false, venue_type || 'Other', approx_footfall || 0, venue_partner_id || null, req.params.id]
+       venue_partner_id=$13, registration_pin=$14, updated_at=NOW()
+       WHERE id = $15 RETURNING *`,
+      [name, location, city, zone, price_per_day, daily_impressions, status, latitude || null, longitude || null, audio_enabled || false, venue_type || 'Other', approx_footfall || 0, venue_partner_id || null, pinValue, req.params.id]
     );
     if (!result.rows.length) return res.status(404).json({ error: 'Screen not found' });
     res.json(result.rows[0]);

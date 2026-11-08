@@ -10,7 +10,7 @@ const router = express.Router();
 
 // POST /api/player/register — first-time device registration
 router.post('/register', async (req, res, next) => {
-  const { screen_code, device_id, android_version, app_version } = req.body;
+  const { screen_code, device_id, android_version, app_version, registration_pin } = req.body;
   const jwt = require('jsonwebtoken');
   console.log(`[Register] attempt screen_code=${screen_code} device=${device_id||'none'}`);
   try {
@@ -20,6 +20,14 @@ router.post('/register', async (req, res, next) => {
       return res.status(404).json({ error: 'Screen not found' });
     }
     const screen = result.rows[0];
+
+    // If a registration PIN is set for this screen, the APK must supply it
+    if (screen.registration_pin) {
+      if (!registration_pin || String(registration_pin) !== String(screen.registration_pin)) {
+        console.log(`[Register] FAILED — wrong PIN for screen ${screen.screen_code}`);
+        return res.status(401).json({ error: 'Invalid registration PIN' });
+      }
+    }
 
     const token = jwt.sign(
       { screenId: screen.id, screenCode: screen.screen_code },
