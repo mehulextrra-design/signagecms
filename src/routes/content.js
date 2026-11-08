@@ -111,12 +111,12 @@ router.patch('/:id', authenticate, async (req, res, next) => {
   if (!content_tier) return res.status(400).json({ error: 'content_tier required' });
 
   try {
-    // Venue partners: only 1 active venue_own media at a time
-    if (req.user.role === 'venue_partner' && content_tier === 'venue_own') {
+    // Venue partners: only 1 active media per tier (venue_own OR venue_cross)
+    if (req.user.role === 'venue_partner' && ['venue_own', 'venue_cross'].includes(content_tier)) {
       const conflict = await query(
         `SELECT id, original_name, file_url FROM content
-         WHERE user_id = $1 AND content_tier = 'venue_own' AND status = 'active' AND id != $2`,
-        [req.user.id, req.params.id]
+         WHERE user_id = $1 AND content_tier = $3 AND status = 'active' AND id != $2`,
+        [req.user.id, req.params.id, content_tier]
       );
       if (conflict.rows.length) {
         return res.status(409).json({

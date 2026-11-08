@@ -181,15 +181,15 @@ body { font-family:'Inter',system-ui,sans-serif; background:var(--bg); color:var
     <div class="page-tabs">
       <button class="page-tab active" onclick="switchTab('overview')">Overview</button>
       <button class="page-tab" onclick="switchTab('content')">My Content</button>
-      <button class="page-tab" onclick="switchTab('revenue')">Revenue</button>
+      <button class="page-tab" onclick="switchTab('revenue')" style="display:none;">Revenue</button>
     </div>
 
     <!-- OVERVIEW TAB -->
     <div class="tab-panel active" id="tab-overview">
       <div class="stat-row" id="overview-stats">
         <div class="stat-box"><div class="stat-label">My Screens</div><div class="stat-val primary" id="ov-screens">—</div></div>
-        <div class="stat-box"><div class="stat-label">Revenue Earned</div><div class="stat-val primary" id="ov-revenue">—</div></div>
-        <div class="stat-box"><div class="stat-label">Pending Settlement</div><div class="stat-val" id="ov-pending">—</div></div>
+        <div class="stat-box" style="display:none;"><div class="stat-label">Revenue Earned</div><div class="stat-val primary" id="ov-revenue">—</div></div>
+        <div class="stat-box" style="display:none;"><div class="stat-label">Pending Settlement</div><div class="stat-val" id="ov-pending">—</div></div>
         <div class="stat-box"><div class="stat-label">My Content Files</div><div class="stat-val" id="ov-content">—</div></div>
       </div>
 
