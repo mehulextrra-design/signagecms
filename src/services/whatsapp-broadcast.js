@@ -314,8 +314,9 @@ async function sendMessage(sock, phone, mediaUrl, caption, contentType) {
 // ── Broadcast ───────────────────────────────────────────────────────────────
 
 async function sendWaBroadcast(campaignId) {
+  console.log(`[WA Broadcast] Starting for campaign ${campaignId}`);
   await ensureWaTables();
-  // Get campaign + user
+
   const campResult = await query(
     `SELECT c.id, c.user_id, c.title AS name, c.wa_broadcast_enabled,
             u.wa_enabled,
@@ -326,31 +327,29 @@ async function sendWaBroadcast(campaignId) {
      WHERE c.id = $1`,
     [campaignId]
   );
-  if (!campResult.rows.length) return;
+  if (!campResult.rows.length) { console.log(`[WA Broadcast] Campaign ${campaignId} not found`); return; }
 
   const camp = campResult.rows[0];
+  console.log(`[WA Broadcast] wa_enabled=${camp.wa_enabled} wa_broadcast_enabled=${camp.wa_broadcast_enabled} image_url=${camp.image_url} content_type=${camp.content_type}`);
 
-  // Guard: feature must be enabled for this user, and campaign opted-in
-  if (!camp.wa_enabled) return;
-  if (!camp.wa_broadcast_enabled) return;
-  if (!camp.image_url) { console.log(`[WA Broadcast] Campaign ${campaignId}: no image_url, skipping`); return; }
+  if (!camp.wa_enabled)          { console.log(`[WA Broadcast] SKIP: wa_enabled=false`); return; }
+  if (!camp.wa_broadcast_enabled){ console.log(`[WA Broadcast] SKIP: wa_broadcast_enabled=false`); return; }
+  if (!camp.image_url)           { console.log(`[WA Broadcast] SKIP: no image_url`); return; }
 
   const userId = camp.user_id;
-
-  // Guard: active session required
   const { status } = await getSessionStatus(userId);
-  if (status !== 'connected') return;
+  console.log(`[WA Broadcast] Session status: ${status}`);
+  if (status !== 'connected') { console.log(`[WA Broadcast] SKIP: session not connected`); return; }
 
-  // Load contacts
   const contactsResult = await query(
     `SELECT phone, name FROM wa_contacts WHERE user_id=$1 LIMIT $2`,
     [userId, BROADCAST_CONFIG.maxPerCampaign]
   );
-  if (!contactsResult.rows.length) return;
+  console.log(`[WA Broadcast] Contacts found: ${contactsResult.rows.length}`);
+  if (!contactsResult.rows.length) { console.log(`[WA Broadcast] SKIP: no contacts`); return; }
 
   const contacts = contactsResult.rows;
 
-  // Create broadcast record
   const broadcastResult = await query(
     `INSERT INTO wa_broadcasts (campaign_id, user_id, total_contacts, status, started_at)
      VALUES ($1, $2, $3, 'running', NOW())
@@ -361,7 +360,19 @@ async function sendWaBroadcast(campaignId) {
 
   const sock = await initSession(userId);
 
+  // Wait up to 8s for socket to be ready (sock.user is set only when open)
+  if (!sock.user) {
+    console.log(`[WA Broadcast] Socket not open yet, waiting up to 8s...`);
+    await new Promise(r => setTimeout(r, 8000));
+  }
+  if (!sock.user) {
+    console.log(`[WA Broadcast] Socket still not ready after wait, aborting`);
+    await query(`UPDATE wa_broadcasts SET status='failed', completed_at=NOW() WHERE id=$1`, [broadcastId]);
+    return;
+  }
+
   const caption = `🎉 ${camp.name}\n\n📍 ${camp.business_name || 'ExtrraVenue'}\n🔗 extrravenue.com`;
+  console.log(`[WA Broadcast] Sending to ${contacts.length} contacts, image: ${camp.image_url}`);
 
   let sent = 0, failed = 0;
 
@@ -369,29 +380,27 @@ async function sendWaBroadcast(campaignId) {
     try {
       await sendMessage(sock, contact.phone, camp.image_url, caption, camp.content_type);
       sent++;
+      console.log(`[WA Broadcast] Sent to ${contact.phone}`);
     } catch (err) {
-      console.error(`[WA Broadcast] Failed to send to ${contact.phone}:`, err.message);
-      // One retry
+      console.error(`[WA Broadcast] Failed (attempt 1) to ${contact.phone}:`, err.message);
       try {
         await new Promise(r => setTimeout(r, 2000));
         await sendMessage(sock, contact.phone, camp.image_url, caption, camp.content_type);
         sent++;
-      } catch (_) {
+        console.log(`[WA Broadcast] Retry OK: ${contact.phone}`);
+      } catch (err2) {
+        console.error(`[WA Broadcast] Failed (attempt 2) to ${contact.phone}:`, err2.message);
         failed++;
       }
     }
-
     await new Promise(r => setTimeout(r, BROADCAST_CONFIG.delayMs));
   }
 
   await query(
-    `UPDATE wa_broadcasts
-     SET sent_count=$2, failed_count=$3, status='done', completed_at=NOW()
-     WHERE id=$1`,
+    `UPDATE wa_broadcasts SET sent_count=$2, failed_count=$3, status='done', completed_at=NOW() WHERE id=$1`,
     [broadcastId, sent, failed]
   );
-
-  console.log(`[WA Broadcast] Campaign ${campaignId}: ${sent} sent, ${failed} failed`);
+  console.log(`[WA Broadcast] Done. Campaign ${campaignId}: ${sent} sent, ${failed} failed`);
 }
 
 // ── Restore sessions on startup ─────────────────────────────────────────────
