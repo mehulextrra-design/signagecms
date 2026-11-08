@@ -3705,76 +3705,62 @@ async function submitVpLeadForm(e){
 
 <!-- Venue Partner Lead Form Modal -->
 <style>
-#vp-lead-modal{display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.8);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:20px;}
+#vp-lead-modal{display:none;position:fixed;inset:0;z-index:9999;background:rgba(30,30,30,.55);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:20px;}
 #vp-lead-modal.vplf-open{display:flex;}
-.vplf-box{background:#0f0d0b;border:1px solid rgba(255,255,255,.1);border-radius:28px;width:100%;max-width:500px;overflow:hidden;font-family:'Libre Franklin',system-ui,sans-serif;box-shadow:0 32px 80px rgba(0,0,0,.7);}
-.vplf-banner{background:linear-gradient(135deg,#c94baa 0%,#7b68c8 55%,#2ca6d4 100%);padding:24px 28px 20px;position:relative;}
-.vplf-banner-tag{font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.65);margin-bottom:6px;}
-.vplf-banner-title{font-family:'Magra',sans-serif;font-size:22px;font-weight:700;color:#fff;line-height:1.2;}
-.vplf-banner-sub{font-size:12.5px;color:rgba(255,255,255,.65);margin-top:4px;}
-.vplf-banner-close{position:absolute;top:16px;right:16px;width:32px;height:32px;border-radius:50%;background:rgba(0,0,0,.25);border:none;cursor:pointer;color:#fff;font-size:18px;display:flex;align-items:center;justify-content:center;line-height:1;transition:background .15s;}
-.vplf-banner-close:hover{background:rgba(0,0,0,.45);}
-.vplf-body{padding:24px 28px 28px;display:flex;flex-direction:column;gap:14px;max-height:calc(90vh - 120px);overflow-y:auto;}
-.vplf-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-@media(max-width:460px){.vplf-row{grid-template-columns:1fr;}}
-.vplf-f{display:flex;flex-direction:column;gap:5px;}
-.vplf-f label{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.35);}
-.vplf-f input,.vplf-f select{padding:11px 14px;border-radius:10px;border:1.5px solid rgba(255,255,255,.1);background:#1c1916;color:#f2efe9;font-size:14px;font-family:inherit;outline:none;transition:border-color .15s,background .15s;width:100%;}
-.vplf-f input::placeholder{color:rgba(255,255,255,.2);}
-.vplf-f input:focus{border-color:#9b8de0;background:#221f1b;}
-.vplf-f select{cursor:pointer;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='rgba(255,255,255,0.35)' stroke-width='1.6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 13px center;}
-.vplf-f select:focus{border-color:#9b8de0;background:#221f1b;}
-.vplf-f select option{background:#1c1916;}
-.vplf-sep{height:1px;background:rgba(255,255,255,.07);margin:2px 0;}
-.vplf-err{color:#f87171;font-size:12px;min-height:1px;}
-.vplf-btn{background:linear-gradient(135deg,#c94baa,#7b68c8 55%,#2ca6d4);border:none;border-radius:12px;padding:14px;color:#fff;font-size:15px;font-weight:700;font-family:inherit;cursor:pointer;letter-spacing:.01em;transition:opacity .15s,transform .15s;}
-.vplf-btn:hover:not(:disabled){opacity:.88;transform:translateY(-1px);}
-.vplf-btn:disabled{opacity:.45;cursor:default;transform:none;}
-.vplf-fine{text-align:center;font-size:11px;color:rgba(255,255,255,.22);}
-/* success */
-.vplf-ok{display:none;flex-direction:column;align-items:center;text-align:center;padding:44px 28px 40px;gap:0;}
-.vplf-ok-ring{width:68px;height:68px;border-radius:50%;background:linear-gradient(135deg,#c94baa,#7b68c8);display:flex;align-items:center;justify-content:center;margin-bottom:20px;}
-.vplf-ok h3{font-family:'Magra',sans-serif;font-size:24px;font-weight:700;color:#f2efe9;margin-bottom:8px;}
-.vplf-ok p{font-size:14px;color:rgba(242,239,233,.5);line-height:1.65;margin-bottom:28px;}
-.vplf-ok button{background:transparent;color:rgba(242,239,233,.55);border:1.5px solid rgba(255,255,255,.12);border-radius:10px;padding:10px 26px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s;}
-.vplf-ok button:hover{background:rgba(255,255,255,.07);color:#f2efe9;}
+#vplf-card{background:#f2efe9;border-radius:24px;width:100%;max-width:500px;overflow:hidden;position:relative;font-family:'Libre Franklin',-apple-system,sans-serif;box-shadow:0 32px 80px rgba(30,30,30,.22),0 0 0 1px rgba(30,30,30,.08);}
+.vplf-head{background:linear-gradient(135deg,#c94baa 0%,#7b68c8 55%,#2ca6d4 100%);padding:26px 30px 22px;position:relative;}
+.vplf-head h2{font-family:'Magra',sans-serif;font-weight:700;font-size:22px;letter-spacing:-.02em;color:#fff;margin:0 0 4px;}
+.vplf-head p{margin:0;font-size:13px;color:rgba(255,255,255,.75);}
+.vplf-hclose{position:absolute;top:18px;right:20px;background:rgba(255,255,255,.18);border:none;color:#fff;font-size:18px;cursor:pointer;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:background .18s;line-height:1;}
+.vplf-hclose:hover{background:rgba(255,255,255,.32);}
+.vplf-body2{padding:26px 30px 28px;background:#f2efe9;}
+.vplf-row2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.vplf-fd{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;}
+.vplf-fd label{font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:rgba(30,30,30,.5);}
+.vplf-fd input,.vplf-fd select{background:#fff;border:1.5px solid rgba(30,30,30,.14);border-radius:12px;padding:11px 14px;font-size:14px;color:#1e1e1e;font-family:inherit;outline:none;transition:border-color .18s,box-shadow .18s;-webkit-appearance:none;width:100%;box-sizing:border-box;}
+.vplf-fd input::placeholder{color:rgba(30,30,30,.35);}
+.vplf-fd input:focus,.vplf-fd select:focus{border-color:#7b68c8;box-shadow:0 0 0 3px rgba(123,104,200,.14);}
+.vplf-fd select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%231e1e1e' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:36px;cursor:pointer;}
+.vplf-submit2{width:100%;padding:14px;margin-top:4px;background:linear-gradient(135deg,#c94baa 0%,#7b68c8 55%,#2ca6d4 100%);border:none;border-radius:14px;font-family:'Magra',sans-serif;font-size:15px;font-weight:700;color:#fff;cursor:pointer;transition:opacity .18s,transform .14s;}
+.vplf-submit2:hover:not(:disabled){opacity:.88;}
+.vplf-submit2:active{transform:scale(.98);}
+.vplf-submit2:disabled{background:rgba(30,30,30,.2);color:rgba(30,30,30,.4);cursor:default;}
+.vplf-fine2{text-align:center;font-size:11px;color:rgba(30,30,30,.35);margin-top:12px;}
+.vplf-errmsg{font-size:12px;color:#c0392b;min-height:14px;margin-bottom:4px;}
+#vplf-success{display:none;flex-direction:column;align-items:center;text-align:center;padding:48px 30px 44px;background:#f2efe9;}
+.vplf-ok-ring{width:68px;height:68px;border-radius:50%;background:linear-gradient(135deg,#c94baa,#7b68c8);display:flex;align-items:center;justify-content:center;margin-bottom:18px;}
+#vplf-success h3{font-family:'Magra',sans-serif;font-size:24px;font-weight:700;color:#1e1e1e;margin-bottom:8px;}
+#vplf-success p{font-size:14px;color:rgba(30,30,30,.55);line-height:1.65;margin-bottom:28px;}
+#vplf-success button{background:transparent;color:rgba(30,30,30,.55);border:1.5px solid rgba(30,30,30,.2);border-radius:10px;padding:10px 28px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s;}
+#vplf-success button:hover{background:rgba(30,30,30,.06);color:#1e1e1e;}
+@media(max-width:540px){
+  #vp-lead-modal{align-items:flex-end;padding:0;}
+  #vplf-card{border-radius:20px 20px 0 0;max-height:94dvh;overflow-y:auto;}
+  .vplf-row2{grid-template-columns:1fr;}
+  .vplf-head{padding:22px 22px 18px;}
+  .vplf-body2{padding:22px 22px 32px;}
+}
 </style>
 <div id="vp-lead-modal">
-  <div class="vplf-box">
-    <!-- Gradient banner header -->
-    <div class="vplf-banner">
-      <div class="vplf-banner-tag">Venue Partner Program</div>
-      <div class="vplf-banner-title">Apni Interest Register Karo</div>
-      <div class="vplf-banner-sub">Hamari team 24 ghante mein call ya WhatsApp karegi.</div>
-      <button class="vplf-banner-close" onclick="closeVpLeadForm()" aria-label="Close">&times;</button>
+  <div id="vplf-card">
+    <div class="vplf-head">
+      <h2>Venue Partner Inquiry</h2>
+      <p>Hamari team 24 ghante mein call ya WhatsApp karegi.</p>
+      <button class="vplf-hclose" onclick="closeVpLeadForm()" aria-label="Close">&times;</button>
     </div>
-
-    <!-- Form -->
-    <form id="vp-lead-form" class="vplf-body" onsubmit="submitVpLeadForm(event)">
-      <div class="vplf-row">
-        <div class="vplf-f">
-          <label>Business Name *</label>
-          <input id="vpl-biz" required placeholder="e.g. Fit Life Gym">
-        </div>
-        <div class="vplf-f">
-          <label>Owner / Manager</label>
-          <input id="vpl-name" placeholder="Aapka naam">
-        </div>
+    <form id="vp-lead-form" class="vplf-body2" onsubmit="submitVpLeadForm(event)">
+      <div class="vplf-row2">
+        <div class="vplf-fd"><label>Business Name *</label><input id="vpl-biz" required placeholder="e.g. Fit Life Gym"></div>
+        <div class="vplf-fd"><label>Owner / Manager</label><input id="vpl-name" placeholder="Aapka naam"></div>
       </div>
-      <div class="vplf-row">
-        <div class="vplf-f">
-          <label>WhatsApp Number *</label>
-          <input id="vpl-phone" required type="tel" placeholder="98XXXXXXXX">
-        </div>
-        <div class="vplf-f">
-          <label>City</label>
-          <input id="vpl-city" placeholder="Ahmedabad">
-        </div>
+      <div class="vplf-row2">
+        <div class="vplf-fd"><label>WhatsApp Number *</label><input id="vpl-phone" required type="tel" placeholder="+91 98765 43210"></div>
+        <div class="vplf-fd"><label>City</label><input id="vpl-city" placeholder="Ahmedabad"></div>
       </div>
-      <div class="vplf-f">
+      <div class="vplf-fd">
         <label>Venue Type</label>
         <select id="vpl-cat">
-          <option value="other">Select venue type…</option>
+          <option value="other">Select venue type&#8230;</option>
           <option value="gym">Gym / Fitness Center</option>
           <option value="restaurant">Restaurant / Cafe / Dhaba</option>
           <option value="salon">Salon / Spa / Parlour</option>
@@ -3784,18 +3770,14 @@ async function submitVpLeadForm(e){
           <option value="office">Office / Co-working Space</option>
           <option value="hotel">Hotel / Guest House</option>
           <option value="education">Education / Coaching Centre</option>
-          <option value="other">Other</option>
         </select>
       </div>
-      <div class="vplf-row">
-        <div class="vplf-f">
-          <label>Daily Footfall (approx)</label>
-          <input id="vpl-footfall" type="number" min="1" placeholder="e.g. 200 visitors">
-        </div>
-        <div class="vplf-f">
+      <div class="vplf-row2">
+        <div class="vplf-fd"><label>Daily Footfall (approx)</label><input id="vpl-footfall" type="number" min="1" placeholder="e.g. 200"></div>
+        <div class="vplf-fd">
           <label>Screens You Have</label>
           <select id="vpl-screens">
-            <option value="0">No screen – ExtrraVenue lagaega</option>
+            <option value="0">No screen &#8211; ExtrraVenue lagaega</option>
             <option value="1">1 screen</option>
             <option value="2">2 screens</option>
             <option value="3">3 screens</option>
@@ -3803,19 +3785,14 @@ async function submitVpLeadForm(e){
           </select>
         </div>
       </div>
-      <div class="vplf-sep"></div>
-      <div class="vplf-err" id="vp-lead-err"></div>
-      <button class="vplf-btn" id="vp-lead-submit" type="submit">Submit Karo &rarr;</button>
-      <div class="vplf-fine">Koi fees nahi &nbsp;&bull;&nbsp; Koi contract nahi &nbsp;&bull;&nbsp; Kabhi bhi exit</div>
+      <div class="vplf-errmsg" id="vp-lead-err"></div>
+      <button class="vplf-submit2" id="vp-lead-submit" type="submit">Submit Karo &#8594;</button>
+      <div class="vplf-fine2">Koi fees nahi &nbsp;&bull;&nbsp; Koi contract nahi &nbsp;&bull;&nbsp; Kabhi bhi exit</div>
     </form>
-
-    <!-- Success -->
-    <div class="vplf-ok" id="vp-lead-success">
-      <div class="vplf-ok-ring">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-      </div>
+    <div id="vplf-success">
+      <div class="vplf-ok-ring"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
       <h3>Registered!</h3>
-      <p>Hamari team aapko <strong style="color:rgba(242,239,233,.85);">24 ghante</strong> mein<br>WhatsApp ya call karegi. Thank you!</p>
+      <p>Hamari team aapko <strong>24 ghante</strong> mein<br>WhatsApp ya call karegi. Thank you!</p>
       <button onclick="closeVpLeadForm()">Close</button>
     </div>
   </div>
