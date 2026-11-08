@@ -291,6 +291,7 @@ body {
     <div class="page-tabs">
       <button class="page-tab active" id="tab-btn-overview" onclick="switchTab('overview')">My Screen</button>
       <button class="page-tab" id="tab-btn-content" onclick="switchTab('content')">My Content</button>
+      <button class="page-tab" id="tab-btn-pop" onclick="switchTab('pop')">Proof of Play</button>
       <button class="page-tab" id="tab-btn-agreement" onclick="switchTab('agreement')">Agreement</button>
     </div>
 
@@ -351,6 +352,35 @@ body {
 
       <div class="card-title" style="margin-bottom:8px;">All My Content</div>
       <div id="content-grid" class="content-grid"><div class="empty">Loading…</div></div>
+    </div>
+
+    <!-- PROOF OF PLAY TAB -->
+    <div class="tab-panel" id="tab-pop">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:16px;">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+          <input type="date" id="pop-start" class="form-input" style="width:140px;font-size:13px;" onchange="loadPoP()">
+          <span style="color:var(--text3);font-size:13px;">to</span>
+          <input type="date" id="pop-end" class="form-input" style="width:140px;font-size:13px;" onchange="loadPoP()">
+        </div>
+        <button onclick="downloadPoP()" class="btn btn-outline btn-sm" style="font-size:13px;">↓ CSV Download</button>
+      </div>
+      <div id="pop-summary" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px;"></div>
+      <div class="card" style="padding:0;overflow:hidden;">
+        <table style="width:100%;border-collapse:collapse;font-size:13px;">
+          <thead>
+            <tr style="background:var(--bg2,var(--bg));border-bottom:1px solid var(--border);">
+              <th style="padding:10px 12px;text-align:left;font-weight:600;color:var(--text2);">Content</th>
+              <th style="padding:10px 12px;text-align:left;font-weight:600;color:var(--text2);">Screen</th>
+              <th style="padding:10px 12px;text-align:left;font-weight:600;color:var(--text2);">Type</th>
+              <th style="padding:10px 12px;text-align:right;font-weight:600;color:var(--text2);">Plays</th>
+              <th style="padding:10px 12px;text-align:left;font-weight:600;color:var(--text2);">Date & Time</th>
+            </tr>
+          </thead>
+          <tbody id="pop-tbody">
+            <tr><td colspan="5" style="text-align:center;color:var(--text3);padding:40px;">Date range select karke plays dekho</td></tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
     <!-- AGREEMENT TAB -->
@@ -468,10 +498,11 @@ async function initApp(user) {
 
 // ── TABS ──────────────────────────────────────────────────────────
 function switchTab(name) {
-  ['overview','content','agreement'].forEach(n => {
+  ['overview','content','pop','agreement'].forEach(n => {
     document.getElementById('tab-'+n).classList.toggle('active', n===name);
     document.getElementById('tab-btn-'+n).classList.toggle('active', n===name);
   });
+  if (name === 'pop') loadPoP();
 }
 
 // ── OVERVIEW ──────────────────────────────────────────────────────
@@ -640,6 +671,86 @@ function olmCancel() {
   document.getElementById('one-limit-overlay').style.display = 'none';
   if (_olmNewContentId) fetch('/api/content/'+_olmNewContentId,{method:'DELETE',headers:{'Authorization':'Bearer '+_token}}).catch(()=>{});
   _olmNewContentId=null; _olmNewTier=null;
+}
+
+// ── PROOF OF PLAY ─────────────────────────────────────────────────
+async function loadPoP() {
+  if (!_vpData) return;
+  const tbody = document.getElementById('pop-tbody');
+  const summary = document.getElementById('pop-summary');
+  tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text3);padding:32px;">Loading…</td></tr>';
+
+  // Default date range: last 30 days
+  const startEl = document.getElementById('pop-start');
+  const endEl   = document.getElementById('pop-end');
+  if (!startEl.value) {
+    const d = new Date(); d.setDate(d.getDate() - 29);
+    startEl.value = d.toISOString().slice(0,10);
+  }
+  if (!endEl.value) endEl.value = new Date().toISOString().slice(0,10);
+
+  try {
+    const qs = `?start=${startEl.value}&end=${endEl.value}`;
+    const data = await api('/venue-partners/' + _vpData.id + '/pop' + qs);
+    const rows = data.rows || [];
+
+    // Summary cards
+    const totalPlays = data.total_plays || 0;
+    const ownPlays  = rows.filter(r => r.content_tier === 'venue_own').reduce((s,r) => s + (parseInt(r.play_count)||1), 0);
+    const crossPlays = rows.filter(r => r.content_tier === 'venue_cross').reduce((s,r) => s + (parseInt(r.play_count)||1), 0);
+    const uniqueScreens = [...new Set(rows.map(r => r.screen_id))].length;
+    summary.innerHTML = [
+      ['Total Plays', totalPlays, '#7b68c8'],
+      ['Own Screen', ownPlays, '#16a34a'],
+      ['City-wide', crossPlays, '#d97706'],
+    ].map(([label, val, color]) => `
+      <div style="background:var(--card-bg,#fff);border:1px solid var(--border);border-radius:10px;padding:14px 16px;">
+        <div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;">${label}</div>
+        <div style="font-size:26px;font-weight:700;color:${color};">${val.toLocaleString('en-IN')}</div>
+      </div>`).join('');
+
+    if (!rows.length) {
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text3);padding:40px;">Is date range mein koi plays nahi hue</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = rows.map(r => {
+      const tierBadge = r.content_tier === 'venue_cross'
+        ? `<span style="background:#fef3c7;color:#b45309;border-radius:4px;padding:1px 6px;font-size:11px;font-weight:600;">City-wide</span>`
+        : `<span style="background:#ede9fe;color:#7b68c8;border-radius:4px;padding:1px 6px;font-size:11px;font-weight:600;">Own Screen</span>`;
+      const dt = r.played_at ? new Date(r.played_at) : null;
+      const dtStr = dt ? dt.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}) + ' ' + dt.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}) : '—';
+      return `<tr style="border-bottom:1px solid var(--border);">
+        <td style="padding:10px 12px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${esc(r.content_name||'')}">${esc(r.content_name||'—')}</td>
+        <td style="padding:10px 12px;color:var(--text2);">${esc(r.screen_name||r.screen_code||'—')}<br><span style="font-size:11px;color:var(--text3);">${esc(r.screen_city||'')}</span></td>
+        <td style="padding:10px 12px;">${tierBadge}</td>
+        <td style="padding:10px 12px;text-align:right;font-weight:600;color:var(--primary);">${(parseInt(r.play_count)||1).toLocaleString('en-IN')}</td>
+        <td style="padding:10px 12px;color:var(--text2);font-size:12px;">${dtStr}</td>
+      </tr>`;
+    }).join('');
+  } catch(e) {
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--danger);padding:32px;">${esc(e.message)}</td></tr>`;
+  }
+}
+
+async function downloadPoP() {
+  if (!_vpData) return;
+  const startEl = document.getElementById('pop-start');
+  const endEl   = document.getElementById('pop-end');
+  const qs = `?format=csv&start=${startEl.value||''}&end=${endEl.value||''}`;
+  try {
+    const resp = await fetch('/api/venue-partners/' + _vpData.id + '/pop' + qs, {
+      headers: { 'Authorization': 'Bearer ' + _token }
+    });
+    if (!resp.ok) throw new Error('Download failed');
+    const blob = await resp.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'venue-pop-' + new Date().toISOString().slice(0,10) + '.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+  } catch(e) { showToast('Download failed: ' + e.message, 'error'); }
 }
 
 // ── AGREEMENT ─────────────────────────────────────────────────────

@@ -299,4 +299,57 @@ router.get('/:id/content', authenticate, async (req, res, next) => {
   } catch (err) { next(err); }
 });
 
+// ── PROOF OF PLAY for venue partner ──────────────────────────────────────────
+router.get('/:id/pop', authenticate, async (req, res, next) => {
+  if (!['admin','superadmin'].includes(req.user.role) && req.user.venue_partner_id !== req.params.id) {
+    return res.status(403).json({ error: 'Access denied' });
+  }
+  try {
+    const vp = await query('SELECT user_id FROM venue_partners WHERE id = $1', [req.params.id]);
+    if (!vp.rows.length) return res.status(404).json({ error: 'Not found' });
+
+    const { start, end, format } = req.query;
+    const params = [vp.rows[0].user_id];
+    let dateCond = '';
+    if (start) { params.push(start); dateCond += ` AND pl.played_at >= $${params.length}::date`; }
+    if (end)   { params.push(end);   dateCond += ` AND pl.played_at < ($${params.length}::date + interval '1 day')`; }
+
+    // Plays of venue partner's own content (venue_own + venue_cross)
+    const result = await query(
+      `SELECT pl.id, pl.screen_id, pl.content_id, pl.played_at, pl.play_count,
+              pl.duration_sec, pl.content_tier,
+              s.screen_code, s.name AS screen_name, s.city AS screen_city,
+              ct.original_name AS content_name, ct.type AS content_type, ct.file_url
+       FROM play_logs pl
+       JOIN content ct ON ct.id = pl.content_id
+       JOIN screens s ON s.id = pl.screen_id
+       WHERE ct.user_id = $1
+         AND pl.content_tier IN ('venue_own','venue_cross')
+         ${dateCond}
+       ORDER BY pl.played_at DESC
+       LIMIT 2000`,
+      params
+    );
+
+    const rows = result.rows;
+    const totalPlays = rows.reduce((s, r) => s + (parseInt(r.play_count) || 1), 0);
+
+    if (format === 'csv') {
+      const headers = ['Screen Code','Screen Name','City','Content','Type','Tier','Played At','Duration (s)','Play Count'];
+      const csvRows = rows.map(r => [
+        r.screen_code||'', r.screen_name||'', r.screen_city||'',
+        r.content_name||'', r.content_type||'', r.content_tier||'',
+        r.played_at ? new Date(r.played_at).toISOString() : '',
+        r.duration_sec||'', r.play_count||1,
+      ].map(v => `"${String(v).replace(/"/g,'""')}"`).join(','));
+      const csv = [headers.join(','), ...csvRows].join('\r\n');
+      res.setHeader('Content-Type', 'text/csv');
+      res.setHeader('Content-Disposition', `attachment; filename="venue-pop-${new Date().toISOString().slice(0,10)}.csv"`);
+      return res.send(csv);
+    }
+
+    res.json({ rows, total_plays: totalPlays, total_records: rows.length });
+  } catch (err) { next(err); }
+});
+
 module.exports = router;
