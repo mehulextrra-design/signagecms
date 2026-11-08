@@ -337,12 +337,16 @@ app.get('/health', (req, res) => {
 });
 
 // 404
-app.use((req, res) => res.status(404).json({ error: 'Route not found' }));
+app.use((req, res) => {
+  if (req.accepts('html')) return res.status(404).sendFile(path.join(__dirname, '../public/error.html'));
+  res.status(404).json({ error: 'Route not found' });
+});
 
 // Global error handler
 app.use((err, req, res, next) => {
   console.error('[ERROR]', err.stack);
   const status = err.status || 500;
+  if (req.accepts('html')) return res.status(status).sendFile(path.join(__dirname, '../public/error.html'));
   res.status(status).json({ error: err.message || 'Internal server error' });
 });
 
@@ -475,6 +479,14 @@ async function runMigrations() {
     await pool.end();
   }
 }
+
+// Keep process alive on unhandled errors — log and continue instead of crashing
+process.on('uncaughtException', (err) => {
+  console.error('[UNCAUGHT EXCEPTION]', err.stack || err.message);
+});
+process.on('unhandledRejection', (reason) => {
+  console.error('[UNHANDLED REJECTION]', reason);
+});
 
 const PORT = process.env.PORT || 3000;
 runMigrations().then(() => {
