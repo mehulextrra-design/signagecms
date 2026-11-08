@@ -163,7 +163,7 @@ router.post('/login', [
   const { email, password } = req.body;
   try {
     const result = await query(
-      'SELECT id, email, role, password_hash, is_active, first_name, business_name FROM users WHERE email = $1',
+      'SELECT id, email, role, password_hash, is_active, first_name, business_name, venue_partner_id FROM users WHERE email = $1',
       [email]
     );
     const user = result.rows[0];
@@ -174,7 +174,7 @@ router.post('/login', [
     if (!valid) return res.status(401).json({ error: 'Invalid credentials' });
 
     const token = generateToken(user.id, user.role);
-    res.json({ token, user: { id: user.id, email: user.email, role: user.role, name: user.first_name, business_name: user.business_name } });
+    res.json({ token, user: { id: user.id, email: user.email, role: user.role, name: user.first_name, business_name: user.business_name, venue_partner_id: user.venue_partner_id } });
   } catch (err) { next(err); }
 });
 
