@@ -93,10 +93,13 @@ app.get('/', (req, res, next) => {
   next();
 });
 
-// /cms → Advertiser portal (works on all domains)
-app.get('/cms', (req, res) => {
-  res.sendFile(path.join(__dirname, '../public/index.html'));
+// /signagecms.html → Advertiser portal (canonical URL)
+app.get('/signagecms.html', (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/signagecms.html'));
 });
+// Legacy redirects → /signagecms.html
+app.get('/cms', (req, res) => res.redirect(301, '/signagecms.html'));
+app.get('/index.html', (req, res) => res.redirect(301, '/signagecms.html'));
 
 // CMS frontend — HTML files never cached, assets cached 1 day
 app.use(express.static(path.join(__dirname, '../public'), {
