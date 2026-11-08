@@ -5,10 +5,10 @@ const { sendWeeklyReports, sendReportForUser, buildWeeklyReport } = require('../
 
 const router = express.Router();
 
-// GET /api/reports/proof-of-play?campaign_id=&screen_id=&user_id=&start=&end=&format=csv
+// GET /api/reports/proof-of-play?campaign_id=&screen_id=&user_id=&venue_partner_id=&tier=&start=&end=&format=csv
 router.get('/proof-of-play', authenticate, async (req, res, next) => {
   try {
-    const { campaign_id, screen_id, user_id, start, end, format } = req.query;
+    const { campaign_id, screen_id, user_id, venue_partner_id, tier, start, end, format } = req.query;
     const isAdmin = ['admin', 'superadmin'].includes(req.user.role);
     let sql = `
       SELECT pl.id, pl.screen_id, pl.campaign_id, pl.content_id,
@@ -20,11 +20,17 @@ router.get('/proof-of-play', authenticate, async (req, res, next) => {
              COALESCE(pl.source,'apk') AS source,
              s.screen_code, s.name AS screen_name, s.city AS screen_city,
              c.title AS campaign_title, c.campaign_code, c.slot_duration_sec,
-             u.first_name AS advertiser_name, u.email AS user_email
+             u.first_name AS advertiser_name, u.email AS user_email,
+             ct.original_name AS content_name,
+             vp.id AS venue_partner_id, vp.business_name AS venue_business_name,
+             vp.contact_name AS venue_contact_name
       FROM play_logs pl
       LEFT JOIN screens s ON s.id = pl.screen_id
       LEFT JOIN campaigns c ON c.id = pl.campaign_id
       LEFT JOIN users u ON u.id = c.user_id
+      LEFT JOIN content ct ON ct.id = pl.content_id AND pl.content_tier IN ('venue_own','venue_cross','filler')
+      LEFT JOIN users vpu ON vpu.id = ct.user_id
+      LEFT JOIN venue_partners vp ON vp.id = vpu.venue_partner_id
       WHERE 1=1
     `;
     const params = [];
@@ -32,9 +38,11 @@ router.get('/proof-of-play', authenticate, async (req, res, next) => {
       params.push(req.user.id);
       sql += ` AND c.user_id = $${params.length}`;
     }
-    if (campaign_id) { params.push(campaign_id); sql += ` AND pl.campaign_id = $${params.length}`; }
-    if (screen_id)   { params.push(screen_id);   sql += ` AND pl.screen_id = $${params.length}`; }
-    if (user_id)     { params.push(user_id);      sql += ` AND c.user_id = $${params.length}`; }
+    if (campaign_id)      { params.push(campaign_id);      sql += ` AND pl.campaign_id = $${params.length}`; }
+    if (screen_id)        { params.push(screen_id);        sql += ` AND pl.screen_id = $${params.length}`; }
+    if (user_id)          { params.push(user_id);          sql += ` AND c.user_id = $${params.length}`; }
+    if (venue_partner_id) { params.push(venue_partner_id); sql += ` AND vp.id = $${params.length}`; }
+    if (tier)             { params.push(tier);             sql += ` AND pl.content_tier = $${params.length}`; }
     if (start) { params.push(start); sql += ` AND pl.played_at >= $${params.length}::date`; }
     if (end)   { params.push(end);   sql += ` AND pl.played_at < ($${params.length}::date + interval '1 day')`; }
     sql += ' ORDER BY pl.played_at DESC LIMIT 5000';
@@ -49,14 +57,19 @@ router.get('/proof-of-play', authenticate, async (req, res, next) => {
 
     // CSV export
     if (format === 'csv') {
-      const headers = ['Play ID','Screen Code','Screen Name','City','Advertiser','Campaign','Campaign Code','Played At','Played Until','Duration (s)','Play Count','Tier'];
-      const csvRows = rows.map(r => [
-        r.id, r.screen_code||'', r.screen_name||'', r.screen_city||'',
-        r.advertiser_name||r.user_email||'', r.campaign_title||'', r.campaign_code||'',
-        r.played_at ? new Date(r.played_at).toISOString() : '',
-        r.played_until ? new Date(r.played_until).toISOString() : '',
-        r.duration_sec||'', r.play_count||1, r.content_tier||'paid',
-      ].map(v => `"${String(v).replace(/"/g,'""')}"`).join(','));
+      const headers = ['Play ID','Screen Code','Screen Name','City','Advertiser / Venue','Campaign / Content','Campaign Code','Played At','Played Until','Duration (s)','Play Count','Tier'];
+      const csvRows = rows.map(r => {
+        const isVenue = ['venue_own','venue_cross'].includes(r.content_tier);
+        return [
+          r.id, r.screen_code||'', r.screen_name||'', r.screen_city||'',
+          isVenue ? (r.venue_business_name||r.venue_contact_name||'') : (r.advertiser_name||r.user_email||''),
+          isVenue ? (r.content_name||'') : (r.campaign_title||''),
+          r.campaign_code||'',
+          r.played_at ? new Date(r.played_at).toISOString() : '',
+          r.played_until ? new Date(r.played_until).toISOString() : '',
+          r.duration_sec||'', r.play_count||1, r.content_tier||'paid',
+        ].map(v => `"${String(v).replace(/"/g,'""')}"`).join(',');
+      });
       const csv = [headers.join(','), ...csvRows].join('\r\n');
       res.setHeader('Content-Type', 'text/csv');
       res.setHeader('Content-Disposition', `attachment; filename="proof-of-play-${new Date().toISOString().slice(0,10)}.csv"`);

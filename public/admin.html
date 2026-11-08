@@ -751,6 +751,20 @@ textarea.form-input{resize:vertical;min-height:80px;}
               <div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em;">Advertiser</div>
               <select id="pop-user" class="form-input" style="width:100%;"><option value="">All Advertisers</option></select>
             </div>
+            <div style="flex:1;min-width:150px;">
+              <div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em;">Venue Partner</div>
+              <select id="pop-venue-partner" class="form-input" style="width:100%;"><option value="">All Venues</option></select>
+            </div>
+            <div style="flex:1;min-width:130px;">
+              <div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em;">Tier</div>
+              <select id="pop-tier" class="form-input" style="width:100%;">
+                <option value="">All Tiers</option>
+                <option value="paid">Paid</option>
+                <option value="venue_own">Venue Own</option>
+                <option value="venue_cross">City-wide</option>
+                <option value="filler">Filler</option>
+              </select>
+            </div>
             <button class="btn btn-primary" onclick="loadPop()" style="flex-shrink:0;margin-top:18px;">Apply Filter</button>
             <button class="btn btn-ghost" onclick="resetPopFilters()" style="flex-shrink:0;margin-top:18px;">Clear</button>
           </div>
@@ -3718,17 +3732,21 @@ async function loadPop() {
     endEl.value = new Date().toISOString().slice(0,10);
   }
 
-  const start      = startEl.value;
-  const end        = endEl.value;
-  const screenId   = document.getElementById('pop-screen').value;
-  const campaignId = document.getElementById('pop-campaign').value;
-  const userId     = document.getElementById('pop-user').value;
+  const start           = startEl.value;
+  const end             = endEl.value;
+  const screenId        = document.getElementById('pop-screen').value;
+  const campaignId      = document.getElementById('pop-campaign').value;
+  const userId          = document.getElementById('pop-user').value;
+  const venuePartnerId  = document.getElementById('pop-venue-partner').value;
+  const tier            = document.getElementById('pop-tier').value;
   const params = new URLSearchParams();
-  if(start)      params.set('start', start);
-  if(end)        params.set('end', end);
-  if(screenId)   params.set('screen_id', screenId);
-  if(campaignId) params.set('campaign_id', campaignId);
-  if(userId)     params.set('user_id', userId);
+  if(start)           params.set('start', start);
+  if(end)             params.set('end', end);
+  if(screenId)        params.set('screen_id', screenId);
+  if(campaignId)      params.set('campaign_id', campaignId);
+  if(userId)          params.set('user_id', userId);
+  if(venuePartnerId)  params.set('venue_partner_id', venuePartnerId);
+  if(tier)            params.set('tier', tier);
   popLastParams = params;
 
   try {
@@ -3769,17 +3787,27 @@ async function loadPop() {
     }
 
     const tierColors = { paid:'var(--primary)', venue_own:'#ca8a04', venue_cross:'#2563EB', filler:'var(--text3)' };
-    tbody.innerHTML = arr.map(p => `
-      <tr>
+    const tierLabels = { paid:'Paid', venue_own:'Venue Own', venue_cross:'City-wide', filler:'Filler' };
+    tbody.innerHTML = arr.map(p => {
+      const isVenue = ['venue_own','venue_cross'].includes(p.content_tier);
+      const whoLabel = isVenue
+        ? (p.venue_business_name || p.venue_contact_name || '—')
+        : (p.advertiser_name || p.user_email || '—');
+      const whatLabel = isVenue
+        ? (p.content_name || '<span style="color:var(--text3);">—</span>')
+        : (p.campaign_title || '<span style="color:var(--text3);">—</span>');
+      const whatSub = isVenue ? '' : (p.campaign_code ? `<br><span style="font-size:10px;color:var(--text3);">${p.campaign_code}</span>` : '');
+      return `<tr>
         <td><code style="font-size:11px;background:var(--surface2);padding:2px 6px;border-radius:4px;">${p.screen_code||'—'}</code><br><span style="font-size:11px;color:var(--text3);">${p.screen_name||''}</span></td>
-        <td style="font-size:12px;color:var(--text2);">${p.advertiser_name||p.user_email||'—'}</td>
-        <td style="font-size:12px;">${p.campaign_title||'<span style="color:var(--text3);">—</span>'}<br><span style="font-size:10px;color:var(--text3);">${p.campaign_code||''}</span></td>
+        <td style="font-size:12px;color:var(--text2);">${whoLabel}</td>
+        <td style="font-size:12px;">${whatLabel}${whatSub}</td>
         <td style="font-size:12px;white-space:nowrap;">${fmtDateTime(p.played_at)}</td>
         <td style="font-size:12px;white-space:nowrap;color:var(--text2);">${p.played_until ? fmtDateTime(p.played_until) : '—'}</td>
         <td style="font-variant-numeric:tabular-nums;">${p.duration_sec||'—'}</td>
         <td style="font-variant-numeric:tabular-nums;font-weight:600;">${p.play_count||1}</td>
-        <td><span style="font-size:10px;font-weight:700;color:${tierColors[p.content_tier]||'var(--text2)'};">${(p.content_tier||'paid').replace('_',' ')}</span></td>
-      </tr>`).join('');
+        <td><span style="font-size:10px;font-weight:700;padding:2px 5px;border-radius:4px;background:${tierColors[p.content_tier]||'var(--text2)'}1a;color:${tierColors[p.content_tier]||'var(--text2)'};">${tierLabels[p.content_tier]||p.content_tier||'paid'}</span></td>
+      </tr>`;
+    }).join('');
   } catch(e) { tbody.innerHTML = emptyRow(8, 'Error: ' + e.message); }
 }
 
@@ -3808,10 +3836,11 @@ async function populatePopFilters() {
   if(popFiltersLoaded) return;
   popFiltersLoaded = true;
   try {
-    const [screens, campaigns, users] = await Promise.all([
+    const [screens, campaigns, users, venues] = await Promise.all([
       api('/screens').catch(()=>[]),
       api('/campaigns?limit=200').catch(()=>[]),
-      api('/users').catch(()=>[])
+      api('/users').catch(()=>[]),
+      api('/venue-partners').catch(()=>[])
     ]);
     const scrSel = document.getElementById('pop-screen');
     (Array.isArray(screens)?screens:(screens.screens||[])).forEach(s => {
@@ -3825,6 +3854,10 @@ async function populatePopFilters() {
     (Array.isArray(users)?users:[]).forEach(u => {
       usrSel.innerHTML += `<option value="${u.id}">${u.first_name||''} ${u.last_name||''} (${u.email})</option>`;
     });
+    const vpSel = document.getElementById('pop-venue-partner');
+    (Array.isArray(venues)?venues:[]).forEach(vp => {
+      vpSel.innerHTML += `<option value="${vp.id}">${vp.business_name||vp.contact_name||vp.id}</option>`;
+    });
   } catch(e) {}
 }
 
@@ -3834,6 +3867,8 @@ function resetPopFilters() {
   document.getElementById('pop-screen').value = '';
   document.getElementById('pop-campaign').value = '';
   document.getElementById('pop-user').value = '';
+  document.getElementById('pop-venue-partner').value = '';
+  document.getElementById('pop-tier').value = '';
   loadPop();
 }
 
