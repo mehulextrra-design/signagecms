@@ -16,7 +16,8 @@ data class RegisterRequest(
     @SerializedName("screen_code") val screenCode: String,
     @SerializedName("device_id") val deviceId: String,
     @SerializedName("android_version") val androidVersion: String,
-    @SerializedName("app_version") val appVersion: String
+    @SerializedName("app_version") val appVersion: String,
+    @SerializedName("registration_pin") val registrationPin: String? = null
 )
 
 data class RegisterResponse(

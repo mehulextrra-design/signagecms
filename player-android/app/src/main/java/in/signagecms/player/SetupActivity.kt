@@ -46,6 +46,8 @@ class SetupActivity : AppCompatActivity() {
             return
         }
 
+        val pin = binding.etPin.text.toString().trim().ifEmpty { null }
+
         setLoading(true)
         binding.tvError.visibility = View.GONE
 
@@ -61,7 +63,8 @@ class SetupActivity : AppCompatActivity() {
                         screenCode = screenCode,
                         deviceId = deviceId,
                         androidVersion = androidVer,
-                        appVersion = appVer
+                        appVersion = appVer,
+                        registrationPin = pin
                     )
                 )
 
@@ -77,6 +80,7 @@ class SetupActivity : AppCompatActivity() {
                 } else {
                     val code = response.code()
                     val msg = when (code) {
+                        401 -> "Invalid Registration PIN. Admin se PIN lo aur dobara enter karo."
                         404 -> "Screen code '${screenCode}' not found in Admin Panel.\nPlease add this screen first."
                         else -> "Registration failed (HTTP $code). Check your network."
                     }
