@@ -28,7 +28,7 @@
 body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.5;height:100vh;overflow:hidden;display:flex;flex-direction:column;}
 
 /* -- AUTH -- */
-#auth-overlay{position:fixed;inset:0;background:linear-gradient(135deg,#0d0a1f 0%,#1a1535 50%,#0d0a1f 100%);display:flex;align-items:center;justify-content:center;z-index:1000;}
+#auth-overlay{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:1000;overflow-y:auto;}
 #auth-overlay.hidden{display:none;}
 .auth-card{background:#fff;border-radius:var(--radius-lg);padding:36px 32px;width:100%;max-width:400px;box-shadow:var(--shadow-lg);}
 .auth-logo{display:flex;align-items:center;gap:10px;margin-bottom:28px;}
