@@ -1261,6 +1261,12 @@ textarea.form-input{resize:vertical;min-height:80px;}
         <div class="form-group"><label class="form-label">Latitude</label><input type="number" class="form-input" id="sc-lat" placeholder="19.0760" step="any"></div>
         <div class="form-group"><label class="form-label">Longitude</label><input type="number" class="form-input" id="sc-lng" placeholder="72.8777" step="any"></div>
       </div>
+      <div class="form-group">
+        <label class="form-label">Venue Partner (optional)</label>
+        <select class="form-select" id="sc-venue-partner">
+          <option value="">— No venue partner —</option>
+        </select>
+      </div>
       <div class="form-group" id="sc-status-group" style="display:none;">
         <label class="form-label">Status</label>
         <select class="form-select" id="sc-status"><option value="online">Online</option><option value="offline">Offline</option><option value="maintenance">Maintenance</option></select>
@@ -2831,7 +2837,7 @@ async function loadScreens() {
   } catch(e) { tbody.innerHTML = emptyRow(9, 'Error: ' + e.message); }
 }
 
-function openScreenModal(screen = null) {
+async function openScreenModal(screen = null) {
   document.getElementById('screen-modal-title').textContent = screen ? 'Edit Screen' : 'Add Screen';
   document.getElementById('sc-id').value = screen?.id || '';
   document.getElementById('sc-code').value = screen?.screen_code || '';
@@ -2851,6 +2857,19 @@ function openScreenModal(screen = null) {
   document.getElementById('sc-audio').checked = screen?.audio_enabled || false;
   document.getElementById('sc-venue-type').value = screen?.venue_type || 'Other';
   document.getElementById('sc-footfall').value = screen?.approx_footfall || 0;
+  // Load venue partners into dropdown
+  try {
+    const vps = await api('/venue-partners');
+    const sel = document.getElementById('sc-venue-partner');
+    sel.innerHTML = '<option value="">— No venue partner —</option>';
+    (vps.venue_partners || vps).forEach(vp => {
+      const opt = document.createElement('option');
+      opt.value = vp.id;
+      opt.textContent = `${vp.business_name} (${vp.city || '—'})`;
+      if (vp.id === screen?.venue_partner_id) opt.selected = true;
+      sel.appendChild(opt);
+    });
+  } catch(e) { /* dropdown stays with default option */ }
   document.getElementById('screen-modal').classList.remove('hidden');
 }
 
@@ -2991,6 +3010,7 @@ async function saveScreen() {
     audio_enabled: document.getElementById('sc-audio').checked,
     venue_type: document.getElementById('sc-venue-type').value,
     approx_footfall: parseInt(document.getElementById('sc-footfall').value) || 0,
+    venue_partner_id: document.getElementById('sc-venue-partner').value || null,
   };
   if(!body.screen_code || !body.name) { showToast('Screen Code and Name required', 'error'); return; }
   const btn = document.getElementById('sc-save-btn');
