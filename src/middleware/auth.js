@@ -9,7 +9,7 @@ const authenticate = async (req, res, next) => {
   const token = header.slice(7);
   try {
     const payload = jwt.verify(token, process.env.JWT_SECRET);
-    const result = await query('SELECT id, email, role, is_active FROM users WHERE id = $1', [payload.userId]);
+    const result = await query('SELECT id, email, role, is_active, venue_partner_id FROM users WHERE id = $1', [payload.userId]);
     if (!result.rows.length || !result.rows[0].is_active) {
       return res.status(401).json({ error: 'User not found or deactivated' });
     }
