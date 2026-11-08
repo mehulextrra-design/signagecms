@@ -118,22 +118,6 @@ router.get('/schedule', authenticatePlayer, async (req, res, next) => {
     // it doesn't double-play their content on their own screen.
     let crossItems = [];
     if (screenCity) {
-      // Debug: show ALL approved venue_cross content and their cities
-      const allCrossRes = await query(
-        `SELECT ct.id, ct.original_name, ct.status, ct.approval_status,
-                vp.id AS vp_id, vp.business_name, vp.city AS vp_city, vp.is_active,
-                LOWER(TRIM(vp.city)) AS vp_city_norm
-         FROM content ct
-         JOIN users u ON u.id = ct.user_id
-         JOIN venue_partners vp ON vp.id = u.venue_partner_id
-         WHERE ct.content_tier = 'venue_cross'`
-      ).catch(() => ({ rows: [] }));
-      console.log(`[CrossDebug] screen=${screenId} screenCity="${screenCity}" screenVP=${screen.venue_partner_id||'none'} allCrossContent=${allCrossRes.rows.length}`);
-      allCrossRes.rows.forEach(r => {
-        const cityMatch = r.vp_city_norm === screenCity;
-        console.log(`[CrossDebug]   content=${r.id} name="${r.original_name}" status=${r.status} approval=${r.approval_status} vpCity="${r.vp_city}" norm="${r.vp_city_norm}" isActive=${r.is_active} cityMatch=${cityMatch}`);
-      });
-
       const crossRes = await query(
         `SELECT ct.id AS content_id, ct.file_url, ct.type AS content_type,
                 ct.duration_sec, ct.original_name AS title,
@@ -151,9 +135,8 @@ router.get('/schedule', authenticatePlayer, async (req, res, next) => {
         [screen.venue_partner_id || null, screenCity]
       );
       crossItems = crossRes.rows;
-      console.log(`[CrossDebug] MATCHED crossItems=${crossItems.length}`);
     } else {
-      console.log(`[CrossDebug] screen=${screenId} SKIPPED — no screenCity (screen.city="${screen.city}" venue_city="${screen.venue_city}")`);
+      console.log(`[Player] screen=${screenId} no city set — skipping cross-network tier`);
     }
     const nCross = crossItems.length || 1;
 
