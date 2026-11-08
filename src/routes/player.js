@@ -113,8 +113,11 @@ router.get('/schedule', authenticatePlayer, async (req, res, next) => {
     const nPaid = paidItems.length || 1;  // avoid div/0
 
     // ── TIER 2: VENUE CROSS-NETWORK (same city, from other venue partners) ─
+    // Runs for any screen that has a city set (not just VP-assigned screens).
+    // If screen belongs to a VP, that VP's own cross content is excluded so
+    // it doesn't double-play their content on their own screen.
     let crossItems = [];
-    if (screen.venue_partner_id && screenCity) {
+    if (screenCity) {
       const crossRes = await query(
         `SELECT ct.id AS content_id, ct.file_url, ct.type AS content_type,
                 ct.duration_sec, ct.original_name AS title,
@@ -126,10 +129,10 @@ router.get('/schedule', authenticatePlayer, async (req, res, next) => {
            AND ct.status = 'active'
            AND ct.approval_status = 'approved'
            AND vp.is_active = TRUE
-           AND vp.id <> $1
+           AND ($1::uuid IS NULL OR vp.id <> $1::uuid)
            AND LOWER(TRIM(vp.city)) = $2
          ORDER BY ct.created_at DESC`,
-        [screen.venue_partner_id, screenCity]
+        [screen.venue_partner_id || null, screenCity]
       );
       crossItems = crossRes.rows;
     }
