@@ -510,6 +510,19 @@ textarea.form-input{resize:vertical;min-height:80px;}
           <div class="table-header"><span class="table-title">Pending Approvals (Quick View)</span><button class="btn btn-ghost btn-sm" onclick="navigate('approvals')">View All</button></div>
           <div class="table-wrap"><table><thead><tr><th>Campaign</th><th>Advertiser</th><th>Amount</th><th>Submitted</th><th>Action</th></tr></thead><tbody id="dash-pending-table"></tbody></table></div>
         </div>
+        <div class="table-card" style="margin-top:0;">
+          <div class="table-header"><span class="table-title">System</span></div>
+          <div class="modal-body" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+            <div>
+              <div style="font-weight:600;font-size:14px;">Database Backup</div>
+              <div style="font-size:13px;color:var(--text2);margin-top:2px;">Automatic: Har Sunday 2 AM IST &nbsp;|&nbsp; Storage: Cloudinary &nbsp;|&nbsp; Email: admin ko</div>
+              <div id="backup-status" style="font-size:12px;margin-top:6px;color:var(--text2);"></div>
+            </div>
+            <button class="btn btn-primary" id="backup-now-btn" onclick="triggerManualBackup()" style="flex-shrink:0;">
+              Backup Now
+            </button>
+          </div>
+        </div>
       </div>
 
       <!-- ALL CAMPAIGNS -->
@@ -1549,6 +1562,23 @@ document.addEventListener('keydown', e => {
     else doLogin();
   }
 });
+
+async function triggerManualBackup() {
+  const btn = document.getElementById('backup-now-btn');
+  const status = document.getElementById('backup-status');
+  btn.disabled = true; btn.textContent = 'Backing up…';
+  status.style.color = 'var(--text2)'; status.textContent = 'Backup chal raha hai, please wait…';
+  try {
+    const res = await api('/reports/backup-now', { method: 'POST' });
+    status.style.color = '#22c55e';
+    status.textContent = `✓ Backup done! ${res.totalRows?.toLocaleString()} rows — email bhej diya. (${res.dateStr})`;
+  } catch(e) {
+    status.style.color = '#ef4444';
+    status.textContent = `✗ Backup fail hua: ${e.message}`;
+  } finally {
+    btn.disabled = false; btn.textContent = 'Backup Now';
+  }
+}
 
 function togglePassVis(inputId, iconId) {
   const inp = document.getElementById(inputId);

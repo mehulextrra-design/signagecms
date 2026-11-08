@@ -892,6 +892,21 @@ async function sendPasswordExpiryReminderEmail({ to, name, resetUrl }) {
   return sendMail({ to, subject: 'extrravenue — Password Update Reminder', html });
 }
 
+async function sendDbBackupFailedEmail({ to, dateStr, errorMsg }) {
+  const html = wrap(`
+    <div class="tag" style="background:#ef4444;">Backup Failed</div>
+    <h2>⚠️ Weekly DB Backup Failed</h2>
+    <p class="sub">Automated backup complete nahi ho saka. Neeche error dekho aur manually check karo.</p>
+    <div class="info-card">
+      <div class="info-row"><span class="ir-label">Date</span><span class="ir-value">${dateStr}</span></div>
+      <div class="info-row"><span class="ir-label">Error</span><span class="ir-value" style="color:#ef4444;word-break:break-all;">${errorMsg}</span></div>
+    </div>
+    <hr class="divider">
+    <p style="font-size:13px;color:#aaa;">Admin panel mein jaake manually backup trigger karo ya Railway logs check karo.</p>
+  `);
+  return sendMail({ to, subject: `⚠️ extrravenue — DB Backup FAILED ${dateStr}`, html });
+}
+
 async function sendDbBackupEmail({ to, backupUrl, dateStr, tables, totalRows }) {
   const html = wrap(`
     <div class="tag">DB Backup</div>
@@ -918,5 +933,5 @@ module.exports = {
   sendDailyPoPReport, sendDailyPoPEmailAll, sendNewUserAlertEmail,
   sendVenuePartnerWelcomeEmail,
   sendPasswordResetEmail, sendPasswordExpiryReminderEmail,
-  sendDbBackupEmail,
+  sendDbBackupEmail, sendDbBackupFailedEmail,
 };

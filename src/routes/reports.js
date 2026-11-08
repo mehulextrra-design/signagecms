@@ -2,6 +2,7 @@ const express = require('express');
 const { query } = require('../db');
 const { authenticate, requireAdmin } = require('../middleware/auth');
 const { sendWeeklyReports, sendReportForUser, buildWeeklyReport } = require('../services/whatsapp');
+const { runDbBackup } = require('../services/scheduler');
 
 const router = express.Router();
 
@@ -304,6 +305,16 @@ router.post('/whatsapp/send/:user_id', authenticate, requireAdmin, async (req, r
     const result = await sendReportForUser(req.params.user_id);
     res.json({ sent: true, ...result });
   } catch (err) { next(err); }
+});
+
+// POST /api/reports/backup-now — admin triggers manual DB backup
+router.post('/backup-now', authenticate, requireAdmin, async (req, res, next) => {
+  try {
+    const result = await runDbBackup();
+    res.json({ ok: true, ...result });
+  } catch (err) {
+    next(err);
+  }
 });
 
 module.exports = router;

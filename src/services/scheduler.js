@@ -1,7 +1,7 @@
 const cron = require('node-cron');
 const { query } = require('../db');
 const { sendWeeklyReports, sendExpiryReminderWA, sendCampaignCompletedWA, sendDailyPoPAllWA } = require('./whatsapp');
-const { sendDailyPoPReport, sendDailyPoPEmailAll, sendExpiryReminderEmail, sendCampaignCompletedEmail, sendPasswordExpiryReminderEmail, sendDbBackupEmail } = require('./email');
+const { sendDailyPoPReport, sendDailyPoPEmailAll, sendExpiryReminderEmail, sendCampaignCompletedEmail, sendPasswordExpiryReminderEmail, sendDbBackupEmail, sendDbBackupFailedEmail } = require('./email');
 const { v2: cloudinary } = require('cloudinary');
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -103,6 +103,59 @@ async function backfillServerPlayLogs(days = 7) {
     total += await generateServerPlayLogs(h);
   }
   console.log(`[ServerLogs] Backfill complete — ${total} entries inserted (${totalHours + 1} hour windows checked)`);
+}
+
+async function runDbBackup() {
+  const ADMIN_EMAIL = process.env.ADMIN_BACKUP_EMAIL || process.env.GMAIL_USER || 'mehul.extrra@gmail.com';
+  const dateStr = new Date().toISOString().slice(0, 10);
+  const BACKUP_TABLES = [
+    { name: 'users',                     sql: `SELECT * FROM users` },
+    { name: 'venue_partners',            sql: `SELECT * FROM venue_partners` },
+    { name: 'screens',                   sql: `SELECT * FROM screens` },
+    { name: 'screen_groups',             sql: `SELECT * FROM screen_groups` },
+    { name: 'screen_group_members',      sql: `SELECT * FROM screen_group_members` },
+    { name: 'content',                   sql: `SELECT * FROM content` },
+    { name: 'campaigns',                 sql: `SELECT * FROM campaigns` },
+    { name: 'campaign_screens',          sql: `SELECT * FROM campaign_screens` },
+    { name: 'wallet_transactions',       sql: `SELECT * FROM wallet_transactions` },
+    { name: 'coupons',                   sql: `SELECT * FROM coupons` },
+    { name: 'filler_content',            sql: `SELECT * FROM filler_content` },
+    { name: 'filler_screen_assignments', sql: `SELECT * FROM filler_screen_assignments` },
+    { name: 'play_logs',                 sql: `SELECT * FROM play_logs WHERE played_at > NOW() - INTERVAL '90 days'` },
+  ];
+
+  const backup = { generated_at: new Date().toISOString(), tables: {} };
+  let totalRows = 0;
+  for (const t of BACKUP_TABLES) {
+    try {
+      const res = await query(t.sql);
+      backup.tables[t.name] = res.rows;
+      totalRows += res.rows.length;
+    } catch (e) {
+      backup.tables[t.name] = { error: e.message };
+    }
+  }
+
+  const jsonBuffer = Buffer.from(JSON.stringify(backup, null, 2), 'utf8');
+  const publicId = `db-backups/signagecms_${dateStr}_${Date.now()}`;
+
+  const uploadResult = await new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(
+      { resource_type: 'raw', public_id: publicId, overwrite: true },
+      (err, result) => err ? reject(err) : resolve(result)
+    );
+    stream.end(jsonBuffer);
+  });
+
+  await sendDbBackupEmail({
+    to: ADMIN_EMAIL,
+    backupUrl: uploadResult.secure_url,
+    dateStr,
+    tables: Object.keys(backup.tables).length,
+    totalRows,
+  });
+  console.log(`[Backup] Done: ${totalRows} rows → ${uploadResult.secure_url}`);
+  return { backupUrl: uploadResult.secure_url, dateStr, tables: Object.keys(backup.tables).length, totalRows };
 }
 
 const startScheduler = () => {
@@ -295,65 +348,17 @@ const startScheduler = () => {
 
   // Every Sunday at 2:00 AM IST (20:30 UTC Saturday): automated DB backup → Cloudinary → email admin
   cron.schedule('30 20 * * 0', async () => {
+    const ADMIN_EMAIL = process.env.ADMIN_BACKUP_EMAIL || process.env.GMAIL_USER || 'mehul.extrra@gmail.com';
+    const dateStr = new Date().toISOString().slice(0, 10);
     try {
-      const ADMIN_EMAIL = process.env.ADMIN_BACKUP_EMAIL || process.env.GMAIL_USER || 'mehul.extrra@gmail.com';
-      const dateStr = new Date().toISOString().slice(0, 10);
-
-      // Tables to backup (play_logs limited to last 90 days to control size)
-      const tables = [
-        { name: 'users',                   sql: `SELECT * FROM users` },
-        { name: 'venue_partners',          sql: `SELECT * FROM venue_partners` },
-        { name: 'screens',                 sql: `SELECT * FROM screens` },
-        { name: 'screen_groups',           sql: `SELECT * FROM screen_groups` },
-        { name: 'screen_group_members',    sql: `SELECT * FROM screen_group_members` },
-        { name: 'content',                 sql: `SELECT * FROM content` },
-        { name: 'campaigns',               sql: `SELECT * FROM campaigns` },
-        { name: 'campaign_screens',        sql: `SELECT * FROM campaign_screens` },
-        { name: 'wallet_transactions',     sql: `SELECT * FROM wallet_transactions` },
-        { name: 'coupons',                 sql: `SELECT * FROM coupons` },
-        { name: 'filler_content',          sql: `SELECT * FROM filler_content` },
-        { name: 'filler_screen_assignments', sql: `SELECT * FROM filler_screen_assignments` },
-        { name: 'play_logs',               sql: `SELECT * FROM play_logs WHERE played_at > NOW() - INTERVAL '90 days'` },
-      ];
-
-      const backup = { generated_at: new Date().toISOString(), tables: {} };
-      let totalRows = 0;
-      for (const t of tables) {
-        try {
-          const res = await query(t.sql);
-          backup.tables[t.name] = res.rows;
-          totalRows += res.rows.length;
-        } catch (e) {
-          backup.tables[t.name] = { error: e.message };
-        }
-      }
-
-      const jsonBuffer = Buffer.from(JSON.stringify(backup, null, 2), 'utf8');
-      const publicId = `db-backups/signagecms_${dateStr}`;
-
-      // Upload to Cloudinary as raw file
-      const uploadResult = await new Promise((resolve, reject) => {
-        const stream = cloudinary.uploader.upload_stream(
-          { resource_type: 'raw', public_id: publicId, overwrite: true },
-          (err, result) => err ? reject(err) : resolve(result)
-        );
-        stream.end(jsonBuffer);
-      });
-
-      await sendDbBackupEmail({
-        to: ADMIN_EMAIL,
-        backupUrl: uploadResult.secure_url,
-        dateStr,
-        tables: Object.keys(backup.tables).length,
-        totalRows,
-      });
-      console.log(`[Scheduler] DB backup done: ${totalRows} rows → ${uploadResult.secure_url}`);
+      await runDbBackup();
     } catch (err) {
       console.error('[Scheduler] DB backup error:', err.message);
+      sendDbBackupFailedEmail({ to: ADMIN_EMAIL, dateStr, errorMsg: err.message }).catch(() => {});
     }
   });
 
   console.log('[Scheduler] All cron jobs started');
 };
 
-module.exports = { startScheduler };
+module.exports = { startScheduler, runDbBackup };
