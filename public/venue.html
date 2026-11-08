@@ -3,173 +3,283 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-<title>Venue Partner Portal — SignageCMS</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<title>extrravenue — Venue Partner</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Magra:wght@400;700&family=Inter:wght@400;500;600;700&display=swap">
 <style>
 :root {
-  --primary:#0D9488; --primary-light:rgba(13,148,136,0.1); --primary-dark:#0a7a70;
-  --bg:#f8fafc; --surface:#fff; --surface2:#f1f5f9;
-  --border:#e2e8f0; --text:#0f172a; --text2:#475569; --text3:#94a3b8;
-  --radius:8px; --danger:#ef4444; --warning:#f59e0b; --success:#16a34a;
+  --primary: #7b68c8;
+  --grad: linear-gradient(135deg,#c94baa 0%,#7b68c8 55%,#2ca6d4 100%);
+  --bg: #f0f0f5;
+  --surface: #fff;
+  --border: #d8d8e4;
+  --text:  #12122a;
+  --text2: #3a3a56;
+  --text3: #7070a0;
+  --success: #16a34a;
+  --danger:  #dc2626;
+  --warning: #d97706;
+  --radius: 14px;
+  --radius-sm: 10px;
+  --shadow: 0 2px 16px rgba(0,0,0,.09);
 }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --bg:#0d1117; --surface:#161b22; --surface2:#21262d;
-    --border:#30363d; --text:#e6edf3; --text2:#8b949e; --text3:#6e7681;
-  }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg); color: var(--text);
+  font-size: 15px; -webkit-font-smoothing: antialiased;
 }
-:root[data-theme="dark"] {
-  --bg:#0d1117; --surface:#161b22; --surface2:#21262d;
-  --border:#30363d; --text:#e6edf3; --text2:#8b949e; --text3:#6e7681;
+
+/* ── AUTH ───────────────────────────────────────────────────────── */
+#login-screen {
+  display: flex; align-items: center; justify-content: center;
+  min-height: 100vh; padding: 24px; background: var(--bg);
 }
-* { box-sizing:border-box; margin:0; padding:0; }
-body { font-family:'Inter',system-ui,sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
+.auth-card {
+  background: var(--surface); border-radius: var(--radius);
+  padding: 40px 32px; width: 100%; max-width: 420px;
+  box-shadow: 0 8px 40px rgba(123,104,200,.13), 0 2px 8px rgba(0,0,0,.06);
+  animation: slideUp .3s ease;
+}
+@keyframes slideUp { from{opacity:0;transform:translateY(18px)} to{opacity:1;transform:translateY(0)} }
+.auth-logo { text-align: center; margin-bottom: 32px; }
+.auth-brand {
+  font-family: 'Magra', sans-serif; font-weight: 700;
+  font-size: 28px; letter-spacing: -.01em;
+  background: var(--grad); -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent; background-clip: text;
+  display: inline-block;
+}
+.auth-sub {
+  display: block; font-size: 13px; font-weight: 500;
+  color: var(--text3); margin-top: 4px;
+  letter-spacing: .06em; text-transform: uppercase;
+}
+.auth-divider {
+  width: 40px; height: 3px; background: var(--grad);
+  border-radius: 2px; margin: 10px auto 0;
+}
+.form-label {
+  display: block; font-size: 12px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: .06em;
+  color: var(--text3); margin-bottom: 7px;
+}
+.form-input {
+  width: 100%; padding: 12px 14px;
+  border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+  font-size: 15px; font-family: inherit; color: var(--text);
+  background: var(--surface); outline: none;
+  transition: border-color .15s, box-shadow .15s;
+}
+.form-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(123,104,200,.13); }
+.form-group { margin-bottom: 16px; }
+.form-select { width: 100%; padding: 12px 14px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-size: 14px; font-family: inherit; color: var(--text); background: var(--surface); outline: none; }
+.form-select:focus { border-color: var(--primary); }
 
-/* LOGIN */
-#login-screen { display:flex; align-items:center; justify-content:center; min-height:100vh; padding:24px; }
-.login-card { background:var(--surface); border:1.5px solid var(--border); border-radius:16px; padding:36px 32px; width:100%; max-width:380px; }
-.login-logo { display:flex; align-items:center; gap:10px; margin-bottom:28px; }
-.login-logo-mark { width:38px; height:38px; background:var(--primary); border-radius:10px; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:800; font-size:14px; }
-.login-logo-name { font-size:16px; font-weight:800; }
-.login-logo-sub { font-size:10px; color:var(--primary); font-weight:700; background:var(--primary-light); border-radius:4px; padding:1px 6px; }
-.login-title { font-size:20px; font-weight:800; margin-bottom:6px; }
-.login-sub { font-size:13px; color:var(--text2); margin-bottom:24px; }
-.form-group { margin-bottom:14px; }
-.form-label { display:block; font-size:12px; font-weight:600; color:var(--text2); margin-bottom:5px; text-transform:uppercase; letter-spacing:0.04em; }
-.form-input { width:100%; padding:10px 12px; border:1.5px solid var(--border); border-radius:var(--radius); font-size:14px; background:var(--surface); color:var(--text); outline:none; transition:border-color 0.15s; }
-.form-input:focus { border-color:var(--primary); }
-.btn { padding:10px 20px; border-radius:var(--radius); font-size:14px; font-weight:600; cursor:pointer; border:none; transition:all 0.15s; }
-.btn-primary { background:var(--primary); color:#fff; width:100%; }
-.btn-primary:hover { background:var(--primary-dark); }
-.btn-ghost { background:transparent; color:var(--text2); border:1.5px solid var(--border); }
-.btn-ghost:hover { background:var(--surface2); color:var(--text); }
-.btn-sm { padding:6px 14px; font-size:12px; }
-.login-error { color:var(--danger); font-size:12px; margin-top:10px; text-align:center; }
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 11px 20px; border-radius: var(--radius-sm);
+  border: none; font-family: inherit; font-size: 14px;
+  font-weight: 600; cursor: pointer; transition: all .15s;
+}
+.btn-primary { background: var(--grad); color: #fff; box-shadow: 0 2px 10px rgba(123,104,200,.3); }
+.btn-primary:hover { opacity: .9; }
+.btn-ghost { background: transparent; color: var(--text2); border: 1.5px solid var(--border); }
+.btn-ghost:hover { background: var(--bg); }
+.btn-sm { padding: 7px 14px; font-size: 13px; }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+.login-error { color: var(--danger); font-size: 13px; margin-top: 10px; padding: 10px 12px; background: #fee2e2; border-radius: 8px; display: none; }
 
-/* MAIN APP */
-#app { display:none; flex-direction:column; min-height:100vh; }
-.topbar { background:var(--surface); border-bottom:1px solid var(--border); padding:0 24px; height:56px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:100; }
-.topbar-logo { display:flex; align-items:center; gap:10px; }
-.topbar-logo-mark { width:30px; height:30px; background:var(--primary); border-radius:8px; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:800; font-size:12px; }
-.topbar-name { font-size:14px; font-weight:800; }
-.topbar-tag { font-size:9.5px; color:var(--primary); font-weight:700; background:var(--primary-light); border-radius:4px; padding:1px 6px; }
-.topbar-user { display:flex; align-items:center; gap:10px; }
-.topbar-biz { font-size:13px; font-weight:600; }
-.topbar-role { font-size:10px; color:var(--text3); }
+/* ── APP ─────────────────────────────────────────────────────────── */
+#app { display: none; min-height: 100vh; }
 
-.main-content { flex:1; padding:24px; max-width:960px; width:100%; margin:0 auto; }
+.topbar {
+  background: var(--surface); border-bottom: 1px solid var(--border);
+  padding: 0 20px; height: 56px;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 100;
+  box-shadow: 0 1px 8px rgba(0,0,0,.06);
+}
+.topbar-brand {
+  font-family: 'Magra', sans-serif; font-weight: 700; font-size: 20px;
+  letter-spacing: -.01em;
+  background: var(--grad); -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent; background-clip: text;
+}
+.topbar-right { display: flex; align-items: center; gap: 12px; }
+.topbar-biz { font-size: 13px; font-weight: 600; color: var(--text2); }
+.topbar-role { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: .04em; }
 
-/* TABS */
-.page-tabs { display:flex; gap:4px; margin-bottom:20px; border-bottom:1px solid var(--border); }
-.page-tab { padding:8px 16px; font-size:13px; font-weight:600; cursor:pointer; color:var(--text2); border:none; background:none; border-bottom:2.5px solid transparent; margin-bottom:-1px; transition:all 0.15s; }
-.page-tab.active { color:var(--primary); border-bottom-color:var(--primary); }
+.main-wrap { max-width: 820px; margin: 0 auto; padding: 20px 16px 40px; }
 
-.tab-panel { display:none; }
-.tab-panel.active { display:block; }
+/* Tabs */
+.page-tabs {
+  display: flex; gap: 2px; margin-bottom: 20px;
+  border-bottom: 1px solid var(--border);
+}
+.page-tab {
+  padding: 10px 18px; font-size: 14px; font-weight: 600;
+  cursor: pointer; color: var(--text3); border: none;
+  background: none; border-bottom: 2.5px solid transparent;
+  margin-bottom: -1px; transition: all .15s; font-family: inherit;
+}
+.page-tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
 
-/* CARDS */
-.card { background:var(--surface); border:1.5px solid var(--border); border-radius:12px; padding:20px; margin-bottom:16px; }
-.card-title { font-size:12px; font-weight:700; color:var(--text2); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:14px; }
-.stat-row { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:12px; margin-bottom:20px; }
-.stat-box { background:var(--surface); border:1.5px solid var(--border); border-radius:10px; padding:14px; }
-.stat-label { font-size:10.5px; font-weight:700; color:var(--text2); text-transform:uppercase; letter-spacing:0.04em; margin-bottom:4px; }
-.stat-val { font-size:22px; font-weight:800; color:var(--text); }
-.stat-val.primary { color:var(--primary); }
-.stat-sub { font-size:11px; color:var(--text3); margin-top:2px; }
+/* Cards */
+.card {
+  background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: var(--radius); padding: 18px 16px; margin-bottom: 14px;
+  box-shadow: var(--shadow);
+}
+.card-title {
+  font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .07em; color: var(--text3); margin-bottom: 14px;
+}
 
-/* SCREEN STATUS */
-.screen-card { background:var(--surface); border:1.5px solid var(--border); border-radius:10px; padding:16px; margin-bottom:10px; display:flex; align-items:center; gap:14px; }
-.screen-status-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
-.online { background:#22c55e; box-shadow:0 0 0 3px rgba(34,197,94,0.2); }
-.offline { background:#ef4444; }
-.maintenance { background:#f59e0b; }
-.screen-info { flex:1; }
-.screen-name { font-size:14px; font-weight:700; }
-.screen-loc { font-size:12px; color:var(--text2); margin-top:2px; }
-.screen-meta { font-size:11px; color:var(--text3); margin-top:3px; }
-.screen-airtime { text-align:right; }
-.airtime-bar { width:100px; height:6px; background:var(--border); border-radius:3px; overflow:hidden; margin-bottom:4px; }
-.airtime-fill { height:100%; background:var(--primary); border-radius:3px; }
-.airtime-label { font-size:10px; color:var(--text3); }
+/* Stats */
+.stat-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px,1fr)); gap: 12px; margin-bottom: 16px; }
+.stat-box { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 14px 12px; }
+.stat-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--text3); margin-bottom: 5px; }
+.stat-val { font-size: 24px; font-weight: 800; color: var(--text); }
+.stat-val.grad { background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.stat-sub { font-size: 11px; color: var(--text3); margin-top: 2px; }
 
-/* CONTENT UPLOAD */
-.upload-zone { border:2px dashed var(--border); border-radius:10px; padding:32px 20px; text-align:center; cursor:pointer; transition:all 0.2s; }
-.upload-zone:hover,.upload-zone.dragover { border-color:var(--primary); background:var(--primary-light); }
-.upload-icon { width:44px; height:44px; margin:0 auto 10px; background:var(--primary-light); border-radius:10px; display:flex; align-items:center; justify-content:center; }
-.upload-title { font-size:14px; font-weight:600; margin-bottom:4px; }
-.upload-sub { font-size:12px; color:var(--text3); }
+/* Screen card */
+.screen-card {
+  background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm); padding: 14px;
+  display: flex; align-items: center; gap: 14px; margin-bottom: 10px;
+}
+.dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.dot-online   { background: #22c55e; box-shadow: 0 0 0 3px rgba(34,197,94,.18); }
+.dot-offline  { background: #ef4444; }
+.dot-maintenance { background: var(--warning); }
+.screen-info { flex: 1; min-width: 0; }
+.screen-name { font-size: 15px; font-weight: 700; color: var(--text); }
+.screen-loc  { font-size: 13px; color: var(--text2); margin-top: 2px; }
+.screen-code { font-size: 11px; color: var(--text3); margin-top: 2px; }
+.airtime-wrap { text-align: right; flex-shrink: 0; }
+
+/* Upload */
+.upload-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px; }
+.upload-box {
+  border: 2px dashed var(--border); border-radius: var(--radius);
+  padding: 24px 14px; text-align: center; cursor: pointer;
+  transition: all .2s;
+}
+.upload-box:hover { border-color: var(--primary); background: rgba(123,104,200,.04); }
+.upload-box-icon { font-size: 28px; margin-bottom: 8px; }
+.upload-box-title { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+.upload-box-sub { font-size: 12px; color: var(--text3); }
 
 /* Content grid */
-.content-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(130px,1fr)); gap:12px; margin-top:14px; }
-.content-item { border:1.5px solid var(--border); border-radius:8px; overflow:hidden; cursor:pointer; transition:border-color 0.15s; }
-.content-item:hover { border-color:var(--primary); }
-.content-thumb { width:100%; height:80px; object-fit:cover; background:var(--surface2); display:block; }
-.content-thumb-video { width:100%; height:80px; background:var(--surface2); display:flex; align-items:center; justify-content:center; font-size:26px; }
-.content-meta { padding:8px; }
-.content-name { font-size:11px; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.content-tier { display:inline-block; font-size:9.5px; font-weight:700; padding:1px 6px; border-radius:4px; margin-top:3px; }
-.tier-venue-own { background:rgba(202,138,4,0.15); color:#92400e; }
-.tier-venue-cross { background:rgba(37,99,235,0.12); color:#1d4ed8; }
+.content-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px,1fr)); gap: 10px; margin-top: 12px; }
+.content-item { border: 1.5px solid var(--border); border-radius: 10px; overflow: hidden; cursor: pointer; transition: border-color .15s; }
+.content-item:hover { border-color: var(--primary); }
+.content-thumb { width: 100%; height: 76px; object-fit: cover; background: var(--bg); display: block; }
+.content-thumb-vid { width: 100%; height: 76px; background: var(--bg); display: flex; align-items: center; justify-content: center; font-size: 24px; }
+.content-meta { padding: 8px; }
+.content-name { font-size: 11px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text); }
+.content-tier-badge { display: inline-block; font-size: 9.5px; font-weight: 700; padding: 1px 7px; border-radius: 4px; margin-top: 3px; }
+.tier-own  { background: #fef3c7; color: #92400e; }
+.tier-cross { background: #dbeafe; color: #1e40af; }
 
-/* Revenue table */
-.rev-table { width:100%; border-collapse:collapse; font-size:13px; }
-.rev-table th { font-size:10.5px; font-weight:700; color:var(--text2); text-transform:uppercase; letter-spacing:0.04em; padding:8px 12px; border-bottom:1px solid var(--border); text-align:left; }
-.rev-table td { padding:10px 12px; border-bottom:1px solid var(--border); }
-.rev-table tr:last-child td { border-bottom:none; }
+/* Progress bar */
+.prog-wrap { display: none; margin-bottom: 14px; }
+.prog-bar { height: 4px; background: var(--border); border-radius: 3px; overflow: hidden; }
+.prog-fill { height: 100%; background: var(--grad); border-radius: 3px; width: 0%; transition: width .3s; }
+.prog-text { font-size: 12px; color: var(--text2); margin-top: 5px; }
 
-.empty { text-align:center; padding:40px 20px; color:var(--text3); font-size:13px; }
-.badge { display:inline-block; font-size:10.5px; font-weight:700; padding:2px 8px; border-radius:4px; }
-.badge-green { background:#dcfce7; color:#166534; }
-.badge-red { background:#fee2e2; color:#991b1b; }
-.badge-yellow { background:#fef9c3; color:#854d0e; }
-.badge-blue { background:#dbeafe; color:#1e40af; }
+/* Badge */
+.badge { display: inline-block; font-size: 10.5px; font-weight: 700; padding: 2px 8px; border-radius: 4px; }
+.badge-green  { background: #dcfce7; color: #166534; }
+.badge-yellow { background: #fef9c3; color: #854d0e; }
+.badge-red    { background: #fee2e2; color: #991b1b; }
+.badge-blue   { background: #dbeafe; color: #1e40af; }
 
-@media (max-width:600px) {
-  .main-content { padding:16px; }
-  .stat-row { grid-template-columns:1fr 1fr; }
-  .topbar { padding:0 16px; }
+/* Agreement */
+.agr-section { margin-bottom: 18px; }
+.agr-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--text3); margin-bottom: 6px; }
+.agr-value { font-size: 15px; font-weight: 500; color: var(--text); }
+
+/* Empty */
+.empty { text-align: center; padding: 36px 20px; color: var(--text3); font-size: 14px; }
+
+/* Toast */
+#toast {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+  background: #12122a; color: #fff; padding: 11px 22px; border-radius: 22px;
+  font-size: 14px; font-weight: 500; z-index: 999; opacity: 0;
+  transition: opacity .25s; pointer-events: none;
+  white-space: nowrap; box-shadow: 0 4px 20px rgba(0,0,0,.2);
+}
+#toast.show { opacity: 1; }
+
+/* OLM overlay */
+.overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(10,10,30,.5); z-index: 500;
+  align-items: center; justify-content: center; padding: 20px;
+  backdrop-filter: blur(2px);
+}
+.overlay-box {
+  background: var(--surface); border-radius: var(--radius);
+  padding: 28px 24px; width: 100%; max-width: 400px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.2);
+}
+.overlay-title { font-size: 16px; font-weight: 700; margin-bottom: 10px; color: var(--text); }
+.overlay-sub { font-size: 14px; color: var(--text2); margin-bottom: 18px; }
+.existing-name { background: var(--bg); border: 1.5px solid var(--border); border-radius: 8px; padding: 10px 14px; font-size: 14px; font-weight: 600; margin-bottom: 18px; color: var(--text); }
+
+/* Agreement print */
+#agr-print { display: none; }
+@media print {
+  body > *:not(#agr-print) { display: none !important; }
+  #agr-print { display: block !important; padding: 20px; }
+}
+
+@media (max-width: 540px) {
+  .main-wrap { padding: 14px 12px 32px; }
+  .upload-row { grid-template-columns: 1fr; }
+  .stat-row { grid-template-columns: 1fr 1fr; }
+  .page-tab { padding: 9px 12px; font-size: 13px; }
 }
 </style>
 </head>
 <body>
 
-<!-- LOGIN SCREEN -->
+<!-- LOGIN -->
 <div id="login-screen">
-  <div class="login-card">
-    <div class="login-logo">
-      <div class="login-logo-mark">SC</div>
-      <div>
-        <div class="login-logo-name">SignageCMS</div>
-      </div>
-      <div class="login-logo-sub">VENUE</div>
+  <div class="auth-card">
+    <div class="auth-logo">
+      <span class="auth-brand">extrravenue</span>
+      <span class="auth-sub">Venue Partner Portal</span>
+      <div class="auth-divider"></div>
     </div>
-    <div class="login-title">Venue Partner Portal</div>
-    <div class="login-sub">Sign in to manage your screen and content</div>
     <div class="form-group">
       <label class="form-label">Email</label>
-      <input type="email" id="login-email" class="form-input" placeholder="you@yourvenue.in" onkeydown="if(event.key==='Enter')doLogin()">
+      <input type="email" id="login-email" class="form-input" placeholder="you@yourvenue.in" autocomplete="email" onkeydown="if(event.key==='Enter')doLogin()">
     </div>
     <div class="form-group">
       <label class="form-label">Password</label>
-      <input type="password" id="login-pass" class="form-input" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+      <input type="password" id="login-pass" class="form-input" placeholder="Enter password" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
     </div>
-    <button class="btn btn-primary" onclick="doLogin()">Sign In</button>
-    <div class="login-error" id="login-err"></div>
+    <div id="login-err" class="login-error"></div>
+    <button class="btn btn-primary" id="login-btn" onclick="doLogin()" style="width:100%;justify-content:center;padding:14px;margin-top:4px;">Sign In</button>
   </div>
 </div>
 
-<!-- MAIN APP -->
+<!-- APP -->
 <div id="app">
   <div class="topbar">
-    <div class="topbar-logo">
-      <div class="topbar-logo-mark">SC</div>
-      <span class="topbar-name">SignageCMS</span>
-      <span class="topbar-tag">VENUE</span>
-    </div>
-    <div class="topbar-user">
-      <div>
+    <div class="topbar-brand">extrravenue</div>
+    <div class="topbar-right">
+      <div style="text-align:right;">
         <div class="topbar-biz" id="tb-biz">—</div>
         <div class="topbar-role">Venue Partner</div>
       </div>
@@ -177,246 +287,249 @@ body { font-family:'Inter',system-ui,sans-serif; background:var(--bg); color:var
     </div>
   </div>
 
-  <div class="main-content">
+  <div class="main-wrap">
     <div class="page-tabs">
-      <button class="page-tab active" onclick="switchTab('overview')">Overview</button>
-      <button class="page-tab" onclick="switchTab('content')">My Content</button>
-      <button class="page-tab" onclick="switchTab('revenue')" style="display:none;">Revenue</button>
+      <button class="page-tab active" id="tab-btn-overview" onclick="switchTab('overview')">My Screen</button>
+      <button class="page-tab" id="tab-btn-content" onclick="switchTab('content')">My Content</button>
+      <button class="page-tab" id="tab-btn-agreement" onclick="switchTab('agreement')">Agreement</button>
     </div>
 
-    <!-- OVERVIEW TAB -->
+    <!-- MY SCREEN TAB -->
     <div class="tab-panel active" id="tab-overview">
-      <div class="stat-row" id="overview-stats">
-        <div class="stat-box"><div class="stat-label">My Screens</div><div class="stat-val primary" id="ov-screens">—</div></div>
-        <div class="stat-box" style="display:none;"><div class="stat-label">Revenue Earned</div><div class="stat-val primary" id="ov-revenue">—</div></div>
-        <div class="stat-box" style="display:none;"><div class="stat-label">Pending Settlement</div><div class="stat-val" id="ov-pending">—</div></div>
-        <div class="stat-box"><div class="stat-label">My Content Files</div><div class="stat-val" id="ov-content">—</div></div>
-      </div>
-
-      <!-- Estimated Reach card -->
-      <div class="card" id="reach-card" style="margin-bottom:16px;display:none;">
-        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
-          <div>
-            <div class="card-title" style="margin-bottom:4px;">Estimated Daily Reach</div>
-            <div id="reach-plays" style="font-size:28px;font-weight:700;color:var(--primary);">—</div>
-            <div id="reach-meta" style="font-size:12px;color:var(--text2);margin-top:3px;">Loading…</div>
-          </div>
-          <div id="reach-upsell" style="display:none;background:#fef3c7;border:1px solid #f59e0b;border-radius:8px;padding:10px 14px;max-width:260px;">
-            <div style="font-size:12px;font-weight:600;color:#b45309;">Reach kam ho rahi hai?</div>
-            <div style="font-size:11px;color:#92400e;margin-top:3px;">Network bhar raha hai. Guaranteed plays ke liye Starter plan try karein.</div>
-          </div>
+      <div class="stat-row" id="stat-row">
+        <div class="stat-box">
+          <div class="stat-label">My Screens</div>
+          <div class="stat-val grad" id="ov-screens">—</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Content Files</div>
+          <div class="stat-val" id="ov-content">—</div>
+        </div>
+        <div class="stat-box" id="reach-stat-box" style="display:none;">
+          <div class="stat-label">Est. Plays / Day</div>
+          <div class="stat-val grad" id="ov-reach">—</div>
+          <div class="stat-sub" id="ov-reach-sub"></div>
         </div>
       </div>
 
       <div class="card-title" style="margin-bottom:10px;">My Screens</div>
-      <div id="screens-list"><div class="empty">Loading screens…</div></div>
+      <div id="screens-list"><div class="empty">Loading…</div></div>
 
-      <!-- Airtime split info -->
-      <div class="card" style="margin-top:16px;">
+      <div class="card" style="margin-top:16px;" id="airtime-card" >
         <div class="card-title">How Your Screen's Airtime is Split</div>
-        <div id="airtime-split-info">
-          <div style="font-size:13px;color:var(--text2);">Loading…</div>
-        </div>
+        <div id="airtime-info"><div style="font-size:13px;color:var(--text3);">Loading…</div></div>
+      </div>
+
+      <div id="reach-upsell" style="display:none;margin-top:12px;background:#fef3c7;border:1.5px solid #fbbf24;border-radius:var(--radius-sm);padding:14px 16px;">
+        <div style="font-size:13px;font-weight:700;color:#92400e;">Reach kam ho rahi hai?</div>
+        <div style="font-size:12px;color:#78350f;margin-top:4px;">Network bhar raha hai. Guaranteed plays ke liye Starter plan try karein.</div>
       </div>
     </div>
 
-    <!-- CONTENT TAB -->
+    <!-- MY CONTENT TAB -->
     <div class="tab-panel" id="tab-content">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;" class="content-type-row">
-        <!-- Venue Own Content -->
-        <div class="card" style="margin-bottom:0;">
-          <div class="card-title" style="color:#ca8a04;">
-            Your Screen Content
-            <span style="font-size:10px;font-weight:500;color:var(--text3);display:block;margin-top:2px;">Plays on your screen only (menu, offers, promos)</span>
-          </div>
-          <div class="upload-zone" onclick="triggerUpload('venue_own')">
-            <div class="upload-icon"><svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="#ca8a04"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg></div>
-            <div class="upload-title" style="font-size:13px;">Upload Your Content</div>
-            <div class="upload-sub">JPG · PNG · MP4 · max 200 MB</div>
-          </div>
+      <div class="upload-row">
+        <div class="upload-box" onclick="triggerUpload('venue_own')">
+          <div class="upload-box-icon">🖥️</div>
+          <div class="upload-box-title">Your Screen Content</div>
+          <div class="upload-box-sub">Menu, offers, promos<br>Plays on your screen only</div>
         </div>
-
-        <!-- Cross-Network Ad -->
-        <div class="card" style="margin-bottom:0;">
-          <div class="card-title" style="color:#2563EB;">
-            Network Ad (Free)
-            <span style="font-size:10px;font-weight:500;color:var(--text3);display:block;margin-top:2px;">Plays on other screens in your city</span>
-          </div>
-          <div class="upload-zone" onclick="triggerUpload('venue_cross')">
-            <div class="upload-icon"><svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="#2563EB"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064"/></svg></div>
-            <div class="upload-title" style="font-size:13px;">Upload Your Ad</div>
-            <div class="upload-sub">Runs city-wide on partner screens</div>
-          </div>
+        <div class="upload-box" onclick="triggerUpload('venue_cross')">
+          <div class="upload-box-icon">🌐</div>
+          <div class="upload-box-title">Network Ad (Free)</div>
+          <div class="upload-box-sub">Your ad on other screens<br>City-wide reach, free</div>
         </div>
       </div>
 
       <input type="file" id="file-input-venue" accept="video/*,image/*" style="display:none" onchange="handleFileUpload(event)">
       <input type="hidden" id="upload-tier">
 
-      <div id="upload-progress" style="display:none;margin-bottom:14px;">
-        <div style="height:4px;background:var(--border);border-radius:3px;overflow:hidden;">
-          <div id="upload-prog-fill" style="height:100%;background:var(--primary);width:0%;transition:width 0.3s;"></div>
-        </div>
-        <div style="font-size:11px;color:var(--text2);margin-top:4px;" id="upload-prog-text">Uploading…</div>
+      <div class="prog-wrap" id="upload-progress">
+        <div class="prog-bar"><div class="prog-fill" id="upload-prog-fill"></div></div>
+        <div class="prog-text" id="upload-prog-text">Uploading…</div>
       </div>
 
-      <div class="card-title" style="margin-top:4px;margin-bottom:10px;">All My Content</div>
-      <div id="content-grid" class="content-grid"><div class="empty">Loading content…</div></div>
+      <div class="card-title" style="margin-bottom:8px;">All My Content</div>
+      <div id="content-grid" class="content-grid"><div class="empty">Loading…</div></div>
     </div>
 
-    <!-- REVENUE TAB -->
-    <div class="tab-panel" id="tab-revenue">
-      <div class="stat-row" style="margin-bottom:20px;">
-        <div class="stat-box"><div class="stat-label">Total Earned</div><div class="stat-val primary" id="rv-total">—</div><div class="stat-sub">From paid campaigns on your screen</div></div>
-        <div class="stat-box"><div class="stat-label">Settled</div><div class="stat-val" style="color:var(--success);" id="rv-settled">—</div></div>
-        <div class="stat-box"><div class="stat-label">Pending</div><div class="stat-val" style="color:var(--warning);" id="rv-pending-amt">—</div><div class="stat-sub">Next settlement upcoming</div></div>
+    <!-- AGREEMENT TAB -->
+    <div class="tab-panel" id="tab-agreement">
+      <div class="card" id="agr-details">
+        <div class="card-title">Venue Partner Agreement</div>
+        <div id="agr-body"><div class="empty">Loading…</div></div>
       </div>
-
-      <div class="card">
-        <div class="card-title">Monthly Revenue</div>
-        <div id="rev-monthly-wrap">
-          <div class="empty">Loading…</div>
-        </div>
-        <div style="font-size:11px;color:var(--text3);margin-top:12px;">Revenue is credited monthly via bank transfer / UPI. Contact your account manager for settlement queries.</div>
-      </div>
+      <button class="btn btn-primary" onclick="printAgreement()" style="margin-top:4px;">📄 Download / Print Agreement</button>
     </div>
 
   </div>
 </div>
 
-<!-- ONE ACTIVE LIMIT MODAL -->
-<div id="one-limit-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;display:none;align-items:center;justify-content:center;padding:16px;">
-  <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:14px;padding:24px;width:100%;max-width:400px;">
-    <div style="font-size:15px;font-weight:800;margin-bottom:8px;">Already Running Media</div>
-    <div style="font-size:13px;color:var(--text2);margin-bottom:6px;">Currently active on your screen:</div>
-    <div style="background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;padding:10px 14px;margin-bottom:16px;font-size:13px;font-weight:600;" id="olm-existing-name">—</div>
-    <div style="font-size:13px;color:var(--text2);margin-bottom:18px;">You can run <strong>only one screen media</strong> at a time. What would you like to do?</div>
+<!-- OLM OVERLAY -->
+<div class="overlay" id="one-limit-overlay" style="display:none;align-items:center;">
+  <div class="overlay-box">
+    <div class="overlay-title">Already Running Media</div>
+    <div class="overlay-sub">Currently active on your screen:</div>
+    <div class="existing-name" id="olm-existing-name">—</div>
+    <div style="font-size:14px;color:var(--text2);margin-bottom:18px;">You can run <strong>only one screen media</strong> at a time. Kya karna hai?</div>
     <div style="display:flex;flex-direction:column;gap:10px;">
-      <button class="btn btn-primary" style="text-align:left;padding:12px 16px;" onclick="olmReplace()">
-        <div style="font-size:13px;font-weight:700;">&#10227; Replace Current Media</div>
-        <div style="font-size:11px;font-weight:400;opacity:0.8;margin-top:2px;">Deactivate existing and run the new one</div>
+      <button class="btn btn-primary" style="justify-content:flex-start;padding:13px 16px;" onclick="olmReplace()">
+        <div>
+          <div style="font-size:14px;font-weight:700;">Replace Current Media</div>
+          <div style="font-size:12px;font-weight:400;opacity:.8;margin-top:2px;">Existing hata do, naya chalao</div>
+        </div>
       </button>
-      <button class="btn" style="background:var(--primary-light);color:var(--primary);border:1.5px solid var(--primary);text-align:left;padding:12px 16px;" onclick="olmRegisterAdvertiser()">
-        <div style="font-size:13px;font-weight:700;">&#9733; Register as Advertiser</div>
-        <div style="font-size:11px;font-weight:400;opacity:0.8;margin-top:2px;">Schedule multiple campaigns with timing control</div>
+      <button class="btn" style="background:#ede9fe;color:var(--primary);border:none;justify-content:flex-start;padding:13px 16px;" onclick="olmRegisterAdvertiser()">
+        <div>
+          <div style="font-size:14px;font-weight:700;">Advertiser ke roop mein Register karo</div>
+          <div style="font-size:12px;font-weight:400;opacity:.8;margin-top:2px;">Multiple campaigns schedule karo</div>
+        </div>
       </button>
       <button class="btn btn-ghost btn-sm" onclick="olmCancel()" style="margin-top:4px;">Cancel</button>
     </div>
   </div>
 </div>
 
+<!-- AGREEMENT PRINT -->
+<div id="agr-print"></div>
+<div id="toast"></div>
+
 <script>
-const BASE = '';
-let _token = localStorage.getItem('vp_token') || '';
+let _token = '';
 let _vpData = null;
-let _olmNewContentId = null;
-let _olmNewTier = null;
+let _olmNewContentId = null, _olmNewTier = null;
+
+try { _token = localStorage.getItem('vp_token') || ''; } catch(e){}
+
+function showToast(msg, type='info') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.background = type==='error' ? '#dc2626' : type==='success' ? '#16a34a' : '#12122a';
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2800);
+}
 
 function api(path, opts={}) {
-  return fetch(BASE + '/api' + path, {
-    headers: { 'Content-Type':'application/json', 'Authorization': 'Bearer ' + _token },
+  return fetch('/api' + path, {
+    headers: { 'Content-Type':'application/json', 'Authorization':'Bearer '+_token },
     ...opts
   }).then(async r => {
-    const d = await r.json();
+    const d = await r.json().catch(()=>({}));
     if (!r.ok) throw new Error(d.error || r.statusText);
     return d;
   });
 }
 
+// ── AUTH ──────────────────────────────────────────────────────────
 async function doLogin() {
   const email = document.getElementById('login-email').value.trim();
-  const pass = document.getElementById('login-pass').value;
-  const err = document.getElementById('login-err');
-  err.textContent = '';
+  const pass  = document.getElementById('login-pass').value;
+  const errEl = document.getElementById('login-err');
+  const btn   = document.getElementById('login-btn');
+  errEl.style.display = 'none';
+  if (!email || !pass) { errEl.textContent = 'Email aur password required'; errEl.style.display = 'block'; return; }
+  btn.disabled = true; btn.textContent = 'Signing in…';
   try {
     const res = await fetch('/api/auth/login', {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ email, password: pass })
-    }).then(async r => { const d=await r.json(); if(!r.ok) throw new Error(d.error||'Login failed'); return d; });
-
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({email, password: pass})
+    }).then(async r => { const d = await r.json(); if(!r.ok) throw new Error(d.error||'Login failed'); return d; });
     if (res.user.role !== 'venue_partner') {
-      err.textContent = 'This portal is for venue partners only.';
-      return;
+      throw new Error('This portal is for venue partners only.');
     }
     _token = res.token;
-    localStorage.setItem('vp_token', _token);
+    try { localStorage.setItem('vp_token', _token); } catch(e){}
     initApp(res.user);
-  } catch(e) { err.textContent = e.message; }
+  } catch(e) {
+    errEl.textContent = e.message; errEl.style.display = 'block';
+  } finally { btn.disabled = false; btn.textContent = 'Sign In'; }
 }
 
 function logout() {
-  localStorage.removeItem('vp_token');
-  _token = '';
+  try { localStorage.removeItem('vp_token'); } catch(e){}
+  _token = ''; _vpData = null;
   document.getElementById('login-screen').style.display = 'flex';
   document.getElementById('app').style.display = 'none';
 }
 
 async function initApp(user) {
   document.getElementById('login-screen').style.display = 'none';
-  document.getElementById('app').style.display = 'flex';
+  document.getElementById('app').style.display = 'block';
   document.getElementById('tb-biz').textContent = user.business_name || user.first_name || user.email;
-  // Load venue partner data
   if (user.venue_partner_id) {
     try {
       _vpData = await api('/venue-partners/' + user.venue_partner_id);
       loadOverview();
       loadContent();
-      loadRevenue();
-    } catch(e) { console.error(e); }
+      loadAgreement();
+    } catch(e) { showToast('Data load failed: ' + e.message, 'error'); }
   }
 }
 
+// ── TABS ──────────────────────────────────────────────────────────
 function switchTab(name) {
-  document.querySelectorAll('.page-tab').forEach((t,i) => {
-    const names = ['overview','content','revenue'];
-    t.classList.toggle('active', names[i]===name);
+  ['overview','content','agreement'].forEach(n => {
+    document.getElementById('tab-'+n).classList.toggle('active', n===name);
+    document.getElementById('tab-btn-'+n).classList.toggle('active', n===name);
   });
-  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-  document.getElementById('tab-'+name).classList.add('active');
 }
 
+// ── OVERVIEW ──────────────────────────────────────────────────────
 function loadOverview() {
   if (!_vpData) return;
   const screens = _vpData.screens || [];
   document.getElementById('ov-screens').textContent = screens.length;
   loadEstimatedReach();
 
-  // Render screens
   const container = document.getElementById('screens-list');
-  if (!screens.length) { container.innerHTML = '<div class="empty">No screens linked yet — contact your account manager.</div>'; return; }
+  if (!screens.length) {
+    container.innerHTML = '<div class="empty">No screens linked yet — contact your account manager.</div>';
+    return;
+  }
   container.innerHTML = screens.map(s => {
-    const dotClass = s.status==='online' ? 'online' : s.status==='maintenance' ? 'maintenance' : 'offline';
-    const paid = s.paid_pct||75, own=s.venue_own_pct||15, cross=s.cross_pct||8;
+    const dotCls = s.status==='online' ? 'dot-online' : s.status==='maintenance' ? 'dot-maintenance' : 'dot-offline';
+    const paid = s.paid_pct||75, own = s.venue_own_pct||15, cross = s.cross_pct||8;
     return `<div class="screen-card">
-      <div class="screen-status-dot ${dotClass}"></div>
+      <div class="dot ${dotCls}"></div>
       <div class="screen-info">
-        <div class="screen-name">${s.name}</div>
-        <div class="screen-loc">${s.location||''} ${s.city?'· '+s.city:''}</div>
-        <div class="screen-meta">${s.screen_code}</div>
+        <div class="screen-name">${esc(s.name)}</div>
+        <div class="screen-loc">${esc(s.location||'')}${s.city?' · '+esc(s.city):''}</div>
+        <div class="screen-code">${esc(s.screen_code||'')}</div>
       </div>
-      <div class="screen-airtime">
-        <div class="airtime-label" style="margin-bottom:4px;font-size:10px;color:var(--text3);">Your airtime</div>
-        <div style="display:flex;height:8px;border-radius:4px;overflow:hidden;width:120px;margin-bottom:4px;">
+      <div class="airtime-wrap">
+        <div style="font-size:11px;color:var(--text3);margin-bottom:5px;">Your airtime</div>
+        <div style="display:flex;height:8px;border-radius:4px;overflow:hidden;width:110px;margin-bottom:4px;">
           <div style="width:${paid}%;background:var(--primary);"></div>
           <div style="width:${own}%;background:#ca8a04;"></div>
           <div style="width:${cross}%;background:#2563EB;"></div>
         </div>
-        <div style="font-size:9.5px;color:var(--text3);">${own}% your content · ${cross}% your ad</div>
+        <div style="font-size:10px;color:var(--text3);">${own}% content · ${cross}% ad</div>
       </div>
     </div>`;
   }).join('');
 
-  // Airtime info
   const s0 = screens[0] || {};
-  document.getElementById('airtime-split-info').innerHTML = `
-    <div style="display:flex;gap:8px;flex-wrap:wrap;">
-      <div style="display:flex;align-items:center;gap:6px;font-size:12px;"><div style="width:12px;height:12px;border-radius:3px;background:var(--primary);flex-shrink:0;"></div><span><strong>${s0.paid_pct||75}%</strong> Paid advertiser campaigns (generates revenue for you)</span></div>
-      <div style="display:flex;align-items:center;gap:6px;font-size:12px;"><div style="width:12px;height:12px;border-radius:3px;background:#ca8a04;flex-shrink:0;"></div><span><strong>${s0.venue_own_pct||15}%</strong> Your screen content (menu, offers)</span></div>
-      <div style="display:flex;align-items:center;gap:6px;font-size:12px;"><div style="width:12px;height:12px;border-radius:3px;background:#2563EB;flex-shrink:0;"></div><span><strong>${s0.cross_pct||8}%</strong> Your city-wide ad (on other screens, free)</span></div>
+  const paid = s0.paid_pct||75, own = s0.venue_own_pct||15, cross = s0.cross_pct||8;
+  document.getElementById('airtime-info').innerHTML = `
+    <div style="display:flex;flex-direction:column;gap:9px;">
+      <div style="display:flex;align-items:center;gap:10px;font-size:13px;"><div style="width:14px;height:14px;border-radius:4px;background:var(--primary);flex-shrink:0;"></div><span><strong>${paid}%</strong> Paid advertiser campaigns (priority)</span></div>
+      <div style="display:flex;align-items:center;gap:10px;font-size:13px;"><div style="width:14px;height:14px;border-radius:4px;background:#ca8a04;flex-shrink:0;"></div><span><strong>${own}%</strong> Your screen content (menu, offers)</span></div>
+      <div style="display:flex;align-items:center;gap:10px;font-size:13px;"><div style="width:14px;height:14px;border-radius:4px;background:#2563EB;flex-shrink:0;"></div><span><strong>${cross}%</strong> Your city-wide ad (on other screens)</span></div>
     </div>`;
 }
 
+async function loadEstimatedReach() {
+  try {
+    const d = await api('/venue-partners/' + _vpData.id + '/reach');
+    if (d.estimated_plays_day == null) return;
+    document.getElementById('reach-stat-box').style.display = 'block';
+    document.getElementById('ov-reach').textContent = '~' + d.estimated_plays_day.toLocaleString('en-IN');
+    document.getElementById('ov-reach-sub').textContent = d.screen_count + ' screens in ' + (d.city||'your city');
+    if (d.estimated_plays_day < 500) document.getElementById('reach-upsell').style.display = 'block';
+  } catch(e) {}
+}
+
+// ── CONTENT ───────────────────────────────────────────────────────
 async function loadContent() {
   const grid = document.getElementById('content-grid');
   grid.innerHTML = '<div class="empty">Loading…</div>';
@@ -425,117 +538,26 @@ async function loadContent() {
     document.getElementById('ov-content').textContent = items.length;
     if (!items.length) { grid.innerHTML = '<div class="empty">No content yet — upload your first file above.</div>'; return; }
     grid.innerHTML = items.map(c => {
-      const isVideo = c.type === 'video';
-      const tierLabel = c.content_tier === 'venue_cross' ? '<span class="content-tier tier-venue-cross">City-wide ad</span>' : '<span class="content-tier tier-venue-own">Screen content</span>';
+      const isVid = c.type === 'video';
+      const tierBadge = c.content_tier === 'venue_cross'
+        ? '<span class="content-tier-badge tier-cross">City-wide</span>'
+        : '<span class="content-tier-badge tier-own">Screen</span>';
       return `<div class="content-item">
-        ${isVideo
-          ? `<div class="content-thumb-video">▶</div>`
-          : `<img class="content-thumb" src="${c.file_url}" onerror="this.style.background='var(--surface2)'" alt="">`}
+        ${isVid
+          ? `<div class="content-thumb-vid">▶</div>`
+          : `<img class="content-thumb" src="${esc(c.file_url)}" onerror="this.style.background='var(--bg)'" alt="">`}
         <div class="content-meta">
-          <div class="content-name" title="${c.original_name}">${c.original_name}</div>
-          ${tierLabel}
+          <div class="content-name" title="${esc(c.original_name)}">${esc(c.original_name)}</div>
+          ${tierBadge}
         </div>
       </div>`;
     }).join('');
-  } catch(e) { grid.innerHTML = '<div class="empty" style="color:var(--danger);">'+e.message+'</div>'; }
-}
-
-async function loadEstimatedReach() {
-  try {
-    const d = await api('/venue-partners/' + _vpData.id + '/reach');
-    const card = document.getElementById('reach-card');
-    card.style.display = 'block';
-    if (d.estimated_plays_day == null) {
-      document.getElementById('reach-plays').textContent = '—';
-      document.getElementById('reach-meta').textContent = 'City not set — contact your account manager.';
-      return;
-    }
-    const plays = d.estimated_plays_day;
-    document.getElementById('reach-plays').textContent = '~' + plays.toLocaleString('en-IN') + ' plays/day';
-    const pct = d.free_time_per_screen_sec ? Math.round((d.free_time_per_screen_sec/54000)*100) : 0;
-    document.getElementById('reach-meta').textContent =
-      `${d.screen_count} screens · ${d.vp_count_in_city} venue partners in city · ${pct}% free airtime`;
-    // Show upsell if reach is low (< 500 plays/day)
-    document.getElementById('reach-upsell').style.display = plays < 500 ? 'block' : 'none';
-  } catch(e) { /* silently skip */ }
-}
-
-async function loadRevenue() {
-  try {
-    const r = await api('/venue-partners/' + _vpData.id + '/revenue');
-    const s = r.summary;
-    const fmt = n => Number(n||0).toLocaleString('en-IN',{minimumFractionDigits:0});
-    document.getElementById('ov-revenue').textContent = '?'+fmt(s.total_earned);
-    document.getElementById('ov-pending').textContent = '?'+fmt(s.pending_settlement);
-    document.getElementById('rv-total').textContent = '?'+fmt(s.total_earned);
-    document.getElementById('rv-settled').textContent = '?'+fmt(s.total_settled);
-    document.getElementById('rv-pending-amt').textContent = '?'+fmt(s.pending_settlement);
-
-    const wrap = document.getElementById('rev-monthly-wrap');
-    if (!r.monthly.length) { wrap.innerHTML = '<div class="empty">No revenue yet — revenue is generated when paid campaigns run on your screen.</div>'; return; }
-    wrap.innerHTML = `<table class="rev-table"><thead><tr><th>Month</th><th>Plays Served</th><th>Revenue Earned</th><th>Status</th></tr></thead><tbody>
-      ${r.monthly.map(m=>`<tr>
-        <td style="font-weight:600;">${m.month}</td>
-        <td>${Number(m.plays||0).toLocaleString()}</td>
-        <td style="font-weight:700;color:var(--primary);">?${Number(m.earned||0).toLocaleString('en-IN',{minimumFractionDigits:2})}</td>
-        <td><span class="badge badge-yellow">Pending</span></td>
-      </tr>`).join('')}
-    </tbody></table>`;
-  } catch(e) { console.error(e); }
+  } catch(e) { grid.innerHTML = '<div class="empty" style="color:var(--danger);">'+esc(e.message)+'</div>'; }
 }
 
 function triggerUpload(tier) {
   document.getElementById('upload-tier').value = tier;
   document.getElementById('file-input-venue').click();
-}
-
-async function olmReplace() {
-  if (!_olmNewContentId) return;
-  document.getElementById('one-limit-overlay').style.display = 'none';
-  try {
-    // Delete existing venue_own content(s) for this user
-    const existing = await api('/content');
-    const toDelete = existing.filter(c => c.content_tier === 'venue_own' && c.id !== _olmNewContentId);
-    for (const c of toDelete) {
-      await fetch('/api/content/' + c.id, {
-        method:'DELETE',
-        headers:{'Authorization':'Bearer '+_token}
-      });
-    }
-    // Now set tier on the new content
-    await fetch('/api/content/' + _olmNewContentId, {
-      method:'PATCH',
-      headers:{'Content-Type':'application/json','Authorization':'Bearer '+_token},
-      body: JSON.stringify({ content_tier: _olmNewTier })
-    });
-    _olmNewContentId = null; _olmNewTier = null;
-    loadContent();
-  } catch(e) { alert('Error: ' + e.message); }
-}
-
-function olmRegisterAdvertiser() {
-  document.getElementById('one-limit-overlay').style.display = 'none';
-  if (!_olmNewContentId) return;
-  // Delete the newly uploaded file (not needed as advertiser registers fresh)
-  fetch('/api/content/' + _olmNewContentId, {
-    method:'DELETE',
-    headers:{'Authorization':'Bearer '+_token}
-  }).catch(()=>{});
-  _olmNewContentId = null; _olmNewTier = null;
-  // Redirect to main advertiser portal
-  window.open('/?register=advertiser', '_blank');
-}
-
-function olmCancel() {
-  document.getElementById('one-limit-overlay').style.display = 'none';
-  if (_olmNewContentId) {
-    // Clean up the uploaded file
-    fetch('/api/content/' + _olmNewContentId, {
-      method:'DELETE',
-      headers:{'Authorization':'Bearer '+_token}
-    }).catch(()=>{});
-  }
-  _olmNewContentId = null; _olmNewTier = null;
 }
 
 async function handleFileUpload(e) {
@@ -545,66 +567,157 @@ async function handleFileUpload(e) {
   const prog = document.getElementById('upload-progress');
   const fill = document.getElementById('upload-prog-fill');
   const text = document.getElementById('upload-prog-text');
-  prog.style.display = 'block';
-  fill.style.width = '10%';
+  prog.style.display = 'block'; fill.style.width = '10%';
   text.textContent = 'Uploading ' + file.name + '…';
 
   const fd = new FormData();
   fd.append('file', file);
-
-  try {
-    const xhr = new XMLHttpRequest();
-    xhr.open('POST', '/api/content/upload');
-    xhr.setRequestHeader('Authorization', 'Bearer ' + _token);
-    xhr.upload.onprogress = ev => {
-      if (ev.lengthComputable) { fill.style.width = Math.round(ev.loaded/ev.total*85) + '%'; }
-    };
-    xhr.onload = async () => {
-      if (xhr.status >= 200 && xhr.status < 300) {
-        const res = JSON.parse(xhr.responseText);
-        // Update content_tier
-        const patchRes = await fetch('/api/content/' + res.id, {
-          method:'PATCH',
-          headers:{'Content-Type':'application/json','Authorization':'Bearer '+_token},
-          body: JSON.stringify({ content_tier: tier })
-        });
-        if (patchRes.status === 409) {
-          const patchData = await patchRes.json();
-          prog.style.display = 'none';
-          fill.style.width = '0%';
-          _olmNewContentId = res.id;
-          _olmNewTier = tier;
-          document.getElementById('olm-existing-name').textContent = patchData.existing?.original_name || 'Unknown file';
-          document.getElementById('one-limit-overlay').style.display = 'flex';
-        } else if (patchRes.ok) {
-          fill.style.width = '100%';
-          text.textContent = '&#10003; Uploaded successfully';
-          setTimeout(()=>{ prog.style.display='none'; fill.style.width='0%'; }, 2000);
-          loadContent();
-        } else {
-          const pErr = await patchRes.json().catch(()=>({}));
-          text.textContent = 'Error: ' + (pErr.error||'Failed to set content type');
-          setTimeout(()=>prog.style.display='none',3000);
-        }
+  const xhr = new XMLHttpRequest();
+  xhr.open('POST', '/api/content/upload');
+  xhr.setRequestHeader('Authorization', 'Bearer ' + _token);
+  xhr.upload.onprogress = ev => { if(ev.lengthComputable) fill.style.width = Math.round(ev.loaded/ev.total*85)+'%'; };
+  xhr.onload = async () => {
+    if (xhr.status >= 200 && xhr.status < 300) {
+      const res = JSON.parse(xhr.responseText);
+      const patchRes = await fetch('/api/content/' + res.id, {
+        method:'PATCH', headers:{'Content-Type':'application/json','Authorization':'Bearer '+_token},
+        body: JSON.stringify({content_tier: tier})
+      });
+      if (patchRes.status === 409) {
+        const pd = await patchRes.json();
+        prog.style.display = 'none'; fill.style.width = '0%';
+        _olmNewContentId = res.id; _olmNewTier = tier;
+        document.getElementById('olm-existing-name').textContent = pd.existing?.original_name || 'Unknown file';
+        document.getElementById('one-limit-overlay').style.display = 'flex';
+      } else if (patchRes.ok) {
+        fill.style.width = '100%';
+        text.textContent = '✓ Uploaded!';
+        setTimeout(()=>{ prog.style.display='none'; fill.style.width='0%'; }, 2000);
+        loadContent();
+        showToast('Content uploaded!', 'success');
       } else {
-        const err = JSON.parse(xhr.responseText);
-        text.textContent = 'Error: ' + (err.error||'Upload failed');
-        setTimeout(()=>prog.style.display='none',3000);
+        const pe = await patchRes.json().catch(()=>({}));
+        text.textContent = 'Error: '+(pe.error||'Failed');
+        setTimeout(()=>prog.style.display='none', 3000);
       }
-    };
-    xhr.onerror = () => { text.textContent = 'Upload failed'; };
-    xhr.send(fd);
-  } catch(e) { text.textContent = 'Error: '+e.message; }
+    } else {
+      const err = JSON.parse(xhr.responseText||'{}');
+      text.textContent = 'Error: '+(err.error||'Upload failed');
+      setTimeout(()=>prog.style.display='none', 3000);
+    }
+  };
+  xhr.onerror = ()=>{ text.textContent = 'Upload failed'; };
+  xhr.send(fd);
   e.target.value = '';
 }
 
-// Auto-login if token exists
-(async () => {
+// ── OLM ──────────────────────────────────────────────────────────
+async function olmReplace() {
+  document.getElementById('one-limit-overlay').style.display = 'none';
+  try {
+    const existing = await api('/content');
+    const toDelete = existing.filter(c => c.content_tier === _olmNewTier && c.id !== _olmNewContentId);
+    for (const c of toDelete) await fetch('/api/content/'+c.id,{method:'DELETE',headers:{'Authorization':'Bearer '+_token}});
+    await fetch('/api/content/'+_olmNewContentId,{method:'PATCH',headers:{'Content-Type':'application/json','Authorization':'Bearer '+_token},body:JSON.stringify({content_tier:_olmNewTier})});
+    _olmNewContentId=null; _olmNewTier=null;
+    loadContent(); showToast('Content replaced!', 'success');
+  } catch(e) { showToast('Error: '+e.message,'error'); }
+}
+function olmRegisterAdvertiser() {
+  document.getElementById('one-limit-overlay').style.display = 'none';
+  if (_olmNewContentId) fetch('/api/content/'+_olmNewContentId,{method:'DELETE',headers:{'Authorization':'Bearer '+_token}}).catch(()=>{});
+  _olmNewContentId=null; _olmNewTier=null;
+  window.open('/?register=advertiser','_blank');
+}
+function olmCancel() {
+  document.getElementById('one-limit-overlay').style.display = 'none';
+  if (_olmNewContentId) fetch('/api/content/'+_olmNewContentId,{method:'DELETE',headers:{'Authorization':'Bearer '+_token}}).catch(()=>{});
+  _olmNewContentId=null; _olmNewTier=null;
+}
+
+// ── AGREEMENT ─────────────────────────────────────────────────────
+function loadAgreement() {
+  if (!_vpData) return;
+  const vp = _vpData;
+  const startDate = vp.approved_at ? new Date(vp.approved_at).toLocaleDateString('en-IN',{day:'2-digit',month:'long',year:'numeric'}) : '—';
+  const endDate = vp.approved_at ? new Date(new Date(vp.approved_at).setFullYear(new Date(vp.approved_at).getFullYear()+1)).toLocaleDateString('en-IN',{day:'2-digit',month:'long',year:'numeric'}) : '—';
+  document.getElementById('agr-body').innerHTML = `
+    <div class="agr-section"><div class="agr-label">Business Name</div><div class="agr-value">${esc(vp.business_name||'—')}</div></div>
+    <div class="agr-section"><div class="agr-label">Contact Person</div><div class="agr-value">${esc(vp.contact_name||'—')}</div></div>
+    <div class="agr-section"><div class="agr-label">City</div><div class="agr-value">${esc(vp.city||'—')}</div></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+      <div class="agr-section"><div class="agr-label">Start Date</div><div class="agr-value">${startDate}</div></div>
+      <div class="agr-section"><div class="agr-label">End Date</div><div class="agr-value">${endDate}</div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+      <div class="agr-section"><div class="agr-label">Term</div><div class="agr-value">1 Year</div></div>
+      <div class="agr-section"><div class="agr-label">Status</div><div class="agr-value"><span class="badge ${vp.approval_status==='approved'?'badge-green':'badge-yellow'}">${(vp.approval_status||'pending').toUpperCase()}</span></div></div>
+    </div>
+    <div class="agr-section"><div class="agr-label">Screens Linked</div><div class="agr-value">${(vp.screens||[]).length} screen(s)</div></div>
+    <div style="background:var(--bg);border-radius:8px;padding:12px 14px;margin-top:8px;font-size:13px;color:var(--text2);line-height:1.6;">
+      <strong>Key Terms:</strong> Slot sharing model — no monetary exchange. Paid advertiser content has priority. Venue partner bears electricity &amp; internet costs. Termination with 7 days' notice. Venue partner responsible for equipment safety.
+    </div>`;
+}
+
+function printAgreement() {
+  if (!_vpData) return;
+  const vp = _vpData;
+  const today = new Date().toLocaleDateString('en-IN',{day:'2-digit',month:'long',year:'numeric'});
+  const agr = document.getElementById('agr-print');
+  agr.innerHTML = `
+    <style>
+      @media print { body > *:not(#agr-print) { display: none !important; } #agr-print { display: block !important; } }
+      #agr-print { font-family:'Times New Roman',serif; max-width:750px; margin:0 auto; padding:40px 48px; color:#111; line-height:1.7; font-size:13pt; }
+      #agr-print h1 { text-align:center; font-size:16pt; margin-bottom:6px; }
+      #agr-print .sub { text-align:center; font-size:11pt; color:#555; margin-bottom:32px; }
+      #agr-print h2 { font-size:13pt; margin-top:24px; margin-bottom:6px; }
+      #agr-print p { margin-bottom:10px; text-align:justify; }
+      #agr-print .sig-grid { display:grid; grid-template-columns:1fr 1fr; gap:40px; margin-top:48px; }
+      #agr-print .sig-box p { border-top:1px solid #333; margin-top:48px; padding-top:6px; font-size:11pt; }
+      .print-btn { background:#7b68c8; color:#fff; border:none; padding:10px 24px; border-radius:8px; font-size:13px; cursor:pointer; margin-bottom:24px; }
+      @media print { .print-btn { display:none; } }
+    </style>
+    <button class="print-btn" onclick="window.print()">🖨️ Print / Save PDF</button>
+    <h1>Venue Partner Agreement</h1>
+    <div class="sub">Digital Signage Network Participation Agreement</div>
+    <p>This Agreement is entered into as of <strong>${today}</strong>, between <strong>extrravenue</strong> ("Company"), AND <strong>${esc(vp.contact_name||'[Contact Name]')}</strong>, operating <strong>${esc(vp.business_name||'[Business Name]')}</strong> at <strong>${esc(vp.city||'[City]')}</strong> ("Venue Partner").</p>
+    <h2>1. Screen &amp; Installation</h2>
+    <p>extrravenue shall connect the digital screen at Venue Partner's premises to its CMS. extrravenue retains ownership of its media player hardware installed at the premises.</p>
+    <h2>2. Content Slot Allocation</h2>
+    <p>Venue Partner is entitled to display their own content during Filler Slots — time not occupied by paid advertiser content. Paid third-party advertiser content takes absolute scheduling priority.</p>
+    <h2>3. Utilities</h2>
+    <p>Venue Partner bears all costs for electricity and internet connectivity at their premises required to operate the screen and media player.</p>
+    <h2>4. Content Guidelines</h2>
+    <p>Venue Partner shall ensure all uploaded content complies with applicable Indian laws. extrravenue reserves the right to remove violating content without notice.</p>
+    <h2>5. Monetary Terms</h2>
+    <p>Non-monetary, service-exchange basis. No revenue share, rental fee, or commission payable by either Party.</p>
+    <h2>6. Term &amp; Termination</h2>
+    <p>Valid for <strong>ONE (1) YEAR</strong> from signing, auto-renews unless either Party provides 30 days written notice. Either Party may terminate with <strong>7 days' written notice</strong>.</p>
+    <h2>7. Equipment Liability</h2>
+    <p>Venue Partner is responsible for protecting extrravenue's installed hardware from damage, theft, or vandalism and shall bear cost of repair or replacement resulting from negligence.</p>
+    <h2>8. Governing Law</h2>
+    <p>Governed by laws of India. Disputes resolved amicably within 15 days, failing which through arbitration under the Arbitration and Conciliation Act, 1996.</p>
+    <div class="sig-grid">
+      <div class="sig-box"><p>For extrravenue<br>Name: ___________________<br>Designation: ____________<br>Date: ${today}</p></div>
+      <div class="sig-box"><p>For Venue Partner<br>Name: ${esc(vp.contact_name||'___________________')}<br>Business: ${esc(vp.business_name||'')}<br>Date: ${today}</p></div>
+    </div>`;
+  agr.style.display = 'block';
+  window.scrollTo(0,0);
+  setTimeout(()=>window.print(), 400);
+  setTimeout(()=>{ agr.style.display='none'; }, 3000);
+}
+
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// Auto-login
+(async()=>{
   if (_token) {
     try {
       const me = await api('/auth/me');
       if (me.role === 'venue_partner') { initApp(me); return; }
-    } catch(e) { localStorage.removeItem('vp_token'); _token=''; }
+    } catch(e) { try{localStorage.removeItem('vp_token');}catch(e){} _token=''; }
   }
 })();
 </script>
