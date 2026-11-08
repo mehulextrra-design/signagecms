@@ -297,6 +297,25 @@ async function disconnectSession(userId) {
   );
 }
 
+// ── Build caption from template + contact data ──────────────────────────────
+
+function buildCaption(customMsg, contact, camp) {
+  const name     = contact.name || 'Customer';
+  const greeting = `Namaste ${name},`;
+  const footer   = [
+    camp.business_name || 'ExtrraVenue',
+    camp.business_mobile ? `📞 ${camp.business_mobile}` : null,
+  ].filter(Boolean).join('\n');
+
+  // Middle: user's custom message, with optional {{Campaign}} / {{City}} variables
+  let middle = (customMsg || `🎉 *${camp.name || 'Campaign'}*`).trim();
+  middle = middle
+    .replace(/\{\{Campaign\}\}/gi, camp.name        || '')
+    .replace(/\{\{City\}\}/gi,     camp.business_city || '');
+
+  return `${greeting}\n\n${middle}\n\n${footer}`;
+}
+
 // ── Send single message ─────────────────────────────────────────────────────
 
 async function sendMessage(sock, phone, mediaUrl, caption, contentType) {
@@ -318,8 +337,8 @@ async function sendWaBroadcast(campaignId) {
   await ensureWaTables();
 
   const campResult = await query(
-    `SELECT c.id, c.user_id, c.title AS name, c.wa_broadcast_enabled,
-            u.wa_enabled,
+    `SELECT c.id, c.user_id, c.title AS name, c.wa_broadcast_enabled, c.wa_caption_template,
+            u.wa_enabled, u.mobile AS business_mobile, u.city AS business_city,
             con.file_url AS image_url, con.type AS content_type, u.business_name
      FROM campaigns c
      JOIN users u ON u.id = c.user_id
@@ -371,12 +390,12 @@ async function sendWaBroadcast(campaignId) {
     return;
   }
 
-  const caption = `🎉 ${camp.name}\n\n📍 ${camp.business_name || 'ExtrraVenue'}\n🔗 extrravenue.com`;
   console.log(`[WA Broadcast] Sending to ${contacts.length} contacts, image: ${camp.image_url}`);
 
   let sent = 0, failed = 0;
 
   for (const contact of contacts) {
+    const caption = buildCaption(camp.wa_caption_template, contact, camp);
     try {
       await sendMessage(sock, contact.phone, camp.image_url, caption, camp.content_type);
       sent++;

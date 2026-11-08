@@ -411,10 +411,17 @@ async function applyCriticalFixes(pool) {
       await pool.query(`ALTER TABLE wa_disclaimer_acceptances ALTER COLUMN user_id TYPE UUID USING NULL`);
       console.log('[DB] WA tables migrated INTEGER -> UUID');
     } else {
-      // Tables exist with correct UUID type — ensure unique index exists (migration 025 missed it)
+      // Tables exist with correct UUID type
+      // Dedup first (migration 027 had wrong order: CREATE INDEX before DELETE),
+      // then ensure unique index — safe even if index already exists
       try {
+        await pool.query(`
+          DELETE FROM wa_contacts a
+          USING wa_contacts b
+          WHERE a.id > b.id AND a.user_id = b.user_id AND a.phone = b.phone
+        `);
         await pool.query(`CREATE UNIQUE INDEX IF NOT EXISTS wa_contacts_unique_phone ON wa_contacts(user_id, phone)`);
-      } catch (e) { /* index already exists */ }
+      } catch (e) { console.warn('[DB] wa_contacts dedup/index warn:', e.message); }
       console.log('[DB] WA tables OK (UUID)');
     }
   } catch (err) {
