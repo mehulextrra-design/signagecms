@@ -310,7 +310,7 @@ async function sendWaBroadcast(campaignId) {
   await ensureWaTables();
   // Get campaign + user
   const campResult = await query(
-    `SELECT c.id, c.user_id, c.title AS name, c.caption, c.wa_broadcast_enabled,
+    `SELECT c.id, c.user_id, c.title AS name, c.wa_broadcast_enabled,
             u.wa_enabled,
             con.media_url AS image_url, u.business_name
      FROM campaigns c
@@ -354,7 +354,7 @@ async function sendWaBroadcast(campaignId) {
 
   const sock = await initSession(userId);
 
-  const caption = `🎉 ${camp.name}\n\n${camp.caption || ''}\n\n📍 ${camp.business_name || 'ExtrraVenue'}\n🔗 extrravenue.com`;
+  const caption = `🎉 ${camp.name}\n\n📍 ${camp.business_name || 'ExtrraVenue'}\n🔗 extrravenue.com`;
 
   let sent = 0, failed = 0;
 
