@@ -91,6 +91,9 @@ router.post('/upload', authenticate, upload.single('file'), async (req, res, nex
     const storedName = req.file.filename;
     const filePath = req.file.filename;
 
+    // VP can pass a custom title; fall back to original filename
+    const displayName = (req.body.title || '').trim() || originalname;
+
     // Cloudinary returns duration (seconds) for video uploads
     const durationSec = type === 'video' && req.file.duration
       ? parseFloat(parseFloat(req.file.duration).toFixed(3))
@@ -99,7 +102,7 @@ router.post('/upload', authenticate, upload.single('file'), async (req, res, nex
     const result = await query(
       `INSERT INTO content (user_id, original_name, stored_name, file_path, file_url, mime_type, file_size, type, duration_sec)
        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING *`,
-      [req.user.id, originalname, storedName, filePath, fileUrl, mimetype, size, type, durationSec]
+      [req.user.id, displayName, storedName, filePath, fileUrl, mimetype, size, type, durationSec]
     );
     res.status(201).json(result.rows[0]);
   } catch (err) { next(err); }
@@ -166,7 +169,32 @@ router.post('/:id/approve', authenticate, async (req, res, next) => {
       [req.params.id, req.body.note || null]
     );
     if (!result.rows.length) return res.status(404).json({ error: 'Not found' });
-    res.json({ ok: true, ...result.rows[0] });
+    const c = result.rows[0];
+
+    // Notify relevant screens to reload their schedule
+    if (c.content_tier === 'venue_own') {
+      // Only screens assigned to this VP
+      query(
+        `INSERT INTO remote_commands (screen_id, command, payload)
+         SELECT s.id, 'reload', '{"reason":"venue_content_approved"}'
+         FROM screens s JOIN users u ON u.id = $1
+         WHERE s.venue_partner_id = u.venue_partner_id AND s.status = 'online'`,
+        [c.user_id]
+      ).catch(() => {});
+    } else if (c.content_tier === 'venue_cross') {
+      // All screens in this VP's city
+      query(
+        `INSERT INTO remote_commands (screen_id, command, payload)
+         SELECT s.id, 'reload', '{"reason":"venue_content_approved"}'
+         FROM screens s
+         JOIN users u ON u.id = $1
+         JOIN venue_partners vp ON vp.id = u.venue_partner_id
+         WHERE LOWER(TRIM(s.city)) = LOWER(TRIM(vp.city)) AND s.status = 'online'`,
+        [c.user_id]
+      ).catch(() => {});
+    }
+
+    res.json({ ok: true, ...c });
   } catch (err) { next(err); }
 });
 

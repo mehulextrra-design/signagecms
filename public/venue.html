@@ -330,12 +330,12 @@ body {
     <!-- MY CONTENT TAB -->
     <div class="tab-panel" id="tab-content">
       <div class="upload-row">
-        <div class="upload-box" onclick="triggerUpload('venue_own')">
+        <div class="upload-box" onclick="openTitlePrompt('venue_own')">
           <div class="upload-box-icon">🖥️</div>
           <div class="upload-box-title">Your Screen Content</div>
           <div class="upload-box-sub">Menu, offers, promos<br>Plays on your screen only</div>
         </div>
-        <div class="upload-box" onclick="triggerUpload('venue_cross')">
+        <div class="upload-box" onclick="openTitlePrompt('venue_cross')">
           <div class="upload-box-icon">🌐</div>
           <div class="upload-box-title">Network Ad (Free)</div>
           <div class="upload-box-sub">Your ad on other screens<br>City-wide reach, free</div>
@@ -344,6 +344,20 @@ body {
 
       <input type="file" id="file-input-venue" accept="video/*,image/*" style="display:none" onchange="handleFileUpload(event)">
       <input type="hidden" id="upload-tier">
+      <input type="hidden" id="upload-title">
+
+      <!-- Title prompt overlay -->
+      <div id="title-prompt-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200;align-items:center;justify-content:center;">
+        <div style="background:var(--card-bg,#fff);border-radius:14px;padding:28px 24px;width:340px;max-width:92vw;box-shadow:0 20px 60px rgba(0,0,0,0.25);">
+          <div style="font-weight:700;font-size:16px;margin-bottom:6px;" id="title-prompt-heading">Content ka naam do</div>
+          <div style="font-size:13px;color:var(--text3);margin-bottom:16px;">Yeh naam PoP report mein dikhega. File naam chhoddo to automatically use hoga.</div>
+          <input type="text" id="content-title-input" class="form-input" placeholder="e.g. Lunch Offer, Summer Promo…" style="width:100%;margin-bottom:16px;" maxlength="80" onkeydown="if(event.key==='Enter')confirmTitleAndUpload()">
+          <div style="display:flex;gap:10px;justify-content:flex-end;">
+            <button onclick="closeTitlePrompt()" class="btn btn-ghost" style="min-width:70px;">Cancel</button>
+            <button onclick="confirmTitleAndUpload()" class="btn btn-primary" style="min-width:100px;">File Choose Karo →</button>
+          </div>
+        </div>
+      </div>
 
       <div class="prog-wrap" id="upload-progress">
         <div class="prog-bar"><div class="prog-fill" id="upload-prog-fill"></div></div>
@@ -593,6 +607,27 @@ async function loadContent() {
   } catch(e) { grid.innerHTML = '<div class="empty" style="color:var(--danger);">'+esc(e.message)+'</div>'; }
 }
 
+function openTitlePrompt(tier) {
+  document.getElementById('upload-tier').value = tier;
+  document.getElementById('content-title-input').value = '';
+  const heading = tier === 'venue_own' ? '🖥️ Screen Content ka naam do' : '🌐 Network Ad ka naam do';
+  document.getElementById('title-prompt-heading').textContent = heading;
+  const overlay = document.getElementById('title-prompt-overlay');
+  overlay.style.display = 'flex';
+  setTimeout(() => document.getElementById('content-title-input').focus(), 50);
+}
+
+function closeTitlePrompt() {
+  document.getElementById('title-prompt-overlay').style.display = 'none';
+}
+
+function confirmTitleAndUpload() {
+  const title = document.getElementById('content-title-input').value.trim();
+  document.getElementById('upload-title').value = title;
+  closeTitlePrompt();
+  document.getElementById('file-input-venue').click();
+}
+
 function triggerUpload(tier) {
   document.getElementById('upload-tier').value = tier;
   document.getElementById('file-input-venue').click();
@@ -610,6 +645,9 @@ async function handleFileUpload(e) {
 
   const fd = new FormData();
   fd.append('file', file);
+  const titleVal = document.getElementById('upload-title').value.trim();
+  if (titleVal) fd.append('title', titleVal);
+  document.getElementById('upload-title').value = '';
   const xhr = new XMLHttpRequest();
   xhr.open('POST', '/api/content/upload');
   xhr.setRequestHeader('Authorization', 'Bearer ' + _token);
