@@ -5,7 +5,9 @@ import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
 import android.os.Build
+import android.os.Handler
 import android.os.IBinder
+import android.os.Looper
 import androidx.core.app.NotificationCompat
 import `in`.signagecms.player.PlayerActivity
 import `in`.signagecms.player.R
@@ -19,14 +21,18 @@ class PlayerService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         startForeground(NOTIF_ID, buildNotification())
 
-        // If the player was killed by the OS (memory pressure) and the service
-        // is being restarted via START_STICKY, bring the activity back to front.
-        if (!PlayerActivity.isVisible) {
-            val launch = Intent(this, SetupActivity::class.java).apply {
-                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        // Delay check by 2s: PlayerActivity sets isVisible=true in onResume(),
+        // which runs after onCreate() where startForegroundService() is called.
+        // Without delay, service would always see isVisible=false on initial start
+        // and incorrectly redirect to SetupActivity, closing the player.
+        Handler(Looper.getMainLooper()).postDelayed({
+            if (!PlayerActivity.isVisible) {
+                val launch = Intent(this, SetupActivity::class.java).apply {
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                }
+                try { startActivity(launch) } catch (e: Exception) { /* ignore */ }
             }
-            try { startActivity(launch) } catch (e: Exception) { /* ignore */ }
-        }
+        }, 2000L)
 
         return START_STICKY
     }
