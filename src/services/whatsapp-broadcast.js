@@ -312,7 +312,7 @@ async function sendWaBroadcast(campaignId) {
   const campResult = await query(
     `SELECT c.id, c.user_id, c.title AS name, c.wa_broadcast_enabled,
             u.wa_enabled,
-            con.media_url AS image_url, u.business_name
+            con.file_url AS image_url, con.type AS content_type, u.business_name
      FROM campaigns c
      JOIN users u ON u.id = c.user_id
      LEFT JOIN content con ON con.id = c.content_id
@@ -326,7 +326,8 @@ async function sendWaBroadcast(campaignId) {
   // Guard: feature must be enabled for this user, and campaign opted-in
   if (!camp.wa_enabled) return;
   if (!camp.wa_broadcast_enabled) return;
-  if (!camp.image_url) return;
+  if (!camp.image_url) { console.log(`[WA Broadcast] Campaign ${campaignId}: no image_url, skipping`); return; }
+  if (camp.content_type === 'video') { console.log(`[WA Broadcast] Campaign ${campaignId}: video content not supported for WA, skipping`); return; }
 
   const userId = camp.user_id;
 
