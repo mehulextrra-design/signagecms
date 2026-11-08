@@ -309,6 +309,18 @@ app.get('/admin', (req, res) => {
   res.sendFile(path.join(__dirname, '../public/admin.html'));
 });
 
+// Inspector portal shortcut — no-cache
+app.get('/inspector', (req, res) => {
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.sendFile(path.join(__dirname, '../public/inspector.html'));
+});
+app.get('/inspector.html', (req, res) => {
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.sendFile(path.join(__dirname, '../public/inspector.html'));
+});
+
 // Serve generated invoice PDFs for WhatsApp delivery (bypasses Cloudinary)
 const { getPDF } = require('./services/pdf-store');
 app.get('/pdfs/:invoiceNo', (req, res) => {
