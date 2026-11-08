@@ -299,9 +299,13 @@ async function disconnectSession(userId) {
 
 // ── Send single message ─────────────────────────────────────────────────────
 
-async function sendMessage(sock, phone, imageUrl, caption) {
+async function sendMessage(sock, phone, mediaUrl, caption, contentType) {
   const jid = phone.replace(/\D/g, '') + '@s.whatsapp.net';
-  await sock.sendMessage(jid, { image: { url: imageUrl }, caption });
+  if (contentType === 'video') {
+    await sock.sendMessage(jid, { video: { url: mediaUrl }, caption });
+  } else {
+    await sock.sendMessage(jid, { image: { url: mediaUrl }, caption });
+  }
 }
 
 // ── Broadcast ───────────────────────────────────────────────────────────────
@@ -327,7 +331,6 @@ async function sendWaBroadcast(campaignId) {
   if (!camp.wa_enabled) return;
   if (!camp.wa_broadcast_enabled) return;
   if (!camp.image_url) { console.log(`[WA Broadcast] Campaign ${campaignId}: no image_url, skipping`); return; }
-  if (camp.content_type === 'video') { console.log(`[WA Broadcast] Campaign ${campaignId}: video content not supported for WA, skipping`); return; }
 
   const userId = camp.user_id;
 
@@ -361,14 +364,14 @@ async function sendWaBroadcast(campaignId) {
 
   for (const contact of contacts) {
     try {
-      await sendMessage(sock, contact.phone, camp.image_url, caption);
+      await sendMessage(sock, contact.phone, camp.image_url, caption, camp.content_type);
       sent++;
     } catch (err) {
       console.error(`[WA Broadcast] Failed to send to ${contact.phone}:`, err.message);
       // One retry
       try {
         await new Promise(r => setTimeout(r, 2000));
-        await sendMessage(sock, contact.phone, camp.image_url, caption);
+        await sendMessage(sock, contact.phone, camp.image_url, caption, camp.content_type);
         sent++;
       } catch (_) {
         failed++;
