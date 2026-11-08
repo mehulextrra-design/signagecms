@@ -224,6 +224,51 @@ router.get('/activity', authenticate, requireAdmin, async (req, res, next) => {
   } catch (err) { next(err); }
 });
 
+// GET /api/reports/wa-broadcast/:campaign_id — WA broadcast analytics for a campaign
+router.get('/wa-broadcast/:campaign_id', authenticate, async (req, res, next) => {
+  try {
+    const isAdmin = ['admin', 'superadmin'].includes(req.user.role);
+
+    // Get most recent broadcast for this campaign, enforce ownership for non-admin
+    const broadcastRes = await query(
+      `SELECT wb.id, wb.total_contacts, wb.sent_count, wb.failed_count,
+              wb.status, wb.started_at, wb.completed_at, c.title AS campaign_title
+       FROM wa_broadcasts wb
+       JOIN campaigns c ON c.id = wb.campaign_id
+       WHERE wb.campaign_id = $1 ${isAdmin ? '' : 'AND c.user_id = $2'}
+       ORDER BY wb.id DESC LIMIT 1`,
+      isAdmin ? [req.params.campaign_id] : [req.params.campaign_id, req.user.id]
+    );
+
+    if (!broadcastRes.rows.length) return res.json({ broadcast: null, messages: [] });
+    const broadcast = broadcastRes.rows[0];
+
+    // Check if wa_broadcast_messages table exists (migration 030 may not have run yet)
+    const tableCheck = await query(
+      `SELECT 1 FROM information_schema.tables WHERE table_name='wa_broadcast_messages'`
+    );
+    if (!tableCheck.rows.length) return res.json({ broadcast, messages: [] });
+
+    const msgsRes = await query(
+      `SELECT phone, contact_name AS name, status, sent_at, delivered_at, read_at
+       FROM wa_broadcast_messages
+       WHERE broadcast_id = $1
+       ORDER BY sent_at ASC`,
+      [broadcast.id]
+    );
+
+    const msgs = msgsRes.rows;
+    const delivered = msgs.filter(m => m.status >= 3).length;
+    const read      = msgs.filter(m => m.status >= 4).length;
+    const failed    = msgs.filter(m => m.status === 0).length;
+
+    res.json({
+      broadcast: { ...broadcast, delivered_count: delivered, read_count: read },
+      messages: msgs,
+    });
+  } catch (err) { next(err); }
+});
+
 // POST /api/reports/whatsapp/send-all — admin: trigger weekly report for all live advertisers
 router.post('/whatsapp/send-all', authenticate, requireAdmin, async (req, res, next) => {
   try {

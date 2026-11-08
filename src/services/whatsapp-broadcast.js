@@ -72,6 +72,19 @@ async function ensureWaTables() {
       user_agent         TEXT,
       disclaimer_version VARCHAR(20) NOT NULL DEFAULT 'v1'
     )`);
+    await query(`CREATE TABLE IF NOT EXISTS wa_broadcast_messages (
+      id           SERIAL PRIMARY KEY,
+      broadcast_id INTEGER REFERENCES wa_broadcasts(id) ON DELETE CASCADE,
+      message_id   TEXT NOT NULL,
+      phone        VARCHAR(20) NOT NULL,
+      contact_name VARCHAR(100),
+      status       SMALLINT NOT NULL DEFAULT 1,
+      sent_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      delivered_at TIMESTAMPTZ,
+      read_at      TIMESTAMPTZ
+    )`);
+    await query(`CREATE INDEX IF NOT EXISTS wa_bcast_msg_broadcast_idx ON wa_broadcast_messages(broadcast_id)`);
+    await query(`CREATE INDEX IF NOT EXISTS wa_bcast_msg_msgid_idx ON wa_broadcast_messages(message_id)`);
     console.log('[WA] Tables created with UUID user_id');
   }
   // else: tables already exist with correct UUID type — nothing to do
@@ -198,6 +211,23 @@ async function initSession(userId) {
 
   sock.ev.on('creds.update', saveCreds);
 
+  // ACK listener — update per-message delivery/read status
+  sock.ev.on('messages.update', (updates) => {
+    for (const { key, update } of updates) {
+      const msgId = key?.id;
+      const status = update?.status;
+      if (!msgId || status == null) continue;
+      const sets = [`status = GREATEST(status, $2)`];
+      const vals = [msgId, status];
+      if (status >= 3) sets.push(`delivered_at = COALESCE(delivered_at, NOW())`);
+      if (status >= 4) sets.push(`read_at = COALESCE(read_at, NOW())`);
+      query(
+        `UPDATE wa_broadcast_messages SET ${sets.join(', ')} WHERE message_id = $1`,
+        vals
+      ).catch(e => console.error('[WA] ACK update error:', e.message));
+    }
+  });
+
   sock.ev.on('connection.update', async ({ connection, lastDisconnect }) => {
     if (connection === 'close') {
       const shouldReconnect = lastDisconnect?.error?.output?.statusCode !== DisconnectReason.loggedOut;
@@ -320,14 +350,15 @@ function buildCaption(customMsg, contact, camp) {
 
 async function sendMessage(sock, phone, mediaUrl, caption, contentType) {
   let digits = phone.replace(/\D/g, '');
-  // Add India country code if 10-digit number
   if (digits.length === 10) digits = '91' + digits;
   const jid = digits + '@s.whatsapp.net';
+  let result;
   if (contentType === 'video') {
-    await sock.sendMessage(jid, { video: { url: mediaUrl }, caption });
+    result = await sock.sendMessage(jid, { video: { url: mediaUrl }, caption });
   } else {
-    await sock.sendMessage(jid, { image: { url: mediaUrl }, caption });
+    result = await sock.sendMessage(jid, { image: { url: mediaUrl }, caption });
   }
+  return result?.key?.id || null;
 }
 
 // ── Broadcast ───────────────────────────────────────────────────────────────
@@ -396,22 +427,33 @@ async function sendWaBroadcast(campaignId) {
 
   for (const contact of contacts) {
     const caption = buildCaption(camp.wa_caption_template, contact, camp);
+    let msgId = null;
     try {
-      await sendMessage(sock, contact.phone, camp.image_url, caption, camp.content_type);
+      msgId = await sendMessage(sock, contact.phone, camp.image_url, caption, camp.content_type);
       sent++;
-      console.log(`[WA Broadcast] Sent to ${contact.phone}`);
+      console.log(`[WA Broadcast] Sent to ${contact.phone} msgId=${msgId}`);
     } catch (err) {
       console.error(`[WA Broadcast] Failed (attempt 1) to ${contact.phone}:`, err.message);
       try {
         await new Promise(r => setTimeout(r, 2000));
-        await sendMessage(sock, contact.phone, camp.image_url, caption, camp.content_type);
+        msgId = await sendMessage(sock, contact.phone, camp.image_url, caption, camp.content_type);
         sent++;
-        console.log(`[WA Broadcast] Retry OK: ${contact.phone}`);
+        console.log(`[WA Broadcast] Retry OK: ${contact.phone} msgId=${msgId}`);
       } catch (err2) {
         console.error(`[WA Broadcast] Failed (attempt 2) to ${contact.phone}:`, err2.message);
         failed++;
       }
     }
+    // Record per-contact message row (status 1=sent, 0=failed)
+    const rowStatus = msgId ? 1 : 0;
+    const rowMsgId  = msgId || `failed_${contact.phone}_${Date.now()}`;
+    query(
+      `INSERT INTO wa_broadcast_messages (broadcast_id, message_id, phone, contact_name, status, sent_at)
+       VALUES ($1, $2, $3, $4, $5, NOW())
+       ON CONFLICT DO NOTHING`,
+      [broadcastId, rowMsgId, contact.phone, contact.name || null, rowStatus]
+    ).catch(e => console.error('[WA Broadcast] msg row insert error:', e.message));
+
     await new Promise(r => setTimeout(r, BROADCAST_CONFIG.delayMs));
   }
 
