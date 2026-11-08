@@ -198,6 +198,25 @@ router.post('/:id/approve', authenticate, async (req, res, next) => {
   } catch (err) { next(err); }
 });
 
+// POST /api/content/reload-city — admin: force reload all screens in a city (for already-approved content)
+router.post('/reload-city', authenticate, async (req, res, next) => {
+  if (!['admin', 'superadmin'].includes(req.user.role)) return res.status(403).json({ error: 'Admin only' });
+  const { city } = req.body;
+  if (!city) return res.status(400).json({ error: 'city required' });
+  try {
+    const result = await query(
+      `INSERT INTO remote_commands (screen_id, command, payload)
+       SELECT s.id, 'reload', '{"reason":"force_city_reload"}'
+       FROM screens s
+       WHERE LOWER(TRIM(s.city)) = LOWER(TRIM($1))
+         AND s.status = 'online'
+       RETURNING screen_id`,
+      [city]
+    );
+    res.json({ ok: true, screens_notified: result.rows.length });
+  } catch (err) { next(err); }
+});
+
 // POST /api/content/:id/reject — admin rejects venue content
 router.post('/:id/reject', authenticate, async (req, res, next) => {
   if (!['admin', 'superadmin'].includes(req.user.role)) return res.status(403).json({ error: 'Admin only' });

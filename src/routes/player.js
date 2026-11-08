@@ -297,6 +297,24 @@ router.post('/heartbeat', authenticatePlayer, async (req, res, next) => {
          WHERE cs.screen_id = $1 AND c.status IN ('approved','live')
          UNION ALL
          SELECT id FROM filler_content WHERE is_active = TRUE
+         UNION ALL
+         SELECT ct.id FROM content ct
+         JOIN users u ON u.id = ct.user_id
+         JOIN venue_partners vp ON vp.id = u.venue_partner_id
+         JOIN screens s ON s.id = $1
+         WHERE ct.content_tier = 'venue_own'
+           AND ct.status = 'active'
+           AND ct.approval_status = 'approved'
+           AND u.venue_partner_id = s.venue_partner_id
+         UNION ALL
+         SELECT ct.id FROM content ct
+         JOIN users u ON u.id = ct.user_id
+         JOIN venue_partners vp ON vp.id = u.venue_partner_id
+         JOIN screens s ON s.id = $1
+         WHERE ct.content_tier = 'venue_cross'
+           AND ct.status = 'active'
+           AND ct.approval_status = 'approved'
+           AND LOWER(TRIM(vp.city)) = LOWER(TRIM(COALESCE(s.city,'')))
        ) sub`,
       [screenId]
     ).catch(() => ({ rows: [{ hash: null }] }));

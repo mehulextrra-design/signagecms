@@ -566,9 +566,11 @@ textarea.form-input{resize:vertical;min-height:80px;}
         <div class="section-head">
           <h2>Venue Content Approvals</h2>
           <button class="btn btn-outline btn-sm" onclick="loadVCApprovals()">↻ Refresh</button>
+          <button class="btn btn-sm" style="background:#7c3aed;color:#fff;border:none;" onclick="promptReloadCity()">⟳ Reload City Screens</button>
         </div>
         <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px 16px;margin-bottom:16px;font-size:13px;color:var(--text2);">
           Venue partners ka upload kiya content play hone se pehle yahan approve karna padega. Pending content screens pe nahi chalega.
+          <br><span style="color:#7c3aed;font-size:12px;">Tip: Pehle se approved content jo screens pe nahi chal raha — "Reload City Screens" se turant start hoga.</span>
         </div>
         <div id="vc-approvals-container">
           <div style="text-align:center;color:var(--text3);padding:48px;">Loading…</div>
@@ -2272,11 +2274,29 @@ async function loadVCApprovals() {
 
 async function approveVCContent(id) {
   try {
-    await api('/content/'+id+'/approve', { method:'POST', body:'{}' });
+    const res = await api('/content/'+id+'/approve', { method:'POST', body:'{}' });
     showToast('Content approved — ab screen pe chalega', 'success');
     document.getElementById('vc-card-'+id)?.remove();
     _updateVCBadge();
+    // Also send reload to city screens so they pick up the change immediately
+    if (res.content_tier === 'venue_cross' || res.content_tier === 'venue_own') {
+      reloadCityScreens(res.vp_city || res.city).catch(()=>{});
+    }
   } catch(e) { showToast('Error: '+e.message, 'error'); }
+}
+
+async function reloadCityScreens(city) {
+  if (!city) return;
+  try {
+    const r = await api('/content/reload-city', { method:'POST', body: JSON.stringify({city}) });
+    if (r.screens_notified > 0) showToast(`${r.screens_notified} screen(s) ko reload signal bheja`, 'success');
+  } catch(e) { console.warn('[reload-city]', e.message); }
+}
+
+function promptReloadCity() {
+  const city = prompt('City name enter karo (jo screens pe reload bhejna hai):');
+  if (!city || !city.trim()) return;
+  reloadCityScreens(city.trim()).then(() => {}).catch(() => {});
 }
 
 async function rejectVCContent(id) {
