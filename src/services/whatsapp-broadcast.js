@@ -300,7 +300,10 @@ async function disconnectSession(userId) {
 // ── Send single message ─────────────────────────────────────────────────────
 
 async function sendMessage(sock, phone, mediaUrl, caption, contentType) {
-  const jid = phone.replace(/\D/g, '') + '@s.whatsapp.net';
+  let digits = phone.replace(/\D/g, '');
+  // Add India country code if 10-digit number
+  if (digits.length === 10) digits = '91' + digits;
+  const jid = digits + '@s.whatsapp.net';
   if (contentType === 'video') {
     await sock.sendMessage(jid, { video: { url: mediaUrl }, caption });
   } else {
