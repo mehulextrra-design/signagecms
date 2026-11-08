@@ -1,9 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="teal">#0D9488</color>
-    <color name="teal_dark">#0F2D2B</color>
+    <color name="primary">#7b68c8</color>
+    <color name="primary_dark">#5a4fa0</color>
+    <color name="bg">#F0F0F5</color>
+    <color name="surface">#FFFFFF</color>
+    <color name="text">#12122a</color>
+    <color name="text2">#3a3a56</color>
+    <color name="text3">#7070a0</color>
+    <color name="border">#E0E0EE</color>
     <color name="black">#000000</color>
     <color name="white">#FFFFFF</color>
-    <color name="surface">#1E293B</color>
     <color name="text_hint">#94A3B8</color>
 </resources>

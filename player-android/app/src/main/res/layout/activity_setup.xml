@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#0F2D2B"
+    android:background="@color/bg"
     android:gravity="center"
     android:orientation="vertical"
     android:padding="40dp">
@@ -12,37 +12,45 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:orientation="vertical"
-        android:layout_marginBottom="40dp">
+        android:orientation="horizontal"
+        android:layout_marginBottom="32dp">
 
-        <TextView
-            android:layout_width="64dp"
-            android:layout_height="64dp"
-            android:background="@drawable/bg_logo"
-            android:gravity="center"
-            android:text="SC"
-            android:textColor="#FFFFFF"
-            android:textSize="22sp"
-            android:textStyle="bold" />
+        <ImageView
+            android:layout_width="36dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_ev_logo"
+            android:layout_marginEnd="10dp"/>
 
-        <TextView
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:text="SignageCMS"
-            android:textColor="#FFFFFF"
-            android:textSize="24sp"
-            android:textStyle="bold" />
+            android:orientation="vertical"
+            android:gravity="center_vertical">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="PLAYER"
-            android:textColor="#0D9488"
-            android:textSize="12sp"
-            android:letterSpacing="0.2"
-            android:textStyle="bold" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="extrravenue"
+                android:textColor="@color/primary"
+                android:textSize="22sp"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="PLAYER"
+                android:textColor="@color/primary"
+                android:textSize="10sp"
+                android:letterSpacing="0.15"
+                android:textStyle="bold"
+                android:background="#1A7b68c8"
+                android:paddingStart="6dp"
+                android:paddingEnd="6dp"
+                android:paddingTop="1dp"
+                android:paddingBottom="1dp"/>
+
+        </LinearLayout>
     </LinearLayout>
 
     <!-- Card -->
@@ -57,7 +65,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Screen Registration"
-            android:textColor="#0F172A"
+            android:textColor="@color/text"
             android:textSize="18sp"
             android:textStyle="bold"
             android:layout_marginBottom="4dp"/>
@@ -66,7 +74,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Enter the Screen Code from Admin Panel"
-            android:textColor="#64748B"
+            android:textColor="@color/text3"
             android:textSize="13sp"
             android:layout_marginBottom="20dp"/>
 
@@ -74,7 +82,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="SCREEN CODE"
-            android:textColor="#64748B"
+            android:textColor="@color/text3"
             android:textSize="11sp"
             android:textStyle="bold"
             android:letterSpacing="0.08"
@@ -88,7 +96,7 @@
             android:hint="e.g. MUM-001"
             android:inputType="textCapCharacters"
             android:padding="12dp"
-            android:textColor="#0F172A"
+            android:textColor="@color/text"
             android:textColorHint="#94A3B8"
             android:textSize="16sp"
             android:textStyle="bold"
@@ -98,7 +106,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="REGISTRATION PIN (if set by admin)"
-            android:textColor="#64748B"
+            android:textColor="@color/text3"
             android:textSize="11sp"
             android:textStyle="bold"
             android:letterSpacing="0.08"
@@ -113,7 +121,7 @@
             android:inputType="numberPassword"
             android:maxLength="8"
             android:padding="12dp"
-            android:textColor="#0F172A"
+            android:textColor="@color/text"
             android:textColorHint="#94A3B8"
             android:textSize="16sp"
             android:layout_marginBottom="16dp"/>
@@ -142,7 +150,7 @@
 
     </LinearLayout>
 
-    <!-- Already Registered Card — shown instead of registration form -->
+    <!-- Already Registered Card -->
     <LinearLayout
         android:id="@+id/layoutRegistered"
         android:layout_width="400dp"
@@ -152,7 +160,6 @@
         android:padding="28dp"
         android:visibility="gone">
 
-        <!-- Buttons at top for easy TV remote access -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -176,9 +183,9 @@
                 android:layout_width="0dp"
                 android:layout_height="48dp"
                 android:layout_weight="1"
-                android:background="#E2E8F0"
+                android:background="@color/border"
                 android:text="▶  Start Player"
-                android:textColor="#0F172A"
+                android:textColor="@color/text"
                 android:textSize="13sp"
                 android:textStyle="bold"/>
 
@@ -194,18 +201,17 @@
             android:visibility="gone"
             android:layout_marginBottom="12dp"/>
 
-        <!-- Divider -->
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="#E2E8F0"
+            android:background="@color/border"
             android:layout_marginBottom="16dp"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="SCREEN CODE"
-            android:textColor="#64748B"
+            android:textColor="@color/text3"
             android:textSize="11sp"
             android:textStyle="bold"
             android:letterSpacing="0.08"
@@ -215,7 +221,7 @@
             android:id="@+id/tvRegScreenCode"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="#0F172A"
+            android:textColor="@color/text"
             android:textSize="22sp"
             android:textStyle="bold"
             android:layout_marginBottom="12dp"/>
@@ -224,7 +230,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="SCREEN NAME"
-            android:textColor="#64748B"
+            android:textColor="@color/text3"
             android:textSize="11sp"
             android:textStyle="bold"
             android:letterSpacing="0.08"
@@ -234,7 +240,7 @@
             android:id="@+id/tvRegScreenName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="#0F172A"
+            android:textColor="@color/text"
             android:textSize="15sp"
             android:layout_marginBottom="12dp"/>
 
@@ -242,7 +248,7 @@
             android:id="@+id/tvRegVersion"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="#64748B"
+            android:textColor="@color/text3"
             android:textSize="13sp"/>
 
     </LinearLayout>
@@ -251,8 +257,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
-        android:text="signagecrm-production.up.railway.app"
-        android:textColor="#64748B"
+        android:text="extrravenue.com"
+        android:textColor="@color/text3"
         android:textSize="11sp"/>
 
 </LinearLayout>
