@@ -844,6 +844,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
               <span class="table-title">Leads</span>
               <div class="table-toolbar">
                 <button class="btn btn-primary btn-sm" onclick="openCreateInspector()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px;"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add Inspector</button>
+                <button class="btn btn-ghost btn-sm" onclick="openResetPassword()" title="Reset Inspector Password">🔑 Reset Password</button>
                 <input id="leads-search" type="text" placeholder="Search…" style="padding:5px 10px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:12px;background:var(--bg);color:var(--text);width:160px;" oninput="filterLeads()">
                 <select id="leads-status-filter" style="padding:5px 8px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:12px;background:var(--bg);color:var(--text);" onchange="filterLeads()">
                   <option value="">All Status</option>
@@ -1375,6 +1376,24 @@ textarea.form-input{resize:vertical;min-height:80px;}
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('create-adv-modal')">Cancel</button>
       <button class="btn btn-primary" id="ca-save-btn" onclick="createAdvertiser()">Create Advertiser</button>
+    </div>
+  </div>
+</div>
+
+<!-- Reset Password Modal -->
+<div class="modal-backdrop hidden" id="reset-password-modal">
+  <div class="modal" style="max-width:400px;">
+    <div class="modal-header">
+      <span class="modal-title">Reset User Password</span>
+      <button class="modal-close" onclick="closeModal('reset-password-modal')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div style="margin-bottom:12px;"><label class="form-label">User Email *</label><input id="rp-email" class="form-input" type="email" placeholder="inspector@email.com"></div>
+      <div style="margin-bottom:4px;"><label class="form-label">New Password * (min 8 chars)</label><input id="rp-pass" class="form-input" type="password" placeholder="New password"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('reset-password-modal')">Cancel</button>
+      <button class="btn btn-primary" id="rp-save-btn" onclick="resetUserPassword()">Reset Password</button>
     </div>
   </div>
 </div>
@@ -3332,6 +3351,26 @@ function openCreateInspector() {
     const el = document.getElementById(id); if(el) el.value = '';
   });
   document.getElementById('create-inspector-modal').classList.remove('hidden');
+}
+
+function openResetPassword() {
+  ['rp-email','rp-pass'].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
+  document.getElementById('reset-password-modal').classList.remove('hidden');
+}
+
+async function resetUserPassword() {
+  const btn = document.getElementById('rp-save-btn');
+  const email = document.getElementById('rp-email').value.trim();
+  const new_password = document.getElementById('rp-pass').value;
+  if (!email || !new_password) return showToast('Email aur password required', 'error');
+  if (new_password.length < 8) return showToast('Password min 8 characters hona chahiye', 'error');
+  btn.disabled = true; btn.textContent = 'Resetting…';
+  try {
+    await api('/auth/reset-user-password', { method:'POST', body: JSON.stringify({ email, new_password }) });
+    showToast('Password reset ho gaya!', 'success');
+    closeModal('reset-password-modal');
+  } catch(e) { showToast(e.message, 'error'); }
+  finally { btn.disabled = false; btn.textContent = 'Reset Password'; }
 }
 
 async function createInspector() {

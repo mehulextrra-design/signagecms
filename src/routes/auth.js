@@ -185,6 +185,28 @@ router.get('/me', authenticate, async (req, res, next) => {
   } catch (err) { next(err); }
 });
 
+// POST /api/auth/reset-user-password — admin resets any user's password
+router.post('/reset-user-password', authenticate, [
+  body('email').isEmail().normalizeEmail(),
+  body('new_password').isLength({ min: 8 }),
+], async (req, res, next) => {
+  if (!['admin', 'superadmin'].includes(req.user.role)) return res.status(403).json({ error: 'Admin only' });
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
+  const { email, new_password } = req.body;
+  try {
+    const result = await query('SELECT id, role FROM users WHERE email = $1', [email]);
+    if (!result.rows.length) return res.status(404).json({ error: 'User not found' });
+    // Admin cannot reset superadmin password
+    if (result.rows[0].role === 'superadmin' && req.user.role !== 'superadmin') {
+      return res.status(403).json({ error: 'Cannot reset superadmin password' });
+    }
+    const hash = await bcrypt.hash(new_password, 12);
+    await query('UPDATE users SET password_hash = $1, updated_at = NOW() WHERE id = $2', [hash, result.rows[0].id]);
+    res.json({ ok: true, message: 'Password reset successfully' });
+  } catch (err) { next(err); }
+});
+
 // POST /api/auth/change-password (admin only)
 router.post('/change-password', authenticate, [
   body('current_password').notEmpty(),
