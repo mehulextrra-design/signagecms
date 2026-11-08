@@ -308,19 +308,70 @@ textarea.form-input{resize:vertical;min-height:80px;}
       </div>
     </div>
     <h2 class="auth-title">Admin Sign In</h2>
-    <p class="auth-sub">Access restricted to platform administrators.</p>
+    <p class="auth-sub" id="auth-sub-title">Access restricted to platform administrators.</p>
     <div class="auth-error" id="auth-error"></div>
-    <div class="form-group">
-      <label class="form-label">Email</label>
-      <input type="email" id="auth-email" class="form-input" placeholder="admin@signagecms.in" value="admin@signagecms.in">
+
+    <!-- LOGIN VIEW -->
+    <div id="login-view">
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input type="email" id="auth-email" class="form-input" placeholder="admin@signagecms.in" value="admin@signagecms.in">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <div style="position:relative;">
+          <input type="password" id="auth-password" class="form-input" placeholder="Password" value="" style="padding-right:44px;">
+          <button type="button" onclick="togglePassVis('auth-password','eye-login')" tabindex="-1" style="position:absolute;right:0;top:0;bottom:0;width:42px;background:none;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#888;">
+            <svg id="eye-login" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+      </div>
+      <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:4px;" onclick="doLogin()" id="login-btn">
+        Sign In to Admin Panel
+      </button>
+      <div style="text-align:center;margin-top:12px;">
+        <a href="#" onclick="showForgotView();return false;" style="font-size:13px;color:var(--primary);text-decoration:none;">Forgot password?</a>
+      </div>
     </div>
-    <div class="form-group">
-      <label class="form-label">Password</label>
-      <input type="password" id="auth-password" class="form-input" placeholder="Password" value="">
+
+    <!-- FORGOT VIEW -->
+    <div id="forgot-view" style="display:none;">
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        <input type="email" id="forgot-email" class="form-input" placeholder="admin@signagecms.in">
+      </div>
+      <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:4px;" onclick="doForgotPassword()" id="forgot-btn">
+        Send Reset Link
+      </button>
+      <div style="text-align:center;margin-top:12px;">
+        <a href="#" onclick="showLoginView();return false;" style="font-size:13px;color:var(--primary);text-decoration:none;">&larr; Back to Sign In</a>
+      </div>
     </div>
-    <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:4px;" onclick="doLogin()" id="login-btn">
-      Sign In to Admin Panel
-    </button>
+
+    <!-- RESET VIEW -->
+    <div id="reset-view" style="display:none;">
+      <div class="form-group">
+        <label class="form-label">New Password</label>
+        <div style="position:relative;">
+          <input type="password" id="reset-pass1" class="form-input" placeholder="Min 8 characters" style="padding-right:44px;">
+          <button type="button" onclick="togglePassVis('reset-pass1','eye-r1')" tabindex="-1" style="position:absolute;right:0;top:0;bottom:0;width:42px;background:none;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#888;">
+            <svg id="eye-r1" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Confirm Password</label>
+        <div style="position:relative;">
+          <input type="password" id="reset-pass2" class="form-input" placeholder="Repeat password" style="padding-right:44px;">
+          <button type="button" onclick="togglePassVis('reset-pass2','eye-r2')" tabindex="-1" style="position:absolute;right:0;top:0;bottom:0;width:42px;background:none;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#888;">
+            <svg id="eye-r2" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+      </div>
+      <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:4px;" onclick="doResetPassword()" id="reset-btn">
+        Set New Password
+      </button>
+    </div>
   </div>
 </div>
 
@@ -1492,11 +1543,101 @@ async function doLogin() {
 }
 
 document.addEventListener('keydown', e => {
-  if(e.key === 'Enter' && !document.getElementById('auth-overlay').classList.contains('hidden')) doLogin();
+  if(e.key === 'Enter' && !document.getElementById('auth-overlay').classList.contains('hidden')) {
+    if(document.getElementById('forgot-view').style.display !== 'none') doForgotPassword();
+    else if(document.getElementById('reset-view').style.display !== 'none') doResetPassword();
+    else doLogin();
+  }
 });
+
+function togglePassVis(inputId, iconId) {
+  const inp = document.getElementById(inputId);
+  const icon = document.getElementById(iconId);
+  const isHidden = inp.type === 'password';
+  inp.type = isHidden ? 'text' : 'password';
+  icon.innerHTML = isHidden
+    ? '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>'
+    : '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+}
+
+function showLoginView() {
+  document.getElementById('login-view').style.display = '';
+  document.getElementById('forgot-view').style.display = 'none';
+  document.getElementById('reset-view').style.display = 'none';
+  document.getElementById('auth-sub-title').textContent = 'Access restricted to platform administrators.';
+  document.getElementById('auth-error').style.display = 'none';
+}
+
+function showForgotView() {
+  const email = document.getElementById('auth-email').value.trim();
+  document.getElementById('login-view').style.display = 'none';
+  document.getElementById('forgot-view').style.display = '';
+  document.getElementById('reset-view').style.display = 'none';
+  document.getElementById('auth-sub-title').textContent = 'Reset link aapke email pe bheja jayega.';
+  document.getElementById('auth-error').style.display = 'none';
+  if(email) document.getElementById('forgot-email').value = email;
+}
+
+async function doForgotPassword() {
+  const email = document.getElementById('forgot-email').value.trim();
+  const errEl = document.getElementById('auth-error');
+  const btn = document.getElementById('forgot-btn');
+  errEl.style.display = 'none';
+  if(!email) { errEl.textContent = 'Email daalna zaroori hai.'; errEl.style.display = 'block'; return; }
+  btn.disabled = true; btn.textContent = 'Sending…';
+  try {
+    await fetch(`${API}/auth/forgot-password`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({email})
+    });
+    errEl.style.color = '#22c55e'; errEl.textContent = 'Reset link bhej diya! Email check karo.'; errEl.style.display = 'block';
+    btn.textContent = 'Sent!';
+  } catch(e) {
+    errEl.style.color = ''; errEl.textContent = 'Kuch gadbad hui, dobara try karo.'; errEl.style.display = 'block';
+    btn.disabled = false; btn.textContent = 'Send Reset Link';
+  }
+}
+
+let _resetToken = null;
+function checkResetToken() {
+  const params = new URLSearchParams(window.location.search);
+  const token = params.get('reset');
+  if(!token) return false;
+  _resetToken = token;
+  document.getElementById('login-view').style.display = 'none';
+  document.getElementById('forgot-view').style.display = 'none';
+  document.getElementById('reset-view').style.display = '';
+  document.getElementById('auth-sub-title').textContent = 'Naya password set karo.';
+  return true;
+}
+
+async function doResetPassword() {
+  const p1 = document.getElementById('reset-pass1').value;
+  const p2 = document.getElementById('reset-pass2').value;
+  const errEl = document.getElementById('auth-error');
+  const btn = document.getElementById('reset-btn');
+  errEl.style.display = 'none';
+  if(p1.length < 8) { errEl.textContent = 'Password kam se kam 8 characters ka hona chahiye.'; errEl.style.display = 'block'; return; }
+  if(p1 !== p2) { errEl.textContent = 'Dono passwords match nahi kar rahe.'; errEl.style.display = 'block'; return; }
+  btn.disabled = true; btn.textContent = 'Setting…';
+  try {
+    const res = await fetch(`${API}/auth/reset-password`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({token: _resetToken, new_password: p1})
+    });
+    const data = await res.json();
+    if(!res.ok) throw new Error(data.error || 'Reset failed');
+    errEl.style.color = '#22c55e'; errEl.textContent = 'Password reset ho gaya! Ab login karo.'; errEl.style.display = 'block';
+    setTimeout(() => { window.history.replaceState({}, '', '/admin.html'); showLoginView(); }, 2000);
+  } catch(e) {
+    errEl.style.color = ''; errEl.textContent = e.message; errEl.style.display = 'block';
+    btn.disabled = false; btn.textContent = 'Set New Password';
+  }
+}
 
 // Auto-restore session on page load / refresh
 (async function restoreSession() {
+  if(checkResetToken()) return; // show reset view, skip auto-login
   try {
     const savedToken = localStorage.getItem('scms_admin_token');
     const savedUser = JSON.parse(localStorage.getItem('scms_admin_user') || 'null');
