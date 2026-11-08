@@ -290,7 +290,8 @@ router.post('/heartbeat', authenticatePlayer, async (req, res, next) => {
     // content_version: hash of active content for this screen so APK can
     // detect changes without parsing the full commands array
     const cvRes = await query(
-      `SELECT md5(string_agg(id::text, ',' ORDER BY id)) AS hash
+      // LEFT 8 chars matches schedule endpoint format so APK can compare directly
+      `SELECT LEFT(md5(string_agg(id::text, ',' ORDER BY id)), 8) AS hash
        FROM (
          SELECT c.id FROM campaigns c
          JOIN campaign_screens cs ON cs.campaign_id = c.id
@@ -300,12 +301,12 @@ router.post('/heartbeat', authenticatePlayer, async (req, res, next) => {
          UNION ALL
          SELECT ct.id FROM content ct
          JOIN users u ON u.id = ct.user_id
-         JOIN venue_partners vp ON vp.id = u.venue_partner_id
          JOIN screens s ON s.id = $1
          WHERE ct.content_tier = 'venue_own'
            AND ct.status = 'active'
            AND ct.approval_status = 'approved'
            AND u.venue_partner_id = s.venue_partner_id
+           AND s.venue_partner_id IS NOT NULL
          UNION ALL
          SELECT ct.id FROM content ct
          JOIN users u ON u.id = ct.user_id
@@ -320,8 +321,10 @@ router.post('/heartbeat', authenticatePlayer, async (req, res, next) => {
     ).catch(() => ({ rows: [{ hash: null }] }));
 
     const contentVersion = cvRes.rows[0]?.hash || '0';
-    const shouldReload = cmds.rows.some(c => c.command === 'reload' || c.command === 'reboot');
-    if (cmds.rows.length > 0) console.log(`[Heartbeat] screen=${screenId} commands=${cmds.rows.map(c=>c.command).join(',')} shouldReload=${shouldReload}`);
+    // Trigger reload if explicit command exists OR if content changed since APK's last sync
+    const versionChanged = !!clientVersion && contentVersion !== '0' && clientVersion !== contentVersion;
+    const shouldReload = cmds.rows.some(c => c.command === 'reload' || c.command === 'reboot') || versionChanged;
+    if (cmds.rows.length > 0 || versionChanged) console.log(`[Heartbeat] screen=${screenId} commands=${cmds.rows.map(c=>c.command).join(',')} versionChanged=${versionChanged} shouldReload=${shouldReload}`);
 
     res.json({
       ok: true,

@@ -359,6 +359,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
       <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
       Pending Approvals
       <span class="sidebar-badge hidden" id="sidebar-pending-count">0</span>
+      <span id="vc-pending-badge" style="display:none;background:var(--danger,#ef4444);color:#fff;border-radius:9px;font-size:10px;padding:1px 6px;margin-left:2px;"></span>
     </button>
     <div class="sidebar-section">Inventory</div>
     <button class="sidebar-item" id="nav-screens" onclick="navigate('screens')">
@@ -377,10 +378,6 @@ textarea.form-input{resize:vertical;min-height:80px;}
     <button class="sidebar-item" id="nav-filler" onclick="navigate('filler')">
       <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
       Filler Content
-    </button>
-    <button class="sidebar-item" id="nav-vc-approvals" onclick="navigate('vc-approvals')">
-      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 10l4.553-2.069A1 1 0 0121 8.87v6.26a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/><circle cx="19" cy="5" r="3" fill="var(--danger)" stroke="none"/></svg>
-      Venue Content <span id="vc-pending-badge" class="badge badge-danger" style="display:none;margin-left:4px;"></span>
     </button>
     <div class="sidebar-section">Users</div>
     <button class="sidebar-item" id="nav-advertisers" onclick="navigate('advertisers')">
@@ -497,8 +494,21 @@ textarea.form-input{resize:vertical;min-height:80px;}
             <button class="btn btn-primary" onclick="loadApprovals()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>Refresh</button>
           </div>
         </div>
+
+        <!-- Advertiser Campaigns -->
+        <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:8px;">Advertiser Campaigns</div>
         <div class="table-card">
           <div class="table-wrap"><table><thead><tr><th>Code</th><th>Creative</th><th>Title</th><th>Advertiser</th><th>Screens</th><th>Dates</th><th>Amount</th><th>AI Review</th><th>Action</th></tr></thead><tbody id="approvals-table"></tbody></table></div>
+        </div>
+
+        <!-- Venue Partner Content -->
+        <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin:24px 0 8px;">Venue Partner Content</div>
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:12px;color:var(--text2);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+          <span>Venue partner ka content approve hone ke baad hi screen pe chalega.</span>
+          <button class="btn btn-sm" style="background:#7c3aed;color:#fff;border:none;font-size:12px;" onclick="promptReloadCity()">⟳ Reload City Screens</button>
+        </div>
+        <div id="vc-approvals-container">
+          <div style="text-align:center;color:var(--text3);padding:48px;">Loading…</div>
         </div>
       </div>
 
@@ -558,22 +568,6 @@ textarea.form-input{resize:vertical;min-height:80px;}
             <thead><tr><th>Preview</th><th>Title</th><th>Type</th><th>Duration</th><th>Screens</th><th>Status</th><th>Actions</th></tr></thead>
             <tbody id="filler-table"><tr><td colspan="7" style="text-align:center;color:var(--text3);padding:32px;">Loading…</td></tr></tbody>
           </table>
-        </div>
-      </div>
-
-      <!-- VENUE CONTENT APPROVALS -->
-      <div id="page-vc-approvals" class="page">
-        <div class="section-head">
-          <h2>Venue Content Approvals</h2>
-          <button class="btn btn-outline btn-sm" onclick="loadVCApprovals()">↻ Refresh</button>
-          <button class="btn btn-sm" style="background:#7c3aed;color:#fff;border:none;" onclick="promptReloadCity()">⟳ Reload City Screens</button>
-        </div>
-        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px 16px;margin-bottom:16px;font-size:13px;color:var(--text2);">
-          Venue partners ka upload kiya content play hone se pehle yahan approve karna padega. Pending content screens pe nahi chalega.
-          <br><span style="color:#7c3aed;font-size:12px;">Tip: Pehle se approved content jo screens pe nahi chal raha — "Reload City Screens" se turant start hoga.</span>
-        </div>
-        <div id="vc-approvals-container">
-          <div style="text-align:center;color:var(--text3);padding:48px;">Loading…</div>
         </div>
       </div>
 
@@ -1601,7 +1595,7 @@ function navigate(page) {
     pop: loadPop, notifications: loadNotificationsPage, activity: loadActivity,
     venues: loadVenues,
     filler: loadFiller,
-    'vc-approvals': loadVCApprovals,
+    'vc-approvals': loadApprovals,
     blog: loadBlogPosts
   };
   if (loaders[page]) loaders[page]();
@@ -2223,22 +2217,20 @@ async function deleteFiller(id, btn) {
 }
 
 // -- VENUE CONTENT APPROVALS -----------------------------------------------
-async function loadVCApprovals() {
+function renderVCApprovals(items) {
   const container = document.getElementById('vc-approvals-container');
-  container.innerHTML = '<div style="text-align:center;color:var(--text3);padding:48px;">Loading…</div>';
-  try {
-    const items = await api('/content/pending');
-    // Update sidebar badge
-    const badge = document.getElementById('vc-pending-badge');
-    if (badge) {
-      badge.textContent = items.length;
-      badge.style.display = items.length ? '' : 'none';
-    }
-    if (!items.length) {
-      container.innerHTML = '<div style="text-align:center;color:var(--text3);padding:64px;font-size:14px;">Koi pending content nahi hai — sab clear hai ✓</div>';
-      return;
-    }
-    container.innerHTML = items.map(c => {
+  if (!container) return;
+  // Update sidebar badge
+  const badge = document.getElementById('vc-pending-badge');
+  if (badge) {
+    badge.textContent = items.length;
+    badge.style.display = items.length ? '' : 'none';
+  }
+  if (!items.length) {
+    container.innerHTML = '<div style="text-align:center;color:var(--text3);padding:40px;font-size:13px;">Koi pending venue content nahi hai ✓</div>';
+    return;
+  }
+  container.innerHTML = items.map(c => {
       const isVideo = c.type === 'video';
       const tierLabel = c.content_tier === 'venue_own' ? 'Own Screen' : 'Cross Network';
       const tierColor = c.content_tier === 'venue_own' ? 'var(--primary)' : '#d97706';
@@ -2269,7 +2261,6 @@ async function loadVCApprovals() {
         </div>
       </div>`;
     }).join('');
-  } catch(e) { container.innerHTML = `<div style="color:var(--danger);padding:32px;text-align:center;">${e.message}</div>`; }
 }
 
 async function approveVCContent(id) {
@@ -2316,7 +2307,7 @@ function _updateVCBadge() {
   if (badge) { badge.textContent = remaining; badge.style.display = remaining ? '' : 'none'; }
   if (!remaining) {
     const c = document.getElementById('vc-approvals-container');
-    if(c) c.innerHTML = '<div style="text-align:center;color:var(--text3);padding:64px;font-size:14px;">Koi pending content nahi hai — sab clear hai ✓</div>';
+    if (c) c.innerHTML = '<div style="text-align:center;color:var(--text3);padding:40px;font-size:13px;">Koi pending venue content nahi hai ✓</div>';
   }
 }
 
@@ -2652,9 +2643,13 @@ async function loadApprovals() {
   const tbody = document.getElementById('approvals-table');
   tbody.innerHTML = loadingRow(9);
   try {
-    const data = await api('/campaigns?status=pending_approval&limit=100');
-    _approvalsData = Array.isArray(data) ? data : (data.data||[]);
+    const [campData, vcData] = await Promise.all([
+      api('/campaigns?status=pending_approval&limit=100'),
+      api('/content/pending').catch(() => []),
+    ]);
+    _approvalsData = Array.isArray(campData) ? campData : (campData.data||[]);
     renderApprovals(_approvalsData);
+    renderVCApprovals(Array.isArray(vcData) ? vcData : []);
   } catch(e) { tbody.innerHTML = emptyRow(9, 'Error: ' + e.message); }
 }
 function filterApprovals() {
@@ -2702,11 +2697,17 @@ function renderApprovals(arr) {
 
 async function refreshPendingBadge() {
   try {
-    const r = await api('/campaigns?status=pending_approval&limit=100');
-    const count = Array.isArray(r) ? r.length : 0;
+    const [r, vc] = await Promise.all([
+      api('/campaigns?status=pending_approval&limit=100').catch(()=>[]),
+      api('/content/pending').catch(()=>[]),
+    ]);
+    const campCount = Array.isArray(r) ? r.length : 0;
+    const vcCount = Array.isArray(vc) ? vc.length : 0;
     const pb = document.getElementById('sidebar-pending-count');
-    if (count > 0) { pb.textContent = count; pb.classList.remove('hidden'); }
+    if (campCount > 0) { pb.textContent = campCount; pb.classList.remove('hidden'); }
     else pb.classList.add('hidden');
+    const vcb = document.getElementById('vc-pending-badge');
+    if (vcb) { vcb.textContent = vcCount; vcb.style.display = vcCount ? '' : 'none'; }
   } catch(e) { /* silent */ }
 }
 
