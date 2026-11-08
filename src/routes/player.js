@@ -96,6 +96,7 @@ router.get('/schedule', authenticatePlayer, async (req, res, next) => {
       `SELECT c.id AS campaign_id, c.campaign_code, c.title,
               c.start_date, c.end_date, c.start_time, c.end_time,
               c.status, c.qr_enabled, c.qr_placement, c.qr_content_url,
+              c.slot_duration_sec,
               ct.id AS content_id, ct.file_url, ct.stored_name, ct.type AS content_type,
               ct.duration_sec, ct.width_px, ct.height_px, ct.file_size
        FROM campaigns c
@@ -232,7 +233,9 @@ router.get('/schedule', authenticatePlayer, async (req, res, next) => {
       file_url: item.file_url,
       stored_name: item.stored_name || (item.file_url ? item.file_url.split('/').pop().split('?')[0] : ''),
       content_type: item.content_type,
-      duration_sec: item.duration_sec || null,
+      duration_sec: item.slot_duration_sec
+        ? Math.min(item.duration_sec || item.slot_duration_sec, item.slot_duration_sec)
+        : (item.duration_sec || null),
       width_px: item.width_px || null,
       height_px: item.height_px || null,
       file_size: item.file_size || null,
