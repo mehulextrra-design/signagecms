@@ -802,23 +802,85 @@ textarea.form-input{resize:vertical;min-height:80px;}
       <div id="page-venues" class="page">
         <div class="section-head">
           <h2>Venue Partners</h2>
-          <button class="btn btn-primary btn-sm" onclick="openVenueModal()">+ Add Venue Partner</button>
+          <div style="display:flex;gap:8px;" id="venues-head-actions">
+            <button class="btn btn-primary btn-sm" id="btn-add-venue" onclick="openVenueModal()">+ Add Venue Partner</button>
+          </div>
         </div>
-        <!-- Stats row -->
-        <div class="stat-grid" style="margin-bottom:16px;">
-          <div class="stat-card"><div class="stat-label">Total Venues</div><div class="stat-value" id="vn-total">—</div></div>
-          <div class="stat-card"><div class="stat-label">Active Screens</div><div class="stat-value" id="vn-screens">—</div></div>
-          <div class="stat-card"><div class="stat-label">Revenue Earned (Total)</div><div class="stat-value" id="vn-revenue">—</div></div>
-          <div class="stat-card" style="border-color:#f59e0b;"><div class="stat-label" style="color:#f59e0b;">Pending Approval</div><div class="stat-value" id="vn-pending-approval" style="color:#f59e0b;">—</div></div>
+        <!-- Tab bar -->
+        <div style="display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:18px;">
+          <button id="vtab-partners" onclick="switchVenueTab('partners')" style="padding:9px 20px;font-size:13px;font-weight:600;border:none;background:none;cursor:pointer;color:var(--primary);border-bottom:2px solid var(--primary);margin-bottom:-2px;font-family:inherit;">Partners</button>
+          <button id="vtab-leads" onclick="switchVenueTab('leads')" style="padding:9px 20px;font-size:13px;font-weight:600;border:none;background:none;cursor:pointer;color:var(--text2);border-bottom:2px solid transparent;margin-bottom:-2px;font-family:inherit;">Leads <span id="vtab-leads-count" style="display:none;background:var(--warning);color:#fff;border-radius:9px;font-size:10px;padding:1px 6px;margin-left:4px;"></span></button>
         </div>
-        <div class="table-card">
-          <table class="data-table">
-            <thead><tr>
-              <th>Business</th><th>Category</th><th>City</th>
-              <th>Screens</th><th>Rev Share</th><th>Filler Quota</th><th>Status</th><th>Actions</th>
-            </tr></thead>
-            <tbody id="venues-table"></tbody>
-          </table>
+
+        <!-- PARTNERS TAB -->
+        <div id="vtab-content-partners">
+          <div class="stat-grid" style="margin-bottom:16px;">
+            <div class="stat-card"><div class="stat-label">Total Venues</div><div class="stat-value" id="vn-total">—</div></div>
+            <div class="stat-card"><div class="stat-label">Active Screens</div><div class="stat-value" id="vn-screens">—</div></div>
+            <div class="stat-card"><div class="stat-label">Revenue Earned (Total)</div><div class="stat-value" id="vn-revenue">—</div></div>
+            <div class="stat-card" style="border-color:#f59e0b;"><div class="stat-label" style="color:#f59e0b;">Pending Approval</div><div class="stat-value" id="vn-pending-approval" style="color:#f59e0b;">—</div></div>
+          </div>
+          <div class="table-card">
+            <table class="data-table">
+              <thead><tr>
+                <th>Business</th><th>Category</th><th>City</th>
+                <th>Screens</th><th>Rev Share</th><th>Filler Quota</th><th>Status</th><th>Actions</th>
+              </tr></thead>
+              <tbody id="venues-table"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- LEADS TAB -->
+        <div id="vtab-content-leads" style="display:none;">
+          <div class="stat-grid" style="margin-bottom:16px;">
+            <div class="stat-card"><div class="stat-label">Total Leads</div><div class="stat-value" id="ld-total">—</div></div>
+            <div class="stat-card" style="border-color:#f59e0b;"><div class="stat-label" style="color:#f59e0b;">New</div><div class="stat-value" id="ld-new" style="color:#f59e0b;">—</div></div>
+            <div class="stat-card" style="border-color:#2563eb;"><div class="stat-label" style="color:#2563eb;">In Pipeline</div><div class="stat-value" id="ld-pipeline" style="color:#2563eb;">—</div></div>
+            <div class="stat-card" style="border-color:var(--success);"><div class="stat-label" style="color:var(--success);">Live</div><div class="stat-value" id="ld-live" style="color:var(--success);">—</div></div>
+          </div>
+          <div class="table-card">
+            <div class="table-header">
+              <span class="table-title">Leads</span>
+              <div class="table-toolbar">
+                <input id="leads-search" type="text" placeholder="Search…" style="padding:5px 10px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:12px;background:var(--bg);color:var(--text);width:160px;" oninput="filterLeads()">
+                <select id="leads-status-filter" style="padding:5px 8px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:12px;background:var(--bg);color:var(--text);" onchange="filterLeads()">
+                  <option value="">All Status</option>
+                  <option value="new">New</option>
+                  <option value="assigned">Assigned</option>
+                  <option value="contacted">Contacted</option>
+                  <option value="meeting_scheduled">Meeting Scheduled</option>
+                  <option value="meeting_done">Meeting Done</option>
+                  <option value="site_visited">Site Visited</option>
+                  <option value="agreement_pending">Agreement Pending</option>
+                  <option value="agreement_signed">Agreement Signed</option>
+                  <option value="installation_pending">Installation Pending</option>
+                  <option value="installation_done">Installation Done</option>
+                  <option value="live">Live</option>
+                  <option value="dropped">Dropped</option>
+                  <option value="site_rejected">Site Rejected</option>
+                </select>
+                <button class="btn btn-ghost btn-sm" onclick="loadLeads()">Refresh</button>
+              </div>
+            </div>
+            <table class="data-table">
+              <thead><tr>
+                <th>Business</th><th>Phone</th><th>City</th><th>Category</th>
+                <th>Source</th><th>Status</th><th>Updated</th><th>Actions</th>
+              </tr></thead>
+              <tbody id="leads-table"><tr><td colspan="8" style="text-align:center;color:var(--text3);padding:32px;">Loading…</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Lead Detail Drawer -->
+        <div id="lead-drawer-overlay" style="display:none;position:fixed;inset:0;z-index:800;background:rgba(0,0,0,.45);" onclick="closeLeadDrawer()"></div>
+        <div id="lead-drawer" style="display:none;position:fixed;top:0;right:0;bottom:0;width:420px;max-width:95vw;background:var(--surface);border-left:1px solid var(--border);z-index:801;overflow-y:auto;box-shadow:-4px 0 24px rgba(0,0,0,.18);">
+          <div style="padding:18px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--surface);">
+            <span style="font-size:15px;font-weight:700;" id="drawer-title">Lead Detail</span>
+            <button class="btn btn-ghost btn-sm" onclick="closeLeadDrawer()">✕</button>
+          </div>
+          <div style="padding:20px;" id="drawer-body">—</div>
         </div>
       </div>
 
@@ -1458,6 +1520,154 @@ function navigate(page) {
     blog: loadBlogPosts
   };
   if (loaders[page]) loaders[page]();
+}
+
+// -- VENUE TAB SWITCHER ---------------------------------------------------
+function switchVenueTab(tab) {
+  const isPartners = tab === 'partners';
+  document.getElementById('vtab-content-partners').style.display = isPartners ? '' : 'none';
+  document.getElementById('vtab-content-leads').style.display = isPartners ? 'none' : '';
+  document.getElementById('btn-add-venue').style.display = isPartners ? '' : 'none';
+  const pBtn = document.getElementById('vtab-partners');
+  const lBtn = document.getElementById('vtab-leads');
+  pBtn.style.color = isPartners ? 'var(--primary)' : 'var(--text2)';
+  pBtn.style.borderBottomColor = isPartners ? 'var(--primary)' : 'transparent';
+  lBtn.style.color = !isPartners ? 'var(--primary)' : 'var(--text2)';
+  lBtn.style.borderBottomColor = !isPartners ? 'var(--primary)' : 'transparent';
+  if (!isPartners) loadLeads();
+}
+
+// -- LEADS -----------------------------------------------------------------
+const LEAD_STATUS_LABELS = {
+  new:'New', assigned:'Assigned', contacted:'Contacted',
+  meeting_scheduled:'Meeting Scheduled', meeting_done:'Meeting Done',
+  site_visited:'Site Visited', site_rejected:'Site Rejected',
+  agreement_pending:'Agreement Pending', agreement_signed:'Agreement Signed',
+  installation_pending:'Installation Pending', installation_done:'Installation Done',
+  live:'Live', dropped:'Dropped'
+};
+const LEAD_STATUS_BADGE = {
+  new:'badge-yellow', assigned:'badge-blue', contacted:'badge-blue',
+  meeting_scheduled:'badge-blue', meeting_done:'badge-blue',
+  site_visited:'badge-teal', site_rejected:'badge-red',
+  agreement_pending:'badge-yellow', agreement_signed:'badge-teal',
+  installation_pending:'badge-yellow', installation_done:'badge-teal',
+  live:'badge-green', dropped:'badge-red'
+};
+const LEAD_CAT_LABELS = { gym:'Gym', restaurant:'Restaurant', salon:'Salon', clinic:'Clinic', retail:'Retail', society:'Society', office:'Office', hotel:'Hotel', education:'Education', other:'Other' };
+
+let _allLeads = [];
+
+async function loadLeads() {
+  try {
+    _allLeads = await api('/leads');
+    // stats
+    const pipeline = ['assigned','contacted','meeting_scheduled','meeting_done','site_visited','agreement_pending','agreement_signed','installation_pending','installation_done'];
+    document.getElementById('ld-total').textContent = _allLeads.length;
+    document.getElementById('ld-new').textContent = _allLeads.filter(l=>l.status==='new').length;
+    document.getElementById('ld-pipeline').textContent = _allLeads.filter(l=>pipeline.includes(l.status)).length;
+    document.getElementById('ld-live').textContent = _allLeads.filter(l=>l.status==='live').length;
+    // badge on tab
+    const newCount = _allLeads.filter(l=>l.status==='new').length;
+    const badge = document.getElementById('vtab-leads-count');
+    if (newCount > 0) { badge.style.display=''; badge.textContent=newCount; } else { badge.style.display='none'; }
+    filterLeads();
+  } catch(e) { console.error(e); }
+}
+
+function filterLeads() {
+  const q = (document.getElementById('leads-search')?.value||'').toLowerCase();
+  const st = document.getElementById('leads-status-filter')?.value||'';
+  const rows = _allLeads.filter(l => {
+    const matchQ = !q || l.business_name?.toLowerCase().includes(q) || l.phone?.includes(q) || l.owner_name?.toLowerCase().includes(q);
+    const matchSt = !st || l.status === st;
+    return matchQ && matchSt;
+  });
+  const tbody = document.getElementById('leads-table');
+  if (!rows.length) { tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--text3);padding:32px;">No leads found</td></tr>'; return; }
+  tbody.innerHTML = rows.map(l => {
+    const badge = LEAD_STATUS_BADGE[l.status]||'badge-gray';
+    const label = LEAD_STATUS_LABELS[l.status]||l.status;
+    const cat = LEAD_CAT_LABELS[l.venue_category]||l.venue_category||'—';
+    const src = l.source==='website'?'Website':l.source==='walk_in'?'Walk-in':l.source||'—';
+    const upd = l.updated_at ? new Date(l.updated_at).toLocaleDateString('en-IN',{day:'2-digit',month:'short'}) : '—';
+    return `<tr style="cursor:pointer;" onclick="openLeadDrawer('${l.id}')">
+      <td><div style="font-weight:600;">${esc(l.business_name)}</div>${l.owner_name?`<div style="font-size:11px;color:var(--text3)">${esc(l.owner_name)}</div>`:''}  </td>
+      <td>${esc(l.phone)}</td>
+      <td>${esc(l.city||'—')}</td>
+      <td>${cat}</td>
+      <td>${src}</td>
+      <td><span class="badge ${badge}">${label}</span></td>
+      <td>${upd}</td>
+      <td onclick="event.stopPropagation()">
+        <select style="font-size:11px;padding:3px 6px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);" onchange="updateLeadStatus('${l.id}',this.value)">
+          ${Object.entries(LEAD_STATUS_LABELS).map(([v,t])=>`<option value="${v}"${l.status===v?' selected':''}>${t}</option>`).join('')}
+        </select>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function esc(s){ const d=document.createElement('div');d.textContent=s||'';return d.innerHTML; }
+
+async function updateLeadStatus(id, status) {
+  try {
+    await api(`/leads/${id}`, { method:'PATCH', body:JSON.stringify({status}) });
+    const lead = _allLeads.find(l=>l.id===id);
+    if (lead) lead.status = status;
+    filterLeads();
+  } catch(e) { alert('Update failed: ' + e.message); }
+}
+
+async function openLeadDrawer(id) {
+  const ov = document.getElementById('lead-drawer-overlay');
+  const dr = document.getElementById('lead-drawer');
+  ov.style.display = 'block';
+  dr.style.display = 'block';
+  document.getElementById('drawer-body').innerHTML = '<div style="color:var(--text3)">Loading…</div>';
+  try {
+    const l = await api(`/leads/${id}`);
+    document.getElementById('drawer-title').textContent = l.business_name;
+    const badge = LEAD_STATUS_BADGE[l.status]||'badge-gray';
+    const activities = (l.activities||[]).map(a=>`
+      <div style="border-left:2px solid var(--border);padding:6px 10px;margin-bottom:8px;">
+        <div style="font-size:11px;color:var(--text3)">${new Date(a.created_at).toLocaleString('en-IN')}</div>
+        <div style="font-size:12px;font-weight:600;">${a.activity_type.replace('_',' ')}</div>
+        ${a.old_status&&a.new_status?`<div style="font-size:11px;color:var(--text2)">${LEAD_STATUS_LABELS[a.old_status]||a.old_status} → ${LEAD_STATUS_LABELS[a.new_status]||a.new_status}</div>`:''}
+        ${a.note?`<div style="font-size:12px;margin-top:2px;">${esc(a.note)}</div>`:''}
+      </div>`).join('');
+    document.getElementById('drawer-body').innerHTML = `
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">
+        <div><div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;margin-bottom:2px;">Phone</div><div style="font-size:13px;">${esc(l.phone)}</div></div>
+        <div><div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;margin-bottom:2px;">City</div><div style="font-size:13px;">${esc(l.city||'—')}</div></div>
+        <div><div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;margin-bottom:2px;">Category</div><div style="font-size:13px;">${LEAD_CAT_LABELS[l.venue_category]||l.venue_category||'—'}</div></div>
+        <div><div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;margin-bottom:2px;">Footfall</div><div style="font-size:13px;">${l.footfall_estimate||'—'}/day</div></div>
+        <div><div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;margin-bottom:2px;">Screens</div><div style="font-size:13px;">${l.screen_count||0}</div></div>
+        <div><div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;margin-bottom:2px;">Source</div><div style="font-size:13px;">${l.source||'—'}</div></div>
+      </div>
+      <div style="margin-bottom:14px;"><span class="badge ${badge}" style="font-size:12px;">${LEAD_STATUS_LABELS[l.status]||l.status}</span></div>
+      ${l.notes?`<div style="background:var(--surface2);border-radius:8px;padding:10px 12px;font-size:13px;margin-bottom:14px;">${esc(l.notes)}</div>`:''}
+      <div style="font-size:12px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:8px;">Activity Log</div>
+      ${activities||'<div style="font-size:12px;color:var(--text3);">No activity yet.</div>'}
+      <div style="margin-top:16px;border-top:1px solid var(--border);padding-top:14px;">
+        <textarea id="lead-note-input" placeholder="Add note…" style="width:100%;padding:10px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;background:var(--bg);color:var(--text);resize:vertical;min-height:64px;font-family:inherit;box-sizing:border-box;"></textarea>
+        <button class="btn btn-primary btn-sm" style="margin-top:8px;" onclick="addLeadNote('${l.id}')">Save Note</button>
+      </div>`;
+  } catch(e) { document.getElementById('drawer-body').innerHTML = '<div style="color:var(--danger)">Error loading lead.</div>'; }
+}
+
+async function addLeadNote(id) {
+  const note = document.getElementById('lead-note-input').value.trim();
+  if (!note) return;
+  try {
+    await api(`/leads/${id}/activity`, { method:'POST', body:JSON.stringify({activity_type:'note',note}) });
+    openLeadDrawer(id);
+  } catch(e) { alert('Failed: ' + e.message); }
+}
+
+function closeLeadDrawer() {
+  document.getElementById('lead-drawer-overlay').style.display = 'none';
+  document.getElementById('lead-drawer').style.display = 'none';
 }
 
 // -- VENUE PARTNERS --------------------------------------------------------
