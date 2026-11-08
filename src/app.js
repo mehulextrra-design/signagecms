@@ -411,6 +411,10 @@ async function applyCriticalFixes(pool) {
       await pool.query(`ALTER TABLE wa_disclaimer_acceptances ALTER COLUMN user_id TYPE UUID USING NULL`);
       console.log('[DB] WA tables migrated INTEGER -> UUID');
     } else {
+      // Tables exist with correct UUID type — ensure unique index exists (migration 025 missed it)
+      try {
+        await pool.query(`CREATE UNIQUE INDEX IF NOT EXISTS wa_contacts_unique_phone ON wa_contacts(user_id, phone)`);
+      } catch (e) { /* index already exists */ }
       console.log('[DB] WA tables OK (UUID)');
     }
   } catch (err) {
