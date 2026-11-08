@@ -273,7 +273,8 @@ const startScheduler = () => {
              password_expiry_notified_at=NOW() WHERE id=$3`,
             [token, expires, u.id]
           );
-          const resetUrl = `${APP_URL}/venue.html?reset=${token}`;
+          const resetPage = u.role === 'venue_inspector' ? 'inspector.html' : 'venue.html';
+          const resetUrl = `${APP_URL}/${resetPage}?reset=${token}`;
           await sendPasswordExpiryReminderEmail({ to: u.email, name: u.first_name || 'User', resetUrl });
           console.log(`[Scheduler] Password expiry reminder sent: ${u.email}`);
         } catch (e) {

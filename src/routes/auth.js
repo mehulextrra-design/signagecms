@@ -236,7 +236,8 @@ router.post('/forgot-password', [
     );
 
     const APP_URL = process.env.APP_URL || 'https://extrravenue.com';
-    const resetUrl = `${APP_URL}/venue.html?reset=${token}`;
+    const resetPage = user.role === 'venue_inspector' ? 'inspector.html' : 'venue.html';
+    const resetUrl = `${APP_URL}/${resetPage}?reset=${token}`;
     await sendPasswordResetEmail({ to: email, name: user.first_name || 'User', resetUrl });
     res.json({ ok: true });
   } catch (err) { next(err); }
