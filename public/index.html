@@ -768,6 +768,12 @@
               <div id="wizard-screens-expand-label" style="display:none;font-size:12px;font-weight:600;color:var(--text2);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.05em;">Individual Screens</div>
             </div>
             <div id="wizard-screens-grid" class="screens-grid" style="display:none;margin-bottom:16px;"><div style="grid-column:1/-1;text-align:center;padding:24px;color:var(--text2);">Loading screens…</div></div>
+            <!-- Ungrouped / VP screens — always visible when groups exist -->
+            <div id="wizard-ungrouped-wrap" style="display:none;">
+              <div style="height:1px;background:var(--border);margin:14px 0;"></div>
+              <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.05em;">Individual Screens</div>
+              <div id="wizard-ungrouped-grid" class="screens-grid" style="margin-bottom:16px;"></div>
+            </div>
             <div class="wizard-nav"><div></div><button class="btn btn-primary" onclick="wizardNext(1)" id="btn-next-1" disabled>Continue &rarr;</button></div>
           </div>
 
@@ -2793,7 +2799,21 @@ async function renderWizardScreens(){
     grid.style.display='grid';
   }
 
-  grid.innerHTML=allScreens.map(s=>`<div class="screen-card ${selectedScreenIds.includes(s.id)?'selected':''}" id="sc-card-${s.id}" onclick="toggleScreen('${s.id}',this)"><div class="screen-name">${s.name}</div><div class="screen-loc">${s.location||s.city||'—'}</div><div style="display:flex;align-items:center;justify-content:space-between;"><div class="screen-price">${s.approx_footfall>0?'~'+s.approx_footfall.toLocaleString('en-IN')+' footfall/day':'—'}</div><div style="width:7px;height:7px;border-radius:50%;background:${s.status==='online'?'var(--success)':'var(--warning)'};"></div></div><div style="font-size:11px;color:var(--text2);margin-top:6px;">${s.venue_type||'Screen'} · ${s.zone||'A'} zone</div></div>`).join('');
+  const screenCardHtml = s => `<div class="screen-card ${selectedScreenIds.includes(s.id)?'selected':''}" id="sc-card-${s.id}" onclick="toggleScreen('${s.id}',this)"><div class="screen-name">${s.name}</div><div class="screen-loc">${s.location||s.city||'—'}</div><div style="display:flex;align-items:center;justify-content:space-between;"><div class="screen-price">${s.approx_footfall>0?'~'+s.approx_footfall.toLocaleString('en-IN')+' footfall/day':'—'}</div><div style="width:7px;height:7px;border-radius:50%;background:${s.status==='online'?'var(--success)':'var(--warning)'};"></div></div><div style="font-size:11px;color:var(--text2);margin-top:6px;">${s.venue_type||'Screen'} · ${s.zone||'A'} zone</div></div>`;
+
+  grid.innerHTML=allScreens.map(screenCardHtml).join('');
+
+  // Ungrouped screens: always visible below groups
+  const groupedIds = new Set(allScreenGroups.flatMap(g => g.screens.map(s => s.id)));
+  const ungrouped = allScreens.filter(s => !groupedIds.has(s.id));
+  const ugWrap = document.getElementById('wizard-ungrouped-wrap');
+  const ugGrid = document.getElementById('wizard-ungrouped-grid');
+  if(allScreenGroups.length && ungrouped.length){
+    ugWrap.style.display='block';
+    ugGrid.innerHTML = ungrouped.map(screenCardHtml).join('');
+  } else {
+    ugWrap.style.display='none';
+  }
 }
 
 let _expandedGroupId=null;
