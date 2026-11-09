@@ -105,6 +105,15 @@ app.get('/', (req, res, next) => {
   next();
 });
 
+// WebView app version check
+app.get('/api/webview-app-version', (req, res) => {
+  res.json({
+    venue:      { versionCode: parseInt(process.env.VENUE_APK_VERSION || '1'),      downloadUrl: process.env.VENUE_APK_URL      || '' },
+    inspector:  { versionCode: parseInt(process.env.INSPECTOR_APK_VERSION || '1'),  downloadUrl: process.env.INSPECTOR_APK_URL  || '' },
+    advertiser: { versionCode: parseInt(process.env.ADVERTISER_APK_VERSION || '1'), downloadUrl: process.env.ADVERTISER_APK_URL || '' },
+  });
+});
+
 // /signagecms.html → Advertiser portal (canonical URL)
 app.get('/signagecms.html', (req, res) => {
   res.sendFile(path.join(__dirname, '../public/signagecms.html'));

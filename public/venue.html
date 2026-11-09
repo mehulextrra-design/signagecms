@@ -511,7 +511,7 @@ function api(path, opts={}) {
     ...opts
   }).then(async r => {
     const d = await r.json().catch(()=>({}));
-    if (!r.ok) throw new Error(d.error || r.statusText);
+    if (!r.ok) { const err = new Error(d.error || r.statusText); err.status = r.status; throw err; }
     return d;
   });
 }
@@ -1019,7 +1019,11 @@ function esc(s) {
     try {
       const me = await api('/auth/me');
       if (me.role === 'venue_partner') { initApp(me); return; }
-    } catch(e) { try{localStorage.removeItem('vp_token');}catch(e){} _token=''; }
+    } catch(e) {
+      if (e.status === 401 || e.status === 403) {
+        try{localStorage.removeItem('vp_token');}catch(e){} _token='';
+      }
+    }
   }
 })();
 </script>

@@ -29,7 +29,7 @@ android {
         create("advertiser") {
             dimension = "portal"
             applicationId = "com.extrravenue.advertiser"
-            buildConfigField("String", "PORTAL_URL", "\"https://www.extrravenue.com/\"")
+            buildConfigField("String", "PORTAL_URL", "\"https://www.extrravenue.com/signagecms.html\"")
         }
     }
 
@@ -67,4 +67,5 @@ android {
 dependencies {
     implementation("androidx.appcompat:appcompat:1.7.0")
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
 }

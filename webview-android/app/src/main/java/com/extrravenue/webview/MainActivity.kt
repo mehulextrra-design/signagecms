@@ -47,6 +47,8 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.webView.loadUrl(BuildConfig.PORTAL_URL)
+
+        AppUpdater(this).checkForUpdate()
     }
 
     @SuppressLint("SetJavaScriptEnabled")
