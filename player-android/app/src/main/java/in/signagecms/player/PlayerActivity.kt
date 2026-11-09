@@ -209,7 +209,10 @@ class PlayerActivity : AppCompatActivity() {
 
     private fun setFullscreen() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            window.setDecorFitsSystemWindows(false)
+            window.insetsController?.apply {
+                hide(android.view.WindowInsets.Type.systemBars())
+                systemBarsBehavior = android.view.WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+            }
         } else {
             @Suppress("DEPRECATION")
             window.decorView.systemUiVisibility = (
@@ -447,7 +450,7 @@ class PlayerActivity : AppCompatActivity() {
         exoPlayer = player
         binding.playerView.player = player
         binding.playerView.useController = false
-        binding.playerView.resizeMode = androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_ZOOM
+        binding.playerView.resizeMode = androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_FIT
         player.volume = 0f
 
         val uri = getContentUri(campaign)
