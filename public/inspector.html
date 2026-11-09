@@ -637,7 +637,7 @@ function esc(s) {
 function showToast(msg, type='info') {
   const t = document.getElementById('toast');
   t.textContent = msg;
-  t.style.background = type==='error' ? '#dc2626' : type==='success' ? '#16a34a' : '#12122a';
+  t.style.background = type==='error' ? '#991b1b' : type==='success' ? 'linear-gradient(135deg,#c94baa 0%,#7b68c8 55%,#2ca6d4 100%)' : 'linear-gradient(135deg,#c94baa 0%,#7b68c8 55%,#2ca6d4 100%)';
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2800);
 }

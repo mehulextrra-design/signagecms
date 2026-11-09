@@ -328,9 +328,9 @@
   #toast-area { position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px; }
   .toast { padding:12px 16px;border-radius:var(--radius-sm);font-size:13px;font-weight:500;box-shadow:var(--shadow-lg);animation:toastIn 0.25s ease;max-width:320px;display:flex;align-items:center;gap:8px; }
   @keyframes toastIn { from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)} }
-  .toast-success { background:#065F46;color:#fff; }
+  .toast-success { background:linear-gradient(135deg,#c94baa 0%,#7b68c8 55%,#2ca6d4 100%);color:#fff; }
   .toast-error { background:#991B1B;color:#fff; }
-  .toast-info { background:#1E40AF;color:#fff; }
+  .toast-info { background:linear-gradient(135deg,#c94baa 0%,#7b68c8 55%,#2ca6d4 100%);color:#fff; }
 
   /* LOADING */
   .loading-spinner { display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.6s linear infinite; }
@@ -2735,13 +2735,16 @@ async function disconnectGoogle(){
 }
 
 function initWizard(){
+  const preselected=window._preselectedScreenIds;
   wizardStep=1;
-  selectedScreenIds=window._preselectedScreenIds||[];
+  selectedScreenIds=preselected||[];
   window._preselectedScreenIds=null;
   uploadedFile=null;uploadedContentId=null;
   campaignCost={base:0,gst:0,total:0,discount:0};
   const sb=document.getElementById('btn-submit-campaign');if(sb){sb.innerHTML='Confirm &amp; Pay &rarr;';sb.disabled=false;}
-  updateWizardUI(1);renderWizardScreens();
+  // If screens were pre-selected from Browse Screens, skip Step 1
+  const startStep=preselected&&preselected.length?2:1;
+  updateWizardUI(startStep);renderWizardScreens();
   document.getElementById('cmp-name').value='';
   document.getElementById('upload-preview').style.display='none';
   document.getElementById('upload-zone').style.display='';
@@ -2750,11 +2753,12 @@ function initWizard(){
   document.getElementById('tab-library').classList.remove('active');
   document.getElementById('creative-upload-section').style.display='';
   document.getElementById('creative-library-section').style.display='none';
-  document.getElementById('btn-next-1').disabled=true;
+  document.getElementById('btn-next-1').disabled=!selectedScreenIds.length;
   document.getElementById('btn-next-2').disabled=true;
   document.getElementById('coupon-input').value='';
   document.getElementById('coupon-msg').innerHTML='';
-  document.getElementById('selected-count').textContent='';
+  const cnt=selectedScreenIds.length;
+  document.getElementById('selected-count').textContent=cnt?`${cnt} screen${cnt>1?'s':''} selected`:'';
   _expandedGroupId=null;
   const grid=document.getElementById('wizard-screens-grid');
   if(grid) grid.style.display='none';
