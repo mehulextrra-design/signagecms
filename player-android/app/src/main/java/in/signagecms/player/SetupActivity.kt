@@ -1,13 +1,10 @@
 package `in`.signagecms.player
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.os.PowerManager
-import android.provider.Settings
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -172,23 +169,7 @@ class SetupActivity : AppCompatActivity() {
     // ── Shared helpers ────────────────────────────────────────────────────
 
     private fun startPlayer() {
-        requestBatteryOptimizationExemption()
         startActivity(Intent(this, PlayerActivity::class.java))
         finish()
-    }
-
-    private fun requestBatteryOptimizationExemption() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            val pm = getSystemService(PowerManager::class.java)
-            if (!pm.isIgnoringBatteryOptimizations(packageName)) {
-                try {
-                    startActivity(
-                        Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS).apply {
-                            data = Uri.parse("package:$packageName")
-                        }
-                    )
-                } catch (_: Exception) {}
-            }
-        }
     }
 }

@@ -32,7 +32,7 @@ class PlayerService : Service() {
                 }
                 try { startActivity(launch) } catch (e: Exception) { /* ignore */ }
             }
-        }, 2000L)
+        }, 5000L)
 
         return START_STICKY
     }

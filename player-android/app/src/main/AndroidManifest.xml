@@ -23,6 +23,8 @@
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
     <!-- Silent/prompted APK self-update -->
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+    <!-- Required on Android 14+ for foreground service with mediaPlayback type -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
 
     <!-- TV / Android TV box compatibility — without this, boxes without
          a touchscreen report "Parse Error" because Android assumes the
