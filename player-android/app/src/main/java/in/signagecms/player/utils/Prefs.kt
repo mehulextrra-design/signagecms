@@ -32,6 +32,10 @@ class Prefs(context: Context) {
         get() = prefs.getInt(KEY_HEARTBEAT_INTERVAL, 60)
         set(value) = prefs.edit().putInt(KEY_HEARTBEAT_INTERVAL, value).apply()
 
+    var pairingCode: String?
+        get() = prefs.getString(KEY_PAIRING_CODE, null)
+        set(value) = prefs.edit().putString(KEY_PAIRING_CODE, value).apply()
+
     val isRegistered: Boolean
         get() = playerToken != null && screenId != null
 
@@ -44,6 +48,7 @@ class Prefs(context: Context) {
         private const val KEY_SCREEN_NAME = "screen_name"
         private const val KEY_SYNC_INTERVAL = "sync_interval_sec"
         private const val KEY_HEARTBEAT_INTERVAL = "heartbeat_interval_sec"
+        private const val KEY_PAIRING_CODE = "pairing_code"
 
         @Volatile
         private var INSTANCE: Prefs? = null

@@ -93,6 +93,23 @@ data class RemoteCommand(
     val payload: String?
 )
 
+// ── PAIRING ───────────────────────────────────────────────────────────────
+
+data class PairRequest(
+    @SerializedName("pairing_code") val pairingCode: String,
+    @SerializedName("device_id") val deviceId: String,
+    @SerializedName("android_version") val androidVersion: String,
+    @SerializedName("app_version") val appVersion: String
+)
+
+data class PairStatusResponse(
+    val status: String,          // "pending" | "bound" | "not_found"
+    val token: String? = null,
+    val screen: ScreenInfo? = null,
+    @SerializedName("sync_interval_sec") val syncIntervalSec: Int? = null,
+    @SerializedName("heartbeat_interval_sec") val heartbeatIntervalSec: Int? = null
+)
+
 // ── PROOF OF PLAY ─────────────────────────────────────────────────────────
 
 data class PlayEntry(

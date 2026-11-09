@@ -9,6 +9,12 @@ interface ApiService {
     @GET("player/app-version")
     suspend fun getAppVersion(): Response<AppVersionResponse>
 
+    @POST("player/pair-request")
+    suspend fun requestPairing(@Body request: PairRequest): Response<Map<String, String>>
+
+    @GET("player/pair-status/{code}")
+    suspend fun getPairStatus(@Path("code") code: String): Response<PairStatusResponse>
+
     @POST("player/register")
     suspend fun register(@Body request: RegisterRequest): Response<RegisterResponse>
 

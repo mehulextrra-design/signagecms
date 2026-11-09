@@ -12,16 +12,18 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import `in`.signagecms.player.api.RetrofitClient
-import `in`.signagecms.player.api.models.RegisterRequest
+import `in`.signagecms.player.api.models.PairRequest
 import `in`.signagecms.player.databinding.ActivitySetupBinding
 import `in`.signagecms.player.update.AppUpdater
 import `in`.signagecms.player.utils.Prefs
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class SetupActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivitySetupBinding
     private lateinit var prefs: Prefs
+    private var polling = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,71 +32,103 @@ class SetupActivity : AppCompatActivity() {
         binding = ActivitySetupBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Already registered → show info screen (version + update button)
         if (prefs.isRegistered) {
             showRegisteredScreen()
             return
         }
 
-        binding.btnRegister.setOnClickListener { doRegister() }
+        startPairing()
     }
 
-    private fun doRegister() {
-        val screenCode = binding.etScreenCode.text.toString().trim().uppercase()
-        if (screenCode.isEmpty()) {
-            showError("Please enter a Screen Code")
-            return
-        }
+    override fun onDestroy() {
+        super.onDestroy()
+        polling = false
+    }
 
-        val pin = binding.etPin.text.toString().trim().ifEmpty { null }
+    // ── Pairing flow ──────────────────────────────────────────────────────
 
-        setLoading(true)
+    private fun startPairing() {
+        val code = getOrCreatePairingCode()
+        binding.tvPairingCode.text = code
+        binding.layoutPairing.visibility = View.VISIBLE
+        binding.layoutRegistered.visibility = View.GONE
+        binding.tvBindStatus.text = "Admin Panel me kisi bhi screen pe ye code enter karo"
         binding.tvError.visibility = View.GONE
 
+        sendPairRequest(code)
+        polling = true
+        pollPairStatus(code)
+    }
+
+    private fun getOrCreatePairingCode(): String {
+        val existing = prefs.pairingCode
+        if (!existing.isNullOrEmpty()) return existing
+        val newCode = (100000..999999).random().toString()
+        prefs.pairingCode = newCode
+        return newCode
+    }
+
+    private fun sendPairRequest(code: String) {
         lifecycleScope.launch {
             try {
-                val deviceId = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
-                    ?: "unknown"
-                val androidVer = Build.VERSION.RELEASE
-                val appVer = BuildConfig.VERSION_NAME
-
-                val response = RetrofitClient.apiService.register(
-                    RegisterRequest(
-                        screenCode = screenCode,
+                val deviceId = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID) ?: "unknown"
+                RetrofitClient.apiService.requestPairing(
+                    PairRequest(
+                        pairingCode = code,
                         deviceId = deviceId,
-                        androidVersion = androidVer,
-                        appVersion = appVer,
-                        registrationPin = pin
+                        androidVersion = Build.VERSION.RELEASE,
+                        appVersion = BuildConfig.VERSION_NAME
                     )
                 )
+            } catch (_: Exception) {}
+        }
+    }
 
-                if (response.isSuccessful) {
-                    val body = response.body()!!
-                    prefs.playerToken = body.token
-                    prefs.screenId = body.screen.id
-                    prefs.screenCode = body.screen.screenCode
-                    prefs.screenName = body.screen.name
-                    prefs.syncIntervalSec = body.syncIntervalSec
-                    prefs.heartbeatIntervalSec = body.heartbeatIntervalSec
-                    startPlayer()
-                } else {
-                    val code = response.code()
-                    val msg = when (code) {
-                        401 -> "Invalid Registration PIN. Admin se PIN lo aur dobara enter karo."
-                        404 -> "Screen code '${screenCode}' not found in Admin Panel.\nPlease add this screen first."
-                        else -> "Registration failed (HTTP $code). Check your network."
+    private fun pollPairStatus(code: String) {
+        lifecycleScope.launch {
+            while (polling) {
+                delay(5000)
+                if (!polling) break
+                try {
+                    val resp = RetrofitClient.apiService.getPairStatus(code)
+                    if (resp.isSuccessful) {
+                        val body = resp.body() ?: continue
+                        when (body.status) {
+                            "bound" -> {
+                                val screen = body.screen
+                                val token = body.token
+                                if (screen != null && token != null) {
+                                    polling = false
+                                    prefs.playerToken = token
+                                    prefs.screenId = screen.id
+                                    prefs.screenCode = screen.screenCode
+                                    prefs.screenName = screen.name
+                                    prefs.syncIntervalSec = body.syncIntervalSec ?: 300
+                                    prefs.heartbeatIntervalSec = body.heartbeatIntervalSec ?: 60
+                                    prefs.pairingCode = null
+                                    binding.tvBindStatus.text = "Bound! Screen: ${screen.name}"
+                                    delay(800)
+                                    startPlayer()
+                                }
+                            }
+                            "pending" -> {
+                                // keep polling silently
+                            }
+                            "not_found" -> {
+                                // re-register the code
+                                sendPairRequest(code)
+                            }
+                        }
                     }
-                    showError(msg)
-                }
-            } catch (e: Exception) {
-                showError("Network error: ${e.message}\nCheck internet connection.")
-            } finally {
-                setLoading(false)
+                } catch (_: Exception) {}
             }
         }
     }
 
+    // ── Already registered ────────────────────────────────────────────────
+
     private fun showRegisteredScreen() {
+        binding.layoutPairing.visibility = View.GONE
         binding.layoutRegistered.visibility = View.VISIBLE
         binding.tvRegScreenCode.text = prefs.screenCode ?: "—"
         binding.tvRegScreenName.text = prefs.screenName ?: "—"
@@ -126,7 +160,6 @@ class SetupActivity : AppCompatActivity() {
 
         binding.btnGoToPlayer.setOnClickListener { startPlayer() }
 
-        // Auto-start player after 60 seconds (TV remote navigation needs time)
         Handler(Looper.getMainLooper()).postDelayed({ startPlayer() }, 60000)
     }
 
@@ -135,6 +168,8 @@ class SetupActivity : AppCompatActivity() {
         binding.tvUpdateStatus.setTextColor(android.graphics.Color.parseColor(colorHex))
         binding.tvUpdateStatus.visibility = View.VISIBLE
     }
+
+    // ── Shared helpers ────────────────────────────────────────────────────
 
     private fun startPlayer() {
         requestBatteryOptimizationExemption()
@@ -152,19 +187,8 @@ class SetupActivity : AppCompatActivity() {
                             data = Uri.parse("package:$packageName")
                         }
                     )
-                } catch (e: Exception) { /* some TV boxes don't have this screen */ }
+                } catch (_: Exception) {}
             }
         }
-    }
-
-    private fun showError(msg: String) {
-        binding.tvError.text = msg
-        binding.tvError.visibility = View.VISIBLE
-    }
-
-    private fun setLoading(loading: Boolean) {
-        binding.btnRegister.isEnabled = !loading
-        binding.btnRegister.text = if (loading) "Registering…" else "Register This Screen"
-        binding.etScreenCode.isEnabled = !loading
     }
 }

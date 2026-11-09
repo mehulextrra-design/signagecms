@@ -7,54 +7,19 @@
     android:orientation="vertical"
     android:padding="40dp">
 
-    <!-- Logo -->
-    <LinearLayout
+    <!-- App title -->
+    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:orientation="horizontal"
-        android:layout_marginBottom="32dp">
+        android:text="@string/app_name"
+        android:textColor="@color/primary"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="32dp"/>
 
-        <ImageView
-            android:layout_width="36dp"
-            android:layout_height="40dp"
-            android:src="@drawable/ic_ev_logo"
-            android:layout_marginEnd="10dp"/>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center_vertical">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="extrravenue"
-                android:textColor="@color/primary"
-                android:textSize="22sp"
-                android:textStyle="bold"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:text="PLAYER"
-                android:textColor="@color/primary"
-                android:textSize="10sp"
-                android:letterSpacing="0.15"
-                android:textStyle="bold"
-                android:background="#1A7b68c8"
-                android:paddingStart="6dp"
-                android:paddingEnd="6dp"
-                android:paddingTop="1dp"
-                android:paddingBottom="1dp"/>
-
-        </LinearLayout>
-    </LinearLayout>
-
-    <!-- Card -->
+    <!-- Pairing Code Card -->
     <LinearLayout
+        android:id="@+id/layoutPairing"
         android:layout_width="400dp"
         android:layout_height="wrap_content"
         android:background="@drawable/bg_card"
@@ -64,69 +29,34 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Screen Registration"
-            android:textColor="@color/text"
-            android:textSize="18sp"
+            android:text="DEVICE PAIRING CODE"
+            android:textColor="@color/text3"
+            android:textSize="11sp"
             android:textStyle="bold"
-            android:layout_marginBottom="4dp"/>
+            android:letterSpacing="0.1"
+            android:layout_marginBottom="12dp"/>
 
         <TextView
+            android:id="@+id/tvPairingCode"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Enter the Screen Code from Admin Panel"
+            android:text="------"
+            android:textColor="@color/text"
+            android:textSize="48sp"
+            android:textStyle="bold"
+            android:fontFamily="monospace"
+            android:letterSpacing="0.2"
+            android:layout_marginBottom="16dp"/>
+
+        <TextView
+            android:id="@+id/tvBindStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Admin Panel me kisi bhi screen pe ye code enter karo"
             android:textColor="@color/text3"
             android:textSize="13sp"
-            android:layout_marginBottom="20dp"/>
+            android:layout_marginBottom="8dp"/>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="SCREEN CODE"
-            android:textColor="@color/text3"
-            android:textSize="11sp"
-            android:textStyle="bold"
-            android:letterSpacing="0.08"
-            android:layout_marginBottom="6dp"/>
-
-        <EditText
-            android:id="@+id/etScreenCode"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:background="@drawable/bg_input"
-            android:hint="e.g. MUM-001"
-            android:inputType="textCapCharacters"
-            android:padding="12dp"
-            android:textColor="@color/text"
-            android:textColorHint="#94A3B8"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="16dp"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="REGISTRATION PIN (if set by admin)"
-            android:textColor="@color/text3"
-            android:textSize="11sp"
-            android:textStyle="bold"
-            android:letterSpacing="0.08"
-            android:layout_marginBottom="6dp"/>
-
-        <EditText
-            android:id="@+id/etPin"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:background="@drawable/bg_input"
-            android:hint="Leave blank if no PIN"
-            android:inputType="numberPassword"
-            android:maxLength="8"
-            android:padding="12dp"
-            android:textColor="@color/text"
-            android:textColorHint="#94A3B8"
-            android:textSize="16sp"
-            android:layout_marginBottom="16dp"/>
-
-        <!-- Error text -->
         <TextView
             android:id="@+id/tvError"
             android:layout_width="match_parent"
@@ -135,18 +65,7 @@
             android:padding="10dp"
             android:textColor="#EF4444"
             android:textSize="12sp"
-            android:visibility="gone"
-            android:layout_marginBottom="12dp"/>
-
-        <Button
-            android:id="@+id/btnRegister"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:background="@drawable/bg_button"
-            android:text="Register This Screen"
-            android:textColor="#FFFFFF"
-            android:textSize="14sp"
-            android:textStyle="bold" />
+            android:visibility="gone"/>
 
     </LinearLayout>
 
