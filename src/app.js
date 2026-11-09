@@ -1,4 +1,16 @@
 require('dotenv').config();
+
+// Sentry — must be initialized before everything else
+const Sentry = require('@sentry/node');
+if (process.env.SENTRY_DSN) {
+  Sentry.init({
+    dsn: process.env.SENTRY_DSN,
+    environment: process.env.NODE_ENV || 'production',
+    tracesSampleRate: 0.1,
+  });
+  console.log('[Sentry] Initialized');
+}
+
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -389,6 +401,7 @@ app.use((req, res) => {
 // Global error handler
 app.use((err, req, res, next) => {
   console.error('[ERROR]', err.stack);
+  if (process.env.SENTRY_DSN) Sentry.captureException(err);
   const status = err.status || 500;
   if (req.accepts('html')) return res.status(status).sendFile(path.join(__dirname, '../public/error.html'));
   res.status(status).json({ error: err.message || 'Internal server error' });
@@ -527,9 +540,11 @@ async function runMigrations() {
 // Keep process alive on unhandled errors — log and continue instead of crashing
 process.on('uncaughtException', (err) => {
   console.error('[UNCAUGHT EXCEPTION]', err.stack || err.message);
+  if (process.env.SENTRY_DSN) Sentry.captureException(err);
 });
 process.on('unhandledRejection', (reason) => {
   console.error('[UNHANDLED REJECTION]', reason);
+  if (process.env.SENTRY_DSN) Sentry.captureException(reason);
 });
 
 const PORT = process.env.PORT || 3000;
