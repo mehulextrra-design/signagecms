@@ -3,11 +3,12 @@ package com.extrravenue.webview
 import android.annotation.SuppressLint
 import android.net.Uri
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.webkit.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import com.extrravenue.webview.BuildConfig
 import com.extrravenue.webview.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
@@ -35,20 +36,32 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        setupWebView()
+        setSupportActionBar(null)
 
-        binding.swipeRefresh.setColorSchemeColors(0xFF7b68c8.toInt())
-        binding.swipeRefresh.setOnChildScrollUpCallback { _, _ -> binding.webView.scrollY > 0 }
-        binding.swipeRefresh.setOnRefreshListener { binding.webView.reload() }
+        setupWebView()
 
         binding.btnRetry.setOnClickListener {
             binding.layoutOffline.visibility = View.GONE
-            binding.webView.reload()
+            binding.webView.loadUrl(BuildConfig.PORTAL_URL)
         }
 
         binding.webView.loadUrl(BuildConfig.PORTAL_URL)
 
         AppUpdater(this).checkForUpdate()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menu.add(Menu.NONE, MENU_RELOAD, Menu.NONE, "Reload")
+            .setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == MENU_RELOAD) {
+            binding.webView.reload()
+            return true
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -70,16 +83,16 @@ class MainActivity : AppCompatActivity() {
 
         binding.webView.webViewClient = object : WebViewClient() {
             override fun onPageStarted(view: WebView, url: String, favicon: android.graphics.Bitmap?) {
-                binding.swipeRefresh.isRefreshing = true
+                binding.progressBar.visibility = View.VISIBLE
                 binding.layoutOffline.visibility = View.GONE
             }
             override fun onPageFinished(view: WebView, url: String) {
-                binding.swipeRefresh.isRefreshing = false
+                binding.progressBar.visibility = View.GONE
                 CookieManager.getInstance().flush()
             }
             override fun onReceivedError(view: WebView, request: WebResourceRequest, error: WebResourceError) {
                 if (request.isForMainFrame) {
-                    binding.swipeRefresh.isRefreshing = false
+                    binding.progressBar.visibility = View.GONE
                     binding.layoutOffline.visibility = View.VISIBLE
                 }
             }
@@ -110,5 +123,9 @@ class MainActivity : AppCompatActivity() {
         } else {
             super.onBackPressed()
         }
+    }
+
+    companion object {
+        private const val MENU_RELOAD = 1
     }
 }
