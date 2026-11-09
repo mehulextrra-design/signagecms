@@ -76,6 +76,9 @@ jobs:
             echo "=============================================="
           fi
 
+      - name: Setup Gradle (with caching)
+        uses: gradle/actions/setup-gradle@v3
+
       - name: Make gradlew executable
         working-directory: player-android
         run: chmod +x gradlew
