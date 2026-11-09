@@ -157,6 +157,23 @@ router.get('/schedule', authenticatePlayer, async (req, res, next) => {
       [screenId, todayStr]
     );
     const paidItems = paidRes.rows;
+    console.log(`[Schedule] screen=${screenId} paid_campaigns=${paidItems.length} date=${todayStr}`);
+    // Diagnose campaigns that exist for this screen but are filtered out (e.g. NULL content_id)
+    if (paidItems.length === 0) {
+      const diagRes = await query(
+        `SELECT c.id, c.campaign_code, c.status, c.start_date, c.end_date, c.content_id
+         FROM campaigns c
+         JOIN campaign_screens cs ON cs.campaign_id = c.id
+         WHERE cs.screen_id = $1
+         ORDER BY c.created_at DESC LIMIT 5`,
+        [screenId]
+      );
+      if (diagRes.rows.length) {
+        diagRes.rows.forEach(r => console.log(`[Schedule:diag] screen=${screenId} camp=${r.campaign_code} status=${r.status} start=${r.start_date} end=${r.end_date} content_id=${r.content_id||'NULL'}`));
+      } else {
+        console.log(`[Schedule:diag] screen=${screenId} — NO campaigns linked to this screen at all`);
+      }
+    }
     const nPaid = paidItems.length || 1;  // avoid div/0
 
     // ── TIER 2: VENUE CROSS-NETWORK (same city, from other venue partners) ─
