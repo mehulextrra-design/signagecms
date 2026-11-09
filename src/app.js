@@ -28,6 +28,18 @@ const blogRoutes = require('./routes/blog');
 const waRoutes  = require('./routes/whatsapp-connect');
 const leadRoutes = require('./routes/leads');
 
+const { query: dbInit } = require('./db');
+dbInit(`CREATE TABLE IF NOT EXISTS player_pairing_codes (
+  pairing_code VARCHAR(6) PRIMARY KEY,
+  device_id    TEXT NOT NULL,
+  android_version TEXT,
+  app_version  TEXT,
+  created_at   TIMESTAMP DEFAULT NOW(),
+  screen_id    UUID REFERENCES screens(id) ON DELETE SET NULL,
+  player_token TEXT,
+  status       VARCHAR(20) NOT NULL DEFAULT 'pending'
+)`).catch(err => console.error('[DB] player_pairing_codes init:', err.message));
+
 const { startScheduler } = require('./services/scheduler');
 const { restoreActiveSessions } = require('./services/whatsapp-broadcast');
 

@@ -8,6 +8,45 @@ const { authenticatePlayer } = require('../middleware/auth');
 
 const router = express.Router();
 
+// POST /api/player/pair-request — APK sends 6-digit code it generated
+router.post('/pair-request', async (req, res, next) => {
+  const { pairing_code, device_id, android_version, app_version } = req.body;
+  if (!pairing_code || !/^\d{6}$/.test(String(pairing_code))) {
+    return res.status(400).json({ error: 'pairing_code must be 6 digits' });
+  }
+  try {
+    await query(`INSERT INTO player_pairing_codes (pairing_code, device_id, android_version, app_version, status)
+                 VALUES ($1,$2,$3,$4,'pending')
+                 ON CONFLICT (pairing_code) DO UPDATE
+                 SET device_id=$2, android_version=$3, app_version=$4,
+                     created_at=NOW(), status='pending', screen_id=NULL, player_token=NULL`,
+      [String(pairing_code), device_id || 'unknown', android_version || '', app_version || '']);
+    res.json({ ok: true });
+  } catch (err) { next(err); }
+});
+
+// GET /api/player/pair-status/:code — APK polls every 5s
+router.get('/pair-status/:code', async (req, res, next) => {
+  try {
+    const result = await query('SELECT * FROM player_pairing_codes WHERE pairing_code=$1', [req.params.code]);
+    if (!result.rows.length) return res.status(404).json({ status: 'not_found' });
+    const record = result.rows[0];
+    if (record.status === 'bound' && record.player_token && record.screen_id) {
+      const sr = await query('SELECT id,screen_code,name,width_px,height_px FROM screens WHERE id=$1', [record.screen_id]);
+      if (!sr.rows.length) return res.json({ status: 'pending' });
+      const s = sr.rows[0];
+      return res.json({
+        status: 'bound',
+        token: record.player_token,
+        screen: { id: s.id, screen_code: s.screen_code, name: s.name, width_px: s.width_px, height_px: s.height_px },
+        sync_interval_sec: 600,
+        heartbeat_interval_sec: 60
+      });
+    }
+    res.json({ status: 'pending' });
+  } catch (err) { next(err); }
+});
+
 // POST /api/player/register — first-time device registration
 router.post('/register', async (req, res, next) => {
   const { screen_code, device_id, android_version, app_version, registration_pin } = req.body;
