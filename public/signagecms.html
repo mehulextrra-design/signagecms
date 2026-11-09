@@ -126,7 +126,8 @@
   .card-body { padding:14px 16px; }
 
   /* TABLE */
-  .table-wrap { overflow-x:auto; }
+  .table-wrap { overflow-x:auto; -webkit-overflow-scrolling:touch; }
+  .table-wrap table { min-width:560px; }
   table { width:100%;border-collapse:collapse;font-size:13px; }
   thead th { padding:10px 16px;text-align:left;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--text2);background:var(--surface2);border-bottom:1px solid var(--border); }
   tbody tr { border-bottom:1px solid var(--border);transition:background 0.1s; }
@@ -416,6 +417,11 @@
     .screen-name { font-size:12px; }
     .screen-loc { font-size:10px;margin-bottom:6px; }
     .screen-price { font-size:11px; }
+    /* Floating selection bar — responsive on mobile */
+    #sbc-sel-bar { left:10px !important;right:10px !important;transform:none !important;bottom:70px !important;white-space:normal !important;flex-wrap:wrap;gap:8px;padding:10px 12px; }
+    #sbc-sel-bar button { flex:1;min-width:0; }
+    /* Browse screens — 1 col on very narrow, avoid card overflow */
+    .screens-grid { grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px; }
   }
 </style>
 </head>
@@ -2294,12 +2300,12 @@ async function loadAnalytics(){
         return`<div class="bar-item"><div class="bar-val" style="color:var(--primary);opacity:.7;">${v>0?fmtNum(v):''}</div><div class="bar" style="height:${h}px;background:var(--primary);opacity:.4;" title="${lbl}: ~${fmtNum(v)}"></div><div class="bar-label">${lbl}</div></div>`;
       }).join('');
 
-      tbl.innerHTML=`<table class="data-table"><thead><tr><th>Campaign</th><th>Code</th><th>Est. Plays/Day</th><th>Screens</th><th>Package</th><th>Status</th></tr></thead><tbody>${
+      tbl.innerHTML=`<div class="table-wrap"><table class="data-table"><thead><tr><th>Campaign</th><th>Code</th><th>Est. Plays/Day</th><th>Screens</th><th>Package</th><th>Status</th></tr></thead><tbody>${
         projected.map(c=>{
           const ppd=_projPlaysPerScreen(c.slot_duration_sec)*parseInt(c.screen_count||1);
           return`<tr><td>${c.title||'—'}</td><td><code>${c.campaign_code||'—'}</code></td><td style="color:var(--primary);font-weight:600;">~${fmtNum(ppd)}</td><td>${fmtNum(c.screen_count)}</td><td><span style="text-transform:capitalize;">${c.package_name||'—'}</span></td><td><span class="badge badge-${c.status==='live'?'success':c.status==='approved'?'info':c.status==='completed'?'default':'warning'}">${c.status||'—'}</span></td></tr>`;
         }).join('')
-      }</tbody></table>`;
+      }</tbody></table></div>`;
     }else{
       if(banner) banner.style.display='none';
       document.getElementById('an-plays').textContent=fmtNum(plays);
@@ -2325,9 +2331,9 @@ async function loadAnalytics(){
       if(!camps.length){
         tbl.innerHTML='<div class="empty-state"><div class="empty-title">No campaign data</div><div class="empty-sub">No plays recorded in this period.</div></div>';
       }else{
-        tbl.innerHTML=`<table class="data-table"><thead><tr><th>Campaign</th><th>Code</th><th>Plays</th><th>Screens</th><th>QR Scans</th><th>Status</th></tr></thead><tbody>${
+        tbl.innerHTML=`<div class="table-wrap"><table class="data-table"><thead><tr><th>Campaign</th><th>Code</th><th>Plays</th><th>Screens</th><th>QR Scans</th><th>Status</th></tr></thead><tbody>${
           camps.map(c=>`<tr><td>${c.title||'—'}</td><td><code>${c.campaign_code||'—'}</code></td><td>${fmtNum(c.plays)}</td><td>${fmtNum(c.screens)}</td><td>${c.qr_enabled?`<span style="color:var(--primary);font-weight:600;">${fmtNum(c.qr_scans)}</span>`:'<span style="color:var(--text3);font-size:11px;">—</span>'}</td><td><span class="badge badge-${c.status==='live'?'success':c.status==='paused'?'warning':'default'}">${c.status||'—'}</span></td></tr>`).join('')
-        }</tbody></table>`;
+        }</tbody></table></div>`;
       }
     }
   }catch(e){console.error('Analytics error',e);}
