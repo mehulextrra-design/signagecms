@@ -199,8 +199,11 @@
   .wizard-panel.active { display:block; }
   .wizard-nav { display:flex;align-items:center;justify-content:space-between;margin-top:24px;padding-top:16px;border-top:1px solid var(--border); }
   @media(max-width:640px){
-    .wizard-panel.active { display:flex;flex-direction:column;min-height:calc(100vh - 240px); }
-    .wizard-nav { position:sticky;bottom:0;background:var(--bg);padding:12px 0 8px;margin-top:auto;z-index:20;box-shadow:0 -4px 12px rgba(0,0,0,0.06); }
+    #page-new-campaign { display:flex;flex-direction:column;height:100%; }
+    #page-new-campaign .wizard-container { display:flex;flex-direction:column;height:100%;overflow:hidden; }
+    #page-new-campaign .wizard-steps { flex-shrink:0;margin-bottom:16px; }
+    #page-new-campaign .wizard-panel.active { flex:1;overflow-y:auto;padding-bottom:8px; }
+    #page-new-campaign .wizard-nav { flex-shrink:0;position:static;margin-top:0;padding:12px 0 8px;border-top:1px solid var(--border);box-shadow:0 -4px 12px rgba(0,0,0,0.06);background:var(--bg); }
     .library-grid { max-height:none;overflow-y:visible; }
   }
 
