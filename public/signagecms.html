@@ -2594,7 +2594,8 @@ async function waImportFromPhone(){
       else toast(d.error||'Import failed','error');
       return;
     }catch(e){
-      if(e.name!=='AbortError') toast('Directory access nahi mili. CSV use karo.','error');
+      if(e.name==='AbortError') return;
+      toast('Error: '+e.name+' — '+e.message,'error');
       return;
     }
   } else {
