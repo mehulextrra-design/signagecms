@@ -3,6 +3,7 @@ package `in`.signagecms.player.receiver
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import `in`.signagecms.player.PlayerActivity
 import `in`.signagecms.player.SetupActivity
 import `in`.signagecms.player.utils.Prefs
 
@@ -18,7 +19,8 @@ class BootReceiver : BroadcastReceiver() {
         ) return
 
         val prefs = Prefs.getInstance(context)
-        val launchIntent = Intent(context, SetupActivity::class.java).apply {
+        val target = if (prefs.isRegistered) PlayerActivity::class.java else SetupActivity::class.java
+        val launchIntent = Intent(context, target).apply {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
         }
         context.startActivity(launchIntent)

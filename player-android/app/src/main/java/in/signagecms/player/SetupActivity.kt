@@ -158,7 +158,7 @@ class SetupActivity : AppCompatActivity() {
 
         binding.btnGoToPlayer.setOnClickListener { startPlayer() }
 
-        Handler(Looper.getMainLooper()).postDelayed({ startPlayer() }, 60000)
+        Handler(Looper.getMainLooper()).postDelayed({ startPlayer() }, 3000)
     }
 
     private fun showUpdateStatus(msg: String, colorHex: String) {
