@@ -1,15 +1,21 @@
 package com.extrravenue.webview
 
+import android.Manifest
 import android.annotation.SuppressLint
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
+import android.provider.ContactsContract
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.webkit.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import com.extrravenue.webview.databinding.ActivityMainBinding
+import org.json.JSONArray
+import org.json.JSONObject
 
 class MainActivity : AppCompatActivity() {
 
@@ -28,6 +34,62 @@ class MainActivity : AppCompatActivity() {
         } else null
         fileUploadCallback?.onReceiveValue(uris ?: emptyArray())
         fileUploadCallback = null
+    }
+
+    private val contactsPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        val js = if (granted) {
+            "window._contactsPermissionCallback && window._contactsPermissionCallback(${readContactsJson()})"
+        } else {
+            "window._contactsPermissionCallback && window._contactsPermissionCallback(null, 'Permission denied')"
+        }
+        binding.webView.post { binding.webView.evaluateJavascript(js, null) }
+    }
+
+    inner class ContactsBridge {
+        @JavascriptInterface
+        fun requestContacts() {
+            if (ContextCompat.checkSelfPermission(this@MainActivity, Manifest.permission.READ_CONTACTS)
+                == PackageManager.PERMISSION_GRANTED
+            ) {
+                val json = readContactsJson()
+                val js = "window._contactsPermissionCallback && window._contactsPermissionCallback($json)"
+                binding.webView.post { binding.webView.evaluateJavascript(js, null) }
+            } else {
+                contactsPermissionLauncher.launch(Manifest.permission.READ_CONTACTS)
+            }
+        }
+    }
+
+    private fun readContactsJson(): String {
+        val result = JSONArray()
+        val seen = mutableSetOf<String>()
+        val cursor = contentResolver.query(
+            ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+            arrayOf(
+                ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
+                ContactsContract.CommonDataKinds.Phone.NUMBER
+            ),
+            null, null,
+            ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME + " ASC"
+        ) ?: return "[]"
+        cursor.use {
+            val nameIdx = it.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME)
+            val numIdx = it.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)
+            while (it.moveToNext()) {
+                val name = it.getString(nameIdx) ?: ""
+                val raw = it.getString(numIdx) ?: continue
+                val digits = raw.replace(Regex("\\D"), "").takeLast(10)
+                if (digits.length == 10 && seen.add(digits)) {
+                    result.put(JSONObject().apply {
+                        put("name", name)
+                        put("phone", digits)
+                    })
+                }
+            }
+        }
+        return result.toString()
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -77,6 +139,8 @@ class MainActivity : AppCompatActivity() {
         ws.displayZoomControls = false
         ws.cacheMode = WebSettings.LOAD_DEFAULT
         ws.mediaPlaybackRequiresUserGesture = false
+
+        binding.webView.addJavascriptInterface(ContactsBridge(), "AndroidContacts")
 
         CookieManager.getInstance().setAcceptCookie(true)
         CookieManager.getInstance().setAcceptThirdPartyCookies(binding.webView, true)
