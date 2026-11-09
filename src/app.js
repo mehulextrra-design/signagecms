@@ -116,6 +116,8 @@ app.get('/api/webview-app-version', (req, res) => {
 
 // /signagecms.html → Advertiser portal (canonical URL)
 app.get('/signagecms.html', (req, res) => {
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+  res.setHeader('Pragma', 'no-cache');
   res.sendFile(path.join(__dirname, '../public/signagecms.html'));
 });
 // Legacy redirects → /signagecms.html

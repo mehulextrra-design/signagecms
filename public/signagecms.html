@@ -417,9 +417,10 @@
     .screen-name { font-size:12px; }
     .screen-loc { font-size:10px;margin-bottom:6px; }
     .screen-price { font-size:11px; }
-    /* Floating selection bar — responsive on mobile */
-    #sbc-sel-bar { left:10px !important;right:10px !important;transform:none !important;bottom:70px !important;white-space:normal !important;flex-wrap:wrap;gap:8px;padding:10px 12px; }
-    #sbc-sel-bar button { flex:1;min-width:0; }
+    /* Floating selection bar — single compact row on mobile */
+    #sbc-sel-bar { left:10px !important;right:10px !important;transform:none !important;bottom:70px !important;gap:8px !important;padding:8px 12px !important; }
+    #sbc-sel-count { flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px !important; }
+    #sbc-sel-bar button { flex-shrink:0;font-size:12px !important;padding:5px 10px !important; }
     /* Browse screens — 1 col on very narrow, avoid card overflow */
     .screens-grid { grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px; }
   }
