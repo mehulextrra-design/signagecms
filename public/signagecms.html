@@ -205,6 +205,13 @@
     #page-new-campaign .wizard-panel.active { flex:1;overflow-y:auto;display:flex;flex-direction:column; }
     #page-new-campaign .wizard-nav { flex-shrink:0;margin-top:auto;position:sticky;bottom:0;background:var(--bg);padding:12px 0 8px;z-index:20;box-shadow:0 -4px 12px rgba(0,0,0,0.06); }
     .library-grid { max-height:none;overflow-y:visible; }
+    /* Step 1: group buttons fill full width in 2-col grid */
+    #wizard-groups-list { display:grid !important;grid-template-columns:1fr 1fr;gap:8px; }
+    /* Step 4: flat review cards, no box-within-box */
+    #wp4 .card { border:none;box-shadow:none;border-radius:0;background:transparent; }
+    #wp4 .card-body { padding:0 0 16px; }
+    #wp4 .two-col { gap:0; }
+    #wp4 .two-col>div+div { border-top:1px solid var(--border);padding-top:16px; }
   }
 
   /* SCREEN CARDS */
