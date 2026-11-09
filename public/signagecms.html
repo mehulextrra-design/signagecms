@@ -199,8 +199,8 @@
   .wizard-panel.active { display:block; }
   .wizard-nav { display:flex;align-items:center;justify-content:space-between;margin-top:24px;padding-top:16px;border-top:1px solid var(--border); }
   @media(max-width:640px){
-    #page-new-campaign { display:flex;flex-direction:column;height:100%; }
-    #page-new-campaign .wizard-container { display:flex;flex-direction:column;height:100%;overflow:hidden; }
+    #page-new-campaign.active { display:flex;flex-direction:column;height:100%; }
+    #page-new-campaign.active .wizard-container { display:flex;flex-direction:column;height:100%;overflow:hidden; }
     #page-new-campaign .wizard-steps { flex-shrink:0;margin-bottom:16px; }
     #page-new-campaign .wizard-panel.active { flex:1;overflow-y:auto;padding-bottom:8px; }
     #page-new-campaign .wizard-nav { flex-shrink:0;position:static;margin-top:0;padding:12px 0 8px;border-top:1px solid var(--border);box-shadow:0 -4px 12px rgba(0,0,0,0.06);background:var(--bg); }
