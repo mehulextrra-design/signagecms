@@ -3552,14 +3552,35 @@ function showWaSkipWarning(){
   return new Promise(resolve=>{_waSkipResolve=resolve;document.getElementById('wa-skip-modal').style.display='flex';});
 }
 function _waSkipOk(){document.getElementById('wa-skip-modal').style.display='none';if(_waSkipResolve)_waSkipResolve('skip');_waSkipResolve=null;}
-function _waSkipCancel(){
-  document.getElementById('wa-skip-modal').style.display='none';
-  // Auto-enable the WA broadcast toggle
+function _waSkipCancel(){document.getElementById('wa-skip-modal').style.display='none';if(_waSkipResolve)_waSkipResolve('back');_waSkipResolve=null;}
+function _waSkipEnableFlow(){
+  // Switch to message compose screen
+  document.getElementById('wa-modal-s1').style.display='none';
+  document.getElementById('wa-modal-s2').style.display='';
+  // Pre-fill with existing caption if any
+  const existing=document.getElementById('wa-caption-template');
+  const inp=document.getElementById('wa-modal-caption-input');
+  if(existing&&inp&&existing.value)inp.value=existing.value;
+}
+function _waModalBack(){
+  document.getElementById('wa-modal-s1').style.display='';
+  document.getElementById('wa-modal-s2').style.display='none';
+}
+function _waModalSave(){
+  // Copy message to main caption field
+  const inp=document.getElementById('wa-modal-caption-input');
+  const main=document.getElementById('wa-caption-template');
+  if(inp&&main)main.value=inp.value;
+  // Enable WA toggle
   const waTog=document.getElementById('wa-broadcast-toggle');
   if(waTog){waTog.checked=true;waTog.dispatchEvent(new Event('change'));}
-  if(_waSkipResolve)_waSkipResolve('back');
+  // Close modal, reset screens
+  document.getElementById('wa-skip-modal').style.display='none';
+  document.getElementById('wa-modal-s1').style.display='';
+  document.getElementById('wa-modal-s2').style.display='none';
+  // Proceed to next step (skip warning)
+  if(_waSkipResolve)_waSkipResolve('skip');
   _waSkipResolve=null;
-  setTimeout(()=>{const waBox=document.getElementById('wa-campaign-toggle');if(waBox)waBox.scrollIntoView({behavior:'smooth',block:'center'});},100);
 }
 
 async function campaignPause(id, btn){
@@ -3720,16 +3741,39 @@ async function saveQRSettings(){
 <!-- WA Skip Warning Modal -->
 <div id="wa-skip-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:2000;align-items:center;justify-content:center;padding:16px;">
   <div style="background:var(--surface);border-radius:var(--radius-lg);width:100%;max-width:380px;box-shadow:0 20px 60px rgba(0,0,0,0.25);overflow:hidden;animation:modal-in 0.18s ease;">
-    <div style="padding:22px 22px 0;">
-      <div style="width:44px;height:44px;border-radius:50%;background:rgba(37,211,102,0.12);display:flex;align-items:center;justify-content:center;margin-bottom:14px;">
-        <svg width="22" height="22" fill="none" stroke="#25D366" stroke-width="2.5" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    <!-- Screen 1: Warning -->
+    <div id="wa-modal-s1">
+      <div style="padding:22px 22px 0;">
+        <div style="width:44px;height:44px;border-radius:50%;background:rgba(37,211,102,0.12);display:flex;align-items:center;justify-content:center;margin-bottom:14px;">
+          <svg width="22" height="22" fill="none" stroke="#25D366" stroke-width="2.5" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </div>
+        <div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:8px;">WhatsApp Broadcast?</div>
+        <div style="font-size:13.5px;color:var(--text2);line-height:1.6;">Aapne <strong>WhatsApp Broadcast</strong> enable nahi kiya. Campaign live hone pe aapke contacts ko WhatsApp message <em>nahi</em> jayega.<br><br>Kya aap continue karna chahte hain without WhatsApp broadcast?</div>
       </div>
-      <div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:8px;">WhatsApp Broadcast?</div>
-      <div style="font-size:13.5px;color:var(--text2);line-height:1.6;">Aapne <strong>WhatsApp Broadcast</strong> enable nahi kiya. Campaign live hone pe aapke contacts ko WhatsApp message <em>nahi</em> jayega.<br><br>Kya aap continue karna chahte hain without WhatsApp broadcast?</div>
+      <div style="display:flex;gap:10px;padding:20px 22px 22px;justify-content:flex-end;flex-wrap:wrap;">
+        <button onclick="_waSkipEnableFlow()" style="padding:8px 16px;border-radius:8px;border:1.5px solid #25D366;background:var(--surface);color:#25D366;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">← WA Enable Karo</button>
+        <button onclick="_waSkipOk()" style="padding:8px 16px;border-radius:8px;border:none;background:var(--text3,#888);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;color:#fff;">Skip, Continue</button>
+      </div>
     </div>
-    <div style="display:flex;gap:10px;padding:20px 22px 22px;justify-content:flex-end;flex-wrap:wrap;">
-      <button onclick="_waSkipCancel()" style="padding:8px 16px;border-radius:8px;border:1.5px solid #25D366;background:var(--surface);color:#25D366;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">← WA Enable Karo</button>
-      <button onclick="_waSkipOk()" style="padding:8px 16px;border-radius:8px;border:none;background:var(--text3,#888);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;color:#fff;">Skip, Continue</button>
+    <!-- Screen 2: Message Compose -->
+    <div id="wa-modal-s2" style="display:none;">
+      <div style="padding:18px 20px 0;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+          <div style="width:36px;height:36px;border-radius:50%;background:#25D366;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <svg width="18" height="18" fill="none" stroke="#fff" stroke-width="2.5" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          </div>
+          <div style="font-size:15px;font-weight:700;color:var(--text);">WhatsApp Message</div>
+        </div>
+        <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:8px;">Message Customize Karo</div>
+        <div style="background:rgba(37,211,102,0.07);border:1px solid rgba(37,211,102,0.25);border-radius:8px 8px 0 0;padding:7px 10px;font-size:12px;color:var(--text3);font-style:italic;">Namaste [Contact Name],</div>
+        <textarea id="wa-modal-caption-input" rows="4" placeholder="Aapke liye special offer hai! Hamara naya campaign dekhiye — {{Campaign}}." style="width:100%;box-sizing:border-box;background:var(--bg);color:var(--text);border:1px solid rgba(37,211,102,0.3);border-top:none;border-bottom:none;border-radius:0;padding:8px 10px;font-size:12px;resize:vertical;outline:none;font-family:inherit;"></textarea>
+        <div style="background:rgba(37,211,102,0.07);border:1px solid rgba(37,211,102,0.25);border-radius:0 0 8px 8px;padding:7px 10px;font-size:12px;color:var(--text3);font-style:italic;">[Business Name] 📞 [Aapka Number]</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:5px;">Variables: <code>{{Campaign}}</code> <code>{{City}}</code></div>
+      </div>
+      <div style="display:flex;gap:10px;padding:16px 20px 20px;justify-content:space-between;flex-wrap:wrap;">
+        <button onclick="_waModalBack()" style="padding:8px 14px;border-radius:8px;border:1.5px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">← Wapas</button>
+        <button onclick="_waModalSave()" style="padding:8px 18px;border-radius:8px;border:none;background:#25D366;color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">Save &amp; Continue →</button>
+      </div>
     </div>
   </div>
 </div>
