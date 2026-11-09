@@ -76,8 +76,10 @@ jobs:
             echo "=============================================="
           fi
 
-      - name: Setup Gradle (with caching)
+      - name: Setup Gradle 8.7 (pre-install, skip wrapper download)
         uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: '8.7'
 
       - name: Make gradlew executable
         working-directory: player-android
@@ -91,7 +93,7 @@ jobs:
           KEY_PASS: signagecms2026
         run: |
           set +e
-          BUILD_OUTPUT=$(./gradlew assembleRelease --no-daemon --stacktrace 2>&1)
+          BUILD_OUTPUT=$(gradle assembleRelease --no-daemon --stacktrace 2>&1)
           EXIT_CODE=$?
           echo "$BUILD_OUTPUT"
           if [ $EXIT_CODE -ne 0 ]; then
