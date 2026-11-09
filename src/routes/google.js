@@ -255,6 +255,9 @@ router.post('/retry-fetch', authenticate, async (req, res) => {
 
 // ── Posting via Make.com native GBP module ────────────────────────────────────
 
+// Plans that include GBP posting
+const GBP_PLANS = ['complete', 'growth'];
+
 async function postCampaignToGoogle(campaignId) {
   const webhookUrl = process.env.MAKE_GBP_WEBHOOK;
   if (!webhookUrl) {
@@ -263,7 +266,7 @@ async function postCampaignToGoogle(campaignId) {
   }
 
   const result = await query(
-    `SELECT c.id, c.title, c.campaign_code,
+    `SELECT c.id, c.title, c.campaign_code, c.package_name,
             u.google_location_id,
             ct.file_url, ct.type AS content_type
      FROM campaigns c
@@ -276,6 +279,12 @@ async function postCampaignToGoogle(campaignId) {
   const row = result.rows[0];
   if (!row?.google_location_id) {
     console.log(`[GBP] skipped campaign ${campaignId} — user has no google_location_id`);
+    return;
+  }
+
+  // Only post to GBP if plan includes it
+  if (!GBP_PLANS.includes(row.package_name)) {
+    console.log(`[GBP] Campaign ${row.campaign_code} plan '${row.package_name}' — GBP posting not included`);
     return;
   }
 

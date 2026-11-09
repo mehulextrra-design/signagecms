@@ -140,9 +140,12 @@ function fbApiPost(path, payload) {
   });
 }
 
+// Plans that include FB/IG social posting
+const SOCIAL_PLANS = ['complete', 'growth'];
+
 async function postCampaignToSocial(campaignId) {
   const result = await query(
-    `SELECT c.id, c.title, c.campaign_code, c.start_date, c.end_date,
+    `SELECT c.id, c.title, c.campaign_code, c.start_date, c.end_date, c.package_name,
             u.fb_page_id, u.fb_page_name, u.fb_page_access_token, u.ig_user_id,
             u.ig_direct_user_id, u.ig_access_token,
             ct.file_url, ct.type AS content_type
@@ -154,6 +157,12 @@ async function postCampaignToSocial(campaignId) {
   );
   const row = result.rows[0];
   if (!row || !row.fb_page_id || !row.fb_page_access_token) return;
+
+  // Only post to social if plan includes it
+  if (!SOCIAL_PLANS.includes(row.package_name)) {
+    console.log(`[Social] Campaign ${row.campaign_code} plan '${row.package_name}' — FB/IG posting not included`);
+    return;
+  }
 
   try {
     let fbRes;
