@@ -2581,7 +2581,7 @@ async function waImportFromPhone(){
         if(err){toast('Contacts permission nahi mili','error');resolve();return;}
         if(!contacts||contacts.length===0){toast('Koi contact nahi mila','error');resolve();return;}
         let list;
-        try{list=JSON.parse(contacts);}catch(e){toast('Contacts parse error','error');resolve();return;}
+        try{list=Array.isArray(contacts)?contacts:JSON.parse(contacts);}catch(e){toast('Contacts parse error','error');resolve();return;}
         if(!list.length){toast('Koi valid number nahi mila','error');resolve();return;}
         const r=await fetch('/api/wa/contacts',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+localStorage.getItem('scms_token')},body:JSON.stringify({contacts:list})});
         const d=await r.json();
