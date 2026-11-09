@@ -1284,10 +1284,11 @@
             <div id="wa-contacts-box" style="border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px;">
               <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
                 <div style="font-size:13px;font-weight:600;color:var(--text);">Contacts <span id="wa-contacts-count" style="font-size:11px;color:var(--text2);font-weight:400;"></span></div>
-                <div style="display:flex;gap:6px;" id="wa-contacts-actions">
-                  <button onclick="waImportContacts()" id="wa-import-btn" style="padding:5px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;background:var(--primary);color:#fff;border:none;">Import CSV</button>
+                <div style="display:flex;gap:6px;flex-wrap:wrap;" id="wa-contacts-actions">
+                  <button onclick="waImportFromPhone()" id="wa-phone-btn" style="padding:5px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;background:var(--primary);color:#fff;border:none;">📱 Directory</button>
+                  <button onclick="document.getElementById('wa-csv-input').click()" style="padding:5px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--bg);color:var(--text);">📄 CSV</button>
                   <input type="file" id="wa-csv-input" accept=".csv,text/csv" style="display:none;" onchange="waImportCSV(this)">
-                  <button onclick="waClearContacts()" style="padding:5px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--bg);color:var(--text2);">Clear All</button>
+                  <button onclick="waClearContacts()" style="padding:5px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--bg);color:var(--text2);">Clear</button>
                 </div>
               </div>
               <div style="font-size:11px;color:#b45309;background:#fef3c7;border-radius:6px;padding:6px 10px;margin-bottom:8px;">
@@ -2433,11 +2434,6 @@ async function loadProfile(){
       document.getElementById('wa-section').style.display='';
       loadWaStatus();
       loadWaContacts();
-      // Label: mobile contact picker if supported, else CSV
-      if('contacts' in navigator && 'ContactsManager' in window){
-        const btn=document.getElementById('wa-import-btn');
-        if(btn) btn.textContent='Import Contacts';
-      }
       // Show WA broadcast toggle in campaign wizard
       const waTogBox=document.getElementById('wa-campaign-toggle');
       if(waTogBox)waTogBox.style.display='';
@@ -2576,9 +2572,9 @@ async function loadWaContacts(){
   }catch(e){}
 }
 
-async function waImportContacts(){
-  // Use Contact Picker API on supported mobile browsers
-  if('contacts' in navigator && 'ContactsManager' in window){
+async function waImportFromPhone(){
+  // Contact Picker API — works on Android Chrome 80+, not on iOS or desktop
+  if('contacts' in navigator){
     try{
       const contacts=await navigator.contacts.select(['name','tel'],{multiple:true});
       if(!contacts||!contacts.length)return;
@@ -2598,11 +2594,12 @@ async function waImportContacts(){
       else toast(d.error||'Import failed','error');
       return;
     }catch(e){
-      // User cancelled or API not available — fall through to CSV
+      if(e.name!=='AbortError') toast('Directory access nahi mili. CSV use karo.','error');
+      return;
     }
+  } else {
+    toast('Phone directory is app me support nahi hoti. CSV wala button use karo.','error');
   }
-  // Fallback: file picker
-  document.getElementById('wa-csv-input').click();
 }
 
 async function waImportCSV(input){
