@@ -3552,7 +3552,7 @@ function showWaSkipWarning(){
   return new Promise(resolve=>{_waSkipResolve=resolve;document.getElementById('wa-skip-modal').style.display='flex';});
 }
 function _waSkipOk(){document.getElementById('wa-skip-modal').style.display='none';if(_waSkipResolve)_waSkipResolve('skip');_waSkipResolve=null;}
-function _waSkipCancel(){document.getElementById('wa-skip-modal').style.display='none';if(_waSkipResolve)_waSkipResolve('back');_waSkipResolve=null;}
+function _waSkipCancel(){document.getElementById('wa-skip-modal').style.display='none';if(_waSkipResolve)_waSkipResolve('back');_waSkipResolve=null;setTimeout(()=>{const waBox=document.getElementById('wa-campaign-toggle');if(waBox)waBox.scrollIntoView({behavior:'smooth',block:'center'});},100);}
 
 async function campaignPause(id, btn){
   const ok = await showConfirm({title:'Pause Campaign',body:'Unspent days will be credited to your wallet. You can resume anytime.',okLabel:'Pause',danger:false});
