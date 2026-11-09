@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -282,7 +282,7 @@ body {
       <button class="btn btn-primary" id="login-btn" onclick="doLogin()" style="width:100%;justify-content:center;padding:14px;margin-top:4px;">Sign In</button>
       <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;gap:8px;">
         <a href="#" onclick="showForgotView();return false;" style="font-size:13px;color:var(--primary);text-decoration:none;">Forgot password?</a>
-        <a href="#" onclick="openVpLeadForm();return false;" style="font-size:13px;color:var(--text3);text-decoration:none;text-align:right;">Not a partner yet? <span style="color:var(--primary);">Apply →</span></a>
+        <a href="#" onclick="openVpLeadForm();return false;" style="font-size:13px;color:var(--text3);text-decoration:none;text-align:right;">Not a partner yet? <span style="color:var(--primary);">Apply ></span></a>
       </div>
     </div>
 
@@ -296,7 +296,7 @@ body {
       <div id="forgot-msg" style="font-size:13px;margin-bottom:12px;display:none;padding:10px 12px;border-radius:8px;"></div>
       <button class="btn btn-primary" id="forgot-btn" onclick="doForgotPassword()" style="width:100%;justify-content:center;padding:14px;">Reset Link Bhejo</button>
       <div style="text-align:center;margin-top:10px;">
-        <a href="#" onclick="showLoginView();return false;" style="font-size:13px;color:var(--text3);text-decoration:none;">← Back to Login</a>
+        <a href="#" onclick="showLoginView();return false;" style="font-size:13px;color:var(--text3);text-decoration:none;">< Back to Login</a>
       </div>
     </div>
 
@@ -407,7 +407,7 @@ body {
           <input type="text" id="content-title-input" class="form-input" placeholder="e.g. Lunch Offer, Summer Promo…" style="width:100%;margin-bottom:16px;" maxlength="80" onkeydown="if(event.key==='Enter')confirmTitleAndUpload()">
           <div style="display:flex;gap:10px;justify-content:flex-end;">
             <button onclick="closeTitlePrompt()" class="btn btn-ghost" style="min-width:70px;">Cancel</button>
-            <button onclick="confirmTitleAndUpload()" class="btn btn-primary" style="min-width:100px;">File Choose Karo →</button>
+            <button onclick="confirmTitleAndUpload()" class="btn btn-primary" style="min-width:100px;">File Choose Karo ></button>
           </div>
         </div>
       </div>
@@ -1105,7 +1105,7 @@ function esc(s) {
         </div>
       </div>
       <div class="vplf-errmsg" id="vp-lead-err"></div>
-      <button class="vplf-submit2" id="vp-lead-submit" type="submit">Submit Karo &#8594;</button>
+      <button class="vplf-submit2" id="vp-lead-submit" type="submit">Submit Karo ></button>
       <div class="vplf-fine2">Koi fees nahi &nbsp;&bull;&nbsp; Koi contract nahi &nbsp;&bull;&nbsp; Kabhi bhi exit</div>
     </form>
     <div id="vplf-success" style="display:none;flex-direction:column;align-items:center;text-align:center;padding:48px 30px 44px;background:#f2efe9;">
@@ -1153,7 +1153,7 @@ async function submitVpLeadForm(e){
     document.getElementById('vplf-success').style.display='flex';
   }catch(ex){
     err.textContent=ex.message;
-    btn.disabled=false; btn.textContent='Submit Karo →';
+    btn.disabled=false; btn.textContent='Submit Karo >';
   }
 }
 document.addEventListener('keydown',function(e){ if(e.key==='Escape') closeVpLeadForm(); });

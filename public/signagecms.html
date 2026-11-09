@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -481,7 +481,7 @@
     <div class="form-group"><label class="form-label">Email</label><input type="email" id="admin-email" class="form-input" placeholder="admin@signagecms.in"></div>
     <div class="form-group"><label class="form-label">Password</label><input type="password" id="admin-password" class="form-input" placeholder="••••••••"></div>
     <button class="btn btn-primary btn-full" id="admin-login-btn" onclick="doAdminLogin()">Sign in</button>
-    <div style="text-align:center;margin-top:8px;"><a onclick="showLogin()" style="font-size:12px;color:var(--text2);cursor:pointer;">&larr; Back to OTP login</a></div>
+    <div style="text-align:center;margin-top:8px;"><a onclick="showLogin()" style="font-size:12px;color:var(--text2);cursor:pointer;">< Back to OTP login</a></div>
   </div>
 
   <div id="register-card" class="auth-card hidden">
@@ -769,7 +769,7 @@
         <!-- Floating selection bar -->
         <div id="sbc-sel-bar" style="display:none;position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--primary);color:#fff;border-radius:12px;padding:10px 18px;display:none;align-items:center;gap:14px;box-shadow:0 8px 32px rgba(0,0,0,0.22);z-index:200;white-space:nowrap;">
           <span id="sbc-sel-count" style="font-size:13px;font-weight:600;"></span>
-          <button onclick="_sbcBookSelected()" style="background:#fff;color:var(--primary);border:none;border-radius:8px;padding:6px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Book Selected &rarr;</button>
+          <button onclick="_sbcBookSelected()" style="background:#fff;color:var(--primary);border:none;border-radius:8px;padding:6px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Book Selected ></button>
           <button onclick="_sbcClearSelection()" style="background:rgba(255,255,255,0.18);color:#fff;border:none;border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer;font-family:inherit;">&times; Clear</button>
         </div>
       </div>
@@ -807,7 +807,7 @@
               <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.05em;">Individual Screens</div>
               <div id="wizard-ungrouped-grid" class="screens-grid" style="margin-bottom:16px;"></div>
             </div>
-            <div class="wizard-nav"><div></div><button class="btn btn-primary" onclick="wizardNext(1)" id="btn-next-1" disabled>Continue &rarr;</button></div>
+            <div class="wizard-nav"><div></div><button class="btn btn-primary" onclick="wizardNext(1)" id="btn-next-1" disabled>Continue ></button></div>
           </div>
 
           <!-- Step 2 -->
@@ -853,7 +853,7 @@
               <div style="flex:1;min-width:0;"><div class="upload-preview-name" id="preview-name" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">—</div><div class="upload-preview-size" id="preview-size">—</div></div>
               <button onclick="clearFile()" style="margin-left:auto;background:none;border:none;cursor:pointer;color:var(--text2);font-size:20px;flex-shrink:0;">×</button>
             </div>
-            <div class="wizard-nav"><button class="btn btn-ghost" onclick="wizardBack(2)">&larr; Back</button><button class="btn btn-primary" onclick="wizardNext(2)" id="btn-next-2" disabled>Continue &rarr;</button></div>
+            <div class="wizard-nav"><button class="btn btn-ghost" onclick="wizardBack(2)">< Back</button><button class="btn btn-primary" onclick="wizardNext(2)" id="btn-next-2" disabled>Continue ></button></div>
           </div>
 
           <!-- Step 3 -->
@@ -969,7 +969,7 @@
                 <div style="font-size:11px;color:var(--text3);margin-top:5px;">Middle message mein use kar sako: <code>{{Campaign}}</code> <code>{{City}}</code></div>
               </div>
             </div>
-            <div class="wizard-nav"><button class="btn btn-ghost" onclick="wizardBack(3)">&larr; Back</button><button class="btn btn-primary" onclick="wizardNext(3)">Continue &rarr;</button></div>
+            <div class="wizard-nav"><button class="btn btn-ghost" onclick="wizardBack(3)">< Back</button><button class="btn btn-primary" onclick="wizardNext(3)">Continue ></button></div>
           </div>
 
           <!-- Step 4 -->
@@ -996,7 +996,7 @@
                 <div id="coupon-msg" style="font-size:12px;margin-top:6px;"></div>
               </div>
             </div>
-            <div class="wizard-nav"><button class="btn btn-ghost" onclick="wizardBack(4)">&larr; Back</button><button class="btn btn-primary" id="btn-submit-campaign" onclick="submitCampaign()">Confirm &amp; Pay →</button></div>
+            <div class="wizard-nav"><button class="btn btn-ghost" onclick="wizardBack(4)">< Back</button><button class="btn btn-primary" id="btn-submit-campaign" onclick="submitCampaign()">Confirm &amp; Pay ></button></div>
           </div>
         </div>
       </div>
@@ -1731,7 +1731,7 @@ async function renderScreensMap(){
         <div><div style="font-size:13px;font-weight:700;">${s.approx_footfall>0?Number(s.approx_footfall).toLocaleString('en-IN'):'—'}</div><div style="font-size:10px;color:#9ca3af;">footfall/day</div></div>
         <div><div style="font-size:13px;font-weight:700;color:${isOnline?'#10b981':'#f59e0b'};">${s.venue_type||'Screen'}</div><div style="font-size:10px;color:#9ca3af;">${isOnline?'online':'offline'}</div></div>
       </div>
-      <button onclick="navigate('new-campaign')" style="width:100%;padding:7px;background:#10b981;color:#fff;border:none;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">Book Campaign →</button>
+      <button onclick="navigate('new-campaign')" style="width:100%;padding:7px;background:#10b981;color:#fff;border:none;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">Book Campaign ></button>
     </div>`;
     const infoWin = new google.maps.InfoWindow({ content: popup, maxWidth: 220 });
     marker.addListener('click', () => { infoWin.open(_gmap, marker); });
@@ -1770,7 +1770,7 @@ function _sbcCard(s){
         <div class="sbc-stat-sep"></div>
         <div class="sbc-stat"><div class="sbc-stat-val" style="color:${statusColor};">${statusLabel}</div><div class="sbc-stat-lbl">status</div></div>
       </div>
-      <button class="sbc-book-btn" onclick="_sbcBookOne('${s.id}',event)">Book Campaign →</button>
+      <button class="sbc-book-btn" onclick="_sbcBookOne('${s.id}',event)">Book Campaign ></button>
     </div>
   </div>`;
 }
@@ -2754,7 +2754,7 @@ function initWizard(){
   window._preselectedScreenIds=null;
   uploadedFile=null;uploadedContentId=null;
   campaignCost={base:0,gst:0,total:0,discount:0};
-  const sb=document.getElementById('btn-submit-campaign');if(sb){sb.innerHTML='Confirm &amp; Pay &rarr;';sb.disabled=false;}
+  const sb=document.getElementById('btn-submit-campaign');if(sb){sb.innerHTML='Confirm &amp; Pay >';sb.disabled=false;}
   // If screens were pre-selected from Browse Screens, skip Step 1
   const startStep=preselected&&preselected.length?2:1;
   updateWizardUI(startStep);renderWizardScreens();
@@ -2933,7 +2933,7 @@ function updateWizardUI(step){
 
 function wizardBack(step){
   updateWizardUI(step-1);
-  if(step===4){const b=document.getElementById('btn-submit-campaign');if(b){b.innerHTML='Confirm &amp; Pay &rarr;';b.disabled=false;}}
+  if(step===4){const b=document.getElementById('btn-submit-campaign');if(b){b.innerHTML='Confirm &amp; Pay >';b.disabled=false;}}
 }
 
 async function wizardNext(step){
@@ -3178,7 +3178,7 @@ async function submitCampaign(){
       toast('Campaign saved! Complete payment from My Campaigns.','info');
       setTimeout(()=>navigate('campaigns'),1200);
     }
-  }catch(e){toast(e.message,'error');btn.innerHTML='Confirm &amp; Pay &rarr;';btn.disabled=false;}
+  }catch(e){toast(e.message,'error');btn.innerHTML='Confirm &amp; Pay >';btn.disabled=false;}
 }
 
 function openRazorpay(campaign,btn,btnLabel,onSuccess){
@@ -3759,7 +3759,7 @@ async function saveQRSettings(){
         <div style="font-size:13.5px;color:var(--text2);line-height:1.6;">Aapne <strong>WhatsApp Broadcast</strong> enable nahi kiya. Campaign live hone pe aapke contacts ko WhatsApp message <em>nahi</em> jayega.<br><br>Kya aap continue karna chahte hain without WhatsApp broadcast?</div>
       </div>
       <div style="display:flex;gap:10px;padding:20px 22px 22px;justify-content:flex-end;flex-wrap:wrap;">
-        <button onclick="_waSkipEnableFlow()" style="padding:8px 16px;border-radius:8px;border:1.5px solid #25D366;background:var(--surface);color:#25D366;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">← WA Enable Karo</button>
+        <button onclick="_waSkipEnableFlow()" style="padding:8px 16px;border-radius:8px;border:1.5px solid #25D366;background:var(--surface);color:#25D366;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">< WA Enable Karo</button>
         <button onclick="_waSkipOk()" style="padding:8px 16px;border-radius:8px;border:none;background:var(--text3,#888);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;color:#fff;">Skip, Continue</button>
       </div>
     </div>
@@ -3779,8 +3779,8 @@ async function saveQRSettings(){
         <div style="font-size:11px;color:var(--text3);margin-top:5px;">Variables: <code>{{Campaign}}</code> <code>{{City}}</code></div>
       </div>
       <div style="display:flex;gap:10px;padding:16px 20px 20px;justify-content:space-between;flex-wrap:wrap;">
-        <button onclick="_waModalBack()" style="padding:8px 14px;border-radius:8px;border:1.5px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">← Back</button>
-        <button onclick="_waModalSave()" style="padding:8px 18px;border-radius:8px;border:none;background:#25D366;color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">Save &amp; Continue →</button>
+        <button onclick="_waModalBack()" style="padding:8px 14px;border-radius:8px;border:1.5px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">< Back</button>
+        <button onclick="_waModalSave()" style="padding:8px 18px;border-radius:8px;border:none;background:#25D366;color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">Save &amp; Continue ></button>
       </div>
     </div>
   </div>
@@ -3824,8 +3824,8 @@ async function saveQRSettings(){
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;">
               <button class="qr-pos-btn" data-pos="top-left" onclick="selectQRPos(this)" style="padding:5px 8px;border:1.5px solid var(--border);border-radius:5px;background:var(--surface);cursor:pointer;font-size:10px;color:var(--text);text-align:left;">&#8598; Top Left</button>
               <button class="qr-pos-btn" data-pos="top-right" onclick="selectQRPos(this)" style="padding:5px 8px;border:1.5px solid var(--border);border-radius:5px;background:var(--surface);cursor:pointer;font-size:10px;color:var(--text);text-align:right;">Top Right &#8599;</button>
-              <button class="qr-pos-btn" data-pos="mid-left" onclick="selectQRPos(this)" style="padding:5px 8px;border:1.5px solid var(--border);border-radius:5px;background:var(--surface);cursor:pointer;font-size:10px;color:var(--text);text-align:left;">&#8592; Mid Left</button>
-              <button class="qr-pos-btn" data-pos="mid-right" onclick="selectQRPos(this)" style="padding:5px 8px;border:1.5px solid var(--border);border-radius:5px;background:var(--surface);cursor:pointer;font-size:10px;color:var(--text);text-align:right;">Mid Right &#8594;</button>
+              <button class="qr-pos-btn" data-pos="mid-left" onclick="selectQRPos(this)" style="padding:5px 8px;border:1.5px solid var(--border);border-radius:5px;background:var(--surface);cursor:pointer;font-size:10px;color:var(--text);text-align:left;">< Mid Left</button>
+              <button class="qr-pos-btn" data-pos="mid-right" onclick="selectQRPos(this)" style="padding:5px 8px;border:1.5px solid var(--border);border-radius:5px;background:var(--surface);cursor:pointer;font-size:10px;color:var(--text);text-align:right;">Mid Right ></button>
               <button class="qr-pos-btn" data-pos="bot-left" onclick="selectQRPos(this)" style="padding:5px 8px;border:1.5px solid var(--border);border-radius:5px;background:var(--surface);cursor:pointer;font-size:10px;color:var(--text);text-align:left;">&#8601; Bot Left</button>
               <button class="qr-pos-btn active" data-pos="bot-right" onclick="selectQRPos(this)" style="padding:5px 8px;border:1.5px solid var(--border);border-radius:5px;background:var(--surface);cursor:pointer;font-size:10px;color:var(--text);text-align:right;">Bot Right &#8600;</button>
             </div>
