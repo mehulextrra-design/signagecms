@@ -3650,6 +3650,11 @@ document.addEventListener('keydown',function(e){
   if(e.key==='Escape'){ closeVenuePartner(); closeVpLeadForm(); }
 });
 
+// Auto-open VP lead form when redirected from venue portal with ?partner=1
+if(new URLSearchParams(window.location.search).get('partner')==='1'){
+  window.addEventListener('load',function(){ setTimeout(openVpLeadForm,400); });
+}
+
 /* ── Venue Partner Lead Form ── */
 function openVpLeadForm(){
   var m=document.getElementById('vp-lead-modal');
