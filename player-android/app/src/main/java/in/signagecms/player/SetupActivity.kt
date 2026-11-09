@@ -1,11 +1,16 @@
 package `in`.signagecms.player
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.provider.Settings
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.method.LinkMovementMethod
+import android.text.style.URLSpan
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -130,7 +135,31 @@ class SetupActivity : AppCompatActivity() {
         binding.layoutRegistered.visibility = View.VISIBLE
         binding.tvRegScreenCode.text = prefs.screenCode ?: "—"
         binding.tvRegScreenName.text = prefs.screenName ?: "—"
-        binding.tvRegVersion.text = "Current version: v${BuildConfig.VERSION_NAME}"
+        binding.tvRegVersion.text = "v${BuildConfig.VERSION_NAME}"
+
+        // Set website as a tappable link
+        val siteText = "www.extrravenue.com"
+        val ss = SpannableString(siteText)
+        ss.setSpan(URLSpan("https://www.extrravenue.com"), 0, siteText.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        binding.tvWebsite.text = ss
+        binding.tvWebsite.movementMethod = LinkMovementMethod.getInstance()
+
+        // Fetch latest available version from server
+        lifecycleScope.launch {
+            try {
+                val resp = RetrofitClient.apiService.getAppVersion()
+                val info = resp.body()
+                if (info != null) {
+                    val latestName = "v${info.versionName}"
+                    val current = "v${BuildConfig.VERSION_NAME}"
+                    binding.tvRegVersion.text = if (info.versionCode > BuildConfig.VERSION_CODE) {
+                        "$current  →  Latest: $latestName"
+                    } else {
+                        "$current  ✓"
+                    }
+                }
+            } catch (_: Exception) {}
+        }
 
         binding.btnCheckUpdate.setOnClickListener {
             binding.btnCheckUpdate.isEnabled = false
