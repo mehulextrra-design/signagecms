@@ -335,8 +335,9 @@ router.get('/schedule', authenticatePlayer, async (req, res, next) => {
 router.post('/heartbeat', authenticatePlayer, async (req, res, next) => {
   const { screenId } = req.player;
   const { ip_address, app_version, android_version, uptime_sec, is_playing, current_campaign_id, content_version: clientVersion } = req.body;
-  // filler IDs have prefix "filler_" — not valid UUIDs, store null for heartbeat
-  const campaignIdForDb = (current_campaign_id && !String(current_campaign_id).startsWith('filler_'))
+  // Only store real UUIDs — synthetic IDs (filler_, venue_cross_, venue_own_, etc.) are not valid UUIDs
+  const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  const campaignIdForDb = (current_campaign_id && UUID_RE.test(String(current_campaign_id)))
     ? current_campaign_id : null;
   console.log(`[Heartbeat] screen=${screenId} playing=${is_playing} current=${current_campaign_id||'none'} clientVer=${clientVersion||'none'}`);
   try {
