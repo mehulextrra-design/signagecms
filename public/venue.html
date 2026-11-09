@@ -282,7 +282,7 @@ body {
       <button class="btn btn-primary" id="login-btn" onclick="doLogin()" style="width:100%;justify-content:center;padding:14px;margin-top:4px;">Sign In</button>
       <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;gap:8px;">
         <a href="#" onclick="showForgotView();return false;" style="font-size:13px;color:var(--primary);text-decoration:none;">Forgot password?</a>
-        <a href="/?partner=1" style="font-size:13px;color:var(--text3);text-decoration:none;text-align:right;">Not a partner yet? <span style="color:var(--primary);">Apply →</span></a>
+        <a href="#" onclick="openVpLeadForm();return false;" style="font-size:13px;color:var(--text3);text-decoration:none;text-align:right;">Not a partner yet? <span style="color:var(--primary);">Apply →</span></a>
       </div>
     </div>
 
@@ -1027,6 +1027,136 @@ function esc(s) {
     }
   }
 })();
+</script>
+
+<!-- ── Venue Partner Inquiry Form Modal ── -->
+<style>
+#vp-lead-modal{display:none;position:fixed;inset:0;z-index:9999;background:rgba(30,30,30,.55);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:20px;}
+#vp-lead-modal.vplf-open{display:flex;}
+#vplf-card{background:#f2efe9;border-radius:24px;width:100%;max-width:500px;overflow:hidden;position:relative;font-family:'Inter',-apple-system,sans-serif;box-shadow:0 32px 80px rgba(30,30,30,.22),0 0 0 1px rgba(30,30,30,.08);}
+.vplf-head{background:linear-gradient(135deg,#c94baa 0%,#7b68c8 55%,#2ca6d4 100%);padding:26px 30px 22px;position:relative;}
+.vplf-head h2{font-family:'Magra',sans-serif;font-weight:700;font-size:22px;color:#fff;margin:0 0 4px;}
+.vplf-head p{margin:0;font-size:13px;color:rgba(255,255,255,.75);}
+.vplf-hclose{position:absolute;top:18px;right:20px;background:rgba(255,255,255,.18);border:none;color:#fff;font-size:18px;cursor:pointer;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:background .18s;line-height:1;}
+.vplf-hclose:hover{background:rgba(255,255,255,.32);}
+.vplf-body2{padding:26px 30px 28px;background:#f2efe9;}
+.vplf-row2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.vplf-fd{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;}
+.vplf-fd label{font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:rgba(30,30,30,.5);}
+.vplf-fd input,.vplf-fd select{background:#fff;border:1.5px solid rgba(30,30,30,.14);border-radius:12px;padding:11px 14px;font-size:14px;color:#1e1e1e;font-family:inherit;outline:none;transition:border-color .18s,box-shadow .18s;-webkit-appearance:none;width:100%;box-sizing:border-box;}
+.vplf-fd input::placeholder{color:rgba(30,30,30,.35);}
+.vplf-fd input:focus,.vplf-fd select:focus{border-color:#7b68c8;box-shadow:0 0 0 3px rgba(123,104,200,.14);}
+.vplf-fd select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%231e1e1e' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:36px;cursor:pointer;}
+.vplf-submit2{width:100%;padding:14px;margin-top:4px;background:linear-gradient(135deg,#c94baa 0%,#7b68c8 55%,#2ca6d4 100%);border:none;border-radius:14px;font-family:'Magra',sans-serif;font-size:15px;font-weight:700;color:#fff;cursor:pointer;transition:opacity .18s,transform .14s;}
+.vplf-submit2:hover:not(:disabled){opacity:.88;}
+.vplf-submit2:disabled{background:rgba(30,30,30,.2);color:rgba(30,30,30,.4);cursor:default;}
+.vplf-errmsg{font-size:12px;color:#c0392b;min-height:14px;margin-bottom:4px;}
+.vplf-fine2{text-align:center;font-size:11px;color:rgba(30,30,30,.35);margin-top:12px;}
+#vplf-success{display:none;flex-direction:column;align-items:center;text-align:center;padding:48px 30px 44px;background:#f2efe9;}
+.vplf-ok-ring{width:68px;height:68px;border-radius:50%;background:linear-gradient(135deg,#c94baa,#7b68c8);display:flex;align-items:center;justify-content:center;margin-bottom:18px;}
+#vplf-success h3{font-family:'Magra',sans-serif;font-size:24px;font-weight:700;color:#1e1e1e;margin-bottom:8px;}
+#vplf-success p{font-size:14px;color:rgba(30,30,30,.55);line-height:1.65;margin-bottom:28px;}
+#vplf-success button{background:transparent;color:rgba(30,30,30,.55);border:1.5px solid rgba(30,30,30,.2);border-radius:10px;padding:10px 28px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;}
+@media(max-width:540px){#vp-lead-modal{align-items:flex-end;padding:0;}#vplf-card{border-radius:20px 20px 0 0;max-height:94dvh;overflow-y:auto;}.vplf-row2{grid-template-columns:1fr;}.vplf-head{padding:22px 22px 18px;}.vplf-body2{padding:22px 22px 32px;}}
+</style>
+
+<div id="vp-lead-modal">
+  <div id="vplf-card">
+    <div class="vplf-head">
+      <h2>Venue Partner Inquiry</h2>
+      <p>Hamari team 24 ghante mein call ya WhatsApp karegi.</p>
+      <button class="vplf-hclose" onclick="closeVpLeadForm()" aria-label="Close">&times;</button>
+    </div>
+    <form id="vp-lead-form" class="vplf-body2" onsubmit="submitVpLeadForm(event)">
+      <div class="vplf-row2">
+        <div class="vplf-fd"><label>Business Name *</label><input id="vpl-biz" required placeholder="e.g. Fit Life Gym"></div>
+        <div class="vplf-fd"><label>Owner / Manager</label><input id="vpl-name" placeholder="Aapka naam"></div>
+      </div>
+      <div class="vplf-row2">
+        <div class="vplf-fd"><label>WhatsApp Number *</label><input id="vpl-phone" required type="tel" placeholder="+91 98765 43210"></div>
+        <div class="vplf-fd"><label>City</label><input id="vpl-city" placeholder="Ahmedabad"></div>
+      </div>
+      <div class="vplf-fd">
+        <label>Venue Type</label>
+        <select id="vpl-cat">
+          <option value="other">Select venue type…</option>
+          <option value="gym">Gym / Fitness Center</option>
+          <option value="restaurant">Restaurant / Cafe / Dhaba</option>
+          <option value="salon">Salon / Spa / Parlour</option>
+          <option value="clinic">Medical / Clinic / Pharmacy</option>
+          <option value="retail">Retail / Shop / Showroom</option>
+          <option value="society">Society / Residential Lobby</option>
+          <option value="office">Office / Co-working Space</option>
+          <option value="hotel">Hotel / Guest House</option>
+          <option value="education">Education / Coaching Centre</option>
+        </select>
+      </div>
+      <div class="vplf-row2">
+        <div class="vplf-fd"><label>Daily Footfall (approx)</label><input id="vpl-footfall" type="number" min="1" placeholder="e.g. 200"></div>
+        <div class="vplf-fd">
+          <label>Screens You Have</label>
+          <select id="vpl-screens">
+            <option value="0">No screen</option>
+            <option value="1">1 screen</option>
+            <option value="2">2 screens</option>
+            <option value="3">3 screens</option>
+            <option value="4">4+ screens</option>
+          </select>
+        </div>
+      </div>
+      <div class="vplf-errmsg" id="vp-lead-err"></div>
+      <button class="vplf-submit2" id="vp-lead-submit" type="submit">Submit Karo &#8594;</button>
+      <div class="vplf-fine2">Koi fees nahi &nbsp;&bull;&nbsp; Koi contract nahi &nbsp;&bull;&nbsp; Kabhi bhi exit</div>
+    </form>
+    <div id="vplf-success" style="display:none;flex-direction:column;align-items:center;text-align:center;padding:48px 30px 44px;background:#f2efe9;">
+      <div class="vplf-ok-ring"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+      <h3>Registered!</h3>
+      <p>Hamari team aapko <strong>24 ghante</strong> mein<br>WhatsApp ya call karegi. Thank you!</p>
+      <button onclick="closeVpLeadForm()">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function openVpLeadForm(){
+  var m=document.getElementById('vp-lead-modal');
+  m.classList.add('vplf-open');
+  document.getElementById('vp-lead-form').reset();
+  document.getElementById('vp-lead-err').textContent='';
+  document.getElementById('vplf-success').style.display='none';
+  document.getElementById('vp-lead-form').style.display='flex';
+  document.getElementById('vp-lead-form').style.flexDirection='column';
+}
+function closeVpLeadForm(){
+  document.getElementById('vp-lead-modal').classList.remove('vplf-open');
+}
+async function submitVpLeadForm(e){
+  e.preventDefault();
+  const btn=document.getElementById('vp-lead-submit');
+  const err=document.getElementById('vp-lead-err');
+  err.textContent='';
+  btn.disabled=true; btn.textContent='Submitting…';
+  const data={
+    business_name:document.getElementById('vpl-biz').value.trim(),
+    owner_name:document.getElementById('vpl-name').value.trim(),
+    phone:document.getElementById('vpl-phone').value.trim(),
+    city:document.getElementById('vpl-city').value.trim(),
+    venue_category:document.getElementById('vpl-cat').value,
+    footfall_estimate:parseInt(document.getElementById('vpl-footfall').value)||null,
+    screen_count:parseInt(document.getElementById('vpl-screens').value)||0,
+  };
+  try{
+    const res=await fetch('/api/leads/public',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+    const json=await res.json();
+    if(!res.ok && res.status!==409) throw new Error(json.error||'Submit failed');
+    document.getElementById('vp-lead-form').style.display='none';
+    document.getElementById('vplf-success').style.display='flex';
+  }catch(ex){
+    err.textContent=ex.message;
+    btn.disabled=false; btn.textContent='Submit Karo →';
+  }
+}
+document.addEventListener('keydown',function(e){ if(e.key==='Escape') closeVpLeadForm(); });
 </script>
 </body>
 </html>
