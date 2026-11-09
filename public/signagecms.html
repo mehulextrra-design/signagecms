@@ -2573,7 +2573,26 @@ async function loadWaContacts(){
 }
 
 async function waImportFromPhone(){
-  // Contact Picker API — works on Android Chrome 80+, not on iOS or desktop
+  // Android WebView native bridge (Advertiser APK)
+  if(window.AndroidContacts){
+    return new Promise(resolve=>{
+      window._contactsPermissionCallback=async(contacts, err)=>{
+        window._contactsPermissionCallback=null;
+        if(err){toast('Contacts permission nahi mili','error');resolve();return;}
+        if(!contacts||contacts.length===0){toast('Koi contact nahi mila','error');resolve();return;}
+        let list;
+        try{list=JSON.parse(contacts);}catch(e){toast('Contacts parse error','error');resolve();return;}
+        if(!list.length){toast('Koi valid number nahi mila','error');resolve();return;}
+        const r=await fetch('/api/wa/contacts',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+localStorage.getItem('scms_token')},body:JSON.stringify({contacts:list})});
+        const d=await r.json();
+        if(r.ok){toast((d.added||list.length)+' contacts import ho gaye','success');loadWaContacts();}
+        else toast(d.error||'Import failed','error');
+        resolve();
+      };
+      AndroidContacts.requestContacts();
+    });
+  }
+  // Contact Picker API — works on Android Chrome 80+, not in WebView
   if('contacts' in navigator){
     try{
       const contacts=await navigator.contacts.select(['name','tel'],{multiple:true});
@@ -2595,12 +2614,11 @@ async function waImportFromPhone(){
       return;
     }catch(e){
       if(e.name==='AbortError') return;
-      toast('Phone contacts APK me kaam nahi karta. Chrome browser me open karo ya 📄 CSV use karo.','error');
+      toast('Directory access nahi mili. CSV use karo.','error');
       return;
     }
-  } else {
-    toast('Phone directory is app me support nahi hoti. CSV wala button use karo.','error');
   }
+  toast('Phone directory is device pe support nahi hoti. CSV use karo.','error');
 }
 
 async function waImportCSV(input){
