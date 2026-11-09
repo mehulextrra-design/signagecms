@@ -318,6 +318,9 @@ router.get('/schedule', authenticatePlayer, async (req, res, next) => {
 router.post('/heartbeat', authenticatePlayer, async (req, res, next) => {
   const { screenId } = req.player;
   const { ip_address, app_version, android_version, uptime_sec, is_playing, current_campaign_id, content_version: clientVersion } = req.body;
+  // filler IDs have prefix "filler_" — not valid UUIDs, store null for heartbeat
+  const campaignIdForDb = (current_campaign_id && !String(current_campaign_id).startsWith('filler_'))
+    ? current_campaign_id : null;
   console.log(`[Heartbeat] screen=${screenId} playing=${is_playing} current=${current_campaign_id||'none'} clientVer=${clientVersion||'none'}`);
   try {
     await query('UPDATE screens SET status=$1, last_heartbeat=NOW(), updated_at=NOW() WHERE id=$2',
@@ -326,7 +329,7 @@ router.post('/heartbeat', authenticatePlayer, async (req, res, next) => {
     await query(
       `INSERT INTO heartbeats (screen_id, ip_address, app_version, android_ver, uptime_sec, is_playing, current_campaign_id)
        VALUES ($1,$2,$3,$4,$5,$6,$7)`,
-      [screenId, ip_address, app_version, android_version, uptime_sec, is_playing, current_campaign_id || null]
+      [screenId, ip_address, app_version, android_version, uptime_sec, is_playing, campaignIdForDb]
     );
 
     const cmds = await query(
