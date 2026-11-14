@@ -975,9 +975,9 @@ function loadAgreement() {
 function printAgreement() {
   if (!_vpData) return;
   const vp = _vpData;
-  // Use approved_at as the locked agreement date; fallback to today for unapproved
-  const today = vp.approved_at
-    ? new Date(vp.approved_at).toLocaleDateString('en-IN',{day:'2-digit',month:'long',year:'numeric'})
+  // Use leads.agreement_date (injected by backend) → vp.approved_at → today
+  const today = (vp.agreement_date || vp.approved_at)
+    ? new Date(vp.agreement_date || vp.approved_at).toLocaleDateString('en-IN',{day:'2-digit',month:'long',year:'numeric'})
     : new Date().toLocaleDateString('en-IN',{day:'2-digit',month:'long',year:'numeric'});
   const agr = document.getElementById('agr-print');
   agr.innerHTML = `
@@ -998,23 +998,23 @@ function printAgreement() {
     <button class="close-agr" onclick="document.getElementById('agr-print').style.display='none'">Close</button>
     <h1>Venue Partner Agreement</h1>
     <div class="sub">Digital Signage Network Participation Agreement</div>
-    <p>This Agreement is entered into as of <strong>${today}</strong>, between <strong>extrravenue</strong> ("Company"), AND <strong>${esc(vp.contact_name||'[Contact Name]')}</strong>, operating <strong>${esc(vp.business_name||'[Business Name]')}</strong> at <strong>${esc(vp.city||'[City]')}</strong> ("Venue Partner").</p>
+    <p>This Agreement is entered into as of <strong>${today}</strong>, between <strong>extrravenue</strong> (hereinafter <strong>"Company"</strong>), AND <strong>${esc(vp.contact_name||'[Contact Name]')}</strong>, operating <strong>${esc(vp.business_name||'[Business Name]')}</strong> located at <strong>${esc(vp.city||'[City]')}</strong> (hereinafter <strong>"Venue Partner"</strong>).</p>
     <h2>1. Screen &amp; Installation</h2>
-    <p>extrravenue shall connect the digital screen at Venue Partner's premises to its CMS. extrravenue retains ownership of its media player hardware installed at the premises.</p>
+    <p>extrravenue shall connect the digital screen at the Venue Partner's premises to its CMS. If a new screen is required, cost and ownership shall be mutually agreed in writing. extrravenue retains ownership of its media player hardware installed at the premises.</p>
     <h2>2. Content Slot Allocation</h2>
-    <p>Venue Partner is entitled to display their own content during Filler Slots — time not occupied by paid advertiser content. Paid third-party advertiser content takes absolute scheduling priority.</p>
+    <p><strong>Venue Content:</strong> The Venue Partner is entitled to display their own promotional content during all available Filler Slots — screen time not occupied by paid advertiser content. <strong>Priority:</strong> Paid third-party advertiser content takes absolute scheduling priority.</p>
     <h2>3. Utilities</h2>
-    <p>Venue Partner bears all costs for electricity and internet connectivity at their premises required to operate the screen and media player.</p>
+    <p>The Venue Partner shall bear all costs for electricity and internet connectivity at their premises required to operate the screen and media player.</p>
     <h2>4. Content Guidelines</h2>
-    <p>Venue Partner shall ensure all uploaded content complies with applicable Indian laws. extrravenue reserves the right to remove violating content without notice.</p>
+    <p>The Venue Partner shall ensure all uploaded content complies with applicable Indian laws. extrravenue reserves the right to remove violating content without notice.</p>
     <h2>5. Monetary Terms</h2>
-    <p>Non-monetary, service-exchange basis. No revenue share, rental fee, or commission payable by either Party.</p>
+    <p>This Agreement is on a non-monetary, service-exchange basis. No revenue share, rental fee, or commission shall be payable by either Party.</p>
     <h2>6. Term &amp; Termination</h2>
     <p>Valid for <strong>ONE (1) YEAR</strong> from signing, auto-renews unless either Party provides 30 days written notice. Either Party may terminate with <strong>7 days' written notice</strong>.</p>
     <h2>7. Equipment Liability</h2>
-    <p>Venue Partner is responsible for protecting extrravenue's installed hardware from damage, theft, or vandalism and shall bear cost of repair or replacement resulting from negligence.</p>
+    <p>The Venue Partner is responsible for protecting extrravenue's installed hardware from damage, theft, or vandalism and shall bear the cost of repair or replacement resulting from negligence.</p>
     <h2>8. Governing Law</h2>
-    <p>Governed by laws of India. Disputes resolved amicably within 15 days, failing which through arbitration under the Arbitration and Conciliation Act, 1996.</p>
+    <p>Governed by the laws of India. Disputes shall first be resolved amicably within 15 days, failing which through arbitration under the Arbitration and Conciliation Act, 1996.</p>
     <div class="sig-grid">
       <div class="sig-box"><p>For extrravenue<br>Name: ___________________<br>Designation: ____________<br>Date: ${today}</p></div>
       <div class="sig-box"><p>For Venue Partner<br>Name: ${esc(vp.contact_name||'___________________')}<br>Business: ${esc(vp.business_name||'')}<br>Date: ${today}</p></div>

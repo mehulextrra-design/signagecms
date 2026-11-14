@@ -64,7 +64,10 @@ router.post('/:id/reject', authenticate, requireAdmin, async (req, res, next) =>
 router.get('/:id', authenticate, async (req, res, next) => {
   try {
     const vp = await query(
-      `SELECT vp.*, u.email FROM venue_partners vp
+      `SELECT vp.*, u.email,
+         (SELECT agreement_date FROM leads WHERE venue_partner_id = vp.id
+          ORDER BY agreement_date DESC NULLS LAST LIMIT 1) AS agreement_date
+       FROM venue_partners vp
        LEFT JOIN users u ON u.id = vp.user_id
        WHERE vp.id = $1`, [req.params.id]
     );
