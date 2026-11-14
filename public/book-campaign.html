@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<title>Book Campaign — ExtrraVenue</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f0f0f5;--surface:#fff;--surface2:#eaeaf2;--border:#d8d8e4;
+  --text:#12122a;--text2:#3a3a56;--text3:#7070a0;
+  --primary:#7b68c8;--primary-hover:#6a58b8;--primary-light:#ede9fb;
+  --grad:linear-gradient(135deg,#c94baa 0%,#7b68c8 55%,#2ca6d4 100%);
+  --success:#16a34a;--success-light:#dcfce7;
+  --warning:#d97706;--danger:#dc2626;--danger-light:#fee2e2;
+  --shadow:0 1px 3px rgba(0,0,0,.1),0 1px 2px rgba(0,0,0,.06);
+  --shadow-md:0 4px 6px -1px rgba(0,0,0,.1),0 2px 4px -1px rgba(0,0,0,.06);
+  --shadow-lg:0 10px 15px -3px rgba(0,0,0,.1),0 4px 6px -2px rgba(0,0,0,.05);
+  --radius:10px;--radius-sm:8px;--radius-lg:14px
+}
+html,body{height:100%;font-family:'Inter',-apple-system,sans-serif;font-size:14px;color:var(--text);background:var(--bg);overflow-x:hidden}
+#loading-screen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:999}
+.spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+#app{display:flex;height:100vh;overflow:hidden}
+#app.hidden{display:none}
+
+/* SIDEBAR */
+.sidebar{width:240px;flex-shrink:0;background:#fff;border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
+.sb-logo{padding:18px 16px 14px;border-bottom:1px solid var(--border)}
+.sb-brand{font-size:15px;font-weight:700;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.sb-tag{font-size:11px;color:var(--text3);margin-top:2px}
+.sb-nav{flex:1;padding:12px 8px;overflow-y:auto}
+.sb-nav a{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:var(--radius-sm);color:var(--text2);text-decoration:none;font-size:13.5px;font-weight:500;transition:background .15s,color .15s;margin-bottom:2px}
+.sb-nav a:hover{background:rgba(123,104,200,.07);color:var(--text)}
+.sb-nav a.active{background:rgba(123,104,200,.14);color:var(--primary)}
+.sb-nav a svg{width:16px;height:16px;flex-shrink:0}
+.sb-wallet{padding:12px 16px 10px;border-top:1px solid var(--border)}
+.sb-wallet-lbl{font-size:11px;color:var(--text3);font-weight:500;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
+.sb-wallet-bal{font-size:17px;font-weight:700;color:var(--primary)}
+.sb-user{padding:12px 16px;border-top:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.sb-avatar{width:32px;height:32px;border-radius:50%;background:var(--primary-light);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:var(--primary);flex-shrink:0}
+.sb-name{font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sb-role{font-size:11px;color:var(--text3)}
+
+/* MAIN */
+.main{flex:1;overflow-y:auto;display:flex;flex-direction:column}
+.main-hdr{padding:20px 28px 0;border-bottom:1px solid var(--border);background:var(--surface)}
+.main-hdr h1{font-size:20px;font-weight:700;margin-bottom:4px}
+.main-hdr p{color:var(--text2);font-size:13px;padding-bottom:16px}
+
+/* STEPPER */
+.stepper{display:flex;align-items:center;padding:16px 28px;background:var(--surface);border-bottom:1px solid var(--border)}
+.step-item{display:flex;align-items:center;gap:8px;flex:1}
+.step-item:last-child{flex:0}
+.step-num{width:28px;height:28px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--text3);background:var(--surface);flex-shrink:0;transition:all .2s}
+.step-item.active .step-num{border-color:var(--primary);background:var(--primary);color:#fff}
+.step-item.done .step-num{border-color:var(--success);background:var(--success);color:#fff}
+.step-label{font-size:12px;font-weight:500;color:var(--text3)}
+.step-item.active .step-label{color:var(--primary);font-weight:600}
+.step-item.done .step-label{color:var(--success)}
+.step-line{flex:1;height:2px;background:var(--border);margin:0 8px;border-radius:2px;transition:background .3s}
+.step-line.done{background:var(--success)}
+
+/* STEP CONTENT */
+.step-content{display:none;flex:1;padding:24px 28px;overflow-y:auto}
+.step-content.active{display:block}
+.section-title{font-size:16px;font-weight:700;margin-bottom:4px}
+.section-sub{font-size:13px;color:var(--text2);margin-bottom:20px}
+
+/* WIZARD NAV */
+.wizard-nav{display:flex;justify-content:space-between;align-items:center;padding:16px 28px;background:var(--surface);border-top:1px solid var(--border);position:sticky;bottom:0;flex-shrink:0}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 18px;border-radius:var(--radius-sm);font-size:14px;font-weight:500;cursor:pointer;border:none;transition:all .15s;font-family:inherit;text-decoration:none}
+.btn-primary{background:var(--grad);color:#fff;box-shadow:0 2px 10px rgba(123,104,200,.3)}
+.btn-primary:hover{opacity:.9}
+.btn-ghost{background:transparent;color:var(--text2);border:1.5px solid var(--border)}
+.btn-ghost:hover{background:var(--surface2);color:var(--text)}
+.btn-sm{padding:6px 12px;font-size:13px}
+.btn-full{width:100%}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+
+/* SCREENS */
+.screen-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+.screen-card{background:var(--surface);border:2px solid var(--border);border-radius:var(--radius);padding:14px;cursor:pointer;transition:border-color .15s,box-shadow .15s;position:relative}
+.screen-card:hover{border-color:var(--primary);box-shadow:var(--shadow-md)}
+.screen-card.selected{border-color:var(--primary);background:var(--primary-light)}
+.sc-check{position:absolute;top:10px;right:10px;width:20px;height:20px;border:2px solid var(--border);border-radius:50%;background:var(--surface);display:flex;align-items:center;justify-content:center;transition:all .15s}
+.screen-card.selected .sc-check{background:var(--primary);border-color:var(--primary)}
+.sc-name{font-weight:600;font-size:13.5px;margin-bottom:4px;padding-right:28px}
+.sc-loc{font-size:12px;color:var(--text3);margin-bottom:8px}
+.sc-meta{display:flex;gap:8px}
+.sc-tag{font-size:11px;padding:2px 7px;background:var(--surface2);border-radius:4px;color:var(--text2)}
+.sel-banner{margin-bottom:14px}
+.sel-pill{display:inline-block;background:var(--primary);color:#fff;border-radius:20px;padding:4px 12px;font-size:13px;font-weight:600}
+
+/* UPLOAD */
+.creative-tabs{display:flex;margin-bottom:16px;border:1.5px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;width:fit-content}
+.creative-tab{padding:8px 16px;font-size:13px;font-weight:500;cursor:pointer;border:none;background:transparent;color:var(--text2);font-family:inherit;transition:background .15s}
+.creative-tab.active{background:var(--primary);color:#fff}
+.upload-zone{border:2px dashed var(--border);border-radius:var(--radius);padding:40px 24px;text-align:center;cursor:pointer;transition:border-color .15s,background .15s}
+.upload-zone:hover,.upload-zone.drag{border-color:var(--primary);background:var(--primary-light)}
+.upload-zone-icon{font-size:36px;margin-bottom:12px}
+.upload-zone p{color:var(--text2);font-size:12px;margin-top:6px}
+.upload-preview{margin-top:16px;border-radius:var(--radius);background:var(--surface2);border:1px solid var(--border);padding:12px;display:flex;align-items:center;gap:12px}
+.preview-thumb{width:60px;height:60px;object-fit:cover;border-radius:6px;background:var(--surface2)}
+.preview-name{font-weight:600;font-size:13px}
+.preview-size{font-size:12px;color:var(--text3);margin-top:2px}
+.lib-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-top:8px}
+.lib-card{border:2px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;cursor:pointer;transition:border-color .15s}
+.lib-card:hover,.lib-card.selected{border-color:var(--primary)}
+.lib-thumb{width:100%;aspect-ratio:16/9;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:24px;overflow:hidden}
+.lib-thumb img{width:100%;height:100%;object-fit:cover}
+.lib-name{padding:6px 8px;font-size:11px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* CYCLE TABS */
+.cycle-tabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+.cycle-tab{padding:8px 16px;border-radius:20px;font-size:13px;font-weight:500;cursor:pointer;border:1.5px solid var(--border);background:var(--surface);color:var(--text2);transition:all .15s;position:relative}
+.cycle-tab:hover{border-color:var(--primary);color:var(--primary)}
+.cycle-tab.active{border-color:var(--primary);background:var(--primary);color:#fff}
+.cycle-badge{position:absolute;top:-8px;right:-4px;background:var(--success);color:#fff;font-size:9px;font-weight:700;padding:2px 5px;border-radius:10px;white-space:nowrap}
+
+/* PLAN CARDS */
+.pkg-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin-bottom:24px}
+.pkg-card{background:var(--surface);border:2px solid var(--border);border-radius:var(--radius-lg);padding:20px;cursor:pointer;transition:border-color .15s,box-shadow .15s,transform .1s;position:relative}
+.pkg-card:hover{border-color:var(--primary);box-shadow:var(--shadow-md);transform:translateY(-2px)}
+.pkg-card.selected{border-color:var(--primary);background:var(--primary-light)}
+.pkg-card.featured{border-color:#a78bfa}
+.pkg-badge{position:absolute;top:-11px;left:50%;transform:translateX(-50%);background:var(--grad);color:#fff;font-size:10px;font-weight:700;padding:3px 10px;border-radius:10px;white-space:nowrap}
+.pkg-name{font-size:15px;font-weight:700;margin-bottom:3px}
+.pkg-slot{font-size:12px;color:var(--text3);margin-bottom:12px}
+.pkg-price-num{font-size:26px;font-weight:700;color:var(--primary)}
+.pkg-price-sfx{font-size:13px;color:var(--text3)}
+.pkg-orig{font-size:12px;color:var(--text3);text-decoration:line-through}
+.pkg-cycle-price{font-size:12px;color:var(--success);font-weight:600;margin-bottom:12px}
+.pkg-features{list-style:none;margin-top:12px;display:flex;flex-direction:column;gap:6px}
+.pkg-features li{font-size:12px;color:var(--text2);display:flex;align-items:flex-start;gap:6px}
+.pkg-features li::before{content:"✓";color:var(--success);font-weight:700;font-size:11px;flex-shrink:0;margin-top:1px}
+.pkg-plays{font-size:11px;color:var(--text3);margin-top:8px;padding-top:8px;border-top:1px solid var(--border)}
+
+/* ADDONS */
+.addons-wrap{margin-top:4px}
+.addons-lbl{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);margin-bottom:12px}
+.addon-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+.addon-card{background:var(--surface);border:2px solid var(--border);border-radius:var(--radius);padding:16px;cursor:pointer;transition:border-color .15s}
+.addon-card:hover{border-color:var(--primary)}
+.addon-card.selected{border-color:var(--primary);background:var(--primary-light)}
+.addon-top{display:flex;align-items:flex-start;gap:10px}
+.addon-chk{width:18px;height:18px;border-radius:4px;border:2px solid var(--border);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.addon-card.selected .addon-chk{background:var(--primary);border-color:var(--primary)}
+.addon-name{font-weight:600;font-size:13.5px;margin-bottom:2px}
+.addon-desc{font-size:12px;color:var(--text2);line-height:1.5}
+.addon-price{font-size:13px;font-weight:700;color:var(--primary);margin-top:8px}
+.wa-caption-box{margin-top:14px;padding:14px;background:rgba(123,104,200,.06);border-radius:var(--radius-sm);border:1.5px solid rgba(123,104,200,.2)}
+.wa-caption-lbl{font-size:12px;font-weight:600;color:var(--primary);margin-bottom:8px}
+.wa-caption-input{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-family:inherit;color:var(--text);background:var(--surface);resize:vertical;min-height:70px}
+.wa-caption-input:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(123,104,200,.12)}
+
+/* SCHEDULE */
+.form-group{margin-bottom:16px}
+.form-label{display:block;font-size:13px;font-weight:500;margin-bottom:6px;color:var(--text2)}
+.form-input{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:14px;color:var(--text);background:var(--surface);transition:border-color .15s;font-family:inherit}
+.form-input:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(123,104,200,.12)}
+.sch-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+
+/* REVIEW */
+.review-card{background:var(--surface);border-radius:var(--radius-lg);border:1px solid var(--border);overflow:hidden;margin-bottom:16px}
+.review-sec{padding:16px 20px;border-bottom:1px solid var(--border)}
+.review-sec:last-child{border-bottom:none}
+.review-sec-ttl{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);margin-bottom:10px}
+.review-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;font-size:13.5px}
+.review-lbl{color:var(--text2)}
+.review-val{font-weight:500;text-align:right;max-width:60%}
+.pricing-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;margin-bottom:16px}
+.p-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;font-size:13.5px}
+.p-row+.p-row{border-top:1px solid var(--border)}
+.p-sep{border-top:2px solid var(--border);margin:6px 0}
+.p-total{display:flex;justify-content:space-between;font-size:16px;font-weight:700;padding:8px 0 0}
+.coupon-row{display:flex;gap:8px;margin-top:12px}
+.wallet-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-top:1px solid var(--border);margin-top:4px}
+.wallet-tog{display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;font-weight:500}
+
+/* TOAST */
+#toast-wrap{position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.toast{padding:11px 16px;border-radius:var(--radius-sm);box-shadow:var(--shadow-md);font-size:13px;font-weight:500;animation:toastIn .25s ease;max-width:320px}
+.toast.success{background:#dcfce7;color:#166534}
+.toast.error{background:#fee2e2;color:#991b1b}
+.toast.info{background:#dbeafe;color:#1e40af}
+@keyframes toastIn{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:translateX(0)}}
+.spinner-sm{width:14px;height:14px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;display:inline-block}
+.empty-msg{text-align:center;padding:40px;color:var(--text3);font-size:13px}
+.section-sep{height:1px;background:var(--border);margin:20px 0}
+
+@media(max-width:768px){
+  .sidebar{display:none}
+  .pkg-grid{grid-template-columns:1fr 1fr}
+  .screen-grid{grid-template-columns:1fr 1fr}
+  .step-label{display:none}
+  .sch-row{grid-template-columns:1fr}
+  .stepper{padding:12px 16px}
+  .step-content{padding:16px}
+  .wizard-nav{padding:12px 16px}
+  .main-hdr{padding:16px 16px 0}
+  .addon-cards{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div id="loading-screen"><div class="spinner"></div></div>
+
+<div id="app" class="hidden">
+  <aside class="sidebar">
+    <div class="sb-logo">
+      <div class="sb-brand">extrravenue</div>
+      <div class="sb-tag">Advertiser Portal</div>
+    </div>
+    <nav class="sb-nav">
+      <a href="signagecms.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Dashboard
+      </a>
+      <a href="#" class="active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+        Book Campaign
+      </a>
+      <a href="signagecms.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+        My Campaigns
+      </a>
+      <a href="signagecms.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+        Analytics
+      </a>
+      <a href="signagecms.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+        Invoices
+      </a>
+      <a href="signagecms.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+        Wallet
+      </a>
+    </nav>
+    <div class="sb-wallet">
+      <div class="sb-wallet-lbl">Wallet Balance</div>
+      <div class="sb-wallet-bal" id="sidebar-wallet-bal">₹0</div>
+    </div>
+    <div class="sb-user">
+      <div class="sb-avatar" id="sb-avatar">?</div>
+      <div>
+        <div class="sb-name" id="sb-name">Loading…</div>
+        <div class="sb-role">Advertiser</div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="main">
+    <div class="main-hdr">
+      <h1>Book a Campaign</h1>
+      <p>Reach customers across digital screens, social media &amp; WhatsApp</p>
+    </div>
+
+    <div class="stepper">
+      <div class="step-item active" id="si-1"><div class="step-num" id="sn-1">1</div><div class="step-label">Select Screens</div></div>
+      <div class="step-line" id="sl-1"></div>
+      <div class="step-item" id="si-2"><div class="step-num" id="sn-2">2</div><div class="step-label">Upload Creative</div></div>
+      <div class="step-line" id="sl-2"></div>
+      <div class="step-item" id="si-3"><div class="step-num" id="sn-3">3</div><div class="step-label">Choose Plan</div></div>
+      <div class="step-line" id="sl-3"></div>
+      <div class="step-item" id="si-4"><div class="step-num" id="sn-4">4</div><div class="step-label">Review &amp; Pay</div></div>
+    </div>
+
+    <!-- Step 1 -->
+    <div class="step-content active" id="step-1">
+      <div class="section-title">Select Screens</div>
+      <div class="section-sub">Choose the screens where you want to display your ad</div>
+      <div id="screens-wrap">
+        <div class="empty-msg" id="screens-loading">Loading screens…</div>
+        <div id="sel-banner" class="sel-banner" style="display:none"><span class="sel-pill" id="sel-pill">0 screens selected</span></div>
+        <div class="screen-grid" id="screen-grid" style="display:none"></div>
+      </div>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="step-content" id="step-2">
+      <div class="section-title">Upload Your Creative</div>
+      <div class="section-sub">Add your campaign name and upload an image or video</div>
+      <div class="form-group">
+        <label class="form-label">Campaign Name</label>
+        <input type="text" class="form-input" id="cmp-name" placeholder="e.g. Diwali Sale 2026" maxlength="80" style="max-width:420px">
+      </div>
+      <div class="creative-tabs">
+        <button class="creative-tab active" onclick="switchTab('upload')">Upload New</button>
+        <button class="creative-tab" onclick="switchTab('library')">My Library</button>
+      </div>
+      <div id="tab-upload">
+        <div class="upload-zone" id="upload-zone" onclick="document.getElementById('file-input').click()">
+          <div class="upload-zone-icon">🎨</div>
+          <strong>Click to upload</strong> or drag &amp; drop
+          <p>Image: JPG, PNG, WebP (max 10 MB) &nbsp;·&nbsp; Video: MP4 (max 50 MB)</p>
+          <input type="file" id="file-input" style="display:none" accept="image/*,video/mp4" onchange="handleFileSelect(this.files[0])">
+        </div>
+        <div class="upload-preview" id="upload-preview" style="display:none">
+          <img id="preview-thumb" class="preview-thumb" src="" alt="">
+          <div style="flex:1">
+            <div class="preview-name" id="preview-name"></div>
+            <div class="preview-size" id="preview-size"></div>
+          </div>
+          <button class="btn btn-ghost btn-sm" onclick="clearCreative()">Remove</button>
+        </div>
+      </div>
+      <div id="tab-library" style="display:none">
+        <div class="empty-msg" id="lib-loading">Loading library…</div>
+        <div class="lib-grid" id="lib-grid" style="display:none"></div>
+      </div>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="step-content" id="step-3">
+      <div class="section-title">Choose Your Plan</div>
+      <div class="section-sub">Pick a billing cycle and package that fits your goals</div>
+
+      <div class="form-group">
+        <div class="form-label">Billing Cycle</div>
+        <div class="cycle-tabs">
+          <button class="cycle-tab active" data-cycle="1mo" onclick="setCycle('1mo')">1 Month</button>
+          <button class="cycle-tab" data-cycle="3mo" onclick="setCycle('3mo')">3 Months <span class="cycle-badge">Save 15%</span></button>
+          <button class="cycle-tab" data-cycle="6mo" onclick="setCycle('6mo')">6 Months <span class="cycle-badge">Save 25%</span></button>
+        </div>
+      </div>
+
+      <div class="pkg-grid" id="pkg-grid"></div>
+
+      <div class="section-sep"></div>
+
+      <div class="form-group">
+        <label class="form-label">Campaign Start Date</label>
+        <input type="date" class="form-input" id="sch-start" style="max-width:220px">
+      </div>
+      <div class="sch-row">
+        <div class="form-group">
+          <label class="form-label">Display From</label>
+          <input type="time" class="form-input" id="sch-time-start" value="09:00">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Display Until</label>
+          <input type="time" class="form-input" id="sch-time-end" value="21:00">
+        </div>
+      </div>
+
+      <div class="addons-wrap">
+        <div class="addons-lbl">Smart Add-Ons</div>
+        <div class="addon-cards" id="addon-cards"></div>
+        <div id="wa-caption-box" class="wa-caption-box" style="display:none">
+          <div class="wa-caption-lbl">WhatsApp Message Template</div>
+          <textarea class="wa-caption-input" id="wa-caption-template" rows="3" placeholder="e.g. 🎉 Exciting offer! Visit us and show this message for a special discount."></textarea>
+          <div style="font-size:11px;color:var(--text3);margin-top:6px">This message will be sent with your campaign creative to subscribers.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 4 -->
+    <div class="step-content" id="step-4">
+      <div class="section-title">Review &amp; Pay</div>
+      <div class="section-sub">Check your campaign details before submitting</div>
+      <div id="review-content"></div>
+    </div>
+
+    <div class="wizard-nav">
+      <button class="btn btn-ghost" id="btn-back" onclick="goBack()" style="display:none">&lt; Back</button>
+      <button class="btn btn-primary" id="btn-next" onclick="goNext()">Next &gt;</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast-wrap"></div>
+
+<script>
+const API='https://www.extrravenue.com/api';
+const token=localStorage.getItem('scms_token');
+if(!token){window.location.href='signagecms.html';}
+
+let currentUser=null,walletBalance=0;
+let currentStep=1;
+let allScreens=[],selectedScreenIds=[];
+let uploadedFile=null,uploadedContentId=null,userLibrary=[];
+let selectedPkg=null,selectedCycle='1mo';
+let waAddon=false,walletApplied=false,couponDiscount=0;
+
+const PKG={
+  trial:    {monthly:0,   slot:8,  multiplier:0,name:'Trial',
+             features:['Screen ad (8s slot)','3 days filler slot','Free — no payment needed']},
+  starter:  {monthly:2999,slot:10, multiplier:1,name:'Starter',
+             features:['Screen ad (10s slot)','City-wide screen network','Basic analytics & reports']},
+  complete: {monthly:4999,slot:15, multiplier:2,name:'Complete',
+             features:['Screen ad (15s slot)','Facebook & Instagram posts','Google Business Profile','QR card for your business','4 social reposts/month']},
+  growth:   {monthly:5999,slot:20, multiplier:3,name:'Growth',
+             features:['Screen ad (20s slot)','Facebook & Instagram posts','Google Business Profile','Business card creation','QR card','Unlimited reposts','WhatsApp 10K contacts/week (included)']},
+};
+
+async function api(path,opts={}){
+  const h={'Content-Type':'application/json',...(opts.headers||{})};
+  if(token)h['Authorization']=`Bearer ${token}`;
+  const r=await fetch(`${API}${path}`,{...opts,headers:h});
+  const d=await r.json().catch(()=>({}));
+  if(!r.ok)throw new Error(d.error||`HTTP ${r.status}`);
+  return d;
+}
+
+function fmtN(n){return Number(n).toLocaleString('en-IN')}
+function fmtD(s){if(!s)return'';const d=new Date(s);return d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})}
+
+function toast(msg,type='info'){
+  const w=document.getElementById('toast-wrap');
+  const el=document.createElement('div');
+  el.className=`toast ${type}`;el.textContent=msg;
+  w.appendChild(el);setTimeout(()=>el.remove(),3200);
+}
+
+async function init(){
+  try{
+    const[u,sd]=await Promise.all([api('/auth/me'),api('/screens?limit=50')]);
+    currentUser=u.user||u;
+    walletBalance=parseFloat(currentUser.wallet_balance||0);
+    allScreens=Array.isArray(sd)?sd:(sd.screens||sd.data||[]);
+    document.getElementById('sidebar-wallet-bal').textContent='₹'+fmtN(walletBalance);
+    const name=((currentUser.first_name||'')+' '+(currentUser.last_name||'')).trim()||currentUser.email||'User';
+    document.getElementById('sb-name').textContent=name;
+    document.getElementById('sb-avatar').textContent=(currentUser.first_name||currentUser.email||'?')[0].toUpperCase();
+    renderScreens();renderPkgCards();setDefaultDate();
+    document.getElementById('loading-screen').style.display='none';
+    document.getElementById('app').classList.remove('hidden');
+  }catch(e){
+    if(e.message.match(/401|403/))window.location.href='signagecms.html';
+    else{document.getElementById('loading-screen').innerHTML='<div style="text-align:center;color:#666;padding:24px"><p>Failed to load. <a href="signagecms.html" style="color:#7b68c8">Go back</a></p><p style="margin-top:8px;font-size:12px">'+e.message+'</p></div>';}
+  }
+}
+
+function setDefaultDate(){
+  const d=new Date();d.setDate(d.getDate()+1);
+  const s=d.toISOString().split('T')[0];
+  const el=document.getElementById('sch-start');
+  el.value=s;el.min=s;
+}
+
+/* ---- SCREENS ---- */
+function renderScreens(){
+  const grid=document.getElementById('screen-grid');
+  document.getElementById('screens-loading').style.display='none';
+  if(!allScreens.length){
+    document.getElementById('screens-loading').style.display='block';
+    document.getElementById('screens-loading').textContent='No screens available. Contact support.';
+    return;
+  }
+  grid.style.display='grid';
+  grid.innerHTML=allScreens.map(s=>`
+    <div class="screen-card${selectedScreenIds.includes(s.id)?' selected':''}" onclick="toggleScreen(${JSON.stringify(s.id)})">
+      <div class="sc-check">${selectedScreenIds.includes(s.id)?'<svg width="10" height="8" viewBox="0 0 12 10"><path d="M1 5l3.5 3.5L11 1" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>':''}</div>
+      <div class="sc-name">${s.name||s.screen_name||'Screen'}</div>
+      <div class="sc-loc">${s.location||s.address||''}</div>
+      <div class="sc-meta">
+        <span class="sc-tag">${s.resolution||'FHD'}</span>
+        <span class="sc-tag">${s.screen_type||'Indoor'}</span>
+      </div>
+    </div>`).join('');
+  updateSelBanner();
+}
+
+function toggleScreen(id){
+  const idx=selectedScreenIds.indexOf(id);
+  if(idx===-1)selectedScreenIds.push(id);
+  else selectedScreenIds.splice(idx,1);
+  renderScreens();renderPkgCards();
+}
+
+function updateSelBanner(){
+  const n=selectedScreenIds.length;
+  const banner=document.getElementById('sel-banner');
+  banner.style.display=n>0?'':'none';
+  document.getElementById('sel-pill').textContent=n+' screen'+(n!==1?'s':'')+' selected';
+}
+
+/* ---- CREATIVE ---- */
+function switchTab(tab){
+  document.querySelectorAll('.creative-tab').forEach((t,i)=>t.classList.toggle('active',['upload','library'][i]===tab));
+  document.getElementById('tab-upload').style.display=tab==='upload'?'':'none';
+  document.getElementById('tab-library').style.display=tab==='library'?'':'none';
+  if(tab==='library')loadLibrary();
+}
+
+function handleFileSelect(file){
+  if(!file)return;
+  uploadedFile=file;uploadedContentId=null;
+  const prev=document.getElementById('upload-preview');
+  const thumb=document.getElementById('preview-thumb');
+  if(file.type.startsWith('image/')){thumb.src=URL.createObjectURL(file);thumb.style.display='';}
+  else{thumb.style.display='none';}
+  document.getElementById('preview-name').textContent=file.name;
+  document.getElementById('preview-size').textContent=(file.size/1024/1024).toFixed(1)+' MB';
+  prev.style.display='flex';
+  document.getElementById('upload-zone').innerHTML=`<div class="upload-zone-icon">✅</div><strong>File ready</strong><p>${file.name}</p><input type="file" id="file-input" style="display:none" accept="image/*,video/mp4" onchange="handleFileSelect(this.files[0])">`;
+}
+
+function clearCreative(){
+  uploadedFile=null;uploadedContentId=null;
+  document.getElementById('upload-preview').style.display='none';
+  document.getElementById('upload-zone').innerHTML=`<div class="upload-zone-icon">🎨</div><strong>Click to upload</strong> or drag &amp; drop<p>Image: JPG, PNG, WebP (max 10 MB) &nbsp;·&nbsp; Video: MP4 (max 50 MB)</p><input type="file" id="file-input" style="display:none" accept="image/*,video/mp4" onchange="handleFileSelect(this.files[0])">`;
+}
+
+async function loadLibrary(){
+  document.getElementById('lib-loading').style.display='block';
+  document.getElementById('lib-grid').style.display='none';
+  try{
+    const d=await api('/content');
+    userLibrary=Array.isArray(d)?d:(d.content||d.data||[]);
+    renderLibrary();
+  }catch(e){document.getElementById('lib-loading').textContent='Failed to load library.';}
+}
+
+function renderLibrary(){
+  const grid=document.getElementById('lib-grid');
+  document.getElementById('lib-loading').style.display='none';
+  if(!userLibrary.length){document.getElementById('lib-loading').style.display='block';document.getElementById('lib-loading').textContent='No files yet. Upload a new one.';return;}
+  grid.style.display='grid';
+  grid.innerHTML=userLibrary.map(c=>`
+    <div class="lib-card${uploadedContentId===c.id?' selected':''}" onclick="selectLib('${c.id}','${(c.original_name||c.name||'File').replace(/'/g,"\\'")}')">
+      <div class="lib-thumb">${c.type==='video'?'🎬':'<img src="'+(c.thumbnail_url||c.file_url||'')+'" onerror="this.style.display=\'none\'">'}
+      </div>
+      <div class="lib-name">${c.original_name||c.name||'File'}</div>
+    </div>`).join('');
+}
+
+function selectLib(id,name){
+  uploadedContentId=id;uploadedFile=null;
+  document.querySelectorAll('.lib-card').forEach(c=>c.classList.remove('selected'));
+  event.currentTarget.classList.add('selected');
+  toast('Selected: '+name,'success');
+}
+
+/* drag & drop */
+window.addEventListener('DOMContentLoaded',()=>{
+  const zone=document.getElementById('upload-zone');
+  if(!zone)return;
+  zone.addEventListener('dragover',e=>{e.preventDefault();zone.classList.add('drag');});
+  zone.addEventListener('dragleave',()=>zone.classList.remove('drag'));
+  zone.addEventListener('drop',e=>{e.preventDefault();zone.classList.remove('drag');const f=e.dataTransfer.files[0];if(f)handleFileSelect(f);});
+});
+
+/* ---- PLAN ---- */
+function setCycle(c){
+  selectedCycle=c;
+  document.querySelectorAll('.cycle-tab').forEach(t=>t.classList.toggle('active',t.dataset.cycle===c));
+  renderPkgCards();
+}
+
+function cycleInfo(){
+  const m={'1mo':{m:1,d:0},'3mo':{m:3,d:.15},'6mo':{m:6,d:.25}};
+  return m[selectedCycle];
+}
+
+function pkgDisplayPrice(key){
+  if(key==='trial')return{main:'FREE',sub:'',save:null};
+  const p=PKG[key],c=cycleInfo();
+  const full=p.monthly*c.m;
+  const after=Math.round(full*(1-c.d));
+  if(c.m===1)return{main:'₹'+fmtN(p.monthly),sub:'/month',save:null};
+  return{main:'₹'+fmtN(after),sub:`for ${c.m} months`,save:'₹'+fmtN(full-after)+' saved'};
+}
+
+function playsPerDay(key){
+  const p=PKG[key];if(!p.multiplier)return'~1,200/day (filler slots)';
+  const n=Math.max(selectedScreenIds.length,1);
+  return'~'+fmtN(Math.round(54000/850*p.multiplier)*n)+'/day · '+n+' screen'+(n!==1?'s':'');
+}
+
+function renderPkgCards(){
+  const grid=document.getElementById('pkg-grid');
+  grid.innerHTML=['trial','starter','complete','growth'].map(key=>{
+    const p=PKG[key],pr=pkgDisplayPrice(key),sel=selectedPkg===key,feat=key==='complete';
+    return`<div class="pkg-card${sel?' selected':''}${feat?' featured':''}" onclick="selectPkg('${key}')" id="pkc-${key}">
+      ${feat?'<div class="pkg-badge">Most Popular</div>':''}
+      <div class="pkg-name">${p.name}</div>
+      <div class="pkg-slot">${p.slot}s ad slot${key==='trial'?' · 3 days':''}</div>
+      <div><span class="pkg-price-num">${pr.main}</span><span class="pkg-price-sfx"> ${pr.sub}</span></div>
+      ${pr.save?`<div class="pkg-cycle-price">✓ ${pr.save}</div>`:'<div style="margin-bottom:12px"></div>'}
+      <ul class="pkg-features">${p.features.map(f=>`<li>${f}</li>`).join('')}</ul>
+      <div class="pkg-plays">${playsPerDay(key)}</div>
+    </div>`;
+  }).join('');
+  renderAddons();
+}
+
+function selectPkg(key){
+  selectedPkg=key;waAddon=false;
+  document.getElementById('wa-caption-box').style.display='none';
+  renderPkgCards();
+}
+
+function renderAddons(){
+  const wrap=document.getElementById('addon-cards');
+  if(!selectedPkg||selectedPkg==='trial'){
+    wrap.innerHTML='<div style="color:var(--text3);font-size:13px;padding:8px 0">Select a paid plan to unlock add-ons</div>';
+    return;
+  }
+  const isG=selectedPkg==='growth';
+  wrap.innerHTML=`<div class="addon-card${waAddon?' selected':''}" onclick="toggleWaAddon()">
+    <div class="addon-top">
+      <div class="addon-chk">${waAddon?'<svg width="10" height="8" viewBox="0 0 12 10"><path d="M1 5l3.5 3.5L11 1" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>':''}</div>
+      <div>
+        <div class="addon-name">${isG?'Upgrade WhatsApp to 20K/week':'WhatsApp Broadcast'}</div>
+        <div class="addon-desc">${isG?'Already included 10K/week — upgrade to 20,000 contacts for double reach':'Send your campaign creative to WhatsApp subscribers (5,000 contacts/week)'}</div>
+      </div>
+    </div>
+    <div class="addon-price">${isG?'+₹400/month':'+₹499/month'}</div>
+  </div>`;
+}
+
+function toggleWaAddon(){
+  waAddon=!waAddon;
+  document.getElementById('wa-caption-box').style.display=waAddon?'':'none';
+  renderAddons();
+}
+
+/* ---- COST ---- */
+function calcCost(){
+  if(!selectedPkg)return null;
+  if(selectedPkg==='trial')return{base:0,months:0,discAmt:0,discPct:0,waTotal:0,subtotal:0,gst:0,total:0,days:3};
+  const p=PKG[selectedPkg],c=cycleInfo(),days=c.m*30;
+  const rawBase=p.monthly*c.m;
+  const discAmt=Math.round(rawBase*c.d);
+  const after=rawBase-discAmt;
+  const waM=waAddon?(selectedPkg==='growth'?400:499):0;
+  const waTotal=Math.round(waM*c.m*(1-c.d));
+  const sub=after+waTotal;
+  const gst=Math.round(sub*0.18);
+  return{base:rawBase,months:c.m,discAmt,discPct:c.d*100,waTotal,subtotal:sub,gst,total:sub+gst,days};
+}
+
+function getEndDate(start,days){
+  const d=new Date(start);d.setDate(d.getDate()+days-1);return d.toISOString().split('T')[0];
+}
+
+/* ---- REVIEW ---- */
+function renderReview(){
+  const cost=calcCost();
+  if(!cost){document.getElementById('review-content').innerHTML='<div class="empty-msg">Please go back and complete all steps.</div>';return;}
+  const start=document.getElementById('sch-start').value;
+  const tS=document.getElementById('sch-time-start').value;
+  const tE=document.getElementById('sch-time-end').value;
+  const endDate=start?getEndDate(start,cost.days):'';
+  const pkg=PKG[selectedPkg];
+  const n=selectedScreenIds.length;
+  const names=allScreens.filter(s=>selectedScreenIds.includes(s.id)).map(s=>s.name||s.screen_name||'Screen').join(', ');
+  const contentName=uploadedFile?uploadedFile.name:(userLibrary.find(c=>c.id===uploadedContentId)?.original_name||'Selected from library');
+  const walletUse=walletApplied?Math.min(walletBalance,Math.max(0,cost.total-couponDiscount)):0;
+  const finalTotal=Math.max(0,cost.total-couponDiscount-walletUse);
+
+  document.getElementById('review-content').innerHTML=`
+    <div class="review-card">
+      <div class="review-sec">
+        <div class="review-sec-ttl">Campaign Details</div>
+        <div class="review-row"><span class="review-lbl">Name</span><span class="review-val">${document.getElementById('cmp-name').value||'—'}</span></div>
+        <div class="review-row"><span class="review-lbl">Screens</span><span class="review-val">${n} screen${n!==1?'s':''}</span></div>
+        <div style="font-size:12px;color:var(--text3);margin-bottom:6px;padding-left:4px">${names.substring(0,100)+(names.length>100?'…':'')}</div>
+        <div class="review-row"><span class="review-lbl">Creative</span><span class="review-val">${contentName}</span></div>
+        <div class="review-row"><span class="review-lbl">Duration</span><span class="review-val">${fmtD(start)} → ${fmtD(endDate)} (${cost.days} days)</span></div>
+        <div class="review-row"><span class="review-lbl">Time window</span><span class="review-val">${tS} – ${tE}</span></div>
+      </div>
+      <div class="review-sec">
+        <div class="review-sec-ttl">Package</div>
+        <div class="review-row"><span class="review-lbl">Plan</span><span class="review-val">${pkg.name} · ${pkg.slot}s slot</span></div>
+        ${selectedPkg!=='trial'?`<div class="review-row"><span class="review-lbl">Billing cycle</span><span class="review-val">${cost.months} month${cost.months>1?'s':''}</span></div>`:''}
+        ${waAddon?`<div class="review-row"><span class="review-lbl">WhatsApp add-on</span><span class="review-val" style="color:var(--success)">${selectedPkg==='growth'?'20K contacts/week':'5K contacts/week'}</span></div>`:''}
+      </div>
+    </div>
+
+    <div class="pricing-card">
+      <div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);margin-bottom:12px">Order Summary</div>
+      ${selectedPkg==='trial'?`
+        <div class="p-row"><span>Trial Campaign (3 days)</span><span style="color:var(--success);font-weight:700">FREE</span></div>
+        <div class="p-row"><span>GST</span><span>₹0</span></div>
+        <div class="p-sep"></div>
+        <div class="p-total"><span>Total</span><span style="color:var(--success)">₹0</span></div>
+      `:`
+        <div class="p-row"><span>${pkg.name} × ${cost.months} mo</span><span>₹${fmtN(cost.base)}</span></div>
+        ${cost.discAmt>0?`<div class="p-row"><span style="color:var(--success)">Multi-month discount (${cost.discPct}%)</span><span style="color:var(--success)">−₹${fmtN(cost.discAmt)}</span></div>`:''}
+        ${waAddon?`<div class="p-row"><span>WhatsApp add-on</span><span>₹${fmtN(cost.waTotal)}</span></div>`:''}
+        <div class="p-row"><span>Subtotal</span><span>₹${fmtN(cost.subtotal)}</span></div>
+        <div class="p-row"><span>GST (18%)</span><span>₹${fmtN(cost.gst)}</span></div>
+        ${couponDiscount>0?`<div class="p-row"><span style="color:var(--success)">Coupon discount</span><span style="color:var(--success)">−₹${fmtN(couponDiscount)}</span></div>`:''}
+        <div class="wallet-row">
+          <label class="wallet-tog">
+            <input type="checkbox" id="wallet-chk" ${walletApplied?'checked':''} onchange="walletApplied=this.checked;renderReview()">
+            <span>Use wallet balance &nbsp;<strong>₹${fmtN(walletBalance)}</strong></span>
+          </label>
+          ${walletUse>0?`<span style="color:var(--success);font-weight:600">−₹${fmtN(walletUse)}</span>`:''}
+        </div>
+        <div class="p-sep"></div>
+        <div class="p-total"><span>Total Payable</span><span style="color:var(--primary)">₹${fmtN(finalTotal)}</span></div>
+        <div class="coupon-row">
+          <input type="text" class="form-input" id="coupon-input" placeholder="Coupon code" style="flex:1;text-transform:uppercase">
+          <button class="btn btn-ghost btn-sm" onclick="applyCoupon()">Apply</button>
+        </div>
+        <div id="coupon-msg" style="font-size:12px;margin-top:4px"></div>
+      `}
+    </div>
+
+    <button class="btn btn-primary btn-full" id="btn-submit" onclick="submitCampaign()" style="font-size:15px;padding:14px 24px;margin-bottom:24px">
+      ${finalTotal===0?'Submit Campaign (Free)':'Confirm & Pay ₹'+fmtN(finalTotal)} &gt;
+    </button>
+  `;
+}
+
+async function applyCoupon(){
+  const code=document.getElementById('coupon-input')?.value?.trim()?.toUpperCase();
+  if(!code){toast('Enter a coupon code','error');return;}
+  const cost=calcCost();
+  try{
+    const d=await api('/coupons/validate',{method:'POST',body:JSON.stringify({code,amount:cost.subtotal})});
+    couponDiscount=d.discount_amount||0;
+    renderReview();
+    document.getElementById('coupon-msg').innerHTML=`<span style="color:var(--success)">✓ Saved ₹${fmtN(couponDiscount)}</span>`;
+  }catch(e){
+    document.getElementById('coupon-msg').innerHTML=`<span style="color:var(--danger)">${e.message}</span>`;
+  }
+}
+
+async function submitCampaign(){
+  const btn=document.getElementById('btn-submit');
+  const origTxt=btn.textContent;
+  btn.innerHTML='<span class="spinner-sm"></span> Processing…';btn.disabled=true;
+  try{
+    const cost=calcCost();
+    const start=document.getElementById('sch-start').value;
+    const endDate=getEndDate(start,cost.days);
+    const walletUse=walletApplied?Math.min(walletBalance,Math.max(0,cost.total-couponDiscount)):0;
+    const capTmpl=document.getElementById('wa-caption-template')?.value?.trim()||undefined;
+
+    if(!uploadedContentId&&uploadedFile){
+      toast('Uploading creative…','info');
+      const fd=new FormData();fd.append('file',uploadedFile);
+      const r=await fetch(`${API}/content/upload`,{method:'POST',headers:{Authorization:`Bearer ${token}`},body:fd});
+      const d=await r.json().catch(()=>({}));
+      if(!r.ok)throw new Error(d.error||'Upload failed');
+      uploadedContentId=d.content?.id||d.id;
+    }
+
+    const body={
+      title:document.getElementById('cmp-name').value.trim(),
+      screen_ids:selectedScreenIds,
+      content_id:uploadedContentId,
+      start_date:start,
+      end_date:endDate,
+      start_time:document.getElementById('sch-time-start').value+':00',
+      end_time:document.getElementById('sch-time-end').value+':00',
+      package_name:selectedPkg,
+      coupon_code:document.getElementById('coupon-input')?.value?.trim()||undefined,
+      wallet_amount:walletUse||undefined,
+      wa_broadcast_enabled:waAddon,
+      wa_caption_template:waAddon?capTmpl:undefined,
+    };
+
+    const campaign=await api('/campaigns',{method:'POST',body:JSON.stringify(body)});
+
+    if(parseFloat(campaign.amount_total)===0||campaign.wallet_paid){
+      const msg=parseFloat(campaign.amount_total)===0?'Trial campaign submitted for approval!':'Wallet payment done! Campaign submitted.';
+      toast(msg,'success');
+      if(walletUse>0){walletBalance=Math.max(0,walletBalance-walletUse);document.getElementById('sidebar-wallet-bal').textContent='₹'+fmtN(walletBalance);}
+      setTimeout(()=>{window.location.href='signagecms.html';},1600);
+      return;
+    }
+
+    const result=await openRazorpay(campaign,btn);
+    if(result?.dismissed){
+      toast('Campaign saved! Complete payment from My Campaigns.','info');
+      setTimeout(()=>{window.location.href='signagecms.html';},1500);
+    }
+  }catch(e){
+    toast(e.message,'error');
+    btn.innerHTML=origTxt;btn.disabled=false;
+  }
+}
+
+function openRazorpay(campaign,btn){
+  return new Promise(async(resolve,reject)=>{
+    try{
+      const order=await api(`/campaigns/${campaign.id}/create-order`,{method:'POST'});
+      new Razorpay({
+        key:order.key_id,amount:order.amount,currency:order.currency,order_id:order.order_id,
+        name:'ExtrraVenue',description:campaign.title||campaign.campaign_code,
+        prefill:{name:currentUser?.first_name||'',email:currentUser?.email||''},
+        theme:{color:'#7b68c8'},
+        handler:async function(resp){
+          try{
+            await api(`/campaigns/${campaign.id}/confirm-payment`,{method:'POST',body:JSON.stringify({
+              payment_id:resp.razorpay_payment_id,order_id:resp.razorpay_order_id,
+              signature:resp.razorpay_signature,payment_method:'razorpay'
+            })});
+            toast('Payment successful! Campaign submitted for approval.','success');
+            setTimeout(()=>{window.location.href='signagecms.html';},1600);
+            resolve({paid:true});
+          }catch(e){toast(e.message,'error');if(btn){btn.innerHTML='Confirm & Pay >';btn.disabled=false;}reject(e);}
+        },
+        modal:{ondismiss:function(){if(btn){btn.innerHTML='Confirm & Pay >';btn.disabled=false;}resolve({dismissed:true});}}
+      }).open();
+    }catch(e){reject(e);}
+  });
+}
+
+/* ---- WIZARD NAV ---- */
+const CHECK_SVG='<svg width="10" height="8" viewBox="0 0 12 10"><path d="M1 5l3.5 3.5L11 1" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>';
+
+function goTo(step){
+  for(let i=1;i<=4;i++){
+    document.getElementById(`step-${i}`).classList.toggle('active',i===step);
+    const si=document.getElementById(`si-${i}`);
+    const sn=document.getElementById(`sn-${i}`);
+    if(i<step){si.className='step-item done';sn.innerHTML=CHECK_SVG;}
+    else if(i===step){si.className='step-item active';sn.textContent=i;}
+    else{si.className='step-item';sn.textContent=i;}
+    if(i<4)document.getElementById(`sl-${i}`).classList.toggle('done',i<step);
+  }
+  document.getElementById('btn-back').style.display=step>1?'':'none';
+  const nb=document.getElementById('btn-next');
+  nb.style.display=step===4?'none':'';
+  nb.textContent=step===3?'Review >':'Next >';
+  currentStep=step;
+  if(step===4)renderReview();
+  window.scrollTo(0,0);
+}
+
+function goNext(){
+  if(currentStep===1){
+    if(!selectedScreenIds.length){toast('Select at least one screen','error');return;}
+    goTo(2);
+  }else if(currentStep===2){
+    if(!document.getElementById('cmp-name').value.trim()){toast('Enter a campaign name','error');return;}
+    if(!uploadedFile&&!uploadedContentId){toast('Upload a creative or select from library','error');return;}
+    goTo(3);
+  }else if(currentStep===3){
+    if(!selectedPkg){toast('Select a package','error');return;}
+    if(!document.getElementById('sch-start').value){toast('Select a start date','error');return;}
+    goTo(4);
+  }
+}
+
+function goBack(){if(currentStep>1)goTo(currentStep-1);}
+
+init();
+</script>
+</body>
+</html>
