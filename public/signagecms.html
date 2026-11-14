@@ -3704,8 +3704,15 @@ function updateNetworkSummary(){
     impDay=playsPerScreen*n; impMo=impDay*30;
   }
   const dur=parseInt(document.getElementById('sch-duration')?.value)||30;
-  const pkgRateLabel=rate.fixedDays?(_wizardV3?'₹499 / 5 Days':'FREE (₹0)'):`₹${rate.monthly.toLocaleString('en-IN')}/mo`;
-  document.getElementById('sum-screens').textContent=rate.fixedDays?n+' screens':n+' screens';
+  let pkgRateLabel;
+  if(rate.fixedDays){pkgRateLabel=_wizardV3?'₹499 / 5 Days':'FREE (₹0)';}
+  else if(_wizardV3){
+    const _cm={'1mo':{m:1,d:0},'3mo':{m:3,d:.15},'6mo':{m:6,d:.25}};
+    const _cc=_cm[_v3Cycle]||{m:1,d:0};
+    const effMo=Math.round(rate.monthly*(1-_cc.d));
+    pkgRateLabel=_cc.d>0?`₹${effMo.toLocaleString('en-IN')}/mo (${_cc.m}mo −${_cc.d*100}%)`:` ₹${rate.monthly.toLocaleString('en-IN')}/mo`;
+  } else {pkgRateLabel=`₹${rate.monthly.toLocaleString('en-IN')}/mo`;}
+  document.getElementById('sum-screens').textContent=n+' screens';
   document.getElementById('sum-impressions').textContent='~'+impDay.toLocaleString('en-IN');
   document.getElementById('sum-impressions-mo').textContent='~'+impMo.toLocaleString('en-IN');
   document.getElementById('sum-cpd').textContent=pkgRateLabel;
@@ -3765,10 +3772,10 @@ function renderReview(){
     <div class="review-row"><span class="review-key">Duration</span><span class="review-val">${days} days</span></div>
     <div class="review-row"><span class="review-key">Period</span><span class="review-val">${fmtDate(start)} – ${fmtDate(end)}</span></div>
     <div class="review-row"><span class="review-key">Time Window</span><span class="review-val">${document.getElementById('sch-time-start').value} – ${document.getElementById('sch-time-end').value}</span></div>
-    <div class="review-row"><span class="review-key">Rate</span><span class="review-val">${_wizardV3?(campaignCost.v3isTrial?'₹499 flat · 5 days trial':campaignCost.v3months+' month billing'):rate.fixedDays?'FREE (₹0 · 5 days)':days>=28&&rate.monthly?'₹'+rate.monthly.toLocaleString('en-IN')+'/mo (monthly flat)':'₹'+rate.ppd.toLocaleString('en-IN')+'/day × '+days+' days'}</span></div>
+    <div class="review-row"><span class="review-key">Rate</span><span class="review-val">${_wizardV3?(campaignCost.v3isTrial?'₹499 flat · 5 days':campaignCost.v3months>1?`₹${rate.monthly?.toLocaleString('en-IN')}/mo × ${campaignCost.v3months} months`:'₹'+rate.monthly?.toLocaleString('en-IN')+'/mo'):rate.fixedDays?'FREE (₹0 · 5 days)':days>=28&&rate.monthly?'₹'+rate.monthly.toLocaleString('en-IN')+'/mo (monthly flat)':'₹'+rate.ppd.toLocaleString('en-IN')+'/day × '+days+' days'}</span></div>
+    ${(_wizardV3&&campaignCost.v3discAmt>0)?`<div class="review-row"><span class="review-key" style="color:var(--success);">Multi-month discount (${campaignCost.v3discPct}%)</span><span class="review-val" style="color:var(--success);">−₹${campaignCost.v3discAmt.toLocaleString('en-IN')}</span></div>`:''}
     ${(_wizardV2&&selectedPkg==='growth'&&_waUpgradeV2)?`<div class="review-row"><span class="review-key" style="color:#25D366;">WA Upgrade</span><span class="review-val" style="color:#25D366;">20K messages/week · +₹400</span></div>`:''}
-    ${(_wizardV3&&_waUpgradeV3)?`<div class="review-row"><span class="review-key" style="color:#25D366;">${selectedPkg==='growth'?'WA Upgrade 20K/week':'WhatsApp Broadcast'}</span><span class="review-val" style="color:#25D366;">+₹${campaignCost.v3waAddon?.toLocaleString('en-IN')||'0'}</span></div>`:''}
-    ${(_wizardV3&&campaignCost.v3discAmt>0)?`<div class="review-row"><span class="review-key" style="color:var(--success);">Multi-month discount (${campaignCost.v3discPct}%)</span><span class="review-val" style="color:var(--success);">−₹${campaignCost.v3discAmt.toLocaleString('en-IN')}</span></div>`:''}`;
+    ${(_wizardV3&&_waUpgradeV3)?`<div class="review-row"><span class="review-key" style="color:#25D366;">${selectedPkg==='growth'?'WA Upgrade 20K/week':'WhatsApp Broadcast'}</span><span class="review-val" style="color:#25D366;">+₹${campaignCost.v3waAddon?.toLocaleString('en-IN')||'0'}</span></div>`:''}`;
   renderPricing();
 }
 
@@ -3797,12 +3804,19 @@ function renderPricing(){
       applyBtn.style.cssText='font-size:12px;padding:7px 16px;flex-shrink:0;white-space:nowrap;';
     }
   } else { walletRow.style.display='none'; }
-  document.getElementById('review-pricing').innerHTML=`
-    <div class="review-row"><span class="review-key">Subtotal</span><span class="review-val">₹${(campaignCost.total-campaignCost.gst).toLocaleString('en-IN')}</span></div>
-    ${disc?`<div class="review-row"><span class="review-key" style="color:var(--success);">Coupon</span><span class="review-val" style="color:var(--success);">-₹${disc.toLocaleString('en-IN')}</span></div>`:''}
-    <div class="review-row"><span class="review-key">GST (18%)</span><span class="review-val">₹${campaignCost.gst.toLocaleString('en-IN')}</span></div>
-    ${walletUse>0?`<div class="review-row"><span class="review-key" style="color:var(--primary);">Wallet</span><span class="review-val" style="color:var(--primary);">-₹${walletUse.toLocaleString('en-IN')}</span></div>`:''}
-    <div class="review-total"><span>${due===0?'Total (Wallet)':'Total Due'}</span><span style="color:var(--primary);">₹${due.toLocaleString('en-IN')}</span></div>`;
+  const _sub=campaignCost.total-campaignCost.gst;
+  let pricingRows='';
+  if(_wizardV3&&!campaignCost.v3isTrial&&campaignCost.v3months>1){
+    const rateObj=R()[selectedPkg]||R().complete;
+    pricingRows+=`<div class="review-row"><span class="review-key">Plan (${campaignCost.v3months} mo)</span><span class="review-val">₹${campaignCost.base.toLocaleString('en-IN')}</span></div>`;
+    pricingRows+=`<div class="review-row"><span class="review-key" style="color:var(--success);">Discount (${campaignCost.v3discPct}%)</span><span class="review-val" style="color:var(--success);">−₹${campaignCost.v3discAmt.toLocaleString('en-IN')}</span></div>`;
+    if(campaignCost.v3waAddon>0) pricingRows+=`<div class="review-row"><span class="review-key" style="color:#25D366;">WA Addon</span><span class="review-val" style="color:#25D366;">+₹${campaignCost.v3waAddon.toLocaleString('en-IN')}</span></div>`;
+  }
+  pricingRows+=`<div class="review-row"><span class="review-key">Subtotal</span><span class="review-val">₹${_sub.toLocaleString('en-IN')}</span></div>`;
+  if(disc) pricingRows+=`<div class="review-row"><span class="review-key" style="color:var(--success);">Coupon</span><span class="review-val" style="color:var(--success);">−₹${disc.toLocaleString('en-IN')}</span></div>`;
+  pricingRows+=`<div class="review-row"><span class="review-key">GST (18%)</span><span class="review-val">₹${campaignCost.gst.toLocaleString('en-IN')}</span></div>`;
+  if(walletUse>0) pricingRows+=`<div class="review-row"><span class="review-key" style="color:var(--primary);">Wallet</span><span class="review-val" style="color:var(--primary);">−₹${walletUse.toLocaleString('en-IN')}</span></div>`;
+  document.getElementById('review-pricing').innerHTML=pricingRows+`<div class="review-total"><span>${due===0?'Total (Wallet)':'Total Due'}</span><span style="color:var(--primary);">₹${due.toLocaleString('en-IN')}</span></div>`;
 }
 
 function toggleWalletApply(){
