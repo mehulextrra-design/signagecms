@@ -1097,10 +1097,10 @@
                   <div class="pkg-opt" data-pkg="trial" onclick="selectPkg('trial')" style="border-color:#f59e0b;">
                     <div class="pkg-name">Trial <span class="pkg-trial-badge">3 DAYS</span></div>
                     <div class="pkg-slot">8 sec</div>
-                    <div class="pkg-price" style="font-size:22px;">FREE</div>
+                    <div class="pkg-price" style="font-size:22px;">₹499<span style="font-size:11px;font-weight:400;color:var(--text3)"> flat</span></div>
                     <div id="pkg-imp-v3-trial" class="pkg-imp">3 days · filler network</div>
                     <div class="pkg-channels"><span class="pkg-ch ch-screen" title="Digital Screen"><svg width="16" height="16"><use href="#pkg-ico-screen"/></svg></span></div>
-                    <div class="pkg-desc">Digital Screen only</div>
+                    <div class="pkg-desc">Digital Screen · 1 campaign · non-refundable</div>
                   </div>
                   <div class="pkg-opt" data-pkg="starter" onclick="selectPkg('starter')">
                     <div class="pkg-name">Starter</div>
@@ -1141,13 +1141,13 @@
                     <div class="pkg-desc">Screen + FB/IG/GBP + Card · QR · Unlimited reposts · WA 10K/week</div>
                   </div>
                 </div>
-                <!-- WA upgrade addon for v3 Growth -->
+                <!-- WA addon for v3 (all plans) -->
                 <div id="wa-upgrade-v3" style="display:none;border:1px solid #25D366;border-radius:10px;padding:12px 14px;margin-top:8px;margin-bottom:4px;">
                   <div style="display:flex;align-items:center;gap:12px;">
                     <label class="toggle-switch" style="flex-shrink:0;"><input type="checkbox" id="wa-upgrade-v3-toggle" onchange="toggleWaUpgradeV3(this)"><span class="toggle-slider"></span></label>
                     <div>
-                      <div style="font-size:13px;font-weight:600;">WA Upgrade: 20K/week <span style="color:#25D366;" id="wa-v3-addon-price">+₹400</span></div>
-                      <div style="font-size:11px;color:var(--text2);">Growth plan contacts double — 20,000 messages/week</div>
+                      <div style="font-size:13px;font-weight:600;" id="wa-v3-addon-label">WhatsApp Broadcast <span style="color:#25D366;" id="wa-v3-addon-price">+₹499</span></div>
+                      <div style="font-size:11px;color:var(--text2);" id="wa-v3-addon-desc">Send campaign updates to your audience via WhatsApp</div>
                     </div>
                   </div>
                 </div>
@@ -3506,11 +3506,12 @@ function setV3Cycle(cycle){
       else{totalEl.style.display='none';}
     }
   });
-  // Update WA addon price label
+  // Update WA addon price label based on plan
   const waP=document.getElementById('wa-v3-addon-price');
   if(waP){
-    const waTotal=Math.round(400*c.m*(1-c.d));
-    waP.textContent=c.m>1?`+₹${waTotal.toLocaleString('en-IN')} (${c.m} mo)`:'+₹400';
+    const waBase=selectedPkg==='growth'?400:499;
+    const waTotal=Math.round(waBase*c.m*(1-c.d));
+    waP.textContent=c.m>1?`+₹${waTotal.toLocaleString('en-IN')} (${c.m} mo)`:'+₹'+waBase;
   }
   updateNetworkSummary();
 }
@@ -3542,8 +3543,18 @@ function applyWizardV2(){
   // v2 WA addon
   if(addon) addon.style.display=(_wizardV2&&selectedPkg==='growth')?'':'none';
   if(!_wizardV2){_waUpgradeV2=false;}
-  // v3 WA addon
-  if(addonV3) addonV3.style.display=(_wizardV3&&selectedPkg==='growth')?'':'none';
+  // v3 WA addon — show for all v3 plans
+  if(addonV3&&_wizardV3){
+    addonV3.style.display='';
+    const isGrowth=selectedPkg==='growth';
+    const lbl=document.getElementById('wa-v3-addon-label');
+    const dsc=document.getElementById('wa-v3-addon-desc');
+    const prc=document.getElementById('wa-v3-addon-price');
+    if(lbl) lbl.innerHTML=isGrowth?`WA Upgrade: 20K/week <span style="color:#25D366;" id="wa-v3-addon-price">+₹400</span>`:`WhatsApp Broadcast <span style="color:#25D366;" id="wa-v3-addon-price">+₹499</span>`;
+    if(dsc) dsc.textContent=isGrowth?'Growth plan contacts double — 20,000 messages/week':'Send campaign updates to your audience via WhatsApp';
+  } else if(addonV3){
+    addonV3.style.display='none';
+  }
   if(!_wizardV3){_waUpgradeV3=false;}
   // WA broadcast toggle
   if(waTogBox){
@@ -3679,13 +3690,20 @@ function calcCost(){
     // V3: multi-month billing
     const cycleMap={'1mo':{m:1,d:0},'3mo':{m:3,d:.15},'6mo':{m:6,d:.25}};
     const c=cycleMap[_v3Cycle]||{m:1,d:0};
-    const v3Rates={trial:{monthly:0,fixedDays:3},starter:{monthly:2999},complete:{monthly:4999},growth:{monthly:5999}};
+    const v3Rates={trial:{monthly:0,fixedDays:3,flat:499},starter:{monthly:2999},complete:{monthly:4999},growth:{monthly:5999}};
     const r=v3Rates[selectedPkg]||v3Rates.complete;
-    if(r.fixedDays){campaignCost={base:0,gst:0,total:0,discount:0,v3months:0,v3discAmt:0};walletApplied=false;return;}
+    if(r.fixedDays){
+      const waAddonAmt=_waUpgradeV3?499:0;
+      const sub=r.flat+waAddonAmt;
+      const gst=Math.round(sub*0.18);
+      campaignCost={base:r.flat,gst,total:sub+gst,discount:0,v3months:0,v3discAmt:0,v3isTrial:true,v3waAddon:waAddonAmt};
+      walletApplied=false;return;
+    }
     const rawBase=r.monthly*c.m;
     const discAmt=Math.round(rawBase*c.d);
     const after=rawBase-discAmt;
-    const waAddon=(_waUpgradeV3&&selectedPkg==='growth')?Math.round(400*c.m*(1-c.d)):0;
+    const waBase=selectedPkg==='growth'?400:499;
+    const waAddon=_waUpgradeV3?Math.round(waBase*c.m*(1-c.d)):0;
     const sub=after+waAddon;
     const gst=Math.round(sub*0.18);
     campaignCost={base:rawBase,gst,total:sub+gst,discount:0,v3months:c.m,v3discAmt:discAmt,v3discPct:c.d*100,v3waAddon:waAddon};
@@ -3712,9 +3730,9 @@ function renderReview(){
     <div class="review-row"><span class="review-key">Duration</span><span class="review-val">${days} days</span></div>
     <div class="review-row"><span class="review-key">Period</span><span class="review-val">${fmtDate(start)} – ${fmtDate(end)}</span></div>
     <div class="review-row"><span class="review-key">Time Window</span><span class="review-val">${document.getElementById('sch-time-start').value} – ${document.getElementById('sch-time-end').value}</span></div>
-    <div class="review-row"><span class="review-key">Rate</span><span class="review-val">${_wizardV3?(campaignCost.v3months?campaignCost.v3months+' month billing':'FREE (3 days)'):rate.fixedDays?'FREE (₹0 · 3 days)':days>=28&&rate.monthly?'₹'+rate.monthly.toLocaleString('en-IN')+'/mo (monthly flat)':'₹'+rate.ppd.toLocaleString('en-IN')+'/day × '+days+' days'}</span></div>
+    <div class="review-row"><span class="review-key">Rate</span><span class="review-val">${_wizardV3?(campaignCost.v3isTrial?'₹499 flat · 3 days trial':campaignCost.v3months+' month billing'):rate.fixedDays?'FREE (₹0 · 3 days)':days>=28&&rate.monthly?'₹'+rate.monthly.toLocaleString('en-IN')+'/mo (monthly flat)':'₹'+rate.ppd.toLocaleString('en-IN')+'/day × '+days+' days'}</span></div>
     ${(_wizardV2&&selectedPkg==='growth'&&_waUpgradeV2)?`<div class="review-row"><span class="review-key" style="color:#25D366;">WA Upgrade</span><span class="review-val" style="color:#25D366;">20K messages/week · +₹400</span></div>`:''}
-    ${(_wizardV3&&_waUpgradeV3&&selectedPkg==='growth')?`<div class="review-row"><span class="review-key" style="color:#25D366;">WA Upgrade</span><span class="review-val" style="color:#25D366;">20K messages/week · +₹${campaignCost.v3waAddon?.toLocaleString('en-IN')||'0'}</span></div>`:''}
+    ${(_wizardV3&&_waUpgradeV3)?`<div class="review-row"><span class="review-key" style="color:#25D366;">${selectedPkg==='growth'?'WA Upgrade 20K/week':'WhatsApp Broadcast'}</span><span class="review-val" style="color:#25D366;">+₹${campaignCost.v3waAddon?.toLocaleString('en-IN')||'0'}</span></div>`:''}
     ${(_wizardV3&&campaignCost.v3discAmt>0)?`<div class="review-row"><span class="review-key" style="color:var(--success);">Multi-month discount (${campaignCost.v3discPct}%)</span><span class="review-val" style="color:var(--success);">−₹${campaignCost.v3discAmt.toLocaleString('en-IN')}</span></div>`:''}`;
   renderPricing();
 }
