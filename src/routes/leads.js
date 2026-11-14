@@ -195,14 +195,18 @@ router.patch('/:id', authenticate, requireInspectorOrAdmin, async (req, res, nex
       return res.status(403).json({ error: 'Inspectors cannot reassign leads' });
     }
 
+    // Set agreement_date when first reaching agreement_pending (locked for the life of the agreement)
+    const setAgreementDate = status === 'agreement_pending' && !lead.agreement_date;
+
     const result = await query(
       `UPDATE leads SET
-         status      = COALESCE($1, status),
-         assigned_to = COALESCE($2, assigned_to),
-         notes       = COALESCE($3, notes),
-         updated_at  = NOW()
+         status         = COALESCE($1, status),
+         assigned_to    = COALESCE($2, assigned_to),
+         notes          = COALESCE($3, notes),
+         agreement_date = CASE WHEN $5::boolean THEN NOW() ELSE agreement_date END,
+         updated_at     = NOW()
        WHERE id = $4 RETURNING *`,
-      [status || null, assigned_to || null, notes || null, req.params.id]
+      [status || null, assigned_to || null, notes || null, req.params.id, setAgreementDate]
     );
 
     // Log activity

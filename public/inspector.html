@@ -995,7 +995,11 @@ async function saveNewLead() {
 async function generateAgreement(id) {
   try {
     const l = await api(`/leads/${id}`);
-    const today = new Date().toLocaleDateString('en-IN', {day:'2-digit', month:'long', year:'numeric'});
+    // Use stored agreement_date if available (set when status = agreement_pending)
+    const today = l.agreement_date
+      ? new Date(l.agreement_date).toLocaleDateString('en-IN', {day:'2-digit', month:'long', year:'numeric'})
+      : new Date().toLocaleDateString('en-IN', {day:'2-digit', month:'long', year:'numeric'});
+    const isLocked = l.status === 'agreement_signed';
     const agr = document.getElementById('agreement-print');
     agr.innerHTML = `
       <style>
@@ -1013,7 +1017,7 @@ async function generateAgreement(id) {
       </style>
       <button class="print-btn" onclick="window.print()">Print / Save PDF</button>
       <button class="close-agr" onclick="document.getElementById('agreement-print').style.display='none'">Close</button>
-      <h1>Venue Partner Agreement</h1>
+      <h1>Venue Partner Agreement${isLocked ? ' <span style="font-size:12pt;background:#e6f4ea;color:#1a7f37;padding:2px 10px;border-radius:4px;vertical-align:middle;">✓ Signed</span>' : ''}</h1>
       <div class="sub">Digital Signage Network Participation Agreement</div>
       <p>This Agreement is entered into as of <strong>${today}</strong>, between <strong>extrravenue</strong> (hereinafter <strong>"Company"</strong>), AND <strong>${esc(l.owner_name||'[Owner Name]')}</strong>, operating <strong>${esc(l.business_name)}</strong> located at <strong>${esc(l.city||'[City]')}</strong> (hereinafter <strong>"Venue Partner"</strong>).</p>
       <h2>1. Screen &amp; Installation</h2>
