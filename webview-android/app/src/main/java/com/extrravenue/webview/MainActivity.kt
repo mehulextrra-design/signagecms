@@ -2,6 +2,7 @@ package com.extrravenue.webview
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
@@ -13,9 +14,15 @@ import android.webkit.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import com.extrravenue.webview.databinding.ActivityMainBinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
+import java.io.File
 
 class MainActivity : AppCompatActivity() {
 
@@ -45,6 +52,42 @@ class MainActivity : AppCompatActivity() {
             "window._contactsPermissionCallback && window._contactsPermissionCallback(null, 'Permission denied')"
         }
         binding.webView.post { binding.webView.evaluateJavascript(js, null) }
+    }
+
+    inner class ShareBridge {
+        @JavascriptInterface
+        fun sharePdf(base64Data: String, fileName: String) {
+            CoroutineScope(Dispatchers.IO).launch {
+                try {
+                    val bytes = android.util.Base64.decode(base64Data, android.util.Base64.DEFAULT)
+                    val file = File(cacheDir, fileName)
+                    file.writeBytes(bytes)
+                    val uri = FileProvider.getUriForFile(
+                        this@MainActivity,
+                        "${packageName}.provider",
+                        file
+                    )
+                    withContext(Dispatchers.Main) {
+                        val intent = Intent(Intent.ACTION_SEND).apply {
+                            type = "application/pdf"
+                            putExtra(Intent.EXTRA_STREAM, uri)
+                            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                            setPackage("com.whatsapp")
+                        }
+                        try {
+                            startActivity(intent)
+                        } catch (e: Exception) {
+                            val fallback = Intent(Intent.ACTION_SEND).apply {
+                                type = "application/pdf"
+                                putExtra(Intent.EXTRA_STREAM, uri)
+                                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                            }
+                            startActivity(Intent.createChooser(fallback, "Share Agreement"))
+                        }
+                    }
+                } catch (_: Exception) {}
+            }
+        }
     }
 
     inner class ContactsBridge {
@@ -140,6 +183,7 @@ class MainActivity : AppCompatActivity() {
         ws.cacheMode = WebSettings.LOAD_DEFAULT
         ws.mediaPlaybackRequiresUserGesture = false
 
+        binding.webView.addJavascriptInterface(ShareBridge(), "AndroidShare")
         binding.webView.addJavascriptInterface(ContactsBridge(), "AndroidContacts")
 
         CookieManager.getInstance().setAcceptCookie(true)

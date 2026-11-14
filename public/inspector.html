@@ -1007,10 +1007,38 @@ function _agrStyles() {
 
 function downloadAgreement(leadId) {
   if (!leadId || !token) return;
-  if (/Android/i.test(navigator.userAgent)) {
-    const tmp = document.createElement('div');
-    tmp.innerHTML = _agrPrintHtml;
-    window.location.href = 'whatsapp://send?text=' + encodeURIComponent(tmp.innerText);
+  if (/Android/i.test(navigator.userAgent) && window.AndroidShare) {
+    const btn = document.getElementById('agr-print-btn');
+    if (btn) { btn.disabled = true; btn.textContent = 'PDF ban rahi hai…'; }
+    function _doShare() {
+      const { jsPDF } = window.jspdf;
+      const el = document.getElementById('agreement-print');
+      const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
+      doc.html(el, {
+        callback: function(pdf) {
+          const b64 = pdf.output('datauristring').split(',')[1];
+          if (btn) { btn.disabled = false; btn.textContent = '📤 WhatsApp Share'; }
+          window.AndroidShare.sharePdf(b64, 'agreement.pdf');
+        },
+        margin: [10, 10, 10, 10],
+        autoPaging: 'text',
+        width: 190,
+        windowWidth: 750
+      });
+    }
+    if (window.jspdf && window.html2canvas) {
+      _doShare();
+    } else {
+      const s1 = document.createElement('script');
+      s1.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+      s1.onload = function() {
+        const s2 = document.createElement('script');
+        s2.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+        s2.onload = _doShare;
+        document.head.appendChild(s2);
+      };
+      document.head.appendChild(s1);
+    }
   } else {
     const path = '/api/leads/' + leadId + '/agreement?t=' + encodeURIComponent(token);
     window.open(path, '_blank') || (window.location.href = path);
@@ -1063,7 +1091,7 @@ async function generateAgreement(id) {
         .print-btn { background: #7b68c8; color: #fff; border: none; padding: 10px 24px; border-radius: 8px; font-size: 13px; cursor: pointer; margin-bottom: 24px; }
         .close-agr { background: none; border: 1.5px solid #ccc; color: #555; padding: 10px 20px; border-radius: 8px; font-size: 13px; cursor: pointer; margin-bottom: 24px; margin-left: 10px; }
       </style>
-      <button class="print-btn" id="agr-print-btn">🖨️ Print / Save PDF</button>
+      <button class="print-btn" id="agr-print-btn">${/Android/i.test(navigator.userAgent) ? '📤 Share via WhatsApp' : '🖨️ Print / Save PDF'}</button>
       <button class="close-agr" id="agr-close-btn">Close</button>
       ${_agrPrintHtml}`;
 
