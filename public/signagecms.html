@@ -1021,6 +1021,7 @@
                   <div class="pkg-slot">8 sec</div>
                   <div class="pkg-price" style="font-size:22px;">FREE<span style="font-size:11px;font-weight:400;color:var(--text3)"> · ₹0</span></div>
                   <div class="pkg-ppd">3 days · filler network</div>
+                  <div id="pkg-imp-v2-trial" class="pkg-imp"></div>
                   <div class="pkg-channels">
                     <span class="pkg-ch ch-screen" title="Digital Screen"><svg width="16" height="16"><use href="#pkg-ico-screen"/></svg></span>
                   </div>
@@ -1030,7 +1031,7 @@
                   <div class="pkg-name">Starter</div>
                   <div class="pkg-slot">10 sec</div>
                   <div class="pkg-price">₹2,999<span style="font-size:11px;font-weight:400;color:var(--text3)">/mo</span></div>
-                  <div class="pkg-ppd">~2,304 plays/day</div>
+                  <div id="pkg-imp-v2-starter" class="pkg-imp"></div>
                   <div class="pkg-channels">
                     <span class="pkg-ch ch-screen" title="Digital Screen"><svg width="16" height="16"><use href="#pkg-ico-screen"/></svg></span>
                   </div>
@@ -1040,7 +1041,7 @@
                   <div class="pkg-name">Complete ⭐<span style="font-size:10px;background:var(--primary);color:#fff;padding:2px 6px;border-radius:4px;margin-left:4px;">Popular</span></div>
                   <div class="pkg-slot">15 sec</div>
                   <div class="pkg-price">₹4,999<span style="font-size:11px;font-weight:400;color:var(--text3)">/mo</span></div>
-                  <div class="pkg-ppd">~4,572 plays/day</div>
+                  <div id="pkg-imp-v2-complete" class="pkg-imp"></div>
                   <div class="pkg-channels">
                     <span class="pkg-ch ch-screen" title="Digital Screen"><svg width="16" height="16"><use href="#pkg-ico-screen"/></svg></span>
                     <span class="pkg-ch ch-fb" title="Facebook"><svg width="16" height="16"><use href="#pkg-ico-fb"/></svg></span>
@@ -1053,7 +1054,7 @@
                   <div class="pkg-name">Growth</div>
                   <div class="pkg-slot">20 sec</div>
                   <div class="pkg-price" id="growth-v2-price">₹5,999<span style="font-size:11px;font-weight:400;color:var(--text3)">/mo</span></div>
-                  <div class="pkg-ppd">~6,876 plays/day</div>
+                  <div id="pkg-imp-v2-growth" class="pkg-imp"></div>
                   <div class="pkg-channels">
                     <span class="pkg-ch ch-screen" title="Digital Screen"><svg width="16" height="16"><use href="#pkg-ico-screen"/></svg></span>
                     <span class="pkg-ch ch-fb" title="Facebook"><svg width="16" height="16"><use href="#pkg-ico-fb"/></svg></span>
@@ -3523,11 +3524,10 @@ function updateNetworkSummary(){
   document.getElementById('sum-impressions-mo').textContent='~'+impMo.toLocaleString('en-IN');
   document.getElementById('sum-cpd').textContent=pkgRateLabel;
   ['trial','starter','complete','growth'].forEach(p=>{
-    const el=document.getElementById('pkg-imp-'+p);if(!el)return;
     const r=R()[p];
-    if(r.fixedDays){ el.textContent='~1,200/day · filler slots'; return; }
-    const plays=Math.round((54000/850)*r.multiplier)*n;
-    el.textContent='~'+plays.toLocaleString('en-IN')+' plays/day';
+    const txt=r.fixedDays?'~1,200/day · filler slots':'~'+( Math.round((54000/850)*r.multiplier)*n ).toLocaleString('en-IN')+' plays/day';
+    const el=document.getElementById('pkg-imp-'+p); if(el) el.textContent=txt;
+    const el2=document.getElementById('pkg-imp-v2-'+p); if(el2) el2.textContent=txt;
   });
 }
 
