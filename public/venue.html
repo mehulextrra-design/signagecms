@@ -987,13 +987,10 @@ function _vpAgrStyles() {
 }
 
 function openVpAgreementWindow() {
-  const w = window.open('', '_blank');
-  if (w) {
-    w.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Venue Partner Agreement</title>${_vpAgrStyles()}</head><body>${_vpAgrHtml}</body></html>`);
-    w.document.close();
-    setTimeout(() => { try { w.print(); } catch(e) {} }, 400);
-  } else {
-    window.print();
+  if (!_vpData || !_token) return;
+  const url = '/api/venue-partners/' + _vpData.id + '/agreement?t=' + encodeURIComponent(_token);
+  if (!window.open(url, '_blank')) {
+    window.location.href = url;
   }
 }
 

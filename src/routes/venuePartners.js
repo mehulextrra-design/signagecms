@@ -63,6 +63,77 @@ router.post('/:id/reject', authenticate, requireAdmin, async (req, res, next) =>
 // ── GET single venue partner ──────────────────────────────────────────────────
 const CITY_CAP = 50;
 
+// ── AGREEMENT HTML VIEW — must be before /:id ────────────────────────────────
+router.get('/:id/agreement', async (req, res, next) => {
+  try {
+    const jwt = require('jsonwebtoken');
+    const rawToken = req.query.t || (req.headers.authorization || '').replace('Bearer ', '');
+    let user;
+    try { user = jwt.verify(rawToken, process.env.JWT_SECRET); }
+    catch(e) { return res.status(401).send('<h1>Unauthorized</h1>'); }
+
+    // Venue partner accessing their own agreement, or admin/inspector
+    const allowed = ['admin','superadmin','venue_inspector'].includes(user.role)
+      || user.venue_partner_id === req.params.id;
+    if (!allowed) return res.status(403).send('<h1>Access denied</h1>');
+
+    const vpRes = await query(
+      `SELECT vp.*, u.email,
+         (SELECT agreement_date FROM leads WHERE venue_partner_id = vp.id
+          ORDER BY agreement_date DESC NULLS LAST LIMIT 1) AS agreement_date
+       FROM venue_partners vp LEFT JOIN users u ON u.id = vp.user_id
+       WHERE vp.id = $1`, [req.params.id]
+    );
+    if (!vpRes.rows.length) return res.status(404).send('<h1>Not found</h1>');
+    const vp = vpRes.rows[0];
+
+    const esc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    const today = (vp.agreement_date || vp.approved_at)
+      ? new Date(vp.agreement_date || vp.approved_at).toLocaleDateString('en-IN',{day:'2-digit',month:'long',year:'numeric'})
+      : new Date().toLocaleDateString('en-IN',{day:'2-digit',month:'long',year:'numeric'});
+
+    const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Venue Partner Agreement</title>
+<style>
+  body{font-family:'Times New Roman',serif;max-width:750px;margin:0 auto;padding:40px 24px;color:#111;line-height:1.7;font-size:13pt;}
+  h1{text-align:center;font-size:16pt;margin-bottom:6px;}
+  .sub{text-align:center;font-size:11pt;color:#555;margin-bottom:32px;}
+  h2{font-size:13pt;margin-top:24px;margin-bottom:6px;}
+  p{margin-bottom:10px;text-align:justify;}
+  .sig-grid{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:48px;}
+  .sig-box p{border-top:1px solid #333;margin-top:48px;padding-top:6px;font-size:11pt;}
+  @media(max-width:600px){body{padding:20px 16px;font-size:11pt;}.sig-grid{grid-template-columns:1fr;gap:20px;}}
+</style></head><body>
+<h1>Venue Partner Agreement</h1>
+<div class="sub">Digital Signage Network Participation Agreement</div>
+<p>This Agreement is entered into as of <strong>${today}</strong>, between <strong>extrravenue</strong> (hereinafter <strong>"Company"</strong>), AND <strong>${esc(vp.contact_name||'[Contact Name]')}</strong>, operating <strong>${esc(vp.business_name||'[Business Name]')}</strong> located at <strong>${esc(vp.city||'[City]')}</strong> (hereinafter <strong>"Venue Partner"</strong>).</p>
+<h2>1. Screen &amp; Installation</h2>
+<p>extrravenue shall connect the digital screen at the Venue Partner's premises to its CMS. If a new screen is required, cost and ownership shall be mutually agreed in writing. extrravenue retains ownership of its media player hardware installed at the premises.</p>
+<h2>2. Content Slot Allocation</h2>
+<p><strong>Venue Content:</strong> The Venue Partner is entitled to display their own promotional content during all available Filler Slots — screen time not occupied by paid advertiser content. <strong>Priority:</strong> Paid third-party advertiser content takes absolute scheduling priority.</p>
+<h2>3. Utilities</h2>
+<p>The Venue Partner shall bear all costs for electricity and internet connectivity at their premises required to operate the screen and media player.</p>
+<h2>4. Content Guidelines</h2>
+<p>The Venue Partner shall ensure all uploaded content complies with applicable Indian laws. extrravenue reserves the right to remove violating content without notice.</p>
+<h2>5. Monetary Terms</h2>
+<p>This Agreement is on a non-monetary, service-exchange basis. No revenue share, rental fee, or commission shall be payable by either Party.</p>
+<h2>6. Term &amp; Termination</h2>
+<p>Valid for <strong>ONE (1) YEAR</strong> from signing, auto-renews unless either Party provides 30 days written notice. Either Party may terminate with <strong>7 days' written notice</strong>.</p>
+<h2>7. Equipment Liability</h2>
+<p>The Venue Partner is responsible for protecting extrravenue's installed hardware from damage, theft, or vandalism and shall bear the cost of repair or replacement resulting from negligence.</p>
+<h2>8. Governing Law</h2>
+<p>Governed by the laws of India. Disputes shall first be resolved amicably within 15 days, failing which through arbitration under the Arbitration and Conciliation Act, 1996.</p>
+<div class="sig-grid">
+  <div class="sig-box"><p>For extrravenue<br>Name: ___________________<br>Designation: ____________<br>Date: ${today}</p></div>
+  <div class="sig-box"><p>For Venue Partner<br>Name: ${esc(vp.contact_name||'___________________')}<br>Business: ${esc(vp.business_name||'')}<br>Date: ${today}</p></div>
+</div>
+</body></html>`;
+
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.send(html);
+  } catch(err) { next(err); }
+});
+
 // ── CITY CAPACITY check (admin) — must be before /:id ────────────────────────
 router.get('/city-cap', authenticate, requireAdmin, async (req, res, next) => {
   try {

@@ -1006,13 +1006,10 @@ function _agrStyles() {
 }
 
 function openAgreementWindow() {
-  const w = window.open('', '_blank');
-  if (w) {
-    w.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Venue Partner Agreement</title>${_agrStyles()}</head><body>${_agrPrintHtml}</body></html>`);
-    w.document.close();
-    setTimeout(() => { try { w.print(); } catch(e) {} }, 400);
-  } else {
-    window.print();
+  if (!_currentLeadId || !token) return;
+  const url = '/api/leads/' + _currentLeadId + '/agreement?t=' + encodeURIComponent(token);
+  if (!window.open(url, '_blank')) {
+    window.location.href = url;
   }
 }
 
