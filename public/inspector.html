@@ -1044,7 +1044,6 @@ async function generateAgreement(id) {
     closeDrawer();
     window.scrollTo(0,0);
     setTimeout(()=>window.print(), 400);
-    setTimeout(()=>{ agr.style.display='none'; }, 3000);
   } catch(e) { showToast('Failed to generate agreement', 'error'); }
 }
 
