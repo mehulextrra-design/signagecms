@@ -160,6 +160,20 @@ class MainActivity : AppCompatActivity() {
                     binding.layoutOffline.visibility = View.VISIBLE
                 }
             }
+            override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
+                val scheme = request.url.scheme ?: ""
+                if (scheme != "http" && scheme != "https") {
+                    return try {
+                        val intent = android.content.Intent(android.content.Intent.ACTION_VIEW, request.url)
+                        intent.addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
+                        startActivity(intent)
+                        true
+                    } catch (e: Exception) {
+                        true
+                    }
+                }
+                return false
+            }
         }
 
         binding.webView.webChromeClient = object : WebChromeClient() {
