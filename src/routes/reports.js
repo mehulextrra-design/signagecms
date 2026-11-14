@@ -313,7 +313,8 @@ router.post('/backup-now', authenticate, requireAdmin, async (req, res, next) =>
     const result = await runDbBackup();
     res.json({ ok: true, ...result });
   } catch (err) {
-    next(err);
+    console.error('[Backup] Failed:', err.message);
+    res.status(500).json({ error: err.message });
   }
 });
 
