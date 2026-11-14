@@ -157,8 +157,31 @@ jobs:
             --repo "$GITHUB_REPOSITORY"
 
           BASE="https://github.com/${GITHUB_REPOSITORY}/releases/download/${TAG}"
+          VENUE_URL="${BASE}/EV-VenuePartner-v1.${RUN_NUM}.apk"
+          INSPECTOR_URL="${BASE}/EV-Inspector-v1.${RUN_NUM}.apk"
+          ADVERTISER_URL="${BASE}/EV-Advertiser-v1.${RUN_NUM}.apk"
+
           printf '## APKs Ready\n| App | Download URL |\n|---|---|\n| Venue Partner | %s |\n| Inspector | %s |\n| Advertiser | %s |\n' \
-            "${BASE}/EV-VenuePartner-v1.${RUN_NUM}.apk" \
-            "${BASE}/EV-Inspector-v1.${RUN_NUM}.apk" \
-            "${BASE}/EV-Advertiser-v1.${RUN_NUM}.apk" \
+            "$VENUE_URL" "$INSPECTOR_URL" "$ADVERTISER_URL" \
             >> "$GITHUB_STEP_SUMMARY"
+
+          echo "VENUE_URL=$VENUE_URL" >> $GITHUB_ENV
+          echo "INSPECTOR_URL=$INSPECTOR_URL" >> $GITHUB_ENV
+          echo "ADVERTISER_URL=$ADVERTISER_URL" >> $GITHUB_ENV
+          echo "RUN_NUM=$RUN_NUM" >> $GITHUB_ENV
+
+      - name: Update Railway env vars
+        if: ${{ secrets.RAILWAY_TOKEN != '' }}
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          RUN_NUM: ${{ github.run_number }}
+        run: |
+          npm install -g @railway/cli --silent
+          railway variables set \
+            VENUE_APK_VERSION="${RUN_NUM}" \
+            VENUE_APK_URL="${VENUE_URL}" \
+            INSPECTOR_APK_VERSION="${RUN_NUM}" \
+            INSPECTOR_APK_URL="${INSPECTOR_URL}" \
+            ADVERTISER_APK_VERSION="${RUN_NUM}" \
+            ADVERTISER_APK_URL="${ADVERTISER_URL}"
+          echo "✅ Railway vars updated: version=$RUN_NUM" >> $GITHUB_STEP_SUMMARY
