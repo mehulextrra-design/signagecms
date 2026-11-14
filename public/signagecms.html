@@ -186,6 +186,7 @@
     .pkg-opt .pkg-ppd  { grid-column:2;grid-row:2;text-align:right; }
     .pkg-opt .pkg-imp  { grid-column:2;grid-row:3;text-align:right;margin-top:2px; }
     .pkg-opt .pkg-desc { grid-column:1;grid-row:3;font-size:10px;margin-top:2px; }
+    .pkg-opt .pkg-channels { justify-content:flex-start; }
   }
 
   /* WIZARD */
@@ -969,10 +970,10 @@
               </div>
               <div class="pkg-selector" id="pkg-selector">
                 <div class="pkg-opt" data-pkg="trial" onclick="selectPkg('trial')" style="border-color:#f59e0b;">
-                  <div class="pkg-name">Trial <span class="pkg-trial-badge">3 DAYS</span></div>
+                  <div class="pkg-name">Trial <span class="pkg-trial-badge">5 DAYS</span></div>
                   <div class="pkg-slot">8 sec</div>
                   <div class="pkg-price" style="font-size:22px;">FREE<span style="font-size:11px;font-weight:400;color:var(--text3)"> · ₹0</span></div>
-                  <div class="pkg-ppd">3 days · filler network</div>
+                  <div class="pkg-ppd">5 days · 1 campaign</div>
                   <div id="pkg-imp-trial" class="pkg-imp"></div>
                   <div class="pkg-channels">
                     <span class="pkg-ch ch-screen" title="Digital Screen"><svg width="16" height="16"><use href="#pkg-ico-screen"/></svg></span>
@@ -1024,10 +1025,10 @@
               <!-- V2 pkg-selector (new pricing) — hidden by default -->
               <div class="pkg-selector" id="pkg-selector-v2" style="display:none;">
                 <div class="pkg-opt" data-pkg="trial" onclick="selectPkg('trial')" style="border-color:#f59e0b;">
-                  <div class="pkg-name">Trial <span class="pkg-trial-badge">3 DAYS</span></div>
+                  <div class="pkg-name">Trial <span class="pkg-trial-badge">5 DAYS</span></div>
                   <div class="pkg-slot">8 sec</div>
                   <div class="pkg-price" style="font-size:22px;">FREE<span style="font-size:11px;font-weight:400;color:var(--text3)"> · ₹0</span></div>
-                  <div class="pkg-ppd">3 days · filler network</div>
+                  <div class="pkg-ppd">5 days · 1 campaign</div>
                   <div id="pkg-imp-v2-trial" class="pkg-imp"></div>
                   <div class="pkg-channels">
                     <span class="pkg-ch ch-screen" title="Digital Screen"><svg width="16" height="16"><use href="#pkg-ico-screen"/></svg></span>
@@ -1100,10 +1101,10 @@
                 </div>
                 <div class="pkg-selector">
                   <div class="pkg-opt" data-pkg="trial" onclick="selectPkg('trial')" style="border-color:#f59e0b;">
-                    <div class="pkg-name">Trial <span class="pkg-trial-badge">3 DAYS</span></div>
+                    <div class="pkg-name">Trial <span class="pkg-trial-badge">5 DAYS</span></div>
                     <div class="pkg-slot">8 sec</div>
                     <div class="pkg-price" style="font-size:22px;">₹499<span style="font-size:11px;font-weight:400;color:var(--text3)"> flat</span></div>
-                    <div id="pkg-imp-v3-trial" class="pkg-imp">3 days · filler network</div>
+                    <div id="pkg-imp-v3-trial" class="pkg-imp">5 days · 1 campaign</div>
                     <div class="pkg-channels"><span class="pkg-ch ch-screen" title="Digital Screen"><svg width="16" height="16"><use href="#pkg-ico-screen"/></svg></span></div>
                     <div class="pkg-desc">Digital Screen · 1 campaign · non-refundable</div>
                   </div>
@@ -1163,18 +1164,10 @@
             </div>
             <!-- WA Broadcast toggle (shown only if wa_enabled) -->
             <div id="wa-campaign-toggle" style="display:none;border:1px solid #25D366;border-radius:10px;padding:12px 14px;margin-bottom:16px;display:none;">
-              <div id="wa-broadcast-toggle-row" style="display:flex;align-items:center;gap:12px;">
-                <label class="toggle-switch" style="flex-shrink:0;">
-                  <input type="checkbox" id="wa-broadcast-toggle" onchange="document.getElementById('wa-caption-wrap').style.display=this.checked?'':'none'">
-                  <span class="toggle-slider"></span>
-                </label>
-                <div>
-                  <div style="font-size:13px;font-weight:600;color:var(--text);">WhatsApp pe bhi bhejo</div>
-                  <div style="font-size:11px;color:var(--text2);">Campaign live hone pe apne contacts ko WhatsApp broadcast bhejo</div>
-                </div>
-              </div>
-              <!-- Caption customize (shown when toggle is ON) -->
-              <div id="wa-caption-wrap" style="display:none;margin-top:12px;border-top:1px solid rgba(37,211,102,0.2);padding-top:12px;">
+              <input type="checkbox" id="wa-broadcast-toggle" checked style="display:none;">
+              <div style="font-size:12px;font-weight:600;color:#25D366;margin-bottom:8px;">WhatsApp Broadcast</div>
+              <!-- Caption customize -->
+              <div id="wa-caption-wrap" style="display:block;">
                 <label style="font-size:12px;font-weight:600;color:var(--text2);display:block;margin-bottom:8px;">Message Customize Karo</label>
                 <!-- Fixed greeting -->
                 <div style="background:rgba(37,211,102,0.07);border:1px solid rgba(37,211,102,0.2);border-radius:7px 7px 0 0;padding:7px 10px;font-size:12px;color:var(--text3);font-style:italic;">Namaste [Contact Name],</div>
@@ -3280,8 +3273,8 @@ async function checkTrialUsed(){
     trialCard.classList.remove('pkg-opt-disabled');
     trialCard.onclick=()=>selectPkg('trial');
     const badge=trialCard.querySelector('.pkg-trial-badge');
-    if(badge)badge.textContent='3 DAYS';
-    trialCard.querySelector('.pkg-ppd').textContent='3 days · filler network';
+    if(badge)badge.textContent='5 DAYS';
+    trialCard.querySelector('.pkg-ppd').textContent='5 days · 1 campaign';
   }
 }
 
@@ -3470,13 +3463,13 @@ async function wizardNext(step){
 }
 
 const PKG_RATES_V1={
-  trial:    {ppd:0,   flat:0,    monthly:0,    slot:8,  multiplier:0, label:'Trial (8s · 3 days)',  fixedDays:3},
+  trial:    {ppd:0,   flat:0,    monthly:0,    slot:8,  multiplier:0, label:'Trial (8s · 5 days)',  fixedDays:5},
   starter:  {ppd:50,  flat:1499, monthly:1499, slot:10, multiplier:1, label:'Starter (10s)'},
   complete: {ppd:117, flat:3499, monthly:3499, slot:15, multiplier:2, label:'Complete (15s)'},
   growth:   {ppd:200, flat:5999, monthly:5999, slot:20, multiplier:3, label:'Growth (20s)'},
 };
 const PKG_RATES_V2={
-  trial:    {ppd:0,   flat:0,    monthly:0,    slot:8,  multiplier:0, label:'Trial (8s · 3 days)',  fixedDays:3},
+  trial:    {ppd:0,   flat:0,    monthly:0,    slot:8,  multiplier:0, label:'Trial (8s · 5 days)',  fixedDays:5},
   starter:  {ppd:100, flat:2999, monthly:2999, slot:10, multiplier:1, label:'Starter (10s)'},
   complete: {ppd:167, flat:4999, monthly:4999, slot:15, multiplier:2, label:'Complete (15s)'},
   growth:   {ppd:200, flat:5999, monthly:5999, slot:20, multiplier:3, label:'Growth (20s)'},
@@ -3528,24 +3521,19 @@ function setV3Cycle(cycle){
 
 function toggleWaUpgradeV3(el){
   _waUpgradeV3=el.checked;
-  // In v3: show caption box directly (skip the toggle row)
   const waBox=document.getElementById('wa-campaign-toggle');
-  const toggleRow=document.getElementById('wa-broadcast-toggle-row');
   const capWrap=document.getElementById('wa-caption-wrap');
   const waTog=document.getElementById('wa-broadcast-toggle');
   if(_waUpgradeV3){
     if(waBox) waBox.style.display='';
-    if(toggleRow) toggleRow.style.display='none';
-    if(capWrap){capWrap.style.display='';capWrap.style.borderTop='none';capWrap.style.paddingTop='0';capWrap.style.marginTop='0';}
+    if(capWrap) capWrap.style.display='';
     if(waTog) waTog.checked=true;
   } else {
     if(waBox) waBox.style.display='none';
-    if(toggleRow) toggleRow.style.display='flex';
     if(capWrap) capWrap.style.display='none';
     if(waTog) waTog.checked=false;
   }
   updateNetworkSummary();
-  // Refresh review if already on step 4
   calcCost();
   if(document.getElementById('wp4')?.classList.contains('active')) renderReview();
 }
@@ -3587,10 +3575,8 @@ function applyWizardV2(){
   if(!_wizardV3){
     _waUpgradeV3=false;
     // Restore toggle row visibility for v1/v2
-    const toggleRow=document.getElementById('wa-broadcast-toggle-row');
-    if(toggleRow) toggleRow.style.display='flex';
-    const capWrap=document.getElementById('wa-caption-wrap');
-    if(capWrap){capWrap.style.borderTop='';capWrap.style.paddingTop='';capWrap.style.marginTop='';}
+        const capWrap=document.getElementById('wa-caption-wrap');
+    if(capWrap) capWrap.style.display='';
   }
   // WA broadcast toggle
   if(waTogBox){
@@ -3706,13 +3692,13 @@ function updateNetworkSummary(){
   }
   const dur=parseInt(document.getElementById('sch-duration')?.value)||30;
   const pkgRateLabel=rate.fixedDays?'FREE (₹0)':`₹${rate.monthly.toLocaleString('en-IN')}/mo`;
-  document.getElementById('sum-screens').textContent=rate.fixedDays?'Filler network':n+' screens';
+  document.getElementById('sum-screens').textContent=rate.fixedDays?n+' screens':n+' screens';
   document.getElementById('sum-impressions').textContent='~'+impDay.toLocaleString('en-IN');
   document.getElementById('sum-impressions-mo').textContent='~'+impMo.toLocaleString('en-IN');
   document.getElementById('sum-cpd').textContent=pkgRateLabel;
   ['trial','starter','complete','growth'].forEach(p=>{
     const r=R()[p];
-    const txt=r.fixedDays?'~1,200/day · filler slots':'~'+( Math.round((54000/850)*r.multiplier)*n ).toLocaleString('en-IN')+' plays/day';
+    const txt=r.fixedDays?'~1,200/day · 5 days':'~'+( Math.round((54000/850)*r.multiplier)*n ).toLocaleString('en-IN')+' plays/day';
     const el=document.getElementById('pkg-imp-'+p); if(el) el.textContent=txt;
     const el2=document.getElementById('pkg-imp-v2-'+p); if(el2) el2.textContent=txt;
     const el3=document.getElementById('pkg-imp-v3-'+p); if(el3) el3.textContent=txt;
@@ -3726,7 +3712,7 @@ function calcCost(){
     // V3: multi-month billing
     const cycleMap={'1mo':{m:1,d:0},'3mo':{m:3,d:.15},'6mo':{m:6,d:.25}};
     const c=cycleMap[_v3Cycle]||{m:1,d:0};
-    const v3Rates={trial:{monthly:0,fixedDays:3,flat:499},starter:{monthly:2999},complete:{monthly:4999},growth:{monthly:5999}};
+    const v3Rates={trial:{monthly:0,fixedDays:5,flat:499},starter:{monthly:2999},complete:{monthly:4999},growth:{monthly:5999}};
     const r=v3Rates[selectedPkg]||v3Rates.complete;
     if(r.fixedDays){
       const waAddonAmt=_waUpgradeV3?499:0;
@@ -3766,7 +3752,7 @@ function renderReview(){
     <div class="review-row"><span class="review-key">Duration</span><span class="review-val">${days} days</span></div>
     <div class="review-row"><span class="review-key">Period</span><span class="review-val">${fmtDate(start)} – ${fmtDate(end)}</span></div>
     <div class="review-row"><span class="review-key">Time Window</span><span class="review-val">${document.getElementById('sch-time-start').value} – ${document.getElementById('sch-time-end').value}</span></div>
-    <div class="review-row"><span class="review-key">Rate</span><span class="review-val">${_wizardV3?(campaignCost.v3isTrial?'₹499 flat · 3 days trial':campaignCost.v3months+' month billing'):rate.fixedDays?'FREE (₹0 · 3 days)':days>=28&&rate.monthly?'₹'+rate.monthly.toLocaleString('en-IN')+'/mo (monthly flat)':'₹'+rate.ppd.toLocaleString('en-IN')+'/day × '+days+' days'}</span></div>
+    <div class="review-row"><span class="review-key">Rate</span><span class="review-val">${_wizardV3?(campaignCost.v3isTrial?'₹499 flat · 5 days trial':campaignCost.v3months+' month billing'):rate.fixedDays?'FREE (₹0 · 5 days)':days>=28&&rate.monthly?'₹'+rate.monthly.toLocaleString('en-IN')+'/mo (monthly flat)':'₹'+rate.ppd.toLocaleString('en-IN')+'/day × '+days+' days'}</span></div>
     ${(_wizardV2&&selectedPkg==='growth'&&_waUpgradeV2)?`<div class="review-row"><span class="review-key" style="color:#25D366;">WA Upgrade</span><span class="review-val" style="color:#25D366;">20K messages/week · +₹400</span></div>`:''}
     ${(_wizardV3&&_waUpgradeV3)?`<div class="review-row"><span class="review-key" style="color:#25D366;">${selectedPkg==='growth'?'WA Upgrade 20K/week':'WhatsApp Broadcast'}</span><span class="review-val" style="color:#25D366;">+₹${campaignCost.v3waAddon?.toLocaleString('en-IN')||'0'}</span></div>`:''}
     ${(_wizardV3&&campaignCost.v3discAmt>0)?`<div class="review-row"><span class="review-key" style="color:var(--success);">Multi-month discount (${campaignCost.v3discPct}%)</span><span class="review-val" style="color:var(--success);">−₹${campaignCost.v3discAmt.toLocaleString('en-IN')}</span></div>`:''}`;
