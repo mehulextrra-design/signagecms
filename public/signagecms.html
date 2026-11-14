@@ -1086,7 +1086,7 @@
             <div id="wa-campaign-toggle" style="display:none;border:1px solid #25D366;border-radius:10px;padding:12px 14px;margin-bottom:16px;display:none;">
               <div style="display:flex;align-items:center;gap:12px;">
                 <label class="toggle-switch" style="flex-shrink:0;">
-                  <input type="checkbox" id="wa-broadcast-toggle">
+                  <input type="checkbox" id="wa-broadcast-toggle" onchange="document.getElementById('wa-caption-wrap').style.display=this.checked?'':'none'">
                   <span class="toggle-slider"></span>
                 </label>
                 <div>
