@@ -2578,22 +2578,21 @@ async function loadProfile(){
     document.getElementById('prof-gst').value=u.gst_number||'';
     document.getElementById('prof-city').value=u.city||'';
     updateSidebarUser();
+    // Always wire up WA caption toggle (v2 shows it for Growth/Complete without wa_enabled)
+    const waTog=document.getElementById('wa-broadcast-toggle');
+    const waCaptionWrap=document.getElementById('wa-caption-wrap');
+    if(waTog&&waCaptionWrap){
+      const _syncWaCaption=()=>{waCaptionWrap.style.display=waTog.checked?'':'none';};
+      waTog.addEventListener('change',_syncWaCaption);
+      _syncWaCaption();
+    }
     // Show WA section if feature enabled
     if(u.wa_enabled){
       document.getElementById('wa-section').style.display='';
       loadWaStatus();
       loadWaContacts();
-      // Show WA broadcast toggle in campaign wizard
       const waTogBox=document.getElementById('wa-campaign-toggle');
       if(waTogBox)waTogBox.style.display='';
-      // Show/hide caption template when toggle changes
-      const waTog=document.getElementById('wa-broadcast-toggle');
-      const waCaptionWrap=document.getElementById('wa-caption-wrap');
-      if(waTog&&waCaptionWrap){
-        const _syncWaCaption=()=>{waCaptionWrap.style.display=waTog.checked?'':'none';};
-        waTog.addEventListener('change',_syncWaCaption);
-        _syncWaCaption(); // set initial state
-      }
     }
   }catch(e){toast('Could not load profile','error');}
 }
