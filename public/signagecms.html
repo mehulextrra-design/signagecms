@@ -164,6 +164,7 @@
   .pkg-opt .pkg-name { font-weight:700;font-size:14px;margin-bottom:4px; }
   .pkg-opt .pkg-slot { font-size:11px;font-weight:600;background:var(--surface2);border-radius:4px;padding:2px 6px;display:inline-block;color:var(--primary);margin-bottom:8px; }
   .pkg-opt .pkg-price { font-size:15px;font-weight:700;color:var(--primary); }
+  #pkg-selector-v3 .pkg-opt .pkg-price { font-size:22px; }
   .pkg-opt .pkg-ppd { font-size:11px;color:var(--text3);margin-top:2px; }
   .pkg-opt .pkg-desc { font-size:11px;color:var(--text2);margin-top:6px;line-height:1.4; }
   .pkg-opt .pkg-imp { font-size:11px;color:var(--success,#16a34a);font-weight:600;margin-top:4px; }
@@ -1097,13 +1098,13 @@
                     <button id="v3c-3mo" onclick="setV3Cycle('3mo')" style="padding:5px 11px;border:none;cursor:pointer;font-family:inherit;font-size:12px;font-weight:500;background:var(--surface2);color:var(--text2);border-left:1px solid var(--border);">3 Months <span style="font-size:9px;background:#16a34a;color:#fff;padding:1px 4px;border-radius:3px;margin-left:2px;">−15%</span></button>
                     <button id="v3c-6mo" onclick="setV3Cycle('6mo')" style="padding:5px 11px;border:none;cursor:pointer;font-family:inherit;font-size:12px;font-weight:500;background:var(--surface2);color:var(--text2);border-left:1px solid var(--border);">6 Months <span style="font-size:9px;background:#16a34a;color:#fff;padding:1px 4px;border-radius:3px;margin-left:2px;">−25%</span></button>
                   </div>
-                  <span id="v3-cycle-desc" style="font-size:11px;color:var(--text3);">1 month billing</span>
+                  <span id="v3-cycle-desc" style="display:none;"></span>
                 </div>
                 <div class="pkg-selector">
                   <div class="pkg-opt" data-pkg="trial" onclick="selectPkg('trial')" style="border-color:#f59e0b;">
                     <div class="pkg-name">Trial <span class="pkg-trial-badge">5 DAYS</span></div>
                     <div class="pkg-slot">8 sec</div>
-                    <div class="pkg-price" style="font-size:22px;">₹499<span style="font-size:11px;font-weight:400;color:var(--text3)"> flat</span></div>
+                    <div class="pkg-price" style="font-size:22px;">₹499<span style="font-size:11px;font-weight:400;color:var(--text3)"> /5 Days</span></div>
                     <div id="pkg-imp-v3-trial" class="pkg-imp">5 days · 1 campaign</div>
                     <div class="pkg-channels"><span class="pkg-ch ch-screen" title="Digital Screen"><svg width="16" height="16"><use href="#pkg-ico-screen"/></svg></span></div>
                     <div class="pkg-desc">Digital Screen · 1 campaign · non-refundable</div>
@@ -3503,9 +3504,16 @@ function setV3Cycle(cycle){
     const total=Math.round(base*c.m*(1-c.d));
     const priceEl=document.getElementById('v3-price-'+key);
     const totalEl=document.getElementById('v3-total-'+key);
-    if(priceEl) priceEl.innerHTML=`₹${base.toLocaleString('en-IN')}<span style="font-size:11px;font-weight:400;color:var(--text3)">/mo</span>`;
+    const discMonthly=Math.round(base*(1-c.d));
+    if(priceEl){
+      if(c.d>0){
+        priceEl.innerHTML=`<s style="font-size:14px;font-weight:400;color:var(--text3);text-decoration:line-through;">₹${base.toLocaleString('en-IN')}</s> ₹${discMonthly.toLocaleString('en-IN')}<span style="font-size:11px;font-weight:400;color:var(--text3)">/mo</span>`;
+      } else {
+        priceEl.innerHTML=`₹${base.toLocaleString('en-IN')}<span style="font-size:11px;font-weight:400;color:var(--text3)">/mo</span>`;
+      }
+    }
     if(totalEl){
-      if(c.m>1){totalEl.textContent=`₹${total.toLocaleString('en-IN')} total (${c.m} mo · save ₹${(base*c.m-total).toLocaleString('en-IN')})`;totalEl.style.display='';}
+      if(c.m>1){totalEl.innerHTML=`₹${total.toLocaleString('en-IN')} total &nbsp;<span style="color:var(--success);">save ₹${(base*c.m-total).toLocaleString('en-IN')}</span>`;totalEl.style.display='';}
       else{totalEl.style.display='none';}
     }
   });
