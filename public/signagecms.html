@@ -952,13 +952,15 @@
                   </symbol>
                 </defs>
               </svg>
-              <!-- V2 toggle chip -->
-              <div id="wv2-chip" style="display:flex;align-items:center;gap:8px;margin-bottom:10px;font-size:12px;color:var(--text2);">
-                <label style="display:flex;align-items:center;gap:6px;cursor:pointer;">
-                  <input type="checkbox" onchange="toggleWizardV2()" style="width:16px;height:16px;cursor:pointer;">
-                  <span>New pricing (v2)</span>
-                </label>
-                <span style="font-size:11px;color:var(--text3);">Starter ₹2,999 · Complete ₹4,999 · Growth ₹5,999</span>
+              <!-- Wizard version toggle chip -->
+              <div id="wv2-chip" style="display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
+                <span style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.4px;">Pricing</span>
+                <div style="display:flex;gap:0;border:1.5px solid var(--border);border-radius:7px;overflow:hidden;font-size:12px;">
+                  <button id="wv-btn-v1" onclick="setWizardVersion('v1')" style="padding:4px 10px;border:none;cursor:pointer;font-family:inherit;font-size:12px;font-weight:500;background:var(--primary);color:#fff;">v1</button>
+                  <button id="wv-btn-v2" onclick="setWizardVersion('v2')" style="padding:4px 10px;border:none;cursor:pointer;font-family:inherit;font-size:12px;font-weight:500;background:var(--surface2);color:var(--text2);border-left:1px solid var(--border);">v2</button>
+                  <button id="wv-btn-v3" onclick="setWizardVersion('v3')" style="padding:4px 10px;border:none;cursor:pointer;font-family:inherit;font-size:12px;font-weight:500;background:var(--surface2);color:var(--text2);border-left:1px solid var(--border);">v3 ✦</button>
+                </div>
+                <span id="wv-desc" style="font-size:11px;color:var(--text3);">v1 · Starter ₹1,499</span>
               </div>
               <div class="pkg-selector" id="pkg-selector">
                 <div class="pkg-opt" data-pkg="trial" onclick="selectPkg('trial')" style="border-color:#f59e0b;">
@@ -1777,6 +1779,7 @@ function moreNav(page){toggleMoreSheet();navigate(page);}
 const PAGE_TITLES={dashboard:'Dashboard',analytics:'Analytics',pop:'Proof of Play',campaigns:'My Campaigns','new-campaign':'Book Campaign',screens:'Browse Screens',invoices:'Invoices',wallet:'My Wallet',profile:'Profile & Settings'};
 
 function navigate(page, fromPopstate){
+  if(page==='new-campaign'&&_wizardV3){window.location.href='book-campaign.html';return;}
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   const el=document.getElementById(`page-${page}`);if(el)el.classList.add('active');
@@ -3388,22 +3391,33 @@ const PKG_RATES_V2={
   growth:   {ppd:200, flat:5999, monthly:5999, slot:20, multiplier:3, label:'Growth (20s)'},
 };
 let _wizardV2 = localStorage.getItem('wizard_v2')==='1';
+let _wizardV3 = localStorage.getItem('wizard_v3')==='1';
 let _waUpgradeV2 = false;
 function R(){ return _wizardV2 ? PKG_RATES_V2 : PKG_RATES_V1; }
-function toggleWizardV2(){
-  _wizardV2=!_wizardV2; _waUpgradeV2=false;
+function setWizardVersion(ver){
+  _wizardV2 = ver==='v2'; _wizardV3 = ver==='v3'; _waUpgradeV2=false;
   localStorage.setItem('wizard_v2',_wizardV2?'1':'0');
+  localStorage.setItem('wizard_v3',_wizardV3?'1':'0');
   applyWizardV2();
+  if(_wizardV3){ window.location.href='book-campaign.html'; }
 }
+function toggleWizardV2(){ setWizardVersion(_wizardV2?'v1':'v2'); }
 function applyWizardV2(){
   const v1=document.getElementById('pkg-selector');
   const v2=document.getElementById('pkg-selector-v2');
-  const chip=document.getElementById('wv2-chip');
   const addon=document.getElementById('wa-upgrade-v2');
   const waTogBox=document.getElementById('wa-campaign-toggle');
   if(v1) v1.style.display=_wizardV2?'none':'';
   if(v2) v2.style.display=_wizardV2?'':'none';
-  if(chip) chip.querySelector('input').checked=_wizardV2;
+  // Update pill buttons
+  const ver=_wizardV3?'v3':(_wizardV2?'v2':'v1');
+  const descMap={v1:'v1 · Starter ₹1,499',v2:'v2 · Starter ₹2,999',v3:'v3 · Separate booking page'};
+  ['v1','v2','v3'].forEach(v=>{
+    const btn=document.getElementById('wv-btn-'+v);
+    if(btn){btn.style.background=ver===v?'var(--primary)':'var(--surface2)';btn.style.color=ver===v?'#fff':'var(--text2)';}
+  });
+  const desc=document.getElementById('wv-desc');
+  if(desc) desc.textContent=descMap[ver]||'';
   if(addon) addon.style.display=(_wizardV2&&selectedPkg==='growth')?'':'none';
   if(!_wizardV2){_waUpgradeV2=false;}
   // In v2, Growth plan includes WA — show broadcast toggle regardless of wa_enabled
@@ -3798,6 +3812,15 @@ function clearFile(){uploadedFile=null;uploadedContentId=null;document.getElemen
 document.addEventListener('DOMContentLoaded',()=>{
   const ne=document.getElementById('cmp-name');
   if(ne)ne.addEventListener('input',()=>{document.getElementById('btn-next-2').disabled=!ne.value.trim()||(!uploadedFile&&!uploadedContentId);});
+  // Init wizard version pill buttons from localStorage
+  const ver=_wizardV3?'v3':(_wizardV2?'v2':'v1');
+  const descMap={v1:'v1 · Starter ₹1,499',v2:'v2 · Starter ₹2,999',v3:'v3 · Separate booking page'};
+  ['v1','v2','v3'].forEach(v=>{
+    const btn=document.getElementById('wv-btn-'+v);
+    if(btn){btn.style.background=ver===v?'var(--primary)':'var(--surface2)';btn.style.color=ver===v?'#fff':'var(--text2)';}
+  });
+  const desc=document.getElementById('wv-desc');
+  if(desc) desc.textContent=descMap[ver]||'';
 });
 
 function openLightbox(url,name,type){
