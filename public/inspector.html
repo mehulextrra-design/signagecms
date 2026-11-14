@@ -1010,7 +1010,7 @@ function downloadAgreement(leadId) {
   if (/Android/i.test(navigator.userAgent)) {
     const tmp = document.createElement('div');
     tmp.innerHTML = _agrPrintHtml;
-    window.open('whatsapp://send?text=' + encodeURIComponent(tmp.innerText), '_blank');
+    window.top.location.href = 'whatsapp://send?text=' + encodeURIComponent(tmp.innerText);
   } else {
     const path = '/api/leads/' + leadId + '/agreement?t=' + encodeURIComponent(token);
     window.open(path, '_blank') || (window.location.href = path);
