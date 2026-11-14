@@ -1010,7 +1010,12 @@ function downloadAgreement(leadId) {
   if (/Android/i.test(navigator.userAgent)) {
     const tmp = document.createElement('div');
     tmp.innerHTML = _agrPrintHtml;
-    window.location.href = 'whatsapp://send?text=' + encodeURIComponent(tmp.innerText);
+    const wa = 'whatsapp://send?text=' + encodeURIComponent(tmp.innerText);
+    const f = document.createElement('iframe');
+    f.style.display = 'none';
+    document.body.appendChild(f);
+    f.src = wa;
+    setTimeout(() => f.remove(), 1500);
   } else {
     const path = '/api/leads/' + leadId + '/agreement?t=' + encodeURIComponent(token);
     window.open(path, '_blank') || (window.location.href = path);
