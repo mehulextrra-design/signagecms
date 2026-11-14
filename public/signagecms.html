@@ -1082,6 +1082,78 @@
                 </div>
               </div>
 
+              <!-- V3 pkg selector: billing cycle tabs + plan cards -->
+              <div id="pkg-selector-v3" style="display:none;">
+                <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center;">
+                  <span style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.4px;">Duration</span>
+                  <div style="display:flex;gap:0;border:1.5px solid var(--border);border-radius:7px;overflow:hidden;">
+                    <button id="v3c-1mo" onclick="setV3Cycle('1mo')" style="padding:5px 11px;border:none;cursor:pointer;font-family:inherit;font-size:12px;font-weight:500;background:var(--primary);color:#fff;">1 Month</button>
+                    <button id="v3c-3mo" onclick="setV3Cycle('3mo')" style="padding:5px 11px;border:none;cursor:pointer;font-family:inherit;font-size:12px;font-weight:500;background:var(--surface2);color:var(--text2);border-left:1px solid var(--border);">3 Months <span style="font-size:9px;background:#16a34a;color:#fff;padding:1px 4px;border-radius:3px;margin-left:2px;">−15%</span></button>
+                    <button id="v3c-6mo" onclick="setV3Cycle('6mo')" style="padding:5px 11px;border:none;cursor:pointer;font-family:inherit;font-size:12px;font-weight:500;background:var(--surface2);color:var(--text2);border-left:1px solid var(--border);">6 Months <span style="font-size:9px;background:#16a34a;color:#fff;padding:1px 4px;border-radius:3px;margin-left:2px;">−25%</span></button>
+                  </div>
+                  <span id="v3-cycle-desc" style="font-size:11px;color:var(--text3);">1 month billing</span>
+                </div>
+                <div class="pkg-selector">
+                  <div class="pkg-opt" data-pkg="trial" onclick="selectPkg('trial')" style="border-color:#f59e0b;">
+                    <div class="pkg-name">Trial <span class="pkg-trial-badge">3 DAYS</span></div>
+                    <div class="pkg-slot">8 sec</div>
+                    <div class="pkg-price" style="font-size:22px;">FREE</div>
+                    <div id="pkg-imp-v3-trial" class="pkg-imp">3 days · filler network</div>
+                    <div class="pkg-channels"><span class="pkg-ch ch-screen" title="Digital Screen"><svg width="16" height="16"><use href="#pkg-ico-screen"/></svg></span></div>
+                    <div class="pkg-desc">Digital Screen only</div>
+                  </div>
+                  <div class="pkg-opt" data-pkg="starter" onclick="selectPkg('starter')">
+                    <div class="pkg-name">Starter</div>
+                    <div class="pkg-slot">10 sec</div>
+                    <div class="pkg-price" id="v3-price-starter">₹2,999<span style="font-size:11px;font-weight:400;color:var(--text3)">/mo</span></div>
+                    <div id="v3-total-starter" style="font-size:11px;color:var(--success);font-weight:600;display:none;margin-bottom:4px;"></div>
+                    <div id="pkg-imp-v3-starter" class="pkg-imp"></div>
+                    <div class="pkg-channels"><span class="pkg-ch ch-screen" title="Digital Screen"><svg width="16" height="16"><use href="#pkg-ico-screen"/></svg></span></div>
+                    <div class="pkg-desc">Screen only</div>
+                  </div>
+                  <div class="pkg-opt" data-pkg="complete" onclick="selectPkg('complete')" style="border-color:var(--primary);">
+                    <div class="pkg-name">Complete ⭐<span style="font-size:10px;background:var(--primary);color:#fff;padding:2px 6px;border-radius:4px;margin-left:4px;">Popular</span></div>
+                    <div class="pkg-slot">15 sec</div>
+                    <div class="pkg-price" id="v3-price-complete">₹4,999<span style="font-size:11px;font-weight:400;color:var(--text3)">/mo</span></div>
+                    <div id="v3-total-complete" style="font-size:11px;color:var(--success);font-weight:600;display:none;margin-bottom:4px;"></div>
+                    <div id="pkg-imp-v3-complete" class="pkg-imp"></div>
+                    <div class="pkg-channels">
+                      <span class="pkg-ch ch-screen"><svg width="16" height="16"><use href="#pkg-ico-screen"/></svg></span>
+                      <span class="pkg-ch ch-fb"><svg width="16" height="16"><use href="#pkg-ico-fb"/></svg></span>
+                      <span class="pkg-ch ch-ig"><svg width="16" height="16"><use href="#pkg-ico-ig"/></svg></span>
+                      <span class="pkg-ch ch-gbp"><svg width="16" height="16"><use href="#pkg-ico-gbp"/></svg></span>
+                    </div>
+                    <div class="pkg-desc">Screen + FB/IG/GBP · QR · 4 reposts/mo</div>
+                  </div>
+                  <div class="pkg-opt" data-pkg="growth" onclick="selectPkg('growth')">
+                    <div class="pkg-name">Growth</div>
+                    <div class="pkg-slot">20 sec</div>
+                    <div class="pkg-price" id="v3-price-growth">₹5,999<span style="font-size:11px;font-weight:400;color:var(--text3)">/mo</span></div>
+                    <div id="v3-total-growth" style="font-size:11px;color:var(--success);font-weight:600;display:none;margin-bottom:4px;"></div>
+                    <div id="pkg-imp-v3-growth" class="pkg-imp"></div>
+                    <div class="pkg-channels">
+                      <span class="pkg-ch ch-screen"><svg width="16" height="16"><use href="#pkg-ico-screen"/></svg></span>
+                      <span class="pkg-ch ch-fb"><svg width="16" height="16"><use href="#pkg-ico-fb"/></svg></span>
+                      <span class="pkg-ch ch-ig"><svg width="16" height="16"><use href="#pkg-ico-ig"/></svg></span>
+                      <span class="pkg-ch ch-gbp"><svg width="16" height="16"><use href="#pkg-ico-gbp"/></svg></span>
+                      <span class="pkg-ch ch-card"><svg width="16" height="16"><use href="#pkg-ico-card"/></svg></span>
+                    </div>
+                    <div class="pkg-desc">Screen + FB/IG/GBP + Card · QR · Unlimited reposts · WA 10K/week</div>
+                  </div>
+                </div>
+                <!-- WA upgrade addon for v3 Growth -->
+                <div id="wa-upgrade-v3" style="display:none;border:1px solid #25D366;border-radius:10px;padding:12px 14px;margin-top:8px;margin-bottom:4px;">
+                  <div style="display:flex;align-items:center;gap:12px;">
+                    <label class="toggle-switch" style="flex-shrink:0;"><input type="checkbox" id="wa-upgrade-v3-toggle" onchange="toggleWaUpgradeV3(this)"><span class="toggle-slider"></span></label>
+                    <div>
+                      <div style="font-size:13px;font-weight:600;">WA Upgrade: 20K/week <span style="color:#25D366;" id="wa-v3-addon-price">+₹400</span></div>
+                      <div style="font-size:11px;color:var(--text2);">Growth plan contacts double — 20,000 messages/week</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- end pkg-selector-v3 -->
+
               <p style="font-size:12px;color:var(--text3);margin-top:8px;">Video duration must be = your plan's slot. Longer content = rejected at upload.</p>
             </div>
             <!-- WA Broadcast toggle (shown only if wa_enabled) -->
@@ -1779,7 +1851,6 @@ function moreNav(page){toggleMoreSheet();navigate(page);}
 const PAGE_TITLES={dashboard:'Dashboard',analytics:'Analytics',pop:'Proof of Play',campaigns:'My Campaigns','new-campaign':'Book Campaign',screens:'Browse Screens',invoices:'Invoices',wallet:'My Wallet',profile:'Profile & Settings'};
 
 function navigate(page, fromPopstate){
-  if(page==='new-campaign'&&_wizardV3){window.location.href='book-campaign.html';return;}
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   const el=document.getElementById(`page-${page}`);if(el)el.classList.add('active');
@@ -3363,8 +3434,18 @@ async function wizardNext(step){
     onStartTimeChange();
   }else if(step===3){
     const start=document.getElementById('sch-start').value;
+    if(!start){toast('Set a start date','error');return;}
+    if(_wizardV3){
+      // V3: derive end date from billing cycle
+      if(!selectedPkg){toast('Select a package','error');return;}
+      const cycleMap={'1mo':30,'3mo':90,'6mo':180};
+      const days=PKG_RATES_V2[selectedPkg]?.fixedDays||cycleMap[_v3Cycle]||30;
+      const endD=new Date(start);endD.setDate(endD.getDate()+days-1);
+      document.getElementById('sch-end').value=endD.toISOString().split('T')[0];
+      calcCost();renderReview();updateWizardUI(4);return;
+    }
     const dur=document.getElementById('sch-duration').value;
-    if(!start||!dur){toast('Set a start date','error');return;}
+    if(!dur){toast('Set a duration','error');return;}
     // WA warning: user has WA enabled but didn't toggle WA broadcast ON
     if(currentUser&&currentUser.wa_enabled){
       const waTog=document.getElementById('wa-broadcast-toggle');
@@ -3393,41 +3474,87 @@ const PKG_RATES_V2={
 let _wizardV2 = localStorage.getItem('wizard_v2')==='1';
 let _wizardV3 = localStorage.getItem('wizard_v3')==='1';
 let _waUpgradeV2 = false;
+let _waUpgradeV3 = false;
+let _v3Cycle = localStorage.getItem('v3_cycle')||'1mo';
 function R(){ return _wizardV2 ? PKG_RATES_V2 : PKG_RATES_V1; }
 function setWizardVersion(ver){
-  _wizardV2 = ver==='v2'; _wizardV3 = ver==='v3'; _waUpgradeV2=false;
+  _wizardV2 = ver==='v2'; _wizardV3 = ver==='v3'; _waUpgradeV2=false; _waUpgradeV3=false;
   localStorage.setItem('wizard_v2',_wizardV2?'1':'0');
   localStorage.setItem('wizard_v3',_wizardV3?'1':'0');
   applyWizardV2();
-  if(_wizardV3){ window.location.href='book-campaign.html'; }
 }
 function toggleWizardV2(){ setWizardVersion(_wizardV2?'v1':'v2'); }
+
+function setV3Cycle(cycle){
+  _v3Cycle=cycle;
+  localStorage.setItem('v3_cycle',cycle);
+  ['1mo','3mo','6mo'].forEach(c=>{
+    const btn=document.getElementById('v3c-'+c);
+    if(btn){btn.style.background=c===cycle?'var(--primary)':'var(--surface2)';btn.style.color=c===cycle?'#fff':'var(--text2)';}
+  });
+  const descMap={'1mo':'1 month billing','3mo':'3 months · 15% off','6mo':'6 months · 25% off'};
+  const d=document.getElementById('v3-cycle-desc');if(d)d.textContent=descMap[cycle]||'';
+  const cycleMap={'1mo':{m:1,d:0},'3mo':{m:3,d:.15},'6mo':{m:6,d:.25}};
+  const c=cycleMap[cycle];
+  [{key:'starter',base:2999},{key:'complete',base:4999},{key:'growth',base:5999}].forEach(({key,base})=>{
+    const total=Math.round(base*c.m*(1-c.d));
+    const priceEl=document.getElementById('v3-price-'+key);
+    const totalEl=document.getElementById('v3-total-'+key);
+    if(priceEl) priceEl.innerHTML=`₹${base.toLocaleString('en-IN')}<span style="font-size:11px;font-weight:400;color:var(--text3)">/mo</span>`;
+    if(totalEl){
+      if(c.m>1){totalEl.textContent=`₹${total.toLocaleString('en-IN')} total (${c.m} mo · save ₹${(base*c.m-total).toLocaleString('en-IN')})`;totalEl.style.display='';}
+      else{totalEl.style.display='none';}
+    }
+  });
+  // Update WA addon price label
+  const waP=document.getElementById('wa-v3-addon-price');
+  if(waP){
+    const waTotal=Math.round(400*c.m*(1-c.d));
+    waP.textContent=c.m>1?`+₹${waTotal.toLocaleString('en-IN')} (${c.m} mo)`:'+₹400';
+  }
+  updateNetworkSummary();
+}
+
+function toggleWaUpgradeV3(el){
+  _waUpgradeV3=el.checked;
+  updateNetworkSummary();
+}
 function applyWizardV2(){
   const v1=document.getElementById('pkg-selector');
   const v2=document.getElementById('pkg-selector-v2');
+  const v3=document.getElementById('pkg-selector-v3');
   const addon=document.getElementById('wa-upgrade-v2');
+  const addonV3=document.getElementById('wa-upgrade-v3');
   const waTogBox=document.getElementById('wa-campaign-toggle');
-  if(v1) v1.style.display=_wizardV2?'none':'';
+  // Show correct selector
+  if(v1) v1.style.display=(!_wizardV2&&!_wizardV3)?'':'none';
   if(v2) v2.style.display=_wizardV2?'':'none';
+  if(v3) v3.style.display=_wizardV3?'':'none';
   // Update pill buttons
   const ver=_wizardV3?'v3':(_wizardV2?'v2':'v1');
-  const descMap={v1:'v1 · Starter ₹1,499',v2:'v2 · Starter ₹2,999',v3:'v3 · Separate booking page'};
+  const descMap={v1:'v1 · Starter ₹1,499',v2:'v2 · Starter ₹2,999',v3:'v3 · Multi-month billing'};
   ['v1','v2','v3'].forEach(v=>{
     const btn=document.getElementById('wv-btn-'+v);
     if(btn){btn.style.background=ver===v?'var(--primary)':'var(--surface2)';btn.style.color=ver===v?'#fff':'var(--text2)';}
   });
   const desc=document.getElementById('wv-desc');
   if(desc) desc.textContent=descMap[ver]||'';
+  // v2 WA addon
   if(addon) addon.style.display=(_wizardV2&&selectedPkg==='growth')?'':'none';
   if(!_wizardV2){_waUpgradeV2=false;}
-  // In v2, Growth plan includes WA — show broadcast toggle regardless of wa_enabled
+  // v3 WA addon
+  if(addonV3) addonV3.style.display=(_wizardV3&&selectedPkg==='growth')?'':'none';
+  if(!_wizardV3){_waUpgradeV3=false;}
+  // WA broadcast toggle
   if(waTogBox){
-    if(_wizardV2&&(selectedPkg==='growth'||selectedPkg==='complete')){
+    if((_wizardV2||_wizardV3)&&(selectedPkg==='growth'||selectedPkg==='complete')){
       waTogBox.style.display='';
     } else if(!currentUser?.wa_enabled){
       waTogBox.style.display='none';
     }
   }
+  // If v3, init cycle UI
+  if(_wizardV3) setV3Cycle(_v3Cycle);
   updateNetworkSummary();
 }
 function toggleWaUpgradeV2(el){
@@ -3541,12 +3668,30 @@ function updateNetworkSummary(){
     const txt=r.fixedDays?'~1,200/day · filler slots':'~'+( Math.round((54000/850)*r.multiplier)*n ).toLocaleString('en-IN')+' plays/day';
     const el=document.getElementById('pkg-imp-'+p); if(el) el.textContent=txt;
     const el2=document.getElementById('pkg-imp-v2-'+p); if(el2) el2.textContent=txt;
+    const el3=document.getElementById('pkg-imp-v3-'+p); if(el3) el3.textContent=txt;
   });
 }
 
 let walletApplied = false;
 
 function calcCost(){
+  if(_wizardV3){
+    // V3: multi-month billing
+    const cycleMap={'1mo':{m:1,d:0},'3mo':{m:3,d:.15},'6mo':{m:6,d:.25}};
+    const c=cycleMap[_v3Cycle]||{m:1,d:0};
+    const v3Rates={trial:{monthly:0,fixedDays:3},starter:{monthly:2999},complete:{monthly:4999},growth:{monthly:5999}};
+    const r=v3Rates[selectedPkg]||v3Rates.complete;
+    if(r.fixedDays){campaignCost={base:0,gst:0,total:0,discount:0,v3months:0,v3discAmt:0};walletApplied=false;return;}
+    const rawBase=r.monthly*c.m;
+    const discAmt=Math.round(rawBase*c.d);
+    const after=rawBase-discAmt;
+    const waAddon=(_waUpgradeV3&&selectedPkg==='growth')?Math.round(400*c.m*(1-c.d)):0;
+    const sub=after+waAddon;
+    const gst=Math.round(sub*0.18);
+    campaignCost={base:rawBase,gst,total:sub+gst,discount:0,v3months:c.m,v3discAmt:discAmt,v3discPct:c.d*100,v3waAddon:waAddon};
+    walletApplied=false;
+    return;
+  }
   const start=document.getElementById('sch-start').value;const end=document.getElementById('sch-end').value;
   const days=Math.max(1,Math.round((new Date(end)-new Date(start))/(1000*60*60*24))+1);
   const rate=R()[selectedPkg]||R().complete;
@@ -3554,7 +3699,7 @@ function calcCost(){
   const base=(rate.fixedDays?rate.flat:(days>=28&&rate.monthly?rate.monthly:rate.ppd*days))+waAddon;
   const gst=Math.round(base*0.18);
   campaignCost={base,gst,total:base+gst,discount:0};
-  walletApplied=false; // reset wallet on cost recalc
+  walletApplied=false;
 }
 
 function renderReview(){
@@ -3567,8 +3712,10 @@ function renderReview(){
     <div class="review-row"><span class="review-key">Duration</span><span class="review-val">${days} days</span></div>
     <div class="review-row"><span class="review-key">Period</span><span class="review-val">${fmtDate(start)} – ${fmtDate(end)}</span></div>
     <div class="review-row"><span class="review-key">Time Window</span><span class="review-val">${document.getElementById('sch-time-start').value} – ${document.getElementById('sch-time-end').value}</span></div>
-    <div class="review-row"><span class="review-key">Rate</span><span class="review-val">${rate.fixedDays?'FREE (₹0 · 3 days)':days>=28&&rate.monthly?'₹'+rate.monthly.toLocaleString('en-IN')+'/mo (monthly flat)':'₹'+rate.ppd.toLocaleString('en-IN')+'/day × '+days+' days'}</span></div>
-    ${(_wizardV2&&selectedPkg==='growth'&&_waUpgradeV2)?`<div class="review-row"><span class="review-key" style="color:#25D366;">WA Upgrade</span><span class="review-val" style="color:#25D366;">20K messages/week · +₹400</span></div>`:''}`;
+    <div class="review-row"><span class="review-key">Rate</span><span class="review-val">${_wizardV3?(campaignCost.v3months?campaignCost.v3months+' month billing':'FREE (3 days)'):rate.fixedDays?'FREE (₹0 · 3 days)':days>=28&&rate.monthly?'₹'+rate.monthly.toLocaleString('en-IN')+'/mo (monthly flat)':'₹'+rate.ppd.toLocaleString('en-IN')+'/day × '+days+' days'}</span></div>
+    ${(_wizardV2&&selectedPkg==='growth'&&_waUpgradeV2)?`<div class="review-row"><span class="review-key" style="color:#25D366;">WA Upgrade</span><span class="review-val" style="color:#25D366;">20K messages/week · +₹400</span></div>`:''}
+    ${(_wizardV3&&_waUpgradeV3&&selectedPkg==='growth')?`<div class="review-row"><span class="review-key" style="color:#25D366;">WA Upgrade</span><span class="review-val" style="color:#25D366;">20K messages/week · +₹${campaignCost.v3waAddon?.toLocaleString('en-IN')||'0'}</span></div>`:''}
+    ${(_wizardV3&&campaignCost.v3discAmt>0)?`<div class="review-row"><span class="review-key" style="color:var(--success);">Multi-month discount (${campaignCost.v3discPct}%)</span><span class="review-val" style="color:var(--success);">−₹${campaignCost.v3discAmt.toLocaleString('en-IN')}</span></div>`:''}`;
   renderPricing();
 }
 
