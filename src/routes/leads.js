@@ -412,7 +412,6 @@ router.get('/:id/agreement', async (req, res, next) => {
 </body></html>`;
 
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
-    res.setHeader('Content-Disposition', `attachment; filename="agreement-${esc(l.business_name).replace(/[^a-z0-9]/gi,'_')}.html"`);
     res.send(html);
   } catch(err) { next(err); }
 });

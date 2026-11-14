@@ -133,8 +133,6 @@ router.get('/:id/agreement', async (req, res, next) => {
 </body></html>`;
 
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
-    const safeName = String(vp.business_name||'agreement').replace(/[^a-z0-9]/gi,'_');
-    res.setHeader('Content-Disposition', `attachment; filename="agreement-${safeName}.html"`);
     res.send(html);
   } catch(err) { next(err); }
 });

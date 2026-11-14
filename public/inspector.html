@@ -1006,34 +1006,16 @@ function _agrStyles() {
 }
 
 function downloadAgreement() {
-  if (!_currentLeadId || !_agrPrintHtml) return;
-  const fullHtml = `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">${_agrStyles()}</head><body>${_agrPrintHtml}</body></html>`;
-  const name = 'agreement-lead.html';
+  if (!_currentLeadId || !token) return;
+  const url = '/api/leads/' + _currentLeadId + '/agreement?t=' + encodeURIComponent(token);
   const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
   if (isMobile && navigator.share) {
-    if (navigator.canShare) {
-      try {
-        const file = new File([fullHtml], name, {type: 'text/html'});
-        if (navigator.canShare({files: [file]})) {
-          navigator.share({files: [file], title: 'Venue Partner Agreement'}).catch(() => {});
-          return;
-        }
-      } catch(e) {}
-    }
     const agr = document.getElementById('agreement-print');
-    navigator.share({title: 'Venue Partner Agreement', text: agr ? agr.innerText : ''}).catch(() => {});
+    navigator.share({title: 'Venue Partner Agreement', text: agr ? agr.innerText : ''})
+      .catch(() => { window.open(url, '_blank') || (window.location.href = url); });
     return;
   }
-  try {
-    const blob = new Blob([fullHtml], {type: 'text/html'});
-    const blobUrl = URL.createObjectURL(blob);
-    const a = Object.assign(document.createElement('a'), {href: blobUrl, download: name});
-    document.body.appendChild(a);
-    a.click();
-    setTimeout(() => { URL.revokeObjectURL(blobUrl); a.remove(); }, 1000);
-  } catch(e) {
-    if (token) window.location.href = '/api/leads/' + _currentLeadId + '/agreement?t=' + encodeURIComponent(token);
-  }
+  window.open(url, '_blank') || (window.location.href = url);
 }
 
 async function generateAgreement(id) {
