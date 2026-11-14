@@ -459,22 +459,23 @@ function renderScreens(){
     return;
   }
   grid.style.display='grid';
-  grid.innerHTML=allScreens.map(s=>`
-    <div class="screen-card${selectedScreenIds.includes(s.id)?' selected':''}" onclick="toggleScreen(${JSON.stringify(s.id)})">
-      <div class="sc-check">${selectedScreenIds.includes(s.id)?'<svg width="10" height="8" viewBox="0 0 12 10"><path d="M1 5l3.5 3.5L11 1" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>':''}</div>
+  grid.innerHTML=allScreens.map(s=>{const sid=String(s.id);const sel=selectedScreenIds.includes(sid);return`
+    <div class="screen-card${sel?' selected':''}" data-sid="${sid}" onclick="toggleScreen(this.dataset.sid)">
+      <div class="sc-check">${sel?'<svg width="10" height="8" viewBox="0 0 12 10"><path d="M1 5l3.5 3.5L11 1" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>':''}</div>
       <div class="sc-name">${s.name||s.screen_name||'Screen'}</div>
       <div class="sc-loc">${s.location||s.address||''}</div>
       <div class="sc-meta">
         <span class="sc-tag">${s.resolution||'FHD'}</span>
         <span class="sc-tag">${s.screen_type||'Indoor'}</span>
       </div>
-    </div>`).join('');
+    </div>`}).join('');
   updateSelBanner();
 }
 
 function toggleScreen(id){
-  const idx=selectedScreenIds.indexOf(id);
-  if(idx===-1)selectedScreenIds.push(id);
+  const sid=String(id);
+  const idx=selectedScreenIds.indexOf(sid);
+  if(idx===-1)selectedScreenIds.push(sid);
   else selectedScreenIds.splice(idx,1);
   renderScreens();renderPkgCards();
 }
@@ -656,7 +657,7 @@ function renderReview(){
   const endDate=start?getEndDate(start,cost.days):'';
   const pkg=PKG[selectedPkg];
   const n=selectedScreenIds.length;
-  const names=allScreens.filter(s=>selectedScreenIds.includes(s.id)).map(s=>s.name||s.screen_name||'Screen').join(', ');
+  const names=allScreens.filter(s=>selectedScreenIds.includes(String(s.id))).map(s=>s.name||s.screen_name||'Screen').join(', ');
   const contentName=uploadedFile?uploadedFile.name:(userLibrary.find(c=>c.id===uploadedContentId)?.original_name||'Selected from library');
   const walletUse=walletApplied?Math.min(walletBalance,Math.max(0,cost.total-couponDiscount)):0;
   const finalTotal=Math.max(0,cost.total-couponDiscount-walletUse);
