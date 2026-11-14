@@ -1005,9 +1005,9 @@ function _agrStyles() {
   </style>`;
 }
 
-function downloadAgreement() {
-  if (!_currentLeadId || !token) return;
-  const url = '/api/leads/' + _currentLeadId + '/agreement?t=' + encodeURIComponent(token);
+function downloadAgreement(leadId) {
+  if (!leadId || !token) return;
+  const url = '/api/leads/' + leadId + '/agreement?t=' + encodeURIComponent(token);
   const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
   if (isMobile && navigator.share) {
     const agr = document.getElementById('agreement-print');
@@ -1068,7 +1068,7 @@ async function generateAgreement(id) {
       <button class="close-agr" id="agr-close-btn">Close</button>
       ${_agrPrintHtml}`;
 
-    agr.querySelector('#agr-print-btn').addEventListener('click', downloadAgreement);
+    agr.querySelector('#agr-print-btn').addEventListener('click', () => downloadAgreement(id));
     agr.querySelector('#agr-close-btn').addEventListener('click', () => { agr.style.display = 'none'; });
 
     agr.style.display = 'block';
