@@ -1194,13 +1194,19 @@
               <div class="card card-body">
                 <div style="font-size:12px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:12px;">Order Summary</div>
                 <div id="review-pricing"></div>
-                <div id="wallet-apply-row" style="display:none;background:rgba(123,104,200,0.07);border:1px solid rgba(123,104,200,0.2);border-radius:8px;padding:10px 12px;margin-bottom:10px;">
-                  <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
-                    <div>
-                      <div style="font-size:12px;font-weight:600;color:var(--primary);">₹ Wallet Balance: <span id="wallet-avail-lbl">₹0</span></div>
-                      <div style="font-size:11px;color:var(--text2);margin-top:2px;" id="wallet-apply-hint"></div>
+                <div id="wallet-apply-row" style="display:none;background:rgba(123,104,200,0.07);border:1.5px solid rgba(123,104,200,0.25);border-radius:12px;padding:12px 14px;margin-bottom:10px;">
+                  <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
+                    <div style="display:flex;align-items:center;gap:10px;min-width:0;">
+                      <div style="width:38px;height:38px;border-radius:9px;background:rgba(123,104,200,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><circle cx="17" cy="14" r="1" fill="var(--primary)" stroke="none"/></svg>
+                      </div>
+                      <div style="min-width:0;">
+                        <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;">Wallet Balance</div>
+                        <div style="font-size:16px;font-weight:700;color:var(--primary);line-height:1.2;" id="wallet-avail-lbl">₹0</div>
+                        <div style="font-size:11px;color:var(--text2);margin-top:2px;" id="wallet-apply-hint"></div>
+                      </div>
                     </div>
-                    <button class="btn btn-ghost" id="wallet-apply-btn" onclick="toggleWalletApply()" style="font-size:12px;padding:4px 12px;">Apply</button>
+                    <button class="btn btn-primary" id="wallet-apply-btn" onclick="toggleWalletApply()" style="font-size:12px;padding:7px 16px;flex-shrink:0;white-space:nowrap;">Apply</button>
                   </div>
                 </div>
                 <div class="coupon-row"><input type="text" class="form-input" id="coupon-input" placeholder="Coupon code" style="flex:1;"><button class="btn btn-ghost" onclick="applyCoupon()">Apply</button></div>
