@@ -549,10 +549,16 @@ process.on('unhandledRejection', (reason) => {
 
 const PORT = process.env.PORT || 3000;
 runMigrations().then(() => {
-  app.listen(PORT, () => {
+  const server = app.listen(PORT, () => {
     console.log(`SignageCMS API running on port ${PORT}`);
     startScheduler();
     restoreActiveSessions();
+  });
+
+  // Handle malformed HTTP requests from bots/scanners (prevents Parse Error crashes)
+  server.on('clientError', (err, socket) => {
+    if (err.code === 'ECONNRESET' || !socket.writable) return;
+    socket.end('HTTP/1.1 400 Bad Request\r\n\r\n');
   });
 });
 
