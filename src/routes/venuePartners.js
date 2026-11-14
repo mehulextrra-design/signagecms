@@ -61,6 +61,24 @@ router.post('/:id/reject', authenticate, requireAdmin, async (req, res, next) =>
 });
 
 // ── GET single venue partner ──────────────────────────────────────────────────
+const CITY_CAP = 50;
+
+// ── CITY CAPACITY check (admin) — must be before /:id ────────────────────────
+router.get('/city-cap', authenticate, requireAdmin, async (req, res, next) => {
+  try {
+    const { city } = req.query;
+    if (!city) return res.json({ count: 0, cap: CITY_CAP, remaining: CITY_CAP });
+    const r = await query(
+      `SELECT COUNT(*) AS count FROM venue_partners
+       WHERE LOWER(TRIM(city)) = LOWER(TRIM($1))
+         AND approval_status IN ('pending','approved')`,
+      [city]
+    );
+    const count = parseInt(r.rows[0].count);
+    res.json({ count, cap: CITY_CAP, remaining: CITY_CAP - count, at_cap: count >= CITY_CAP });
+  } catch (err) { next(err); }
+});
+
 router.get('/:id', authenticate, async (req, res, next) => {
   try {
     const vp = await query(
@@ -84,24 +102,6 @@ router.get('/:id', authenticate, async (req, res, next) => {
        FROM screens WHERE venue_partner_id = $1`, [req.params.id]
     );
     res.json({ ...row, screens: screens.rows });
-  } catch (err) { next(err); }
-});
-
-const CITY_CAP = 50; // max active venue partners per city
-
-// ── CITY CAPACITY check (admin) ───────────────────────────────────────────────
-router.get('/city-cap', authenticate, requireAdmin, async (req, res, next) => {
-  try {
-    const { city } = req.query;
-    if (!city) return res.json({ count: 0, cap: CITY_CAP, remaining: CITY_CAP });
-    const r = await query(
-      `SELECT COUNT(*) AS count FROM venue_partners
-       WHERE LOWER(TRIM(city)) = LOWER(TRIM($1))
-         AND approval_status IN ('pending','approved')`,
-      [city]
-    );
-    const count = parseInt(r.rows[0].count);
-    res.json({ count, cap: CITY_CAP, remaining: CITY_CAP - count, at_cap: count >= CITY_CAP });
   } catch (err) { next(err); }
 });
 
