@@ -1007,8 +1007,14 @@ function _agrStyles() {
 
 function downloadAgreement(leadId) {
   if (!leadId || !token) return;
-  const url = '/api/leads/' + leadId + '/agreement?t=' + encodeURIComponent(token);
-  window.open(url, '_blank') || (window.location.href = url);
+  const path = '/api/leads/' + leadId + '/agreement?t=' + encodeURIComponent(token);
+  if (/Android/i.test(navigator.userAgent)) {
+    // WebView APK: intent:// opens URL in system browser which handles download
+    window.location.href = 'intent://www.extrravenue.com' + path + '#Intent;scheme=https;end';
+  } else {
+    // Desktop: window.open triggers download via Content-Disposition header
+    window.open(path, '_blank') || (window.location.href = path);
+  }
 }
 
 async function generateAgreement(id) {

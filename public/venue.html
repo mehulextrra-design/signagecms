@@ -988,8 +988,14 @@ function _vpAgrStyles() {
 
 function downloadVpAgreement() {
   if (!_vpData || !_token) return;
-  const url = '/api/venue-partners/' + _vpData.id + '/agreement?t=' + encodeURIComponent(_token);
-  window.open(url, '_blank') || (window.location.href = url);
+  const path = '/api/venue-partners/' + _vpData.id + '/agreement?t=' + encodeURIComponent(_token);
+  if (/Android/i.test(navigator.userAgent)) {
+    // WebView APK: intent:// opens URL in system browser which handles download
+    window.location.href = 'intent://www.extrravenue.com' + path + '#Intent;scheme=https;end';
+  } else {
+    // Desktop: window.open triggers download via Content-Disposition header
+    window.open(path, '_blank') || (window.location.href = path);
+  }
 }
 
 function printAgreement() {

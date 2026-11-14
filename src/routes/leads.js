@@ -411,7 +411,9 @@ router.get('/:id/agreement', async (req, res, next) => {
 </div>
 </body></html>`;
 
+    const fname = String(l.business_name||'agreement').replace(/[^a-z0-9]/gi,'_');
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.setHeader('Content-Disposition', `attachment; filename="agreement-${fname}.html"`);
     res.send(html);
   } catch(err) { next(err); }
 });
