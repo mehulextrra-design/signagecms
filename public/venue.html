@@ -991,7 +991,7 @@ function downloadVpAgreement() {
   if (/Android/i.test(navigator.userAgent)) {
     const tmp = document.createElement('div');
     tmp.innerHTML = _vpAgrHtml;
-    window.top.location.href = 'whatsapp://send?text=' + encodeURIComponent(tmp.innerText);
+    window.location.href = 'whatsapp://send?text=' + encodeURIComponent(tmp.innerText);
   } else {
     const path = '/api/venue-partners/' + _vpData.id + '/agreement?t=' + encodeURIComponent(_token);
     window.open(path, '_blank') || (window.location.href = path);
