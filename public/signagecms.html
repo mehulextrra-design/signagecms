@@ -3785,7 +3785,7 @@ function renderPricing(){
     }
   } else { walletRow.style.display='none'; }
   document.getElementById('review-pricing').innerHTML=`
-    <div class="review-row"><span class="review-key">Subtotal</span><span class="review-val">₹${campaignCost.base.toLocaleString('en-IN')}</span></div>
+    <div class="review-row"><span class="review-key">Subtotal</span><span class="review-val">₹${(campaignCost.total-campaignCost.gst).toLocaleString('en-IN')}</span></div>
     ${disc?`<div class="review-row"><span class="review-key" style="color:var(--success);">Coupon</span><span class="review-val" style="color:var(--success);">-₹${disc.toLocaleString('en-IN')}</span></div>`:''}
     <div class="review-row"><span class="review-key">GST (18%)</span><span class="review-val">₹${campaignCost.gst.toLocaleString('en-IN')}</span></div>
     ${walletUse>0?`<div class="review-row"><span class="review-key" style="color:var(--primary);">Wallet</span><span class="review-val" style="color:var(--primary);">-₹${walletUse.toLocaleString('en-IN')}</span></div>`:''}
@@ -3801,8 +3801,9 @@ async function applyCoupon(){
   const code=document.getElementById('coupon-input').value.trim().toUpperCase();
   if(!code){toast('Enter a coupon code','error');return;}
   try{
-    const data=await api('/coupons/validate',{method:'POST',body:JSON.stringify({code,amount:campaignCost.base})});
-    const disc=data.discount_amount||0;campaignCost.discount=disc;campaignCost.gst=Math.round((campaignCost.base-disc)*0.18);
+    const _sub=campaignCost.total-campaignCost.gst;
+    const data=await api('/coupons/validate',{method:'POST',body:JSON.stringify({code,amount:_sub})});
+    const disc=data.discount_amount||0;campaignCost.discount=disc;campaignCost.gst=Math.round((_sub-disc)*0.18);
     renderPricing();document.getElementById('coupon-msg').innerHTML=`<span style="color:var(--success);">? Saved ₹${disc.toLocaleString('en-IN')}</span>`;
     toast(`Coupon applied! ₹${disc.toLocaleString('en-IN')} off`,'success');
   }catch(e){document.getElementById('coupon-msg').innerHTML=`<span style="color:var(--danger);">${e.message}</span>`;}
