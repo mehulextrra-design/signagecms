@@ -269,8 +269,10 @@
   .sbc-chevron{transition:transform 0.2s;color:var(--text3);}
   .sbc-chevron.open{transform:rotate(90deg);}
   /* Group sections on browse page */
-  .sbc-group-section{margin-bottom:16px;}
-  .sbc-group-header{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px;padding:14px 16px;background:var(--surface);border:1.5px solid var(--border);border-left:3.5px solid var(--primary);border-radius:10px;}
+  .sbc-group-section{margin-bottom:12px;border:1.5px solid var(--border);border-left:3.5px solid var(--primary);border-radius:10px;overflow:hidden;background:var(--surface);}
+  .sbc-group-header{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 16px;background:transparent;border:none;border-radius:0;margin-bottom:0;}
+  .sbc-group-header:hover{background:var(--surface2);}
+  [id^="sbc-body-"]:not([style*="display:none"]):not([style*="display: none"]){border-top:1px solid var(--border);padding:10px 10px 12px;}
   .sbc-group-name{font-size:14px;font-weight:700;color:var(--text);line-height:1.2;}
   .sbc-group-desc{font-size:11px;color:var(--text2);margin-top:3px;display:block;}
   .sbc-group-meta{display:flex;align-items:center;gap:6px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end;}
@@ -2172,7 +2174,7 @@ async function renderScreensList(){
           <svg id="sbc-chev-${id}" class="sbc-chevron open" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
         </div>
       </div>
-      <div id="sbc-body-${id}" class="screens-grid" style="margin-top:8px;">${cards}</div>
+      <div id="sbc-body-${id}" class="screens-grid">${cards}</div>
     </div>`;
   }
 
