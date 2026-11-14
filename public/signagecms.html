@@ -3535,6 +3535,9 @@ function toggleWaUpgradeV3(el){
     if(waTog) waTog.checked=false;
   }
   updateNetworkSummary();
+  // Refresh review if already on step 4
+  calcCost();
+  if(document.getElementById('wp4')?.classList.contains('active')) renderReview();
 }
 function applyWizardV2(){
   const v1=document.getElementById('pkg-selector');
