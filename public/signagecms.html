@@ -896,6 +896,7 @@
                   <option value="30" selected>30 Days — 1 Month</option>
                   <option value="60">60 Days — 2 Months</option>
                   <option value="90">90 Days — 3 Months</option>
+                  <option value="180" style="display:none">180 Days — 6 Months</option>
                 </select>
                 <div class="form-hint" id="sch-end-display" style="color:var(--primary);font-weight:500;"></div>
               </div>
@@ -3522,6 +3523,17 @@ function setV3Cycle(cycle){
       totalEl.style.color=c.d>0?'var(--success)':'var(--text2)';
     }
   });
+  // Sync duration dropdown value to billing cycle (v3 paid plans, informational only — v3 ignores it)
+  const durEl=document.getElementById('sch-duration');
+  if(durEl&&selectedPkg!=='trial'&&!durEl.disabled){
+    const cycToDays={'1mo':30,'3mo':90,'6mo':180};
+    const targetDays=cycToDays[cycle];
+    if(targetDays){
+      const opt180=durEl.querySelector('option[value="180"]');
+      if(opt180) opt180.style.display=targetDays===180?'':'none';
+      durEl.value=String(targetDays);
+    }
+  }
   // Update WA addon price label based on plan
   const waP=document.getElementById('wa-v3-addon-price');
   if(waP){
@@ -3620,7 +3632,7 @@ function selectPkg(pkg){
     durEl.value='5';
     durEl.disabled=true;
   } else {
-    if(durEl.querySelector('option[value="3"]')){
+    if(durEl.disabled){
       durEl.innerHTML=`<option value="15">15 Days — Half Month</option><option value="30" selected>30 Days — 1 Month</option><option value="60">60 Days — 2 Months</option><option value="90">90 Days — 3 Months</option>`;
       durEl.value='30';
     }
@@ -3843,7 +3855,8 @@ async function submitCampaign(){
     const walletUse=walletApplied?Math.min(walletBalance,afterDisc):0;
     const waTog=document.getElementById('wa-broadcast-toggle');
     const waCaptionTmpl=document.getElementById('wa-caption-template');
-    const body={title:document.getElementById('cmp-name').value.trim(),screen_ids:selectedScreenIds,content_id:uploadedContentId,start_date:document.getElementById('sch-start').value,end_date:document.getElementById('sch-end').value,start_time:document.getElementById('sch-time-start').value+':00',end_time:document.getElementById('sch-time-end').value+':00',package_name:selectedPkg,coupon_code:document.getElementById('coupon-input').value.trim()||undefined,wallet_amount:walletUse||undefined,wa_broadcast_enabled:waTog?waTog.checked:false,wa_caption_template:(waCaptionTmpl&&waCaptionTmpl.value.trim())||undefined};
+    const _v3billingMonths=_wizardV3&&!campaignCost.v3isTrial?campaignCost.v3months||1:undefined;
+    const body={title:document.getElementById('cmp-name').value.trim(),screen_ids:selectedScreenIds,content_id:uploadedContentId,start_date:document.getElementById('sch-start').value,end_date:document.getElementById('sch-end').value,start_time:document.getElementById('sch-time-start').value+':00',end_time:document.getElementById('sch-time-end').value+':00',package_name:selectedPkg,coupon_code:document.getElementById('coupon-input').value.trim()||undefined,wallet_amount:walletUse||undefined,wa_broadcast_enabled:waTog?waTog.checked:false,wa_caption_template:(waCaptionTmpl&&waCaptionTmpl.value.trim())||undefined,is_v3:_wizardV3||undefined,billing_months:_v3billingMonths};
     const campaign=await api('/campaigns',{method:'POST',body:JSON.stringify(body)});
     // Free / wallet-fully-covered — no Razorpay needed
     if(parseFloat(campaign.amount_total)===0||campaign.wallet_paid){

@@ -163,18 +163,29 @@ const PACKAGES = {
   complete: { slot_duration_sec: 15, loop_multiplier: 2, name: 'complete', monthly: 3499, ppd: 117 },
   growth:   { slot_duration_sec: 20, loop_multiplier: 3, name: 'growth',   monthly: 5999, ppd: 200 },
 };
+// V3 pricing (updated rates, multi-month billing)
+const V3_PACKAGES = {
+  trial:    { slot_duration_sec: 8,  loop_multiplier: 1, name: 'trial',    flat: 499,  fixedDays: 5, bucket: 'filler' },
+  starter:  { slot_duration_sec: 10, loop_multiplier: 1, name: 'starter',  monthly: 2999 },
+  complete: { slot_duration_sec: 15, loop_multiplier: 2, name: 'complete', monthly: 4999 },
+  growth:   { slot_duration_sec: 20, loop_multiplier: 3, name: 'growth',   monthly: 5999 },
+};
+const V3_CYCLE_DISCOUNTS = { 1: 0, 3: 0.15, 6: 0.25 };
+const V3_WA_BASE         = { trial: 499, starter: 499, complete: 499, growth: 400 };
 
 // POST /api/campaigns — create + pay
 router.post('/', authenticate, async (req, res, next) => {
   const client = await getClient();
   try {
     await client.query('BEGIN');
-    const { screen_ids, content_id, title, start_date, end_date, start_time, end_time, coupon_code, package_name, wallet_amount, wa_broadcast_enabled, wa_caption_template } = req.body;
+    const { screen_ids, content_id, title, start_date, end_date, start_time, end_time, coupon_code, package_name, wallet_amount, wa_broadcast_enabled, wa_caption_template, is_v3, billing_months } = req.body;
 
     if (!screen_ids?.length) throw { status: 400, message: 'At least one screen required' };
 
-    // Resolve package → slot duration
-    const pkg = PACKAGES[(package_name || 'complete').toLowerCase()] || PACKAGES.complete;
+    // Resolve package → slot duration (v3 uses separate rate table)
+    const pkg = is_v3
+      ? (V3_PACKAGES[(package_name || 'complete').toLowerCase()] || V3_PACKAGES.complete)
+      : (PACKAGES[(package_name || 'complete').toLowerCase()] || PACKAGES.complete);
 
     // TEMP: Trial lock disabled for testing
     // if (pkg.fixedDays) {
@@ -205,11 +216,25 @@ router.post('/', authenticate, async (req, res, next) => {
     );
     if (screenResult.rows.length !== screen_ids.length) throw { status: 400, message: 'Invalid screen IDs' };
 
-    // Package pricing — monthly flat or per-day
+    // Package pricing
     const days = Math.ceil((new Date(end_date) - new Date(start_date)) / 86400000) + 1;
     let amount_base;
-    if (pkg.fixedDays) {
-      amount_base = pkg.flat; // trial = 0
+    if (is_v3) {
+      if (pkg.fixedDays) {
+        // v3 trial: ₹499 flat + optional WA addon
+        const waAddon = wa_broadcast_enabled ? (V3_WA_BASE[pkg.name] || 499) : 0;
+        amount_base = pkg.flat + waAddon;
+      } else {
+        const months = parseInt(billing_months) || 1;
+        const discPct = V3_CYCLE_DISCOUNTS[months] || 0;
+        const rawBase = pkg.monthly * months;
+        const discAmt = Math.round(rawBase * discPct);
+        const waBase = V3_WA_BASE[pkg.name] || 499;
+        const waAddon = wa_broadcast_enabled ? Math.round(waBase * months * (1 - discPct)) : 0;
+        amount_base = rawBase - discAmt + waAddon;
+      }
+    } else if (pkg.fixedDays) {
+      amount_base = pkg.flat; // v1/v2 trial = 0
     } else if (days >= 28 && pkg.monthly) {
       amount_base = pkg.monthly; // monthly flat rate for ~30-day bookings
     } else {
