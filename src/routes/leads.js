@@ -320,8 +320,14 @@ router.post('/:id/create-venue-partner', authenticate, requireInspectorOrAdmin, 
       [email, hash, lead.contact_name || lead.business_name, lead.business_name, lead.city, vpId]
     );
 
-    // Link user back to venue_partner
-    await query('UPDATE venue_partners SET user_id = $1 WHERE id = $2', [userRes.rows[0].id, vpId]);
+    // Link user back to venue_partner; copy agreement_date from lead
+    await query(
+      'UPDATE venue_partners SET user_id = $1, agreement_date = $3 WHERE id = $2',
+      [userRes.rows[0].id, vpId, lead.agreement_date || new Date()]
+    );
+
+    // Mark lead as VP created
+    await query('UPDATE leads SET vp_created = TRUE WHERE id = $1', [req.params.id]);
 
     // Log activity on lead
     await query(
