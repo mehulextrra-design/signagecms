@@ -1164,16 +1164,6 @@
             <button class="btn btn-primary btn-sm" onclick="saveProfile()">Save Changes</button>
           </div>
 
-          <!-- Password -->
-          <div class="profile-section">
-            <div class="profile-section-title">Change Password</div>
-            <div class="prof-row">
-              <div class="prof-group"><label class="prof-label">Current</label><input type="password" id="prof-pass-cur" class="prof-input" placeholder="Current password"></div>
-              <div class="prof-group"><label class="prof-label">New</label><input type="password" id="prof-pass-new" class="prof-input" placeholder="New password"></div>
-            </div>
-            <button class="btn btn-ghost btn-sm" onclick="changePassword()">Update Password</button>
-          </div>
-
           <!-- Social Accounts -->
           <div class="profile-section" id="social-accounts-section">
             <div class="profile-section-title">Social Accounts</div>
@@ -2939,13 +2929,6 @@ async function saveProfile(){
     document.getElementById('profile-avatar').textContent=hInit;
     toast('Profile saved!','success');
   }catch(e){toast(e.message,'error');}
-}
-
-async function changePassword(){
-  const cur=document.getElementById('prof-pass-cur').value;const nw=document.getElementById('prof-pass-new').value;
-  if(!cur||!nw){toast('Enter current and new password','error');return;}
-  try{await api('/users/change-password',{method:'POST',body:JSON.stringify({current_password:cur,new_password:nw})});document.getElementById('prof-pass-cur').value='';document.getElementById('prof-pass-new').value='';toast('Password updated!','success');}
-  catch(e){toast(e.message,'error');}
 }
 
 async function loadFbStatus(){
