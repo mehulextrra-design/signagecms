@@ -952,6 +952,14 @@
                   </symbol>
                 </defs>
               </svg>
+              <!-- V2 toggle chip -->
+              <div id="wv2-chip" style="display:flex;align-items:center;gap:8px;margin-bottom:10px;font-size:12px;color:var(--text2);">
+                <label style="display:flex;align-items:center;gap:6px;cursor:pointer;">
+                  <input type="checkbox" onchange="toggleWizardV2()" style="width:16px;height:16px;cursor:pointer;">
+                  <span>New pricing (v2)</span>
+                </label>
+                <span style="font-size:11px;color:var(--text3);">Starter ₹2,999 · Complete ₹4,999 · Growth ₹5,999</span>
+              </div>
               <div class="pkg-selector" id="pkg-selector">
                 <div class="pkg-opt" data-pkg="trial" onclick="selectPkg('trial')" style="border-color:#f59e0b;">
                   <div class="pkg-name">Trial <span class="pkg-trial-badge">3 DAYS</span></div>
@@ -1005,6 +1013,72 @@
                   <div class="pkg-desc"><span style="color:var(--text3);font-size:10px;">Best suited for:</span><br>Real estate, jewellers, hospitals</div>
                 </div>
               </div>
+
+              <!-- V2 pkg-selector (new pricing) — hidden by default -->
+              <div class="pkg-selector" id="pkg-selector-v2" style="display:none;">
+                <div class="pkg-opt" data-pkg="trial" onclick="selectPkg('trial')" style="border-color:#f59e0b;">
+                  <div class="pkg-name">Trial <span class="pkg-trial-badge">3 DAYS</span></div>
+                  <div class="pkg-slot">8 sec</div>
+                  <div class="pkg-price" style="font-size:22px;">FREE<span style="font-size:11px;font-weight:400;color:var(--text3)"> · ₹0</span></div>
+                  <div class="pkg-ppd">3 days · filler network</div>
+                  <div class="pkg-channels">
+                    <span class="pkg-ch ch-screen" title="Digital Screen"><svg width="16" height="16"><use href="#pkg-ico-screen"/></svg></span>
+                  </div>
+                  <div class="pkg-desc"><span style="color:var(--text3);font-size:10px;">Channels:</span><br>Digital Screen only</div>
+                </div>
+                <div class="pkg-opt" data-pkg="starter" onclick="selectPkg('starter')">
+                  <div class="pkg-name">Starter</div>
+                  <div class="pkg-slot">10 sec</div>
+                  <div class="pkg-price">₹2,999<span style="font-size:11px;font-weight:400;color:var(--text3)">/mo</span></div>
+                  <div class="pkg-ppd">~2,304 plays/day</div>
+                  <div class="pkg-channels">
+                    <span class="pkg-ch ch-screen" title="Digital Screen"><svg width="16" height="16"><use href="#pkg-ico-screen"/></svg></span>
+                  </div>
+                  <div class="pkg-desc"><span style="color:var(--text3);font-size:10px;">Channels:</span><br>Digital Screen only</div>
+                </div>
+                <div class="pkg-opt selected" data-pkg="complete" onclick="selectPkg('complete')" style="border-color:var(--primary);">
+                  <div class="pkg-name">Complete ⭐<span style="font-size:10px;background:var(--primary);color:#fff;padding:2px 6px;border-radius:4px;margin-left:4px;">Popular</span></div>
+                  <div class="pkg-slot">15 sec</div>
+                  <div class="pkg-price">₹4,999<span style="font-size:11px;font-weight:400;color:var(--text3)">/mo</span></div>
+                  <div class="pkg-ppd">~4,572 plays/day</div>
+                  <div class="pkg-channels">
+                    <span class="pkg-ch ch-screen" title="Digital Screen"><svg width="16" height="16"><use href="#pkg-ico-screen"/></svg></span>
+                    <span class="pkg-ch ch-fb" title="Facebook"><svg width="16" height="16"><use href="#pkg-ico-fb"/></svg></span>
+                    <span class="pkg-ch ch-ig" title="Instagram"><svg width="16" height="16"><use href="#pkg-ico-ig"/></svg></span>
+                    <span class="pkg-ch ch-gbp" title="Google Business Profile"><svg width="16" height="16"><use href="#pkg-ico-gbp"/></svg></span>
+                  </div>
+                  <div class="pkg-desc"><span style="color:var(--text3);font-size:10px;">Channels:</span><br>Screen + FB/IG/GBP · QR Lead Gen · 4 reposts/mo</div>
+                </div>
+                <div class="pkg-opt" data-pkg="growth" onclick="selectPkg('growth')">
+                  <div class="pkg-name">Growth</div>
+                  <div class="pkg-slot">20 sec</div>
+                  <div class="pkg-price" id="growth-v2-price">₹5,999<span style="font-size:11px;font-weight:400;color:var(--text3)">/mo</span></div>
+                  <div class="pkg-ppd">~6,876 plays/day</div>
+                  <div class="pkg-channels">
+                    <span class="pkg-ch ch-screen" title="Digital Screen"><svg width="16" height="16"><use href="#pkg-ico-screen"/></svg></span>
+                    <span class="pkg-ch ch-fb" title="Facebook"><svg width="16" height="16"><use href="#pkg-ico-fb"/></svg></span>
+                    <span class="pkg-ch ch-ig" title="Instagram"><svg width="16" height="16"><use href="#pkg-ico-ig"/></svg></span>
+                    <span class="pkg-ch ch-gbp" title="Google Business Profile"><svg width="16" height="16"><use href="#pkg-ico-gbp"/></svg></span>
+                    <span class="pkg-ch ch-card" title="Digital Card (Coming Soon)"><svg width="16" height="16"><use href="#pkg-ico-card"/></svg></span>
+                  </div>
+                  <div class="pkg-desc"><span style="color:var(--text3);font-size:10px;">Channels:</span><br>Screen + FB/IG/GBP + Card · QR · Unlimited reposts · <span id="growth-v2-wa">WA 10K/week</span></div>
+                </div>
+              </div>
+
+              <!-- WA upgrade addon (Growth v2 only) -->
+              <div id="wa-upgrade-v2" style="display:none;border:1px solid #25D366;border-radius:10px;padding:12px 14px;margin-top:8px;margin-bottom:4px;">
+                <div style="display:flex;align-items:center;gap:12px;">
+                  <label class="toggle-switch" style="flex-shrink:0;">
+                    <input type="checkbox" id="wa-upgrade-v2-toggle" onchange="toggleWaUpgradeV2(this)">
+                    <span class="toggle-slider"></span>
+                  </label>
+                  <div>
+                    <div style="font-size:13px;font-weight:600;color:var(--text);">WA Upgrade: 20K messages/week <span style="color:#25D366;">+₹400</span></div>
+                    <div style="font-size:11px;color:var(--text2);">Growth plan ke contacts limit double ho jaayegi — 20,000 messages/week</div>
+                  </div>
+                </div>
+              </div>
+
               <p style="font-size:12px;color:var(--text3);margin-top:8px;">Video duration must be = your plan's slot. Longer content = rejected at upload.</p>
             </div>
             <!-- WA Broadcast toggle (shown only if wa_enabled) -->
@@ -3279,7 +3353,7 @@ async function wizardNext(step){
       }catch(e){toast(e.message,'error');document.getElementById('btn-next-2').innerHTML='Continue ?';document.getElementById('btn-next-2').disabled=false;return;}
       document.getElementById('btn-next-2').innerHTML='Continue ?';
     }
-    updateWizardUI(3);updateNetworkSummary();
+    updateWizardUI(3);updateNetworkSummary();applyWizardV2();
     // Auto-set start time to current time
     const _now=new Date();
     document.getElementById('sch-time-start').value=`${String(_now.getHours()).padStart(2,'0')}:${String(_now.getMinutes()).padStart(2,'0')}`;
@@ -3301,12 +3375,43 @@ async function wizardNext(step){
   }
 }
 
-const PKG_RATES={
+const PKG_RATES_V1={
   trial:    {ppd:0,   flat:0,    monthly:0,    slot:8,  multiplier:0, label:'Trial (8s · 3 days)',  fixedDays:3},
   starter:  {ppd:50,  flat:1499, monthly:1499, slot:10, multiplier:1, label:'Starter (10s)'},
   complete: {ppd:117, flat:3499, monthly:3499, slot:15, multiplier:2, label:'Complete (15s)'},
   growth:   {ppd:200, flat:5999, monthly:5999, slot:20, multiplier:3, label:'Growth (20s)'},
 };
+const PKG_RATES_V2={
+  trial:    {ppd:0,   flat:0,    monthly:0,    slot:8,  multiplier:0, label:'Trial (8s · 3 days)',  fixedDays:3},
+  starter:  {ppd:100, flat:2999, monthly:2999, slot:10, multiplier:1, label:'Starter (10s)'},
+  complete: {ppd:167, flat:4999, monthly:4999, slot:15, multiplier:2, label:'Complete (15s)'},
+  growth:   {ppd:200, flat:5999, monthly:5999, slot:20, multiplier:3, label:'Growth (20s)'},
+};
+let _wizardV2 = localStorage.getItem('wizard_v2')==='1';
+let _waUpgradeV2 = false;
+function R(){ return _wizardV2 ? PKG_RATES_V2 : PKG_RATES_V1; }
+function toggleWizardV2(){
+  _wizardV2=!_wizardV2; _waUpgradeV2=false;
+  localStorage.setItem('wizard_v2',_wizardV2?'1':'0');
+  applyWizardV2();
+}
+function applyWizardV2(){
+  const v1=document.getElementById('pkg-selector');
+  const v2=document.getElementById('pkg-selector-v2');
+  const chip=document.getElementById('wv2-chip');
+  const addon=document.getElementById('wa-upgrade-v2');
+  if(v1) v1.style.display=_wizardV2?'none':'';
+  if(v2) v2.style.display=_wizardV2?'':'none';
+  if(chip) chip.querySelector('input').checked=_wizardV2;
+  if(addon) addon.style.display=(_wizardV2&&selectedPkg==='growth')?'':'none';
+  if(!_wizardV2){_waUpgradeV2=false;}
+  updateNetworkSummary();
+}
+function toggleWaUpgradeV2(el){
+  _waUpgradeV2=el.checked;
+  document.getElementById('growth-v2-price').textContent=_waUpgradeV2?'₹6,399':'₹5,999';
+  document.getElementById('growth-v2-wa').textContent=_waUpgradeV2?'WA 20K/week ✨':'WA 10K/week';
+}
 let selectedPkg='complete';
 
 function selectPkg(pkg){
@@ -3327,6 +3432,9 @@ function selectPkg(pkg){
   }
   updateEndFromDuration();
   updateNetworkSummary();
+  // keep WA addon visibility in sync when pkg changes in v2 mode
+  const _addon=document.getElementById('wa-upgrade-v2');
+  if(_addon) _addon.style.display=(_wizardV2&&pkg==='growth')?'':'none';
 }
 
 function clampEndTime(el){
@@ -3386,7 +3494,7 @@ function fmtTime12(t){
 
 function updateNetworkSummary(){
   const n=selectedScreenIds.length||36;
-  const rate=PKG_RATES[selectedPkg]||PKG_RATES.complete;
+  const rate=R()[selectedPkg]||R().complete;
   let impDay, impMo;
   if(rate.fixedDays){
     impDay=1200; impMo=1200*3; // trial: filler bucket ~1,200/day total
@@ -3402,7 +3510,7 @@ function updateNetworkSummary(){
   document.getElementById('sum-cpd').textContent=pkgRateLabel;
   ['trial','starter','complete','growth'].forEach(p=>{
     const el=document.getElementById('pkg-imp-'+p);if(!el)return;
-    const r=PKG_RATES[p];
+    const r=R()[p];
     if(r.fixedDays){ el.textContent='~1,200/day · filler slots'; return; }
     const plays=Math.round((54000/850)*r.multiplier)*n;
     el.textContent='~'+plays.toLocaleString('en-IN')+' plays/day';
@@ -3414,8 +3522,9 @@ let walletApplied = false;
 function calcCost(){
   const start=document.getElementById('sch-start').value;const end=document.getElementById('sch-end').value;
   const days=Math.max(1,Math.round((new Date(end)-new Date(start))/(1000*60*60*24))+1);
-  const rate=PKG_RATES[selectedPkg]||PKG_RATES.complete;
-  const base=rate.fixedDays?rate.flat:(days>=28&&rate.monthly?rate.monthly:rate.ppd*days);
+  const rate=R()[selectedPkg]||R().complete;
+  const waAddon=(_wizardV2&&selectedPkg==='growth'&&_waUpgradeV2)?400:0;
+  const base=(rate.fixedDays?rate.flat:(days>=28&&rate.monthly?rate.monthly:rate.ppd*days))+waAddon;
   const gst=Math.round(base*0.18);
   campaignCost={base,gst,total:base+gst,discount:0};
   walletApplied=false; // reset wallet on cost recalc
@@ -3424,7 +3533,7 @@ function calcCost(){
 function renderReview(){
   const start=document.getElementById('sch-start').value;const end=document.getElementById('sch-end').value;
   const days=Math.max(1,Math.round((new Date(end)-new Date(start))/(1000*60*60*24))+1);
-  const rate=PKG_RATES[selectedPkg]||PKG_RATES.complete;
+  const rate=R()[selectedPkg]||R().complete;
   document.getElementById('review-details').innerHTML=`
     <div class="review-row"><span class="review-key">Campaign</span><span class="review-val">${document.getElementById('cmp-name').value}</span></div>
     <div class="review-row"><span class="review-key">Package</span><span class="review-val" style="color:var(--primary);font-weight:600;">${rate.label} — Entire Network</span></div>
