@@ -80,7 +80,7 @@ app.use(cors({
   origin: _allowedOrigins.length
     ? (origin, cb) => {
         if (!origin || _allowedOrigins.includes(origin)) return cb(null, true);
-        cb(new Error('CORS: origin not allowed'));
+        cb(null, false); // silently reject — no thrown error
       }
     : '*',
   credentials: true,
@@ -400,6 +400,10 @@ app.use((req, res) => {
 
 // Global error handler
 app.use((err, req, res, next) => {
+  // Payload too large (express body-parser limit) — 413, don't send to Sentry
+  if (err.type === 'entity.too.large') {
+    return res.status(413).json({ error: 'Request body too large' });
+  }
   console.error('[ERROR]', err.stack);
   if (process.env.SENTRY_DSN) Sentry.captureException(err);
   const status = err.status || 500;
