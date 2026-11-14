@@ -188,6 +188,7 @@
     .pkg-opt .pkg-imp  { grid-column:2;grid-row:3;text-align:right;margin-top:2px; }
     .pkg-opt .pkg-desc { grid-column:1;grid-row:3;font-size:10px;margin-top:2px; }
     .pkg-opt .pkg-channels { justify-content:flex-start; }
+    #pkg-selector-v3 .pkg-opt [id^="v3-total-"] { grid-column:2;grid-row:2;text-align:right;align-self:start;font-size:10px; }
   }
 
   /* WIZARD */
@@ -3513,8 +3514,12 @@ function setV3Cycle(cycle){
       }
     }
     if(totalEl){
-      if(c.m>1){totalEl.innerHTML=`₹${total.toLocaleString('en-IN')} total &nbsp;<span style="color:var(--success);">save ₹${(base*c.m-total).toLocaleString('en-IN')}</span>`;totalEl.style.display='';}
-      else{totalEl.style.display='none';}
+      const n=selectedScreenIds.length||36;
+      const perScrMo=Math.round(discMonthly/n);
+      const perDay=(discMonthly/(n*30)).toFixed(1);
+      totalEl.innerHTML=`₹${perScrMo}/screen/mo <span style="color:var(--text3);">· ₹${perDay}/day</span>`;
+      totalEl.style.display='';
+      totalEl.style.color=c.d>0?'var(--success)':'var(--text2)';
     }
   });
   // Update WA addon price label based on plan
@@ -3611,8 +3616,8 @@ function selectPkg(pkg){
   // Trial locks duration to 3 days; paid plans get normal options
   const durEl=document.getElementById('sch-duration');
   if(pkg==='trial'){
-    durEl.innerHTML='<option value="3">3 Days (FREE · Trial)</option>';
-    durEl.value='3';
+    durEl.innerHTML=`<option value="5">5 Days (Trial${_wizardV3?' · ₹499':' · FREE'})</option>`;
+    durEl.value='5';
     durEl.disabled=true;
   } else {
     if(durEl.querySelector('option[value="3"]')){
@@ -3699,7 +3704,7 @@ function updateNetworkSummary(){
     impDay=playsPerScreen*n; impMo=impDay*30;
   }
   const dur=parseInt(document.getElementById('sch-duration')?.value)||30;
-  const pkgRateLabel=rate.fixedDays?'FREE (₹0)':`₹${rate.monthly.toLocaleString('en-IN')}/mo`;
+  const pkgRateLabel=rate.fixedDays?(_wizardV3?'₹499 / 5 Days':'FREE (₹0)'):`₹${rate.monthly.toLocaleString('en-IN')}/mo`;
   document.getElementById('sum-screens').textContent=rate.fixedDays?n+' screens':n+' screens';
   document.getElementById('sum-impressions').textContent='~'+impDay.toLocaleString('en-IN');
   document.getElementById('sum-impressions-mo').textContent='~'+impMo.toLocaleString('en-IN');
