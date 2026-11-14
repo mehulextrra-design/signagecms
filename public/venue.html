@@ -986,11 +986,28 @@ function _vpAgrStyles() {
   </style>`;
 }
 
-function openVpAgreementWindow() {
-  if (!_vpData || !_token) return;
-  const url = '/api/venue-partners/' + _vpData.id + '/agreement?t=' + encodeURIComponent(_token);
-  if (!window.open(url, '_blank')) {
-    window.location.href = url;
+async function downloadVpAgreement() {
+  if (!_vpData) return;
+  const fullHtml = `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">${_vpAgrStyles()}</head><body>${_vpAgrHtml}</body></html>`;
+  const name = 'agreement-' + (_vpData.business_name || 'venue').replace(/[^a-z0-9]/gi, '_') + '.html';
+  if (navigator.share) {
+    try {
+      const file = new File([fullHtml], name, {type: 'text/html'});
+      if (navigator.canShare && navigator.canShare({files: [file]})) {
+        await navigator.share({files: [file]});
+        return;
+      }
+    } catch(e) {}
+  }
+  try {
+    const blob = new Blob([fullHtml], {type: 'text/html'});
+    const url = URL.createObjectURL(blob);
+    const a = Object.assign(document.createElement('a'), {href: url, download: name});
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 1000);
+  } catch(e) {
+    window.location.href = '/api/venue-partners/' + _vpData.id + '/agreement?t=' + encodeURIComponent(_token);
   }
 }
 
@@ -1043,7 +1060,7 @@ function printAgreement() {
     <button class="close-agr" id="vp-agr-close-btn">Close</button>
     ${_vpAgrHtml}`;
 
-  agr.querySelector('#vp-agr-print-btn').addEventListener('click', openVpAgreementWindow);
+  agr.querySelector('#vp-agr-print-btn').addEventListener('click', downloadVpAgreement);
   agr.querySelector('#vp-agr-close-btn').addEventListener('click', () => { agr.style.display = 'none'; });
 
   agr.style.display = 'block';

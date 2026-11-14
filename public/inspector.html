@@ -1005,11 +1005,28 @@ function _agrStyles() {
   </style>`;
 }
 
-function openAgreementWindow() {
-  if (!_currentLeadId || !token) return;
-  const url = '/api/leads/' + _currentLeadId + '/agreement?t=' + encodeURIComponent(token);
-  if (!window.open(url, '_blank')) {
-    window.location.href = url;
+async function downloadAgreement() {
+  if (!_currentLeadId) return;
+  const fullHtml = `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">${_agrStyles()}</head><body>${_agrPrintHtml}</body></html>`;
+  const name = 'agreement-lead.html';
+  if (navigator.share) {
+    try {
+      const file = new File([fullHtml], name, {type: 'text/html'});
+      if (navigator.canShare && navigator.canShare({files: [file]})) {
+        await navigator.share({files: [file]});
+        return;
+      }
+    } catch(e) {}
+  }
+  try {
+    const blob = new Blob([fullHtml], {type: 'text/html'});
+    const url = URL.createObjectURL(blob);
+    const a = Object.assign(document.createElement('a'), {href: url, download: name});
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 1000);
+  } catch(e) {
+    if (token) window.location.href = '/api/leads/' + _currentLeadId + '/agreement?t=' + encodeURIComponent(token);
   }
 }
 
@@ -1063,8 +1080,7 @@ async function generateAgreement(id) {
       <button class="close-agr" id="agr-close-btn">Close</button>
       ${_agrPrintHtml}`;
 
-    const dlUrl = '/api/leads/' + id + '/agreement?t=' + encodeURIComponent(token);
-    agr.querySelector('#agr-print-btn').addEventListener('click', () => { window.location.href = dlUrl; });
+    agr.querySelector('#agr-print-btn').addEventListener('click', downloadAgreement);
     agr.querySelector('#agr-close-btn').addEventListener('click', () => { agr.style.display = 'none'; });
 
     agr.style.display = 'block';
