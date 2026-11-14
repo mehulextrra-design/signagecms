@@ -163,13 +163,53 @@ router.post('/contacts', authenticate, requireWaEnabled, async (req, res) => {
   }
 });
 
-// GET /api/wa/contacts
-router.get('/contacts', authenticate, requireWaEnabled, async (req, res) => {
+// GET /api/wa/contacts/export  — download contacts as CSV
+router.get('/contacts/export', authenticate, requireWaEnabled, async (req, res) => {
   try {
     await ensureWaTables();
     const r = await query(
-      `SELECT id, name, phone, created_at FROM wa_contacts
-       WHERE user_id=$1 ORDER BY created_at DESC LIMIT 500`,
+      `SELECT name, phone FROM wa_contacts WHERE user_id=$1 ORDER BY name ASC NULLS LAST`,
+      [req.user.id]
+    );
+    const lines = ['Name,Phone', ...r.rows.map(c =>
+      `"${(c.name || '').replace(/"/g, '""')}","${c.phone}"`
+    )];
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', 'attachment; filename="wa-contacts.csv"');
+    res.send(lines.join('\r\n'));
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// GET /api/wa/contacts  — list with optional pagination+search
+router.get('/contacts', authenticate, requireWaEnabled, async (req, res) => {
+  try {
+    await ensureWaTables();
+    const { page, limit = 50, search } = req.query;
+
+    if (page !== undefined) {
+      const pageNum  = Math.max(1, parseInt(page) || 1);
+      const limitNum = Math.min(100, Math.max(1, parseInt(limit) || 50));
+      const offset   = (pageNum - 1) * limitNum;
+      const params   = [req.user.id];
+      let where      = 'WHERE user_id=$1';
+      if (search) {
+        params.push(`%${search}%`);
+        where += ` AND (name ILIKE $${params.length} OR phone ILIKE $${params.length})`;
+      }
+      const [countRes, dataRes] = await Promise.all([
+        query(`SELECT COUNT(*) FROM wa_contacts ${where}`, params),
+        query(`SELECT id, name, phone FROM wa_contacts ${where} ORDER BY name ASC NULLS LAST, created_at DESC LIMIT $${params.length + 1} OFFSET $${params.length + 2}`,
+          [...params, limitNum, offset]),
+      ]);
+      const total = parseInt(countRes.rows[0].count);
+      return res.json({ contacts: dataRes.rows, total, page: pageNum, pages: Math.ceil(total / limitNum) || 1 });
+    }
+
+    // Legacy (no page param) — used by profile page small preview
+    const r = await query(
+      `SELECT id, name, phone, created_at FROM wa_contacts WHERE user_id=$1 ORDER BY created_at DESC LIMIT 500`,
       [req.user.id]
     );
     res.json({ contacts: r.rows, total: r.rows.length });
@@ -192,6 +232,22 @@ router.delete('/contacts', authenticate, requireWaEnabled, async (req, res) => {
 router.delete('/contacts/:id', authenticate, requireWaEnabled, async (req, res) => {
   try {
     await query(`DELETE FROM wa_contacts WHERE id=$1 AND user_id=$2`, [req.params.id, req.user.id]);
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// PATCH /api/wa/contacts/:id  — edit name + phone
+router.patch('/contacts/:id', authenticate, requireWaEnabled, async (req, res) => {
+  try {
+    const { name, phone } = req.body;
+    const digits = (phone || '').replace(/\D/g, '');
+    if (!digits || digits.length < 10) return res.status(400).json({ error: 'Invalid phone number' });
+    await query(
+      `UPDATE wa_contacts SET name=$1, phone=$2 WHERE id=$3 AND user_id=$4`,
+      [name || null, digits, req.params.id, req.user.id]
+    );
     res.json({ ok: true });
   } catch (err) {
     res.status(500).json({ error: err.message });
