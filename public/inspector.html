@@ -1063,7 +1063,8 @@ async function generateAgreement(id) {
       <button class="close-agr" id="agr-close-btn">Close</button>
       ${_agrPrintHtml}`;
 
-    agr.querySelector('#agr-print-btn').addEventListener('click', openAgreementWindow);
+    const dlUrl = '/api/leads/' + id + '/agreement?t=' + encodeURIComponent(token);
+    agr.querySelector('#agr-print-btn').addEventListener('click', () => { window.location.href = dlUrl; });
     agr.querySelector('#agr-close-btn').addEventListener('click', () => { agr.style.display = 'none'; });
 
     agr.style.display = 'block';

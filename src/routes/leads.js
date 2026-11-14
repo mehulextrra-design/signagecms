@@ -345,16 +345,16 @@ router.post('/:id/create-venue-partner', authenticate, requireInspectorOrAdmin, 
   } catch (err) { next(err); }
 });
 
-// ── AGREEMENT HTML VIEW (opens as standalone page, auth via ?t= query param) ──
+// ── AGREEMENT HTML DOWNLOAD (auth via ?t= query param) ───────────────────────
 router.get('/:id/agreement', async (req, res, next) => {
   try {
     const jwt = require('jsonwebtoken');
     const rawToken = req.query.t || (req.headers.authorization || '').replace('Bearer ', '');
-    let user;
-    try { user = jwt.verify(rawToken, process.env.JWT_SECRET); }
+    let decoded;
+    try { decoded = jwt.verify(rawToken, process.env.JWT_SECRET); }
     catch(e) { return res.status(401).send('<h1>Unauthorized</h1>'); }
 
-    if (!['admin','superadmin','venue_inspector'].includes(user.role)) {
+    if (!['admin','superadmin','venue_inspector'].includes(decoded.role)) {
       return res.status(403).send('<h1>Access denied</h1>');
     }
 
@@ -362,7 +362,7 @@ router.get('/:id/agreement', async (req, res, next) => {
     if (!result.rows.length) return res.status(404).send('<h1>Not found</h1>');
     const l = result.rows[0];
 
-    if (user.role === 'venue_inspector' && l.assigned_to !== user.id) {
+    if (decoded.role === 'venue_inspector' && l.assigned_to !== decoded.userId) {
       return res.status(403).send('<h1>Access denied</h1>');
     }
 
@@ -412,6 +412,7 @@ router.get('/:id/agreement', async (req, res, next) => {
 </body></html>`;
 
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.setHeader('Content-Disposition', `attachment; filename="agreement-${esc(l.business_name).replace(/[^a-z0-9]/gi,'_')}.html"`);
     res.send(html);
   } catch(err) { next(err); }
 });

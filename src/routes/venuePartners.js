@@ -68,13 +68,16 @@ router.get('/:id/agreement', async (req, res, next) => {
   try {
     const jwt = require('jsonwebtoken');
     const rawToken = req.query.t || (req.headers.authorization || '').replace('Bearer ', '');
-    let user;
-    try { user = jwt.verify(rawToken, process.env.JWT_SECRET); }
+    let decoded;
+    try { decoded = jwt.verify(rawToken, process.env.JWT_SECRET); }
     catch(e) { return res.status(401).send('<h1>Unauthorized</h1>'); }
 
-    // Venue partner accessing their own agreement, or admin/inspector
-    const allowed = ['admin','superadmin','venue_inspector'].includes(user.role)
-      || user.venue_partner_id === req.params.id;
+    // Look up user's venue_partner_id from DB (JWT only has userId+role)
+    const userRow = await query('SELECT venue_partner_id FROM users WHERE id = $1', [decoded.userId]);
+    const dbVpId = userRow.rows[0]?.venue_partner_id;
+
+    const allowed = ['admin','superadmin','venue_inspector'].includes(decoded.role)
+      || dbVpId === req.params.id;
     if (!allowed) return res.status(403).send('<h1>Access denied</h1>');
 
     const vpRes = await query(
@@ -130,6 +133,8 @@ router.get('/:id/agreement', async (req, res, next) => {
 </body></html>`;
 
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    const safeName = String(vp.business_name||'agreement').replace(/[^a-z0-9]/gi,'_');
+    res.setHeader('Content-Disposition', `attachment; filename="agreement-${safeName}.html"`);
     res.send(html);
   } catch(err) { next(err); }
 });
