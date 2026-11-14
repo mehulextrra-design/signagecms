@@ -972,30 +972,39 @@ function loadAgreement() {
     </div>`;
 }
 
+let _vpAgrHtml = '';
+
+function _vpAgrStyles() {
+  return `<style>
+    body { font-family: 'Times New Roman', serif; max-width: 750px; margin: 0 auto; padding: 40px 48px; color: #111; line-height: 1.7; font-size: 13pt; }
+    h1 { text-align: center; font-size: 16pt; margin-bottom: 6px; }
+    .sub { text-align: center; font-size: 11pt; color: #555; margin-bottom: 32px; }
+    h2 { font-size: 13pt; margin-top: 24px; margin-bottom: 6px; }
+    p { margin-bottom: 10px; text-align: justify; }
+    .sig-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 48px; }
+    .sig-box p { border-top: 1px solid #333; margin-top: 48px; padding-top: 6px; font-size: 11pt; }
+  </style>`;
+}
+
+function openVpAgreementWindow() {
+  const w = window.open('', '_blank');
+  if (w) {
+    w.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Venue Partner Agreement</title>${_vpAgrStyles()}</head><body>${_vpAgrHtml}</body></html>`);
+    w.document.close();
+    setTimeout(() => { try { w.print(); } catch(e) {} }, 400);
+  } else {
+    window.print();
+  }
+}
+
 function printAgreement() {
   if (!_vpData) return;
   const vp = _vpData;
-  // Use leads.agreement_date (injected by backend) → vp.approved_at → today
   const today = (vp.agreement_date || vp.approved_at)
     ? new Date(vp.agreement_date || vp.approved_at).toLocaleDateString('en-IN',{day:'2-digit',month:'long',year:'numeric'})
     : new Date().toLocaleDateString('en-IN',{day:'2-digit',month:'long',year:'numeric'});
-  const agr = document.getElementById('agr-print');
-  agr.innerHTML = `
-    <style>
-      @media print { body > *:not(#agr-print) { display: none !important; } #agr-print { display: block !important; } }
-      #agr-print { font-family:'Times New Roman',serif; max-width:750px; margin:0 auto; padding:40px 48px; color:#111; line-height:1.7; font-size:13pt; }
-      #agr-print h1 { text-align:center; font-size:16pt; margin-bottom:6px; }
-      #agr-print .sub { text-align:center; font-size:11pt; color:#555; margin-bottom:32px; }
-      #agr-print h2 { font-size:13pt; margin-top:24px; margin-bottom:6px; }
-      #agr-print p { margin-bottom:10px; text-align:justify; }
-      #agr-print .sig-grid { display:grid; grid-template-columns:1fr 1fr; gap:40px; margin-top:48px; }
-      #agr-print .sig-box p { border-top:1px solid #333; margin-top:48px; padding-top:6px; font-size:11pt; }
-      .print-btn { background:#7b68c8; color:#fff; border:none; padding:10px 24px; border-radius:8px; font-size:13px; cursor:pointer; margin-bottom:24px; }
-      .close-agr { background:none; border:1.5px solid #ccc; color:#555; padding:10px 20px; border-radius:8px; font-size:13px; cursor:pointer; margin-bottom:24px; margin-left:10px; }
-      @media print { .print-btn { display:none; } .close-agr { display:none; } }
-    </style>
-    <button class="print-btn" onclick="window.print()">🖨️ Print / Save PDF</button>
-    <button class="close-agr" onclick="document.getElementById('agr-print').style.display='none'">Close</button>
+
+  _vpAgrHtml = `
     <h1>Venue Partner Agreement</h1>
     <div class="sub">Digital Signage Network Participation Agreement</div>
     <p>This Agreement is entered into as of <strong>${today}</strong>, between <strong>extrravenue</strong> (hereinafter <strong>"Company"</strong>), AND <strong>${esc(vp.contact_name||'[Contact Name]')}</strong>, operating <strong>${esc(vp.business_name||'[Business Name]')}</strong> located at <strong>${esc(vp.city||'[City]')}</strong> (hereinafter <strong>"Venue Partner"</strong>).</p>
@@ -1019,9 +1028,29 @@ function printAgreement() {
       <div class="sig-box"><p>For extrravenue<br>Name: ___________________<br>Designation: ____________<br>Date: ${today}</p></div>
       <div class="sig-box"><p>For Venue Partner<br>Name: ${esc(vp.contact_name||'___________________')}<br>Business: ${esc(vp.business_name||'')}<br>Date: ${today}</p></div>
     </div>`;
+
+  const agr = document.getElementById('agr-print');
+  agr.innerHTML = `
+    <style>
+      #agr-print { font-family:'Times New Roman',serif; max-width:750px; margin:0 auto; padding:20px 24px; color:#111; line-height:1.7; font-size:13pt; }
+      #agr-print h1 { text-align:center; font-size:16pt; margin-bottom:6px; }
+      #agr-print .sub { text-align:center; font-size:11pt; color:#555; margin-bottom:32px; }
+      #agr-print h2 { font-size:13pt; margin-top:24px; margin-bottom:6px; }
+      #agr-print p { margin-bottom:10px; text-align:justify; }
+      #agr-print .sig-grid { display:grid; grid-template-columns:1fr 1fr; gap:40px; margin-top:48px; }
+      #agr-print .sig-box p { border-top:1px solid #333; margin-top:48px; padding-top:6px; font-size:11pt; }
+      .print-btn { background:#7b68c8; color:#fff; border:none; padding:10px 24px; border-radius:8px; font-size:13px; cursor:pointer; margin-bottom:24px; }
+      .close-agr { background:none; border:1.5px solid #ccc; color:#555; padding:10px 20px; border-radius:8px; font-size:13px; cursor:pointer; margin-bottom:24px; margin-left:10px; }
+    </style>
+    <button class="print-btn" id="vp-agr-print-btn">🖨️ Print / Save PDF</button>
+    <button class="close-agr" id="vp-agr-close-btn">Close</button>
+    ${_vpAgrHtml}`;
+
+  agr.querySelector('#vp-agr-print-btn').addEventListener('click', openVpAgreementWindow);
+  agr.querySelector('#vp-agr-close-btn').addEventListener('click', () => { agr.style.display = 'none'; });
+
   agr.style.display = 'block';
-  window.scrollTo(0,0);
-  setTimeout(()=>window.print(), 400);
+  window.scrollTo(0, 0);
 }
 
 function esc(s) {
