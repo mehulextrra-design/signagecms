@@ -3400,11 +3400,20 @@ function applyWizardV2(){
   const v2=document.getElementById('pkg-selector-v2');
   const chip=document.getElementById('wv2-chip');
   const addon=document.getElementById('wa-upgrade-v2');
+  const waTogBox=document.getElementById('wa-campaign-toggle');
   if(v1) v1.style.display=_wizardV2?'none':'';
   if(v2) v2.style.display=_wizardV2?'':'none';
   if(chip) chip.querySelector('input').checked=_wizardV2;
   if(addon) addon.style.display=(_wizardV2&&selectedPkg==='growth')?'':'none';
   if(!_wizardV2){_waUpgradeV2=false;}
+  // In v2, Growth plan includes WA — show broadcast toggle regardless of wa_enabled
+  if(waTogBox){
+    if(_wizardV2&&(selectedPkg==='growth'||selectedPkg==='complete')){
+      waTogBox.style.display='';
+    } else if(!currentUser?.wa_enabled){
+      waTogBox.style.display='none';
+    }
+  }
   updateNetworkSummary();
 }
 function toggleWaUpgradeV2(el){
@@ -3432,9 +3441,14 @@ function selectPkg(pkg){
   }
   updateEndFromDuration();
   updateNetworkSummary();
-  // keep WA addon visibility in sync when pkg changes in v2 mode
+  // keep v2 UI in sync when pkg changes
   const _addon=document.getElementById('wa-upgrade-v2');
   if(_addon) _addon.style.display=(_wizardV2&&pkg==='growth')?'':'none';
+  const _waTogBox=document.getElementById('wa-campaign-toggle');
+  if(_waTogBox){
+    if(_wizardV2&&(pkg==='growth'||pkg==='complete')) _waTogBox.style.display='';
+    else if(!currentUser?.wa_enabled) _waTogBox.style.display='none';
+  }
 }
 
 function clampEndTime(el){
@@ -3540,7 +3554,8 @@ function renderReview(){
     <div class="review-row"><span class="review-key">Duration</span><span class="review-val">${days} days</span></div>
     <div class="review-row"><span class="review-key">Period</span><span class="review-val">${fmtDate(start)} – ${fmtDate(end)}</span></div>
     <div class="review-row"><span class="review-key">Time Window</span><span class="review-val">${document.getElementById('sch-time-start').value} – ${document.getElementById('sch-time-end').value}</span></div>
-    <div class="review-row"><span class="review-key">Rate</span><span class="review-val">${rate.fixedDays?'FREE (₹0 · 3 days)':days>=28&&rate.monthly?'₹'+rate.monthly.toLocaleString('en-IN')+'/mo (monthly flat)':'₹'+rate.ppd.toLocaleString('en-IN')+'/day × '+days+' days'}</span></div>`;
+    <div class="review-row"><span class="review-key">Rate</span><span class="review-val">${rate.fixedDays?'FREE (₹0 · 3 days)':days>=28&&rate.monthly?'₹'+rate.monthly.toLocaleString('en-IN')+'/mo (monthly flat)':'₹'+rate.ppd.toLocaleString('en-IN')+'/day × '+days+' days'}</span></div>
+    ${(_wizardV2&&selectedPkg==='growth'&&_waUpgradeV2)?`<div class="review-row"><span class="review-key" style="color:#25D366;">WA Upgrade</span><span class="review-val" style="color:#25D366;">20K messages/week · +₹400</span></div>`:''}`;
   renderPricing();
 }
 
