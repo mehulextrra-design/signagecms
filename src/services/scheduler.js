@@ -1,5 +1,8 @@
 const cron = require('node-cron');
 const crypto = require('crypto');
+const zlib = require('zlib');
+const { promisify } = require('util');
+const gzip = promisify(zlib.gzip);
 const { query } = require('../db');
 const hashToken = t => crypto.createHash('sha256').update(t).digest('hex');
 const { sendWeeklyReports, sendExpiryReminderWA, sendCampaignCompletedWA, sendDailyPoPAllWA } = require('./whatsapp');
@@ -139,14 +142,16 @@ async function runDbBackup() {
   }
 
   const jsonBuffer = Buffer.from(JSON.stringify(backup, null, 2), 'utf8');
-  const publicId = `db-backups/signagecms_${dateStr}_${Date.now()}`;
+  const compressedBuffer = await gzip(jsonBuffer);
+  const publicId = `db-backups/signagecms_${dateStr}_${Date.now()}.json.gz`;
+  console.log(`[Backup] JSON ${(jsonBuffer.length/1024/1024).toFixed(1)}MB → compressed ${(compressedBuffer.length/1024/1024).toFixed(1)}MB`);
 
   const uploadResult = await new Promise((resolve, reject) => {
     const stream = cloudinary.uploader.upload_stream(
       { resource_type: 'raw', public_id: publicId, overwrite: true },
       (err, result) => err ? reject(err) : resolve(result)
     );
-    stream.end(jsonBuffer);
+    stream.end(compressedBuffer);
   });
 
   await sendDbBackupEmail({
