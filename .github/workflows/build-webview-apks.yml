@@ -171,11 +171,12 @@ jobs:
           echo "RUN_NUM=$RUN_NUM" >> $GITHUB_ENV
 
       - name: Update Railway env vars
-        if: ${{ secrets.RAILWAY_TOKEN != '' }}
+        continue-on-error: true
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
           RUN_NUM: ${{ github.run_number }}
         run: |
+          if [ -z "$RAILWAY_TOKEN" ]; then echo "⚠️ RAILWAY_TOKEN not set, skipping" >> $GITHUB_STEP_SUMMARY; exit 0; fi
           npm install -g @railway/cli --silent
           railway variables set \
             VENUE_APK_VERSION="${RUN_NUM}" \
