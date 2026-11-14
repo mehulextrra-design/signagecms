@@ -210,7 +210,7 @@
     #page-new-campaign.active .wizard-container { display:flex;flex-direction:column;height:100%;overflow:hidden;width:calc(100% + 32px);margin-left:-16px;margin-right:-16px;padding:0 16px; }
     #page-new-campaign .wizard-steps { flex-shrink:0;margin-bottom:16px; }
     #page-new-campaign .wizard-panel.active { flex:1;overflow-y:auto;display:block;padding-bottom:72px; }
-    #page-new-campaign .wizard-nav { position:fixed;bottom:calc(60px + env(safe-area-inset-bottom,0px));left:0;right:0;background:var(--bg);padding:10px 16px 8px;z-index:30;box-shadow:0 -4px 12px rgba(0,0,0,0.06); }
+    #page-new-campaign .wizard-nav { position:fixed;bottom:0;left:0;right:0;background:var(--bg);padding:10px 16px calc(8px + env(safe-area-inset-bottom,0px));z-index:30;box-shadow:0 -4px 12px rgba(0,0,0,0.06); }
     .library-grid { max-height:none;overflow-y:visible; }
     /* Step 1: group buttons fill full width in 2-col grid */
     #wizard-groups-list { display:grid !important;grid-template-columns:1fr 1fr;gap:8px; }
