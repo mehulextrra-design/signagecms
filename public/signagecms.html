@@ -1307,6 +1307,20 @@
   </div>
 </div>
 
+<!-- APP CONFIRM MODAL -->
+<div id="app-confirm-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:2000;align-items:center;justify-content:center;padding:16px;" onclick="if(event.target===this)_appConfirmResolve(false)">
+  <div style="background:var(--surface);border-radius:14px;width:100%;max-width:360px;box-shadow:0 8px 40px rgba(0,0,0,0.22);overflow:hidden;animation:modal-in .15s ease;">
+    <div style="padding:22px 22px 16px;">
+      <div id="app-confirm-title" style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:8px;"></div>
+      <div id="app-confirm-msg" style="font-size:13px;color:var(--text2);line-height:1.6;"></div>
+    </div>
+    <div style="padding:12px 22px 18px;display:flex;gap:10px;justify-content:flex-end;">
+      <button onclick="_appConfirmResolve(false)" style="padding:8px 20px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:1.5px solid var(--border);background:var(--surface);color:var(--text2);font-family:inherit;">Cancel</button>
+      <button id="app-confirm-ok" onclick="_appConfirmResolve(true)" style="padding:8px 20px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;background:var(--primary);color:#fff;font-family:inherit;">OK</button>
+    </div>
+  </div>
+</div>
+
 <!-- WA DISCLAIMER MODAL -->
 <div id="wa-disclaimer-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1200;align-items:center;justify-content:center;padding:16px;" onclick="if(event.target===this)waDisclaimerClose()">
   <div style="background:var(--surface);border-radius:var(--radius-lg);width:100%;max-width:460px;box-shadow:0 20px 60px rgba(0,0,0,0.3);overflow:hidden;animation:modal-in .18s ease;">
@@ -2605,7 +2619,7 @@ async function waGetCode(){
 }
 
 async function waDisconnect(){
-  if(!confirm('WhatsApp disconnect karo?'))return;
+  if(!await appConfirm('WhatsApp disconnect karo?',{title:'WhatsApp Disconnect',okLabel:'Disconnect',danger:true}))return;
   try{
     await api('/wa/disconnect',{method:'POST'});
     toast('Disconnected','success');
@@ -2696,7 +2710,7 @@ async function fetchFormData(path,fd){
 }
 
 async function waClearContacts(){
-  if(!confirm('Sare contacts delete karo?'))return;
+  if(!await appConfirm('Sare contacts delete ho jayenge. Yeh action undo nahi ho sakti.',{title:'Clear All Contacts',okLabel:'Delete All',danger:true}))return;
   try{
     await api('/wa/contacts',{method:'DELETE'});
     toast('Contacts cleared','success');
@@ -2804,7 +2818,7 @@ async function wacmSaveRow(id){
 }
 
 async function wacmDelRow(id){
-  if(!confirm('Yeh contact delete karo?'))return;
+  if(!await appConfirm('Yeh contact delete karo?',{title:'Delete Contact',okLabel:'Delete',danger:true}))return;
   try{
     await api(`/wa/contacts/${id}`,{method:'DELETE'});
     _wacmSelected.delete(id);
@@ -2844,7 +2858,7 @@ function wacmUpdateSelUI(){
 
 async function wacmBulkDelete(){
   if(!_wacmSelected.size)return;
-  if(!confirm(`${_wacmSelected.size} contacts delete karo?`))return;
+  if(!await appConfirm(`${_wacmSelected.size} contacts delete ho jayenge.`,{title:'Delete Selected',okLabel:'Delete',danger:true}))return;
   try{
     for(const id of [..._wacmSelected]){
       await api(`/wa/contacts/${id}`,{method:'DELETE'});
@@ -2946,7 +2960,7 @@ async function connectFacebook(){
 }
 
 async function disconnectFacebook(){
-  if(!confirm('Disconnect Facebook? Auto-posting will stop.'))return;
+  if(!await appConfirm('Auto-posting band ho jayega.',{title:'Facebook Disconnect',okLabel:'Disconnect',danger:true}))return;
   try{
     await api('/auth/facebook/disconnect',{method:'POST'});
     toast('Facebook disconnected','success');
@@ -2985,7 +2999,7 @@ async function connectInstagram(){
 }
 
 async function disconnectInstagram(){
-  if(!confirm('Disconnect Instagram? Auto-posting will stop.'))return;
+  if(!await appConfirm('Auto-posting band ho jayega.',{title:'Instagram Disconnect',okLabel:'Disconnect',danger:true}))return;
   try{
     await api('/auth/instagram/disconnect',{method:'POST'});
     toast('Instagram disconnected','success');
@@ -3050,7 +3064,7 @@ async function connectGoogle(){
 }
 
 async function disconnectGoogle(){
-  if(!confirm('Disconnect Google Business Profile? Auto-posting will stop.'))return;
+  if(!await appConfirm('Auto-posting band ho jayega.',{title:'Google Business Disconnect',okLabel:'Disconnect',danger:true}))return;
   try{
     await api('/auth/google/disconnect',{method:'POST'});
     toast('Google Business Profile disconnected','success');
@@ -3549,7 +3563,7 @@ async function submitForApproval(id,btn){
 }
 
 async function adminTestPay(id,btn){
-  if(!confirm('Razorpay bypass karke campaign ko paid mark karo? (Sirf testing ke liye)'))return;
+  if(!await appConfirm('Razorpay bypass karke campaign ko paid mark karo? Sirf testing ke liye.',{title:'Test Payment',okLabel:'Mark Paid'}))return;
   const orig=btn.innerHTML;btn.innerHTML='…';btn.disabled=true;
   try{
     const res=await api(`/campaigns/${id}/confirm-payment`,{method:'POST',body:JSON.stringify({
@@ -3692,6 +3706,25 @@ function fmtDate(d){if(!d)return '—';return new Date(d).toLocaleDateString('en
 function statusBadge(s){const map={live:'badge-live',pending_payment:'badge-pending',pending_approval:'badge-pending',approved:'badge-live',completed:'badge-completed',cancelled:'badge-rejected',rejected:'badge-rejected',paused:'badge-draft'};return `<span class="badge ${map[s]||'badge-draft'}">${(s||'').replace(/_/g,' ')}</span>`;}
 function payBadge(s){const map={paid:'badge-live',pending:'badge-pending',refunded:'badge-rejected'};return `<span class="badge ${map[s]||'badge-draft'}">${s||'—'}</span>`;}
 function toggleMobileMenu(){/* kept for compatibility — sidebar hidden on mobile */}
+
+// ── App-level confirm modal (replaces native browser confirm) ─────────────────
+let _appConfirmResolve=null;
+function appConfirm(msg,{title='Confirm',okLabel='OK',danger=false}={}){
+  return new Promise(resolve=>{
+    _appConfirmResolve=(v)=>{
+      document.getElementById('app-confirm-overlay').style.display='none';
+      _appConfirmResolve=null;
+      resolve(v);
+    };
+    document.getElementById('app-confirm-title').textContent=title;
+    document.getElementById('app-confirm-msg').textContent=msg;
+    const ok=document.getElementById('app-confirm-ok');
+    ok.textContent=okLabel;
+    ok.style.background=danger?'#ef4444':'var(--primary)';
+    document.getElementById('app-confirm-overlay').style.display='flex';
+    ok.focus();
+  });
+}
 
 function toast(msg,type='info'){
   const el=document.createElement('div');el.className=`toast toast-${type}`;
