@@ -1158,7 +1158,7 @@
             </div>
             <!-- WA Broadcast toggle (shown only if wa_enabled) -->
             <div id="wa-campaign-toggle" style="display:none;border:1px solid #25D366;border-radius:10px;padding:12px 14px;margin-bottom:16px;display:none;">
-              <div style="display:flex;align-items:center;gap:12px;">
+              <div id="wa-broadcast-toggle-row" style="display:flex;align-items:center;gap:12px;">
                 <label class="toggle-switch" style="flex-shrink:0;">
                   <input type="checkbox" id="wa-broadcast-toggle" onchange="document.getElementById('wa-caption-wrap').style.display=this.checked?'':'none'">
                   <span class="toggle-slider"></span>
@@ -3518,6 +3518,22 @@ function setV3Cycle(cycle){
 
 function toggleWaUpgradeV3(el){
   _waUpgradeV3=el.checked;
+  // In v3: show caption box directly (skip the toggle row)
+  const waBox=document.getElementById('wa-campaign-toggle');
+  const toggleRow=document.getElementById('wa-broadcast-toggle-row');
+  const capWrap=document.getElementById('wa-caption-wrap');
+  const waTog=document.getElementById('wa-broadcast-toggle');
+  if(_waUpgradeV3){
+    if(waBox) waBox.style.display='';
+    if(toggleRow) toggleRow.style.display='none';
+    if(capWrap){capWrap.style.display='';capWrap.style.borderTop='none';capWrap.style.paddingTop='0';capWrap.style.marginTop='0';}
+    if(waTog) waTog.checked=true;
+  } else {
+    if(waBox) waBox.style.display='none';
+    if(toggleRow) toggleRow.style.display='flex';
+    if(capWrap) capWrap.style.display='none';
+    if(waTog) waTog.checked=false;
+  }
   updateNetworkSummary();
 }
 function applyWizardV2(){
@@ -3555,7 +3571,14 @@ function applyWizardV2(){
   } else if(addonV3){
     addonV3.style.display='none';
   }
-  if(!_wizardV3){_waUpgradeV3=false;}
+  if(!_wizardV3){
+    _waUpgradeV3=false;
+    // Restore toggle row visibility for v1/v2
+    const toggleRow=document.getElementById('wa-broadcast-toggle-row');
+    if(toggleRow) toggleRow.style.display='flex';
+    const capWrap=document.getElementById('wa-caption-wrap');
+    if(capWrap){capWrap.style.borderTop='';capWrap.style.paddingTop='';capWrap.style.marginTop='';}
+  }
   // WA broadcast toggle
   if(waTogBox){
     if((_wizardV2||_wizardV3)&&(selectedPkg==='growth'||selectedPkg==='complete')){
