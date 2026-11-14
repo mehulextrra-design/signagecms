@@ -415,9 +415,9 @@
     .sidebar { display:none; }
     .mobile-topbar { display:flex; }
     #app { flex-direction:column;width:100%;overflow:hidden; }
-    .main { height:calc(100vh - 52px - 60px);width:100%;max-width:100%; }
+    .main { height:calc(100dvh - 52px - 60px - env(safe-area-inset-bottom, 0px));width:100%;max-width:100%; }
     .topbar { display:none; }
-    .content { padding:16px;padding-bottom:8px; }
+    .content { padding:16px;padding-bottom:24px; }
     .bottom-nav { display:block; }
     .form-row { grid-template-columns:1fr; }
     .schedule-grid { grid-template-columns:1fr 1fr;gap:10px; }

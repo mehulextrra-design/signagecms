@@ -244,7 +244,7 @@ body {
 }
 
 @media (max-width: 540px) {
-  .main-wrap { padding: 14px 12px 32px; }
+  .main-wrap { padding: 14px 12px calc(32px + env(safe-area-inset-bottom, 0px)); }
   .upload-row { grid-template-columns: 1fr; }
   .stat-row { grid-template-columns: 1fr 1fr; }
   .page-tab { padding: 9px 12px; font-size: 13px; }

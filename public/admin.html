@@ -239,7 +239,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
   .mobile-topbar{display:flex;}
   .main{padding-top:52px;}
   .topbar{display:none;}
-  .content{padding:14px;padding-bottom:24px;}
+  .content{padding:14px;padding-bottom:calc(24px + env(safe-area-inset-bottom, 0px));}
 
   /* Stats */
   .stat-grid{grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;}

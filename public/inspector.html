@@ -212,11 +212,11 @@ body {
 .leads-container {
   position: fixed;
   top: calc(var(--header-h) + var(--toolbar-h));
-  bottom: var(--nav-h);
+  bottom: calc(var(--nav-h) + env(safe-area-inset-bottom, 0px));
   left: 0; right: 0;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  padding: 12px 14px 8px;
+  padding: 12px 14px 16px;
 }
 
 /* Lead cards */
