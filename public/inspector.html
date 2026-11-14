@@ -1008,13 +1008,6 @@ function _agrStyles() {
 function downloadAgreement(leadId) {
   if (!leadId || !token) return;
   const url = '/api/leads/' + leadId + '/agreement?t=' + encodeURIComponent(token);
-  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-  if (isMobile && navigator.share) {
-    const agr = document.getElementById('agreement-print');
-    navigator.share({title: 'Venue Partner Agreement', text: agr ? agr.innerText : ''})
-      .catch(() => { window.open(url, '_blank') || (window.location.href = url); });
-    return;
-  }
   window.open(url, '_blank') || (window.location.href = url);
 }
 

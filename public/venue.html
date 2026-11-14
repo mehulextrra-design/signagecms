@@ -989,13 +989,6 @@ function _vpAgrStyles() {
 function downloadVpAgreement() {
   if (!_vpData || !_token) return;
   const url = '/api/venue-partners/' + _vpData.id + '/agreement?t=' + encodeURIComponent(_token);
-  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-  if (isMobile && navigator.share) {
-    const agr = document.getElementById('agr-print');
-    navigator.share({title: 'Venue Partner Agreement', text: agr ? agr.innerText : ''})
-      .catch(() => { window.open(url, '_blank') || (window.location.href = url); });
-    return;
-  }
   window.open(url, '_blank') || (window.location.href = url);
 }
 
