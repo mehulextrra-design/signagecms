@@ -3483,10 +3483,33 @@ async function renderWizardScreens(){
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
         </button>
       </div>`).join('');
+
+    // Auto-select all groups if wizard opened fresh (no pre-selection)
+    if(!selectedScreenIds.length){
+      allScreenGroups.forEach(g=>{
+        g.screens.forEach(s=>{ if(!selectedScreenIds.includes(s.id)) selectedScreenIds.push(s.id); });
+        document.getElementById('gchip-'+g.id)?.classList.add('active');
+      });
+      const cnt=selectedScreenIds.length;
+      document.getElementById('selected-count').textContent=cnt?`${cnt} screen${cnt>1?'s':''} selected`:'';
+      document.getElementById('btn-next-1').disabled=false;
+    } else {
+      // Restore active state on chips for already-selected groups
+      allScreenGroups.forEach(g=>{
+        if(g.screens.every(s=>selectedScreenIds.includes(s.id)))
+          document.getElementById('gchip-'+g.id)?.classList.add('active');
+      });
+    }
   } else {
     groupsWrap.style.display='none';
-    // No groups → show all screens directly
+    // No groups → show all screens directly and auto-select all
     grid.style.display='grid';
+    if(!selectedScreenIds.length){
+      allScreens.forEach(s=>{ if(!selectedScreenIds.includes(s.id)) selectedScreenIds.push(s.id); });
+      const cnt=selectedScreenIds.length;
+      document.getElementById('selected-count').textContent=cnt?`${cnt} screen${cnt>1?'s':''} selected`:'';
+      document.getElementById('btn-next-1').disabled=false;
+    }
   }
 
   const screenCardHtml = s => `<div class="screen-card ${selectedScreenIds.includes(s.id)?'selected':''}" id="sc-card-${s.id}" onclick="toggleScreen('${s.id}',this)"><div class="screen-name">${s.name}</div><div class="screen-loc">${s.location||s.city||'—'}</div><div style="display:flex;align-items:center;justify-content:space-between;"><div class="screen-price">${s.approx_footfall>0?'~'+s.approx_footfall.toLocaleString('en-IN')+' footfall/day':'—'}</div><div style="width:7px;height:7px;border-radius:50%;background:${s.status==='online'?'var(--success)':'var(--warning)'};"></div></div><div style="font-size:11px;color:var(--text2);margin-top:6px;">${s.venue_type||'Screen'} · ${s.zone||'A'} zone</div></div>`;
