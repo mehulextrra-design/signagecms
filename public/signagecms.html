@@ -3785,7 +3785,7 @@ function applyWizardV2(){
   // WA broadcast toggle
   if(waTogBox){
     const _waOnV2=_wizardV2&&(selectedPkg==='growth'||selectedPkg==='complete');
-    const _waOnV3=_wizardV3&&selectedPkg==='growth'&&currentUser?.wa_enabled;
+    const _waOnV3=_wizardV3&&selectedPkg==='omnichannel_growth'&&currentUser?.wa_enabled;
     if(_waOnV2||_waOnV3){
       waTogBox.style.display='';
     } else {
@@ -3829,7 +3829,7 @@ function selectPkg(pkg){
   const _waTogBox=document.getElementById('wa-campaign-toggle');
   if(_waTogBox){
     const _waOnV2=_wizardV2&&(pkg==='growth'||pkg==='complete');
-    const _waOnV3=_wizardV3&&pkg==='growth'&&currentUser?.wa_enabled;
+    const _waOnV3=_wizardV3&&pkg==='omnichannel_growth'&&currentUser?.wa_enabled;
     _waTogBox.style.display=(_waOnV2||_waOnV3)?'':'none';
   }
 }
