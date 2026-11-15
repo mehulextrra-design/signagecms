@@ -3784,9 +3784,11 @@ function applyWizardV2(){
   }
   // WA broadcast toggle
   if(waTogBox){
-    if(_wizardV2&&(selectedPkg==='growth'||selectedPkg==='complete')){
+    const _waOnV2=_wizardV2&&(selectedPkg==='growth'||selectedPkg==='complete');
+    const _waOnV3=_wizardV3&&selectedPkg==='growth'&&currentUser?.wa_enabled;
+    if(_waOnV2||_waOnV3){
       waTogBox.style.display='';
-    } else if(!currentUser?.wa_enabled){
+    } else {
       waTogBox.style.display='none';
     }
   }
@@ -3826,8 +3828,9 @@ function selectPkg(pkg){
   if(_addon) _addon.style.display=(_wizardV2&&pkg==='growth')?'':'none';
   const _waTogBox=document.getElementById('wa-campaign-toggle');
   if(_waTogBox){
-    if(_wizardV2&&(pkg==='growth'||pkg==='complete')) _waTogBox.style.display='';
-    else if(!currentUser?.wa_enabled) _waTogBox.style.display='none';
+    const _waOnV2=_wizardV2&&(pkg==='growth'||pkg==='complete');
+    const _waOnV3=_wizardV3&&pkg==='growth'&&currentUser?.wa_enabled;
+    _waTogBox.style.display=(_waOnV2||_waOnV3)?'':'none';
   }
 }
 
