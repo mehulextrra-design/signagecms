@@ -471,6 +471,10 @@ textarea.form-input{resize:vertical;min-height:80px;}
       <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
       Blog Manager
     </button>
+    <button class="sidebar-item" id="nav-contacts" onclick="navigate('contacts')">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+      WA Contacts
+    </button>
     <button class="sidebar-item" id="nav-activity" onclick="navigate('activity')">
       <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
       Activity Log
@@ -1023,6 +1027,52 @@ textarea.form-input{resize:vertical;min-height:80px;}
             <tbody id="blog-posts-table"></tbody></table>
           </div>
           <div id="blog-pager"></div>
+        </div>
+      </div>
+
+      <!-- WA CONTACTS DIRECTORY -->
+      <div id="page-contacts" class="page">
+        <div class="section-head">
+          <h2>WA Contacts Directory</h2>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn btn-sm btn-ghost" onclick="document.getElementById('contacts-import-row').style.display=document.getElementById('contacts-import-row').style.display==='none'?'flex':'none'">Import CSV</button>
+            <button class="btn btn-sm btn-ghost" onclick="openSegmentModal()">+ Segment</button>
+            <button class="btn btn-sm btn-ghost" onclick="loadContactsPage()">Refresh</button>
+          </div>
+        </div>
+
+        <!-- Import row -->
+        <div id="contacts-import-row" style="display:none;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px;padding:12px;background:var(--surface);border-radius:var(--r);border:1px solid var(--border);">
+          <span style="font-size:13px;font-weight:600;">CSV columns: name, phone/mobile, city, area, industry, business_type (phone required)</span>
+          <input type="file" id="contacts-csv-input" accept=".csv" style="font-size:13px;">
+          <button class="btn btn-sm btn-primary" onclick="importContactsCsv()">Upload</button>
+          <span id="contacts-import-status" style="font-size:12px;color:var(--text2);"></span>
+        </div>
+
+        <!-- Filters -->
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
+          <select id="contacts-filter-city" onchange="loadContactsPage()" style="font-size:13px;padding:6px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface);color:var(--text);">
+            <option value="">All Cities</option>
+          </select>
+          <select id="contacts-filter-industry" onchange="loadContactsPage()" style="font-size:13px;padding:6px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface);color:var(--text);">
+            <option value="">All Industries</option>
+          </select>
+          <input id="contacts-search" type="text" placeholder="Search name or phone..." oninput="loadContactsPage()" style="font-size:13px;padding:6px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface);color:var(--text);width:200px;">
+          <span id="contacts-total-badge" style="font-size:12px;color:var(--text2);align-self:center;"></span>
+        </div>
+
+        <!-- Segments -->
+        <div id="contacts-segments-wrap" style="margin-bottom:12px;"></div>
+
+        <!-- Table -->
+        <div class="table-card">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Name</th><th>Phone</th><th>City</th><th>Area</th><th>Industry</th><th>Last Sent</th><th>DND</th><th></th></tr></thead>
+              <tbody id="contacts-table"></tbody>
+            </table>
+          </div>
+          <div id="contacts-pager"></div>
         </div>
       </div>
 
@@ -1750,7 +1800,8 @@ const pageTitles = {
   venues: 'Venue Partners',
   filler: 'Filler Content',
   'vc-approvals': 'Venue Content Approvals',
-  blog: 'Blog Manager'
+  blog: 'Blog Manager',
+  contacts: 'WA Contacts Directory'
 };
 
 function navigate(page) {
@@ -1787,7 +1838,8 @@ function navigate(page) {
     venues: loadVenues,
     filler: loadFiller,
     'vc-approvals': loadApprovals,
-    blog: loadBlogPosts
+    blog: loadBlogPosts,
+    contacts: loadContactsPage
   };
   if (loaders[page]) loaders[page]();
 }
@@ -4270,6 +4322,144 @@ async function loadActivity() {
       </tr>`).join('');
     }, 'activity-pager');
   } catch(e) { tbody.innerHTML = emptyRow(5, 'Error: ' + e.message); }
+}
+
+// ── WA CONTACTS DIRECTORY ────────────────────────────────────────────────────
+let _contactsMeta = null;
+let _contactsPage = 1;
+
+async function loadContactsMeta() {
+  if (_contactsMeta) return _contactsMeta;
+  try {
+    _contactsMeta = await api('/admin-contacts/meta');
+    const cityEl = document.getElementById('contacts-filter-city');
+    const indEl = document.getElementById('contacts-filter-industry');
+    (_contactsMeta.cities||[]).forEach(c => {
+      const o = document.createElement('option'); o.value=c; o.textContent=c; cityEl.appendChild(o);
+    });
+    (_contactsMeta.industries||[]).forEach(i => {
+      const o = document.createElement('option'); o.value=i; o.textContent=i; indEl.appendChild(o);
+    });
+  } catch(e) { console.warn('[Contacts] meta load error:', e.message); }
+  return _contactsMeta;
+}
+
+async function loadContactsPage(resetPage) {
+  if (resetPage) _contactsPage = 1;
+  await loadContactsMeta();
+  await loadContactsSegments();
+  const city = document.getElementById('contacts-filter-city').value;
+  const industry = document.getElementById('contacts-filter-industry').value;
+  const search = document.getElementById('contacts-search').value;
+  const tbody = document.getElementById('contacts-table');
+  tbody.innerHTML = loadingRow(8);
+  try {
+    const params = new URLSearchParams({ page: _contactsPage, limit: 50 });
+    if (city) params.set('city', city);
+    if (industry) params.set('industry', industry);
+    if (search) params.set('search', search);
+    const data = await api('/admin-contacts?' + params.toString());
+    const list = data.contacts || [];
+    document.getElementById('contacts-total-badge').textContent = `${data.total || 0} contacts`;
+    if (!list.length) { tbody.innerHTML = emptyRow(8, 'No contacts found'); document.getElementById('contacts-pager').innerHTML=''; return; }
+    tbody.innerHTML = list.map(c => `
+      <tr>
+        <td style="font-size:13px;">${c.name||'—'}</td>
+        <td style="font-size:12px;font-family:monospace;">${c.phone}</td>
+        <td style="font-size:12px;">${c.city||'—'}</td>
+        <td style="font-size:12px;">${c.area||'—'}</td>
+        <td style="font-size:12px;">${c.industry||'—'}</td>
+        <td style="font-size:11px;color:var(--text3);">${c.last_messaged_at ? fmtDate(c.last_messaged_at) : '—'}</td>
+        <td>${c.is_dnd ? '<span style="color:#ef4444;font-size:11px;font-weight:600;">DND</span>' : ''}</td>
+        <td style="white-space:nowrap;">
+          <button class="btn btn-ghost btn-xs" onclick="toggleContactDnd(${c.id},${c.is_dnd})">${c.is_dnd?'Un-DND':'DND'}</button>
+          <button class="btn btn-ghost btn-xs" style="color:#ef4444;" onclick="deleteContact(${c.id})">Del</button>
+        </td>
+      </tr>`).join('');
+    // Simple prev/next pager
+    const total = data.total || 0;
+    const pages = Math.ceil(total / 50);
+    const pager = document.getElementById('contacts-pager');
+    if (pages > 1) {
+      pager.innerHTML = `<div style="display:flex;align-items:center;gap:8px;padding:12px 0;font-size:13px;">
+        <button class="btn btn-ghost btn-xs" onclick="_contactsPage=${Math.max(1,_contactsPage-1)};loadContactsPage()" ${_contactsPage<=1?'disabled':''}>Prev</button>
+        <span style="color:var(--text2);">Page ${_contactsPage} / ${pages}</span>
+        <button class="btn btn-ghost btn-xs" onclick="_contactsPage=${Math.min(pages,_contactsPage+1)};loadContactsPage()" ${_contactsPage>=pages?'disabled':''}>Next</button>
+      </div>`;
+    } else { pager.innerHTML = ''; }
+  } catch(e) { tbody.innerHTML = emptyRow(8, 'Error: ' + e.message); }
+}
+
+async function loadContactsSegments() {
+  const wrap = document.getElementById('contacts-segments-wrap');
+  try {
+    const segs = await api('/admin-contacts/segments');
+    if (!segs.length) { wrap.innerHTML=''; return; }
+    wrap.innerHTML = `<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:4px;">
+      <span style="font-size:12px;font-weight:600;color:var(--text2);align-self:center;">Segments:</span>
+      ${segs.map(s=>`<span style="display:inline-flex;align-items:center;gap:5px;background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:3px 10px;font-size:12px;">
+        <span>${s.name}</span>
+        <span style="color:var(--text3);">(${Number(s.available_now||0).toLocaleString()} avail)</span>
+        <button onclick="deleteSegment(${s.id})" style="border:none;background:none;cursor:pointer;color:var(--text3);font-size:14px;line-height:1;padding:0 2px;" title="Delete">&times;</button>
+      </span>`).join('')}
+    </div>`;
+  } catch(e) { wrap.innerHTML=''; }
+}
+
+async function importContactsCsv() {
+  const fileInput = document.getElementById('contacts-csv-input');
+  const statusEl = document.getElementById('contacts-import-status');
+  if (!fileInput.files.length) { statusEl.textContent='No file selected'; return; }
+  statusEl.textContent = 'Uploading...';
+  const form = new FormData();
+  form.append('file', fileInput.files[0]);
+  try {
+    const res = await fetch('/api/admin-contacts/import', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') },
+      body: form
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || res.statusText);
+    statusEl.textContent = `Done: ${data.inserted} inserted, ${data.skipped} skipped of ${data.total}`;
+    _contactsMeta = null; // reset meta so dropdowns refresh
+    loadContactsPage(true);
+  } catch(e) { statusEl.textContent = 'Error: ' + e.message; }
+}
+
+async function toggleContactDnd(id, currentDnd) {
+  try {
+    await api(`/admin-contacts/${id}/dnd`, { method:'PATCH' });
+    loadContactsPage();
+  } catch(e) { alert('Error: ' + e.message); }
+}
+
+async function deleteContact(id) {
+  if (!confirm('Delete this contact?')) return;
+  try {
+    await api(`/admin-contacts/${id}`, { method:'DELETE' });
+    loadContactsPage();
+  } catch(e) { alert('Error: ' + e.message); }
+}
+
+async function deleteSegment(id) {
+  if (!confirm('Delete this segment?')) return;
+  try {
+    await api(`/admin-contacts/segments/${id}`, { method:'DELETE' });
+    loadContactsPage();
+  } catch(e) { alert('Error: ' + e.message); }
+}
+
+function openSegmentModal() {
+  const name = prompt('Segment name:');
+  if (!name) return;
+  const city = prompt('City filter (leave blank for all):') || null;
+  const industry = prompt('Industry filter (leave blank for all):') || null;
+  const area = prompt('Area filter (leave blank for all):') || null;
+  api('/admin-contacts/segments', {
+    method: 'POST',
+    body: JSON.stringify({ name, city, industry, area })
+  }).then(() => loadContactsPage()).catch(e => alert('Error: ' + e.message));
 }
 
 // Close modal on backdrop click

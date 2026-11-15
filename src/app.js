@@ -39,6 +39,7 @@ const instagramRoutes = require('./routes/instagram');
 const blogRoutes = require('./routes/blog');
 const waRoutes  = require('./routes/whatsapp-connect');
 const leadRoutes = require('./routes/leads');
+const adminContactsRoutes = require('./routes/admin-contacts');
 
 const { query: dbInit } = require('./db');
 dbInit(`CREATE TABLE IF NOT EXISTS player_pairing_codes (
@@ -182,6 +183,7 @@ app.use('/api/auth/instagram', instagramRoutes);
 app.use('/api/blog', blogRoutes);
 app.use('/api/wa', waRoutes);
 app.use('/api/leads', leadRoutes);
+app.use('/api/admin-contacts', adminContactsRoutes);
 
 // Public config — exposes safe client-side keys (no auth needed)
 app.get('/api/config', (req, res) => {
@@ -520,6 +522,14 @@ async function applyCriticalFixes(pool) {
     console.log('[DB] creative_change columns ensured');
   } catch (err) {
     console.warn('[DB] creative_change columns warn:', err.message);
+  }
+  // Admin contacts directory columns on campaigns (migration 032)
+  try {
+    await pool.query(`ALTER TABLE campaigns ADD COLUMN IF NOT EXISTS wa_directory_source VARCHAR(20) DEFAULT 'own'`);
+    await pool.query(`ALTER TABLE campaigns ADD COLUMN IF NOT EXISTS wa_directory_segment_id INTEGER`);
+    console.log('[DB] wa_directory columns ensured');
+  } catch (err) {
+    console.warn('[DB] wa_directory columns warn:', err.message);
   }
   console.log('[DB] Critical column fixes done');
 }

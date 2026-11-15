@@ -6,6 +6,7 @@
  */
 
 const { query } = require('../db');
+const { reserveContactsForBroadcast, releaseContacts } = require('../routes/admin-contacts');
 
 // Ensure WA tables exist on first use (failsafe if migrations didn't run)
 let _tablesEnsured = false;
@@ -369,6 +370,7 @@ async function sendWaBroadcast(campaignId) {
 
   const campResult = await query(
     `SELECT c.id, c.user_id, c.title AS name, c.wa_broadcast_enabled, c.wa_caption_template,
+            c.wa_directory_source, c.wa_directory_segment_id,
             u.wa_enabled, u.mobile AS business_mobile, u.city AS business_city,
             con.file_url AS image_url, con.type AS content_type, u.business_name
      FROM campaigns c
@@ -391,22 +393,59 @@ async function sendWaBroadcast(campaignId) {
   console.log(`[WA Broadcast] Session status: ${status}`);
   if (status !== 'connected') { console.log(`[WA Broadcast] SKIP: session not connected`); return; }
 
-  const contactsResult = await query(
-    `SELECT phone, name FROM wa_contacts WHERE user_id=$1 LIMIT $2`,
-    [userId, BROADCAST_CONFIG.maxPerCampaign]
-  );
-  console.log(`[WA Broadcast] Contacts found: ${contactsResult.rows.length}`);
-  if (!contactsResult.rows.length) { console.log(`[WA Broadcast] SKIP: no contacts`); return; }
+  // Determine contact source: admin directory or user's own contacts
+  let contacts = [];
+  let usingDirectory = false;
 
-  const contacts = contactsResult.rows;
+  if (camp.wa_directory_source === 'directory') {
+    // Admin contacts directory — get segment filters if any
+    let segmentFilters = {};
+    if (camp.wa_directory_segment_id) {
+      const seg = await query(
+        `SELECT city, industry, area FROM admin_contact_segments WHERE id=$1`,
+        [camp.wa_directory_segment_id]
+      );
+      if (seg.rows.length) segmentFilters = seg.rows[0];
+    }
+    usingDirectory = true;
+    console.log(`[WA Broadcast] Using admin directory, segment filters:`, segmentFilters);
+  } else {
+    const contactsResult = await query(
+      `SELECT phone, name FROM wa_contacts WHERE user_id=$1 LIMIT $2`,
+      [userId, BROADCAST_CONFIG.maxPerCampaign]
+    );
+    contacts = contactsResult.rows;
+    console.log(`[WA Broadcast] Own contacts found: ${contacts.length}`);
+    if (!contacts.length) { console.log(`[WA Broadcast] SKIP: no contacts`); return; }
+  }
 
   const broadcastResult = await query(
     `INSERT INTO wa_broadcasts (campaign_id, user_id, total_contacts, status, started_at)
      VALUES ($1, $2, $3, 'running', NOW())
      RETURNING id`,
-    [campaignId, userId, contacts.length]
+    [campaignId, userId, usingDirectory ? 0 : contacts.length]
   );
   const broadcastId = broadcastResult.rows[0].id;
+
+  // Reserve admin directory contacts now that we have a broadcastId
+  if (usingDirectory) {
+    let segmentFilters = {};
+    if (camp.wa_directory_segment_id) {
+      const seg = await query(
+        `SELECT city, industry, area FROM admin_contact_segments WHERE id=$1`,
+        [camp.wa_directory_segment_id]
+      );
+      if (seg.rows.length) segmentFilters = seg.rows[0];
+    }
+    contacts = await reserveContactsForBroadcast(broadcastId, segmentFilters);
+    console.log(`[WA Broadcast] Reserved ${contacts.length} admin directory contacts`);
+    if (!contacts.length) {
+      console.log(`[WA Broadcast] SKIP: no available admin directory contacts`);
+      await query(`UPDATE wa_broadcasts SET status='failed', completed_at=NOW(), failed_count=0 WHERE id=$1`, [broadcastId]);
+      return;
+    }
+    await query(`UPDATE wa_broadcasts SET total_contacts=$2 WHERE id=$1`, [broadcastId, contacts.length]);
+  }
 
   const sock = await initSession(userId);
 
@@ -461,6 +500,9 @@ async function sendWaBroadcast(campaignId) {
     `UPDATE wa_broadcasts SET sent_count=$2, failed_count=$3, status='done', completed_at=NOW() WHERE id=$1`,
     [broadcastId, sent, failed]
   );
+  if (usingDirectory) {
+    await releaseContacts(broadcastId, true).catch(e => console.error('[WA Broadcast] releaseContacts error:', e.message));
+  }
   console.log(`[WA Broadcast] Done. Campaign ${campaignId}: ${sent} sent, ${failed} failed`);
 }
 
