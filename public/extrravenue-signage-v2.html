@@ -150,7 +150,7 @@
           "name": "How much does digital screen advertising cost in Ahmedabad?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "extrravenue offers digital signage advertising plans starting at ₹1,499/month (Starter – 10-second slot, 2 Lac+ impressions/month), ₹3,499/month (Complete – 15-second slot + Facebook & Instagram, 4 Lac+ impressions/month), and ₹5,999/month (Growth – 20-second priority slot + all channels, 6.17 Lac+ impressions/month). A free trial is also available. All prices are exclusive of 18% GST."
+            "text": "extrravenue offers digital signage advertising plans starting at ₹3,999/month (Starter Screen – 20-second slot, screen only, 4.4 Lac+ impressions/month) and ₹5,999/month (Omnichannel Growth – 20-second slot + Facebook, Instagram, Google Business Profile &amp; WhatsApp broadcast, 4.4 Lac+ impressions/month). A free 7-day trial is also available. All prices are exclusive of 18% GST."
           }
         },
         {
@@ -646,9 +646,10 @@ body{margin:0;background:#f2efe9;}
 .pric-foot{margin-top:auto;}
 
 /* New Plans Grid */
-.plans-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:32px;align-items:stretch;}
+.plans-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:32px;align-items:stretch;}
 @media(max-width:900px){.plans-grid{grid-template-columns:repeat(2,1fr);}}
 @media(max-width:540px){.plans-grid{grid-template-columns:1fr;}}
+.ch-wa svg{color:#25D366;}
 .plan{background:var(--surface);border-radius:var(--r);border:2px solid transparent;padding:24px 22px;display:flex;flex-direction:column;position:relative;transition:border-color .25s,background .25s;}
 .plan.featured{background:var(--dark);color:var(--bg);border-color:var(--orange);}
 .plan-badge{position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:var(--orange);color:#fff;font-size:9.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;border-radius:99px;padding:3px 13px;white-space:nowrap;}
@@ -658,6 +659,8 @@ body{margin:0;background:#f2efe9;}
 .price-amt{font-family:'Magra',sans-serif;font-size:clamp(28px,3vw,38px);font-weight:700;line-height:1;margin-bottom:18px;display:flex;align-items:baseline;flex-wrap:wrap;gap:8px;}
 .price-mo{font-size:17px;font-weight:400;color:rgba(26,23,20,.6);margin-left:2px;}
 .featured .price-mo{color:rgba(242,239,233,.55);}
+.plan-slot{font-size:13px;color:rgba(26,23,20,.5);margin-top:4px;margin-bottom:2px;}
+.featured .plan-slot{color:rgba(242,239,233,.55);}
 .plan-slot{font-size:12px;color:rgba(26,23,20,.65);margin-bottom:20px;margin-top:3px;}
 .featured .plan-slot{color:rgba(242,239,233,.6);}
 .plan-div{border:none;border-top:1.5px solid var(--line-strong);margin:0 0 22px;}
@@ -2098,13 +2101,12 @@ function loadPreset(key){
     {id:4,name:'Navrangpura Gate',area:'Navrangpura, Ahmedabad',plays:2900,zone:'A'},
   ];
   var PKGS=[
-    {id:'trial',name:'Trial',days:3,slot:'8s',price:0},
-    {id:'starter',name:'Starter',days:30,slot:'10s',price:1499},
-    {id:'complete',name:'Complete',days:30,slot:'15s',price:3499,pop:true},
-    {id:'growth',name:'Growth',days:30,slot:'20s',price:5999},
+    {id:'trial',name:'Trial',days:7,slot:'10s',price:0},
+    {id:'starter_screen',name:'Starter Screen',days:30,slot:'20s',price:3999},
+    {id:'omnichannel_growth',name:'Omnichannel Growth',days:30,slot:'20s',price:5999,pop:true},
   ];
   var COLORS=['#7b68c8','#22d3ee','#c94baa','#6ee7b7'];
-  var selScreens=[1,2],selPkg='complete',curTab='summary',uploadedCreative=null;
+  var selScreens=[1,2],selPkg='omnichannel_growth',curTab='summary',uploadedCreative=null;
 
   function fmt(n){return n.toLocaleString('en-IN');}
   function fmtRs(n){return '₹'+fmt(n);}
@@ -2537,6 +2539,14 @@ function loadPreset(key){
           <line x1="6" y1="15" x2="11" y2="15"/>
           <circle cx="17" cy="15" r="2"/>
         </symbol>
+        <symbol id="ico-wa" viewBox="0 0 24 24">
+          <path fill="currentColor" d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347zM12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.117 1.531 5.845L0 24l6.335-1.508A11.956 11.956 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.822 9.822 0 01-5.011-1.372l-.36-.214-3.726.887.916-3.618-.234-.373A9.776 9.776 0 012.182 12C2.182 6.589 6.587 2.182 12 2.182S21.818 6.589 21.818 12 17.413 21.818 12 21.818z"/>
+        </symbol>
+        <symbol id="ico-qr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="6" height="6" rx="1"/><rect x="15" y="3" width="6" height="6" rx="1"/><rect x="3" y="15" width="6" height="6" rx="1"/>
+          <rect x="5" y="5" width="2" height="2" fill="currentColor" stroke="none"/><rect x="17" y="5" width="2" height="2" fill="currentColor" stroke="none"/><rect x="5" y="17" width="2" height="2" fill="currentColor" stroke="none"/>
+          <path d="M15 15h2v2h-2zM19 15h2v2h-2zM15 19h2v2h-2zM19 19h2v2h-2z" fill="currentColor" stroke="none"/>
+        </symbol>
       </defs>
     </svg>
 
@@ -2549,130 +2559,91 @@ function loadPreset(key){
 
       <!-- Trial -->
       <div class="plan">
+        <div class="plan-badge" style="background:#1a8a4a;color:#fff;">FREE TRIAL · 7 DAYS</div>
         <div class="plan-label">Trial</div>
         <div class="price-free">FREE</div>
+        <div class="plan-slot">10 sec ad slot</div>
         <hr class="plan-div">
         <div class="plan-stats">
           <div class="plan-stat">
             <div class="plan-stat-num">~1,200</div>
-            <div class="plan-stat-lbl">plays/day (8s, estimated)</div>
+            <div class="plan-stat-lbl">plays/day</div>
           </div>
           <div class="plan-stat">
-            <div class="plan-stat-num">~3,600</div>
-            <div class="plan-stat-lbl">total plays (3 din)</div>
+            <div class="plan-stat-num">~8,400</div>
+            <div class="plan-stat-lbl">total plays (7 din)</div>
           </div>
           <div class="plan-stat">
-            <div class="plan-stat-num">~10,800</div>
-            <div class="plan-stat-lbl">viewer impressions (3 din)</div>
+            <div class="plan-stat-num">₹0</div>
+            <div class="plan-stat-lbl">no card needed</div>
           </div>
         </div>
         <div class="channels">
           <span class="ch-pill ch-screen"><svg width="20" height="20"><use href="#ico-screen"/></svg></span>
+          <span class="ch-pill" style="opacity:.35;"><svg width="20" height="20"><use href="#ico-qr"/></svg></span>
         </div>
         <ul class="plan-feats">
-          <li>All Digital Network, 3 din</li>
-          <li>8-second ad slot</li>
-          <li>Proof of Play report</li>
-          <li class="off">Facebook + Instagram</li>
-          <li class="off">Google Business Profile</li>
-          <li class="off">Digital Card</li>
-        </ul>
-        <a class="pcta pcta-outline" href="/get-started.html">Free Trial</a>
-      </div>
-
-      <!-- Starter -->
-      <div class="plan">
-        <span class="disc-pct">75% off</span>
-        <div class="plan-label">Starter</div>
-        <div class="price-top"><span class="price-orig">&#8377;5,999</span></div>
-        <div class="price-amt">&#8377;1,499<span class="price-mo">/month</span></div>
-        <hr class="plan-div">
-        <div class="plan-stats">
-          <div class="plan-stat">
-            <div class="plan-stat-num">2,304</div>
-            <div class="plan-stat-lbl">plays/day (10s)</div>
-          </div>
-          <div class="plan-stat">
-            <div class="plan-stat-num">69,120</div>
-            <div class="plan-stat-lbl">plays/month</div>
-          </div>
-          <div class="plan-stat">
-            <div class="plan-stat-num">2,05,000+</div>
-            <div class="plan-stat-lbl">viewer impressions/month</div>
-          </div>
-        </div>
-        <div class="channels">
-          <span class="ch-pill ch-screen"><svg width="20" height="20"><use href="#ico-screen"/></svg></span>
-        </div>
-        <ul class="plan-feats">
-          <li>All Digital Network coverage</li>
+          <li>All Digital Network, 7 din</li>
           <li>10-second ad slot</li>
-          <li>Proof of Play CSV report</li>
-          <li class="off">Facebook + Instagram</li>
-          <li class="off">Google Business Profile</li>
-          <li class="off">Digital Card</li>
+          <li>Proof-of-Play report</li>
+          <li>Basic QR Code</li>
+          <li>1 campaign only</li>
         </ul>
-        <a class="pcta pcta-outline" href="/get-started.html">Book Slot</a>
+        <a class="pcta pcta-outline" href="/signagecms.html">Free Trial</a>
       </div>
 
-      <!-- Complete -->
-      <div class="plan featured">
-        <div class="plan-badge">Most Popular</div>
-        <span class="disc-pct">61% off</span>
-        <div class="plan-label">Complete</div>
-        <div class="price-top"><span class="price-orig">&#8377;8,999</span></div>
-        <div class="price-amt">&#8377;3,499<span class="price-mo">/month</span></div>
-        <hr class="plan-div">
-        <div class="plan-stats">
-          <div class="plan-stat">
-            <div class="plan-stat-num">4,572</div>
-            <div class="plan-stat-lbl">plays/day (15s)</div>
-          </div>
-          <div class="plan-stat">
-            <div class="plan-stat-num">1,37,160</div>
-            <div class="plan-stat-lbl">plays/month</div>
-          </div>
-          <div class="plan-stat">
-            <div class="plan-stat-num">4,11,000+</div>
-            <div class="plan-stat-lbl">viewer impressions/month</div>
-          </div>
-        </div>
-        <div class="channels">
-          <span class="ch-pill ch-screen"><svg width="20" height="20"><use href="#ico-screen"/></svg></span>
-          <span class="ch-pill ch-fb"><svg width="20" height="20"><use href="#ico-fb"/></svg></span>
-          <span class="ch-pill ch-ig"><svg width="20" height="20"><use href="#ico-ig"/></svg></span>
-          <span class="ch-pill ch-gbp"><svg width="20" height="20"><use href="#ico-gbp"/></svg></span>
-        </div>
-        <ul class="plan-feats">
-          <li>All Digital Network coverage</li>
-          <li>15-second ad slot</li>
-          <li>Proof of Play CSV report</li>
-          <li>Facebook + Instagram auto-post</li>
-          <li>Google Business Profile post</li>
-          <li class="off">Digital Card</li>
-        </ul>
-        <a class="pcta pcta-outline" href="/get-started.html">Book Slot</a>
-      </div>
-
-      <!-- Growth -->
+      <!-- Starter Screen -->
       <div class="plan">
-        <div class="plan-badge">Best Value</div>
-        <span class="disc-pct best">80% off</span>
-        <div class="plan-label">Growth</div>
-        <div class="price-top"><span class="price-orig">&#8377;29,999</span></div>
-        <div class="price-amt">&#8377;5,999<span class="price-mo">/month</span></div>
+        <div class="plan-label">Starter Screen</div>
+        <div class="price-amt">&#8377;3,999<span class="price-mo">/month</span></div>
+        <div class="plan-slot">20 sec ad slot &nbsp;·&nbsp; ₹87/screen/month</div>
         <hr class="plan-div">
         <div class="plan-stats">
           <div class="plan-stat">
-            <div class="plan-stat-num">6,876</div>
-            <div class="plan-stat-lbl">plays/day (20s)</div>
+            <div class="plan-stat-num">~4,953</div>
+            <div class="plan-stat-lbl">plays/day</div>
           </div>
           <div class="plan-stat">
-            <div class="plan-stat-num">2,06,280</div>
+            <div class="plan-stat-num">~1,48,590</div>
             <div class="plan-stat-lbl">plays/month</div>
           </div>
           <div class="plan-stat">
-            <div class="plan-stat-num">6,17,000+</div>
+            <div class="plan-stat-num">4,45,770+</div>
+            <div class="plan-stat-lbl">viewer impressions/month</div>
+          </div>
+        </div>
+        <div class="channels">
+          <span class="ch-pill ch-screen"><svg width="20" height="20"><use href="#ico-screen"/></svg></span>
+          <span class="ch-pill"><svg width="20" height="20"><use href="#ico-qr"/></svg></span>
+        </div>
+        <ul class="plan-feats">
+          <li>All Digital Network coverage</li>
+          <li>20-second ad slot</li>
+          <li>Proof-of-Play report</li>
+          <li>QR Code included</li>
+          <li>Screen only</li>
+        </ul>
+        <a class="pcta pcta-outline" href="/signagecms.html">Book Slot</a>
+      </div>
+
+      <!-- Omnichannel Growth -->
+      <div class="plan featured">
+        <div class="plan-badge">★ MOST POPULAR</div>
+        <div class="plan-label">Omnichannel Growth</div>
+        <div class="price-amt">&#8377;5,999<span class="price-mo">/month</span></div>
+        <div class="plan-slot">20 sec ad slot &nbsp;·&nbsp; ₹131/screen/month</div>
+        <hr class="plan-div">
+        <div class="plan-stats">
+          <div class="plan-stat">
+            <div class="plan-stat-num">~4,953</div>
+            <div class="plan-stat-lbl">plays/day</div>
+          </div>
+          <div class="plan-stat">
+            <div class="plan-stat-num">~1,48,590</div>
+            <div class="plan-stat-lbl">plays/month</div>
+          </div>
+          <div class="plan-stat">
+            <div class="plan-stat-num">4,45,770+</div>
             <div class="plan-stat-lbl">viewer impressions/month</div>
           </div>
         </div>
@@ -2681,17 +2652,17 @@ function loadPreset(key){
           <span class="ch-pill ch-fb"><svg width="20" height="20"><use href="#ico-fb"/></svg></span>
           <span class="ch-pill ch-ig"><svg width="20" height="20"><use href="#ico-ig"/></svg></span>
           <span class="ch-pill ch-gbp"><svg width="20" height="20"><use href="#ico-gbp"/></svg></span>
-          <span class="ch-pill ch-card"><svg width="20" height="20"><use href="#ico-card"/></svg></span>
+          <span class="ch-pill ch-wa"><svg width="20" height="20"><use href="#ico-wa"/></svg></span>
+          <span class="ch-pill"><svg width="20" height="20"><use href="#ico-qr"/></svg></span>
         </div>
         <ul class="plan-feats">
-          <li>All Digital Network coverage</li>
-          <li>20-second priority slot (1st in loop)</li>
-          <li>Proof of Play CSV report</li>
+          <li>Screen + Social Media + GBP</li>
+          <li>WhatsApp broadcast</li>
+          <li>PoP report · QR · Unlimited reposts</li>
           <li>Facebook + Instagram auto-post</li>
           <li>Google Business Profile post</li>
-          <li>Digital Card (shareable profile)</li>
         </ul>
-        <a class="pcta pcta-outline" href="/get-started.html">Book Slot</a>
+        <a class="pcta pcta-outline" href="/signagecms.html">Book Slot</a>
       </div>
 
     </div>
