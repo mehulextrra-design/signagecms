@@ -141,7 +141,7 @@ function fbApiPost(path, payload) {
 }
 
 // Plans that include FB/IG social posting
-const SOCIAL_PLANS = ['complete', 'growth'];
+const SOCIAL_PLANS = ['complete', 'growth', 'omnichannel_growth'];
 
 async function postCampaignToSocial(campaignId) {
   const result = await query(

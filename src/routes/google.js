@@ -256,7 +256,7 @@ router.post('/retry-fetch', authenticate, async (req, res) => {
 // ── Posting via Make.com native GBP module ────────────────────────────────────
 
 // Plans that include GBP posting
-const GBP_PLANS = ['complete', 'growth'];
+const GBP_PLANS = ['complete', 'growth', 'omnichannel_growth'];
 
 async function postCampaignToGoogle(campaignId) {
   const webhookUrl = process.env.MAKE_GBP_WEBHOOK;
