@@ -936,7 +936,7 @@
                 <div style="font-size:18px;font-weight:700;" id="sum-impressions">—</div>
               </div>
               <div>
-                <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;font-weight:600;">Plays / Month</div>
+                <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;font-weight:600;" id="sum-impressions-mo-label">Plays / Month</div>
                 <div style="font-size:18px;font-weight:700;" id="sum-impressions-mo">—</div>
               </div>
             </div>
@@ -3905,9 +3905,15 @@ function updateNetworkSummary(){
     const effMo=Math.round(rate.monthly*(1-_cc.d));
     pkgRateLabel=`₹${effMo.toLocaleString('en-IN')}/month`;
   } else {pkgRateLabel=`₹${rate.monthly.toLocaleString('en-IN')}/month`;}
+  // For v3 multi-month: scale total plays and update label
+  const cycleMonths=_wizardV3&&!rate.fixedDays?({'1mo':1,'3mo':3,'6mo':6}[_v3Cycle]||1):1;
+  const impTotal=impMo*cycleMonths;
+  const moLabel=cycleMonths>1?`Plays / ${cycleMonths} Months`:'Plays / Month';
   document.getElementById('sum-screens').textContent=n+' screens';
   document.getElementById('sum-impressions').textContent='~'+impDay.toLocaleString('en-IN');
-  document.getElementById('sum-impressions-mo').textContent='~'+impMo.toLocaleString('en-IN');
+  document.getElementById('sum-impressions-mo').textContent='~'+impTotal.toLocaleString('en-IN');
+  const moLblEl=document.getElementById('sum-impressions-mo-label');
+  if(moLblEl) moLblEl.textContent=moLabel;
   document.getElementById('sum-cpd').textContent=pkgRateLabel;
   ['trial','starter','complete','growth','starter_screen','omnichannel_growth'].forEach(p=>{
     const r=R()[p];if(!r)return;
