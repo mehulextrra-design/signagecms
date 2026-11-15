@@ -178,7 +178,7 @@ const V3_PACKAGES = {
   growth:   { slot_duration_sec: 20, loop_multiplier: 2, name: 'omnichannel_growth', monthly: 5999 },
 };
 const V3_CYCLE_DISCOUNTS = { 1: 0, 3: 0.15, 6: 0.25 };
-const V3_WA_BASE         = { trial: 499, starter: 499, complete: 499, growth: 400, omnichannel_growth: 400 };
+const V3_WA_BASE         = { trial: 0, starter: 0, complete: 0, growth: 0, omnichannel_growth: 0 }; // WA inbuilt in all v3 plans, no extra charge
 
 // POST /api/campaigns — create + pay
 router.post('/', authenticate, async (req, res, next) => {
