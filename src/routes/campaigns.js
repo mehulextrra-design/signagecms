@@ -178,7 +178,8 @@ const V3_PACKAGES = {
   growth:   { slot_duration_sec: 20, loop_multiplier: 2, name: 'omnichannel_growth', monthly: 5999 },
 };
 const V3_CYCLE_DISCOUNTS = { 1: 0, 3: 0.15, 6: 0.25 };
-const V3_WA_BASE         = { trial: 0, starter: 0, complete: 0, growth: 0, omnichannel_growth: 0 }; // WA inbuilt in all v3 plans, no extra charge
+// WA is only available on omnichannel_growth (inbuilt, no extra charge); all other v3 plans cannot use WA
+const V3_WA_PLANS = new Set(['omnichannel_growth']);
 
 // POST /api/campaigns — create + pay
 router.post('/', authenticate, async (req, res, next) => {
@@ -227,18 +228,19 @@ router.post('/', authenticate, async (req, res, next) => {
     const days = Math.ceil((new Date(end_date) - new Date(start_date)) / 86400000) + 1;
     let amount_base;
     if (is_v3) {
+      // WA only available on omnichannel_growth; force off for all other v3 plans
+      const waAllowed = V3_WA_PLANS.has(pkg.name);
+      if (!waAllowed) wa_broadcast_enabled = false;
       if (pkg.fixedDays) {
-        // v3 trial: ₹499 flat + optional WA addon
-        const waAddon = wa_broadcast_enabled ? (V3_WA_BASE[pkg.name] || 499) : 0;
-        amount_base = pkg.flat + waAddon;
+        // v3 trial: flat price, WA not available
+        amount_base = pkg.flat;
       } else {
         const months = parseInt(billing_months) || 1;
         const discPct = V3_CYCLE_DISCOUNTS[months] || 0;
         const rawBase = pkg.monthly * months;
         const discAmt = Math.round(rawBase * discPct);
-        const waBase = V3_WA_BASE[pkg.name] || 499;
-        const waAddon = wa_broadcast_enabled ? Math.round(waBase * months * (1 - discPct)) : 0;
-        amount_base = rawBase - discAmt + waAddon;
+        // omnichannel_growth: WA inbuilt, no extra charge
+        amount_base = rawBase - discAmt;
       }
     } else if (pkg.fixedDays) {
       amount_base = pkg.flat; // v1/v2 trial = 0
