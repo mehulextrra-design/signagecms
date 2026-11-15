@@ -158,6 +158,7 @@
 
   /* PACKAGE SELECTOR */
   .pkg-selector { display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:6px; }
+  #pkg-selector-v3 .pkg-selector { grid-template-columns:repeat(3,1fr); }
   .pkg-opt { border:2px solid var(--border);border-radius:10px;padding:14px 10px;cursor:pointer;text-align:center;transition:all 0.15s;background:var(--surface); }
   .pkg-opt:hover { border-color:var(--primary);background:var(--surface2); }
   .pkg-opt.selected { border-color:var(--primary);background:rgba(123,104,200,0.08); }
@@ -3593,7 +3594,7 @@ async function wizardNext(step){
       // V3: derive end date from billing cycle
       if(!selectedPkg){toast('Select a package','error');return;}
       const cycleMap={'1mo':30,'3mo':90,'6mo':180};
-      const days=PKG_RATES_V2[selectedPkg]?.fixedDays||cycleMap[_v3Cycle]||30;
+      const days=R()[selectedPkg]?.fixedDays||cycleMap[_v3Cycle]||30;
       const endD=new Date(start);endD.setDate(endD.getDate()+days-1);
       document.getElementById('sch-end').value=endD.toISOString().split('T')[0];
       calcCost();renderReview();updateWizardUI(4);return;
@@ -3625,12 +3626,20 @@ const PKG_RATES_V2={
   complete: {ppd:167, flat:4999, monthly:4999, slot:15, multiplier:2, label:'Complete (15s)'},
   growth:   {ppd:200, flat:5999, monthly:5999, slot:20, multiplier:3, label:'Growth (20s)'},
 };
+const PKG_RATES_V3={
+  trial:              {monthly:0,    slot:10, multiplier:1, label:'Trial (10s · 7 days FREE)',    fixedDays:7},
+  starter_screen:     {monthly:3999, slot:20, multiplier:2, label:'Starter Screen (20s)'},
+  omnichannel_growth: {monthly:5999, slot:20, multiplier:2, label:'Omnichannel Growth (20s)'},
+  starter:            {monthly:3999, slot:20, multiplier:2, label:'Starter Screen (20s)'},
+  complete:           {monthly:3999, slot:20, multiplier:2, label:'Starter Screen (20s)'},
+  growth:             {monthly:5999, slot:20, multiplier:2, label:'Omnichannel Growth (20s)'},
+};
 let _wizardV2 = localStorage.getItem('wizard_v2')==='1';
 let _wizardV3 = localStorage.getItem('wizard_v3')==='1';
 let _waUpgradeV2 = false;
 let _waUpgradeV3 = false;
 let _v3Cycle = localStorage.getItem('v3_cycle')||'1mo';
-function R(){ return _wizardV2 ? PKG_RATES_V2 : PKG_RATES_V1; }
+function R(){ return _wizardV3 ? PKG_RATES_V3 : (_wizardV2 ? PKG_RATES_V2 : PKG_RATES_V1); }
 function setWizardVersion(ver){
   _wizardV2 = ver==='v2'; _wizardV3 = ver==='v3'; _waUpgradeV2=false; _waUpgradeV3=false;
   localStorage.setItem('wizard_v2',_wizardV2?'1':'0');
