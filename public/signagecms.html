@@ -621,7 +621,7 @@
         </button>
         <button class="btn btn-primary btn-sm" onclick="navigate('new-campaign')">
           <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-          Book Campaign
+          <span data-i18n="btn_book">Book Campaign</span>
         </button>
       </div>
     </div>
@@ -830,7 +830,7 @@
               <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.05em;">Individual Screens</div>
               <div id="wizard-ungrouped-grid" class="screens-grid" style="margin-bottom:16px;"></div>
             </div>
-            <div class="wizard-nav"><div></div><button class="btn btn-primary" onclick="wizardNext(1)" id="btn-next-1" disabled>Continue ></button></div>
+            <div class="wizard-nav"><div></div><button class="btn btn-primary" data-i18n="wiz_next" onclick="wizardNext(1)" id="btn-next-1" disabled>Continue ></button></div>
           </div>
 
           <!-- Step 2 -->
@@ -838,7 +838,7 @@
             <!-- Campaign Name + Storage inline -->
             <div style="display:flex;align-items:flex-end;gap:12px;margin-bottom:12px;flex-wrap:wrap;">
               <div style="flex:1;min-width:180px;">
-                <label class="form-label" style="margin-bottom:4px;">Campaign Name</label>
+                <label class="form-label" data-i18n="lbl_camp_name" style="margin-bottom:4px;">Campaign Name</label>
                 <input type="text" id="cmp-name" class="form-input" placeholder="e.g. Domino's Weekend Offer — July">
               </div>
               <div id="storage-bar-wrap" style="flex-shrink:0;min-width:190px;background:var(--surface);border:1.5px solid var(--border);border-radius:8px;padding:6px 10px;margin-bottom:2px;">
@@ -876,7 +876,7 @@
               <div style="flex:1;min-width:0;"><div class="upload-preview-name" id="preview-name" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">—</div><div class="upload-preview-size" id="preview-size">—</div></div>
               <button onclick="clearFile()" style="margin-left:auto;background:none;border:none;cursor:pointer;color:var(--text2);font-size:20px;flex-shrink:0;">×</button>
             </div>
-            <div class="wizard-nav"><button class="btn btn-ghost" onclick="wizardBack(2)">< Back</button><button class="btn btn-primary" onclick="wizardNext(2)" id="btn-next-2" disabled>Continue ></button></div>
+            <div class="wizard-nav"><button class="btn btn-ghost" data-i18n="wiz_back" onclick="wizardBack(2)">< Back</button><button class="btn btn-primary" data-i18n="wiz_next" onclick="wizardNext(2)" id="btn-next-2" disabled>Continue ></button></div>
           </div>
 
           <!-- Step 3 -->
@@ -885,12 +885,12 @@
             <div style="font-size:13px;color:var(--text2);margin-bottom:20px;">Choose when your ad runs.</div>
             <div class="schedule-grid">
               <div class="form-group">
-                <label class="form-label">Start Date</label>
+                <label class="form-label" data-i18n="lbl_start_date">Start Date</label>
                 <input type="date" id="sch-start" class="form-input" onchange="onStartDateChange()">
-                <div class="form-hint">Campaign starts after approval.</div>
+                <div class="form-hint" data-i18n="hint_start_date">Campaign starts after approval.</div>
               </div>
               <div class="form-group">
-                <label class="form-label">Duration</label>
+                <label class="form-label" data-i18n="lbl_duration">Duration</label>
                 <select id="sch-duration" class="select-input" onchange="updateEndFromDuration()">
                   <option value="15">15 Days — Half Month</option>
                   <option value="30" selected>30 Days — 1 Month</option>
@@ -901,12 +901,14 @@
                 <div class="form-hint" id="sch-end-display" style="color:var(--primary);font-weight:500;"></div>
               </div>
               <div class="form-group">
-                <label class="form-label">Campaign Start Time <span style="color:var(--text3);font-weight:400;font-size:11px;">(auto-set to now)</span></label>
+                <label class="form-label" data-i18n="lbl_start_time">Campaign Start Time</label>
                 <input type="time" id="sch-time-start" class="form-input" min="00:00" max="23:59" onchange="onStartTimeChange()">
+                <div class="form-hint" data-i18n="hint_start_time">(auto-set to now)</div>
               </div>
               <div class="form-group">
-                <label class="form-label">Campaign End Time <span style="color:var(--text3);font-weight:400;font-size:11px;">(auto: 1 min before start)</span></label>
+                <label class="form-label" data-i18n="lbl_end_time">Campaign End Time</label>
                 <input type="time" id="sch-time-end" class="form-input" min="00:00" max="23:59" readonly style="background:var(--surface2);cursor:not-allowed;opacity:0.8;">
+                <div class="form-hint" data-i18n="hint_end_time">(auto: 1 min before start)</div>
               </div>
             </div>
             <!-- hidden end date kept for backend compatibility -->
@@ -1181,7 +1183,7 @@
                 <div style="font-size:11px;color:var(--text3);margin-top:5px;">Middle message mein use kar sako: <code>{{Campaign}}</code> <code>{{City}}</code></div>
               </div>
             </div>
-            <div class="wizard-nav"><button class="btn btn-ghost" onclick="wizardBack(3)">< Back</button><button class="btn btn-primary" onclick="wizardNext(3)">Continue ></button></div>
+            <div class="wizard-nav"><button class="btn btn-ghost" data-i18n="wiz_back" onclick="wizardBack(3)">< Back</button><button class="btn btn-primary" data-i18n="wiz_next" onclick="wizardNext(3)">Continue ></button></div>
           </div>
 
           <!-- Step 4 -->
@@ -1214,7 +1216,7 @@
                 <div id="coupon-msg" style="font-size:12px;margin-top:6px;"></div>
               </div>
             </div>
-            <div class="wizard-nav"><button class="btn btn-ghost" onclick="wizardBack(4)">< Back</button><button class="btn btn-primary" id="btn-submit-campaign" onclick="submitCampaign()">Confirm &amp; Pay ></button></div>
+            <div class="wizard-nav"><button class="btn btn-ghost" data-i18n="wiz_back" onclick="wizardBack(4)">< Back</button><button class="btn btn-primary" data-i18n="wiz_submit" id="btn-submit-campaign" onclick="submitCampaign()">Confirm &amp; Pay ></button></div>
           </div>
         </div>
       </div>
@@ -1236,7 +1238,7 @@
       <div id="page-wallet" class="page">
         <div class="stat-grid" style="margin-bottom:20px;">
           <div class="stat-card" style="grid-column:span 2;">
-            <div class="stat-label">Wallet Balance</div>
+            <div class="stat-label" data-i18n="lbl_wallet_bal">Wallet Balance</div>
             <div class="stat-value" id="wallet-balance-display">—</div>
             <div class="stat-sub">Available for campaign booking or refund</div>
           </div>
@@ -1289,38 +1291,38 @@
 
           <!-- Personal -->
           <div class="profile-section">
-            <div class="profile-section-title">Personal Info</div>
+            <div class="profile-section-title" data-i18n="sec_personal">Personal Info</div>
             <div class="prof-group" style="margin-bottom:10px;">
-              <label class="prof-label">Email</label>
+              <label class="prof-label" data-i18n="lbl_email">Email</label>
               <input type="email" id="prof-email" class="prof-input" placeholder="you@example.com" autocomplete="off">
             </div>
             <div class="prof-row">
-              <div class="prof-group"><label class="prof-label">First Name</label><input type="text" id="prof-first" class="prof-input"></div>
-              <div class="prof-group"><label class="prof-label">Last Name</label><input type="text" id="prof-last" class="prof-input"></div>
+              <div class="prof-group"><label class="prof-label" data-i18n="lbl_first_name">First Name</label><input type="text" id="prof-first" class="prof-input"></div>
+              <div class="prof-group"><label class="prof-label" data-i18n="lbl_last_name">Last Name</label><input type="text" id="prof-last" class="prof-input"></div>
             </div>
             <div class="prof-row">
-              <div class="prof-group"><label class="prof-label">Mobile</label><input type="tel" id="prof-mobile" class="prof-input"></div>
-              <div class="prof-group"><label class="prof-label">City</label><input type="text" id="prof-city" class="prof-input"></div>
+              <div class="prof-group"><label class="prof-label" data-i18n="lbl_mobile">Mobile</label><input type="tel" id="prof-mobile" class="prof-input"></div>
+              <div class="prof-group"><label class="prof-label" data-i18n="lbl_city">City</label><input type="text" id="prof-city" class="prof-input"></div>
             </div>
           </div>
 
           <!-- Business -->
           <div class="profile-section">
-            <div class="profile-section-title">Business</div>
+            <div class="profile-section-title" data-i18n="sec_business">Business</div>
             <div class="prof-row">
-              <div class="prof-group"><label class="prof-label">Business Name</label><input type="text" id="prof-biz" class="prof-input"></div>
-              <div class="prof-group"><label class="prof-label">Type</label><input type="text" id="prof-biz-type" class="prof-input"></div>
+              <div class="prof-group"><label class="prof-label" data-i18n="lbl_biz_name">Business Name</label><input type="text" id="prof-biz" class="prof-input"></div>
+              <div class="prof-group"><label class="prof-label" data-i18n="lbl_biz_type">Type</label><input type="text" id="prof-biz-type" class="prof-input"></div>
             </div>
             <div class="prof-group" style="max-width:50%;">
-              <label class="prof-label">GST Number</label><input type="text" id="prof-gst" class="prof-input" placeholder="27AABCM1234A1ZD">
+              <label class="prof-label" data-i18n="lbl_gst">GST Number</label><input type="text" id="prof-gst" class="prof-input" placeholder="27AABCM1234A1ZD">
             </div>
           </div>
 
           <!-- Preferences -->
           <div class="profile-section">
-            <div class="profile-section-title">Preferences / Pasand</div>
+            <div class="profile-section-title" data-i18n="sec_prefs">Preferences / Pasand</div>
             <div class="prof-group">
-              <label class="prof-label">Language / Bhasha</label>
+              <label class="prof-label" data-i18n="lbl_language">Language / Bhasha</label>
               <select id="prof-lang" class="prof-input" style="max-width:220px;" onchange="previewLang(this.value)">
                 <option value="en">🇬🇧 English</option>
                 <option value="hi">🇮🇳 हिंदी</option>
@@ -1331,7 +1333,7 @@
           </div>
 
           <div style="margin-bottom:10px;">
-            <button class="btn btn-primary btn-sm" onclick="saveProfile()">Save Changes</button>
+            <button class="btn btn-primary btn-sm" data-i18n="btn_save" onclick="saveProfile()">Save Changes</button>
           </div>
 
           <!-- Social Accounts -->
@@ -1811,12 +1813,10 @@ function applyLang(lang){
     const el=document.getElementById('wl'+n);
     if(el)el.textContent=t('wiz'+n);
   });
-  // Wizard nav buttons
-  const nb=document.getElementById('btn-wizard-back');if(nb)nb.textContent=t('wiz_back');
-  const nc=document.getElementById('btn-wizard-next');if(nc)nc.textContent=t('wiz_next');
-  const ns=document.getElementById('btn-submit-campaign');if(ns&&!ns.disabled)ns.textContent=t('wiz_submit');
-  // Book campaign button in sidebar / header
+  // All static elements with data-i18n attribute
   document.querySelectorAll('[data-i18n]').forEach(el=>{const k=el.dataset.i18n;el.textContent=t(k);});
+  // Re-render campaigns table so status badges use the new language
+  if(typeof allCampaigns!=='undefined'&&allCampaigns.length&&typeof renderCampaignsTable==='function'){renderCampaignsTable(allCampaigns);}
 }
 function previewLang(lang){
   const hints={en:'English interface',hi:'हिंदी में दिखेगा (देवनागरी)',hinglish:'Hinglish mein dikhega'};
@@ -4294,7 +4294,7 @@ function _lbEsc(e){if(e.key==='Escape')closeLightbox();}
 
 function formatBytes(b){if(b<1024)return b+' B';if(b<1048576)return (b/1024).toFixed(1)+' KB';return (b/1048576).toFixed(1)+' MB';}
 function fmtDate(d){if(!d)return '—';return new Date(d).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});}
-function statusBadge(s){const map={live:'badge-live',pending_payment:'badge-pending',pending_approval:'badge-pending',approved:'badge-live',completed:'badge-completed',cancelled:'badge-rejected',rejected:'badge-rejected',paused:'badge-draft'};return `<span class="badge ${map[s]||'badge-draft'}">${(s||'').replace(/_/g,' ')}</span>`;}
+function statusBadge(s){const map={live:'badge-live',pending_payment:'badge-pending',pending_approval:'badge-pending',approved:'badge-live',completed:'badge-completed',cancelled:'badge-rejected',rejected:'badge-rejected',paused:'badge-draft'};const keyMap={live:'s_live',pending_payment:'s_pending_pay',pending_approval:'s_pending_app',approved:'s_live',completed:'s_completed',cancelled:'s_cancelled',rejected:'s_rejected',paused:'s_paused'};return `<span class="badge ${map[s]||'badge-draft'}">${t(keyMap[s])||((s||'').replace(/_/g,' '))}</span>`;}
 function payBadge(s){const map={paid:'badge-live',pending:'badge-pending',refunded:'badge-rejected'};return `<span class="badge ${map[s]||'badge-draft'}">${s||'—'}</span>`;}
 function toggleMobileMenu(){/* kept for compatibility — sidebar hidden on mobile */}
 
