@@ -506,6 +506,13 @@ async function applyCriticalFixes(pool) {
   } catch (err) {
     console.warn('[DB] WA tables fix warn:', err.message);
   }
+  // preferred_language for advertiser UI (migration 030)
+  try {
+    await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS preferred_language VARCHAR(10) NOT NULL DEFAULT 'en'`);
+    console.log('[DB] preferred_language column ensured');
+  } catch (err) {
+    console.warn('[DB] preferred_language warn:', err.message);
+  }
   console.log('[DB] Critical column fixes done');
 }
 

@@ -9,7 +9,7 @@ router.get('/', authenticate, requireAdmin, async (req, res, next) => {
   try {
     const result = await query(
       `SELECT id, email, role, first_name, last_name, mobile, business_name, business_type,
-              gst_number, city, is_verified, is_active, wa_enabled, created_at
+              gst_number, city, is_verified, is_active, wa_enabled, preferred_language, created_at
        FROM users WHERE role = 'advertiser' ORDER BY created_at DESC`
     );
     res.json(result.rows);
@@ -23,7 +23,7 @@ router.get('/:id', authenticate, async (req, res, next) => {
   }
   try {
     const result = await query(
-      'SELECT id, email, role, first_name, last_name, mobile, business_name, gst_number, city, is_verified, created_at FROM users WHERE id=$1',
+      'SELECT id, email, role, first_name, last_name, mobile, business_name, gst_number, city, is_verified, preferred_language, created_at FROM users WHERE id=$1',
       [req.params.id]
     );
     if (!result.rows.length) return res.status(404).json({ error: 'User not found' });
@@ -36,7 +36,9 @@ router.put('/:id', authenticate, async (req, res, next) => {
   if (!['admin', 'superadmin'].includes(req.user.role) && String(req.user.id) !== String(req.params.id)) {
     return res.status(403).json({ error: 'Access denied' });
   }
-  const { email, first_name, last_name, mobile, business_name, business_type, gst_number, pan_number, city } = req.body;
+  const { email, first_name, last_name, mobile, business_name, business_type, gst_number, pan_number, city, preferred_language } = req.body;
+  const allowedLangs = ['en', 'hi', 'hinglish'];
+  const lang = allowedLangs.includes(preferred_language) ? preferred_language : undefined;
   try {
     // Check email uniqueness if being changed
     if (email) {
@@ -47,9 +49,11 @@ router.put('/:id', authenticate, async (req, res, next) => {
       `UPDATE users SET
          email=COALESCE(NULLIF($1,''), email),
          first_name=$2, last_name=$3, mobile=$4, business_name=$5, business_type=$6,
-         gst_number=$7, pan_number=$8, city=$9, updated_at=NOW()
-       WHERE id=$10 RETURNING *`,
-      [email||null, first_name, last_name, mobile, business_name, business_type, gst_number, pan_number, city, req.params.id]
+         gst_number=$7, pan_number=$8, city=$9,
+         preferred_language=COALESCE($10, preferred_language),
+         updated_at=NOW()
+       WHERE id=$11 RETURNING *`,
+      [email||null, first_name, last_name, mobile, business_name, business_type, gst_number, pan_number, city, lang||null, req.params.id]
     );
     res.json(result.rows[0]);
   } catch (err) { next(err); }

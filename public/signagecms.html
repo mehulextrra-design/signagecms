@@ -562,39 +562,39 @@
     </div>
     <div class="sidebar-nav">
       <div class="nav-section-label">Overview</div>
-      <div class="nav-item active" onclick="navigate('dashboard')">
+      <div class="nav-item active" data-page="dashboard" onclick="navigate('dashboard')">
         <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-        Dashboard
+        <span class="nav-label">Dashboard</span>
       </div>
-      <div class="nav-item" onclick="navigate('analytics')">
+      <div class="nav-item" data-page="analytics" onclick="navigate('analytics')">
         <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-        Analytics
+        <span class="nav-label">Analytics</span>
       </div>
-      <div class="nav-item" onclick="navigate('pop')">
+      <div class="nav-item" data-page="pop" onclick="navigate('pop')">
         <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-        Proof of Play
+        <span class="nav-label">Proof of Play</span>
       </div>
       <div class="nav-section-label">Campaigns</div>
-      <div class="nav-item" onclick="navigate('campaigns')">
+      <div class="nav-item" data-page="campaigns" onclick="navigate('campaigns')">
         <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
-        My Campaigns
+        <span class="nav-label">My Campaigns</span>
       </div>
-      <div class="nav-item" onclick="navigate('new-campaign')">
+      <div class="nav-item" data-page="new-campaign" onclick="navigate('new-campaign')">
         <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-        Book Campaign
+        <span class="nav-label">Book Campaign</span>
       </div>
-      <div class="nav-item" onclick="navigate('screens')">
+      <div class="nav-item" data-page="screens" onclick="navigate('screens')">
         <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-        Browse Screens
+        <span class="nav-label">Browse Screens</span>
       </div>
       <div class="nav-section-label">Billing</div>
-      <div class="nav-item" onclick="navigate('invoices')">
+      <div class="nav-item" data-page="invoices" onclick="navigate('invoices')">
         <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-        Invoices
+        <span class="nav-label">Invoices</span>
       </div>
-      <div class="nav-item" onclick="navigate('wallet')">
+      <div class="nav-item" data-page="wallet" onclick="navigate('wallet')">
         <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
-        Wallet <span id="sidebar-wallet-bal" style="margin-left:auto;font-size:11px;background:rgba(123,104,200,0.2);color:#7b68c8;border-radius:4px;padding:1px 6px;font-weight:600;"></span>
+        <span class="nav-label">Wallet</span> <span id="sidebar-wallet-bal" style="margin-left:auto;font-size:11px;background:rgba(123,104,200,0.2);color:#7b68c8;border-radius:4px;padding:1px 6px;font-weight:600;"></span>
       </div>
     </div>
     <div class="sidebar-footer">
@@ -1316,6 +1316,20 @@
             </div>
           </div>
 
+          <!-- Preferences -->
+          <div class="profile-section">
+            <div class="profile-section-title">Preferences / Pasand</div>
+            <div class="prof-group">
+              <label class="prof-label">Language / Bhasha</label>
+              <select id="prof-lang" class="prof-input" style="max-width:220px;" onchange="previewLang(this.value)">
+                <option value="en">🇬🇧 English</option>
+                <option value="hi">🇮🇳 Hindi (Roman)</option>
+                <option value="hinglish">🤝 Hinglish</option>
+              </select>
+              <div style="font-size:11px;color:var(--text3);margin-top:4px;" id="lang-preview-hint"></div>
+            </div>
+          </div>
+
           <div style="margin-bottom:10px;">
             <button class="btn btn-primary btn-sm" onclick="saveProfile()">Save Changes</button>
           </div>
@@ -1663,6 +1677,153 @@
 <script>
 const API = 'https://www.extrravenue.com/api';
 let token = null, currentUser = null;
+
+// ── Language / i18n ──────────────────────────────────────────────────
+let _lang = localStorage.getItem('ui_lang') || 'en';
+const TRANSLATIONS = {
+  en: {
+    // Nav
+    nav_dashboard:'Dashboard', nav_analytics:'Analytics', nav_pop:'Proof of Play',
+    nav_campaigns:'My Campaigns', nav_book:'Book Campaign', nav_browse:'Browse Screens',
+    nav_invoices:'Invoices', nav_wallet:'Wallet', nav_profile:'Profile', nav_logout:'Logout',
+    // Page headings
+    h_dashboard:'Dashboard', h_campaigns:'My Campaigns', h_new_campaign:'Book Campaign',
+    h_screens:'Browse Screens', h_analytics:'Analytics', h_invoices:'Invoices',
+    h_wallet:'Wallet', h_profile:'Profile',
+    // Wizard steps
+    wiz1:'Select Screens', wiz2:'Upload Creative', wiz3:'Set Schedule', wiz4:'Review & Pay',
+    wiz_next:'Continue >', wiz_back:'< Back', wiz_submit:'Confirm & Pay >',
+    // Campaign form
+    lbl_camp_name:'Campaign Name', lbl_start_date:'Start Date', lbl_duration:'Duration',
+    lbl_start_time:'Campaign Start Time', lbl_end_time:'Campaign End Time',
+    hint_start_date:'Campaign starts after approval.',
+    hint_start_time:'(auto-set to now)', hint_end_time:'(auto: 1 min before start)',
+    // Buttons
+    btn_save:'Save Changes', btn_cancel:'Cancel', btn_pay:'Pay Now',
+    btn_book:'+ Book Campaign', btn_upload_creative:'Upload Creative',
+    btn_browse_screens:'Browse & Select Screens',
+    // Profile
+    lbl_email:'Email', lbl_first_name:'First Name', lbl_last_name:'Last Name',
+    lbl_mobile:'Mobile', lbl_city:'City', lbl_biz_name:'Business Name',
+    lbl_biz_type:'Type', lbl_gst:'GST Number',
+    sec_personal:'Personal Info', sec_business:'Business', sec_prefs:'Preferences / Pasand',
+    lbl_language:'Language / Bhasha',
+    // Wallet
+    lbl_wallet_bal:'Wallet Balance', btn_add_money:'+ Add Money',
+    // Status
+    s_live:'live', s_pending_pay:'pending payment', s_pending_app:'pending approval',
+    s_completed:'completed', s_cancelled:'cancelled', s_rejected:'rejected', s_paused:'paused',
+    // Toasts
+    t_profile_saved:'Profile saved!', t_camp_submitted:'Campaign submitted for approval!',
+    t_payment_ok:'Payment successful! Campaign submitted for approval.',
+    t_select_screen:'Select at least one screen',
+    t_upload_first:'Please upload your creative first',
+    t_set_start:'Set a start date',
+    // Misc
+    tap_review_pay:'Tap to review & pay',
+  },
+  hi: {
+    nav_dashboard:'Dashboard', nav_analytics:'Analytics', nav_pop:'Play ka Saboot',
+    nav_campaigns:'Mere Campaign', nav_book:'Campaign Banao', nav_browse:'Screens Dekho',
+    nav_invoices:'Raseed', nav_wallet:'Wallet', nav_profile:'Mera Khata', nav_logout:'Bahar Jao',
+    h_dashboard:'Mukhy Prishth', h_campaigns:'Mere Campaign', h_new_campaign:'Campaign Banao',
+    h_screens:'Screens Chunein', h_analytics:'Vishleshann', h_invoices:'Raseed',
+    h_wallet:'Wallet', h_profile:'Mera Khata',
+    wiz1:'Screens Chunein', wiz2:'Creative Upload Karein', wiz3:'Samay Nischit Karein', wiz4:'Jaanch aur Bhugtaan',
+    wiz_next:'Aage Badhein >', wiz_back:'< Peeche', wiz_submit:'Pakka Karein aur Pay Karein >',
+    lbl_camp_name:'Campaign ka Naam', lbl_start_date:'Shuru ki Taareekh', lbl_duration:'Kitne Din',
+    lbl_start_time:'Campaign Shuru ka Samay', lbl_end_time:'Campaign Khatam ka Samay',
+    hint_start_date:'Campaign svikriti ke baad shuru hogi.',
+    hint_start_time:'(abhi ka samay auto set hoga)', hint_end_time:'(shuru se 1 minute pehle)',
+    btn_save:'Save Karein', btn_cancel:'Ruk Jaaein', btn_pay:'Abhi Pay Karein',
+    btn_book:'+ Campaign Banao', btn_upload_creative:'Creative Upload Karein',
+    btn_browse_screens:'Screens Dhundho aur Chunein',
+    lbl_email:'Email', lbl_first_name:'Pehla Naam', lbl_last_name:'Antim Naam',
+    lbl_mobile:'Mobile', lbl_city:'Sheher', lbl_biz_name:'Vyavsay ka Naam',
+    lbl_biz_type:'Prakar', lbl_gst:'GST Number',
+    sec_personal:'Vyaktigat Jaankari', sec_business:'Vyavsay', sec_prefs:'Preferences / Pasand',
+    lbl_language:'Bhasha Chunein',
+    lbl_wallet_bal:'Wallet Mein Raqam', btn_add_money:'+ Paisa Daalo',
+    s_live:'Chal Raha Hai', s_pending_pay:'Payment Baaki', s_pending_app:'Svikriti Baaki',
+    s_completed:'Poora Hua', s_cancelled:'Raddh Kiya', s_rejected:'Asveekriti', s_paused:'Ruka Hua',
+    t_profile_saved:'Profile Save Ho Gayi!', t_camp_submitted:'Campaign Approval ke liye Bheja Gaya!',
+    t_payment_ok:'Payment Ho Gayi! Campaign Approval ke liye Bheja Gaya.',
+    t_select_screen:'Kam se Kam Ek Screen Chunein',
+    t_upload_first:'Pehle Apna Creative Upload Karein',
+    t_set_start:'Shuru ki Taareekh Daalo',
+    tap_review_pay:'Jaanch karein aur Pay karein',
+  },
+  hinglish: {
+    nav_dashboard:'Dashboard', nav_analytics:'Analytics', nav_pop:'Proof of Play',
+    nav_campaigns:'Mera Campaigns', nav_book:'Campaign Book Karo', nav_browse:'Screens Dekho',
+    nav_invoices:'Invoices', nav_wallet:'Wallet', nav_profile:'Mera Profile', nav_logout:'Logout Karo',
+    h_dashboard:'Dashboard', h_campaigns:'Mera Campaigns', h_new_campaign:'Campaign Book Karo',
+    h_screens:'Screens Browse Karo', h_analytics:'Analytics', h_invoices:'Invoices',
+    h_wallet:'Wallet', h_profile:'Mera Profile',
+    wiz1:'Screens Select Karo', wiz2:'Creative Upload Karo', wiz3:'Schedule Set Karo', wiz4:'Review & Pay Karo',
+    wiz_next:'Continue Karo >', wiz_back:'< Wapas', wiz_submit:'Confirm & Pay Karo >',
+    lbl_camp_name:'Campaign ka Naam', lbl_start_date:'Start Date', lbl_duration:'Duration',
+    lbl_start_time:'Campaign Start Time', lbl_end_time:'Campaign End Time',
+    hint_start_date:'Campaign approval ke baad start hogi.',
+    hint_start_time:'(abhi ka time auto set hoga)', hint_end_time:'(start se 1 min pehle)',
+    btn_save:'Save Karo', btn_cancel:'Cancel', btn_pay:'Pay Karo',
+    btn_book:'+ Campaign Book Karo', btn_upload_creative:'Creative Upload Karo',
+    btn_browse_screens:'Screens Dhundo aur Select Karo',
+    lbl_email:'Email', lbl_first_name:'Pehla Naam', lbl_last_name:'Last Name',
+    lbl_mobile:'Mobile', lbl_city:'City', lbl_biz_name:'Business ka Naam',
+    lbl_biz_type:'Type', lbl_gst:'GST Number',
+    sec_personal:'Personal Info', sec_business:'Business', sec_prefs:'Preferences / Pasand',
+    lbl_language:'Bhasha Choose Karo',
+    lbl_wallet_bal:'Wallet Balance', btn_add_money:'+ Paisa Dalo',
+    s_live:'Live Hai', s_pending_pay:'Payment Baaki Hai', s_pending_app:'Approval Pending',
+    s_completed:'Complete Ho Gaya', s_cancelled:'Cancel Ho Gaya', s_rejected:'Reject Ho Gaya', s_paused:'Paused Hai',
+    t_profile_saved:'Profile save ho gayi!', t_camp_submitted:'Campaign approval ke liye bhej diya!',
+    t_payment_ok:'Payment ho gayi! Campaign approval ke liye bhej diya.',
+    t_select_screen:'Kam se kam ek screen choose karo',
+    t_upload_first:'Pehle apna creative upload karo',
+    t_set_start:'Start date set karo',
+    tap_review_pay:'Review karo aur pay karo',
+  }
+};
+function t(key){return(TRANSLATIONS[_lang]||TRANSLATIONS.en)[key]||(TRANSLATIONS.en)[key]||key;}
+function applyLang(lang){
+  _lang=lang;
+  localStorage.setItem('ui_lang',lang);
+  // Nav labels
+  const nm={'dashboard':'nav_dashboard','analytics':'nav_analytics','pop':'nav_pop',
+    'campaigns':'nav_campaigns','new-campaign':'nav_book','screens':'nav_browse',
+    'invoices':'nav_invoices','wallet':'nav_wallet','profile':'nav_profile'};
+  document.querySelectorAll('.nav-item[data-page]').forEach(el=>{
+    const k=nm[el.dataset.page];
+    if(k){const sp=el.querySelector('.nav-label');if(sp)sp.textContent=t(k);}
+  });
+  // Page headings (h2 or first heading inside each page)
+  const ph={'page-dashboard':'h_dashboard','page-campaigns':'h_campaigns',
+    'page-new-campaign':'h_new_campaign','page-screens':'h_screens',
+    'page-analytics':'h_analytics','page-invoices':'h_invoices',
+    'page-wallet':'h_wallet','page-profile':'h_profile'};
+  Object.entries(ph).forEach(([id,k])=>{
+    const pg=document.getElementById(id);
+    if(pg){const h=pg.querySelector('.page-title,h2,[data-i18n-heading]');if(h)h.textContent=t(k);}
+  });
+  // Wizard step labels
+  ['1','2','3','4'].forEach(n=>{
+    const el=document.getElementById('wl'+n);
+    if(el)el.textContent=t('wiz'+n);
+  });
+  // Wizard nav buttons
+  const nb=document.getElementById('btn-wizard-back');if(nb)nb.textContent=t('wiz_back');
+  const nc=document.getElementById('btn-wizard-next');if(nc)nc.textContent=t('wiz_next');
+  const ns=document.getElementById('btn-submit-campaign');if(ns&&!ns.disabled)ns.textContent=t('wiz_submit');
+  // Book campaign button in sidebar / header
+  document.querySelectorAll('[data-i18n]').forEach(el=>{const k=el.dataset.i18n;el.textContent=t(k);});
+}
+function previewLang(lang){
+  const hints={en:'English interface',hi:'Hindi mein dikhega (Roman script)',hinglish:'Hinglish mein dikhega'};
+  const h=document.getElementById('lang-preview-hint');
+  if(h)h.textContent=hints[lang]||'';
+  applyLang(lang);
+}
 let allCampaigns = [], allInvoices = [], allScreens = [];
 let wizardStep = 1, selectedScreenIds = [], uploadedFile = null, uploadedContentId = null;
 let campaignCost = {base:0,gst:0,total:0,discount:0};
@@ -1823,7 +1984,9 @@ function doLogout(){clearToken();currentUser=null;showAuthScreen();showLogin();}
 async function loadUserInfo(){
   const r=await fetch(`${API}/auth/me`,{headers:{Authorization:`Bearer ${token}`}});
   if(!r.ok)throw new Error('Unauthorized');
-  const data=await r.json();currentUser=data.user||data;showApp();
+  const data=await r.json();currentUser=data.user||data;
+  if(currentUser.preferred_language)applyLang(currentUser.preferred_language);
+  showApp();
 }
 
 function showApp(){
@@ -2657,6 +2820,9 @@ async function loadProfile(){
     document.getElementById('prof-biz-type').value=u.business_type||'';
     document.getElementById('prof-gst').value=u.gst_number||'';
     document.getElementById('prof-city').value=u.city||'';
+    // Language preference
+    const langSel=document.getElementById('prof-lang');
+    if(langSel&&u.preferred_language){langSel.value=u.preferred_language;applyLang(u.preferred_language);}
     updateSidebarUser();
     // Always wire up WA caption toggle (v2 shows it for Growth/Complete without wa_enabled)
     const waTog=document.getElementById('wa-broadcast-toggle');
@@ -3073,9 +3239,12 @@ async function wacmExportCSV(){
 
 async function saveProfile(){
   try{
-    const body={email:document.getElementById('prof-email').value.trim(),first_name:document.getElementById('prof-first').value,last_name:document.getElementById('prof-last').value,mobile:document.getElementById('prof-mobile').value,business_name:document.getElementById('prof-biz').value,business_type:document.getElementById('prof-biz-type').value,gst_number:document.getElementById('prof-gst').value,city:document.getElementById('prof-city').value};
+    const _lang_sel=document.getElementById('prof-lang');
+    const body={email:document.getElementById('prof-email').value.trim(),first_name:document.getElementById('prof-first').value,last_name:document.getElementById('prof-last').value,mobile:document.getElementById('prof-mobile').value,business_name:document.getElementById('prof-biz').value,business_type:document.getElementById('prof-biz-type').value,gst_number:document.getElementById('prof-gst').value,city:document.getElementById('prof-city').value,preferred_language:_lang_sel?_lang_sel.value:'en'};
     await api(`/users/${currentUser.id}`,{method:'PUT',body:JSON.stringify(body)});
-    currentUser={...currentUser,...body};updateSidebarUser();
+    currentUser={...currentUser,...body};
+    applyLang(body.preferred_language);
+    updateSidebarUser();
     const hName=[body.first_name,body.last_name].filter(Boolean).join(' ')||body.email||currentUser.email;
     document.getElementById('profile-fullname').textContent=hName;
     document.getElementById('profile-email-disp').textContent=body.email||currentUser.email;
