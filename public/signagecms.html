@@ -1096,10 +1096,12 @@
 
               <!-- V4 pkg selector: billing cycle tabs + 3 plan cards -->
               <div id="pkg-selector-v3" style="display:none;">
-                <div style="display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap;align-items:center;">
-                  <button id="v3c-1mo" onclick="setV3Cycle('1mo')" style="padding:7px 16px;border:1.5px solid var(--border);border-radius:20px;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;background:var(--primary);color:#fff;transition:all 0.15s;">Monthly</button>
-                  <button id="v3c-3mo" onclick="setV3Cycle('3mo')" style="padding:7px 16px;border:1.5px solid var(--border);border-radius:20px;cursor:pointer;font-family:inherit;font-size:13px;font-weight:500;background:var(--surface2);color:var(--text2);transition:all 0.15s;">3 Months <span style="font-size:10px;background:#16a34a;color:#fff;padding:1px 5px;border-radius:10px;margin-left:3px;font-weight:600;">−15%</span></button>
-                  <button id="v3c-6mo" onclick="setV3Cycle('6mo')" style="padding:7px 16px;border:1.5px solid var(--border);border-radius:20px;cursor:pointer;font-family:inherit;font-size:13px;font-weight:500;background:var(--surface2);color:var(--text2);transition:all 0.15s;">6 Months <span style="font-size:10px;background:#16a34a;color:#fff;padding:1px 5px;border-radius:10px;margin-left:3px;font-weight:600;">−25%</span></button>
+                <div style="display:flex;justify-content:center;margin-bottom:20px;">
+                  <div style="display:inline-flex;gap:4px;background:#fff;border:1.5px solid var(--border);border-radius:50px;padding:4px;">
+                    <button id="v3c-1mo" onclick="setV3Cycle('1mo')" style="padding:9px 22px;border:none;border-radius:50px;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;background:var(--primary);color:#fff;transition:all 0.2s ease;white-space:nowrap;">Monthly</button>
+                    <button id="v3c-3mo" onclick="setV3Cycle('3mo')" style="padding:9px 22px;border:none;border-radius:50px;cursor:pointer;font-family:inherit;font-size:13px;font-weight:500;background:transparent;color:var(--text2);transition:all 0.2s ease;white-space:nowrap;">3 Months <span style="font-size:10px;background:#16a34a;color:#fff;padding:2px 6px;border-radius:10px;margin-left:3px;font-weight:600;">−15%</span></button>
+                    <button id="v3c-6mo" onclick="setV3Cycle('6mo')" style="padding:9px 22px;border:none;border-radius:50px;cursor:pointer;font-family:inherit;font-size:13px;font-weight:500;background:transparent;color:var(--text2);transition:all 0.2s ease;white-space:nowrap;">6 Months <span style="font-size:10px;background:#16a34a;color:#fff;padding:2px 6px;border-radius:10px;margin-left:3px;font-weight:600;">−25%</span></button>
+                  </div>
                   <span id="v3-cycle-desc" style="display:none;"></span>
                 </div>
                 <div class="pkg-selector">
@@ -3650,7 +3652,7 @@ function setV3Cycle(cycle){
   localStorage.setItem('v3_cycle',cycle);
   ['1mo','3mo','6mo'].forEach(c=>{
     const btn=document.getElementById('v3c-'+c);
-    if(btn){btn.style.background=c===cycle?'var(--primary)':'var(--surface2)';btn.style.color=c===cycle?'#fff':'var(--text2)';btn.style.borderColor=c===cycle?'var(--primary)':'var(--border)';btn.style.fontWeight=c===cycle?'600':'500';}
+    if(btn){btn.style.background=c===cycle?'var(--primary)':'transparent';btn.style.color=c===cycle?'#fff':'var(--text2)';btn.style.fontWeight=c===cycle?'600':'500';}
   });
   const descMap={'1mo':'1 month billing','3mo':'3 months · 15% off','6mo':'6 months · 25% off'};
   const d=document.getElementById('v3-cycle-desc');if(d)d.textContent=descMap[cycle]||'';
