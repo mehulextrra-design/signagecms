@@ -2460,7 +2460,7 @@ function renderCampaignsTable(campaigns){
         ${c.status==='rejected'?`<button class="ca-btn ca-primary" onclick="navigate('new-campaign')" title="Book Again"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"/></svg></button>`:''}
         ${c.status==='live'?`<button class="ca-btn ca-default" onclick="campaignPause('${c.id}',this)" title="Pause Campaign"><svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg></button>`:''}
         ${c.status==='paused'?`<button class="ca-btn ca-primary" onclick="campaignResume('${c.id}',this)" title="Resume Campaign"><svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></button>`:''}
-        ${['live','paused','approved'].includes(c.status)?`<button class="ca-btn ca-purple${c.creative_change_status==='pending'?' ca-pulse':''}" onclick="openCreativeModal('${c.id}','${(c.title||'').replace(/'/g,"\\'")}','${c.creative_change_status||''}')" title="${c.creative_change_status==='pending'?'Creative review pending':'Change Creative'}"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>`:''}
+        ${['live','paused','approved'].includes(c.status)?`<button class="ca-btn ca-purple${c.creative_change_status==='pending'?' ca-pulse':''}" onclick="openCreativeModal('${c.id}','${(c.title||'').replace(/'/g,"\\'")}','${c.creative_change_status||''}','${c.package_name||''}')" title="${c.creative_change_status==='pending'?'Creative review pending':'Change Creative'}"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>`:''}
         ${['live','approved','paused'].includes(c.status)&&c.creative_type==='image'?`<button class="ca-btn ca-teal${c.qr_enabled?' ca-active':''}" onclick="openQRModal('${c.id}','${(c.campaign_code||'').replace(/'/g,"\\'")}','${(c.title||'').replace(/'/g,"\\'")}',${c.qr_enabled?'true':'false'},'${c.qr_placement||'bot-right'}','${c.qr_phone||''}',${c.qr_content_url?`'${c.qr_content_url}'`:'null'},'${(c.qr_message||'').replace(/'/g,"\\'")}')" title="${c.qr_enabled?'QR Active':'Enable QR Overlay'}"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="3" height="3"/><rect x="18" y="18" width="3" height="3"/><rect x="14" y="18" width="3" height="3"/><rect x="18" y="14" width="3" height="3"/></svg></button>`:''}
         ${['live','paused','approved'].includes(c.status)?`<button class="ca-btn ca-danger" onclick="campaignCancel('${c.id}','${(c.title||c.campaign_code).replace(/'/g,"\\'")}')` + `" title="Cancel Campaign"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></button>`:''}
         ${!['pending_payment','rejected','live','approved','paused'].includes(c.status)?'<span style="color:var(--text3);font-size:12px;">—</span>':''}
@@ -4586,13 +4586,19 @@ async function campaignCancel(id, title){
 
 // -- CREATIVE CHANGE MODAL -----------------------------------------------------
 let creativeCampaignId = null;
+let creativeIsOmni = false;
 
-function openCreativeModal(id, title, changeStatus){
+function openCreativeModal(id, title, changeStatus, packageName){
   creativeCampaignId = id;
+  creativeIsOmni = ['omnichannel_growth','growth','complete'].includes(packageName);
   document.getElementById('creative-modal-title').textContent = title;
   document.getElementById('creative-status-note').style.display = changeStatus==='pending' ? 'block' : 'none';
   document.getElementById('creative-file-input').value = '';
   document.getElementById('creative-upload-status').textContent = '';
+  const waWrap = document.getElementById('creative-wa-wrap');
+  if(waWrap){ waWrap.style.display = creativeIsOmni ? '' : 'none'; }
+  const waMsg = document.getElementById('creative-wa-message');
+  if(waMsg) waMsg.value = '';
   document.getElementById('creative-modal-overlay').style.display = 'flex';
 }
 
@@ -4619,7 +4625,10 @@ async function submitCreativeChange(){
     const contentId = uploadData.id || uploadData.content?.id;
     // Submit creative change
     statusEl.textContent = 'Submitting for review…';
-    await api(`/campaigns/${creativeCampaignId}/creative`,{method:'PUT',body:JSON.stringify({content_id:contentId})});
+    const waMsg = document.getElementById('creative-wa-message')?.value?.trim();
+    const payload = {content_id:contentId};
+    if(creativeIsOmni) payload.wa_message = waMsg || null;
+    await api(`/campaigns/${creativeCampaignId}/creative`,{method:'PUT',body:JSON.stringify(payload)});
     toast('Creative change submitted for admin review. Current creative continues until approved.','success');
     closeCreativeModal();
     await loadCampaigns();
@@ -4824,12 +4833,19 @@ async function saveQRSettings(){
         ? A creative change is already pending admin review.
       </div>
       <div style="margin-bottom:14px;">
-        <label style="font-size:12px;font-weight:600;color:var(--text2);display:block;margin-bottom:6px;">Upload New Creative (Image only)</label>
-        <input type="file" id="creative-file-input" accept="image/jpeg,image/png,image/webp,image/gif"
+        <label style="font-size:12px;font-weight:600;color:var(--text2);display:block;margin-bottom:6px;">Upload New Creative</label>
+        <input type="file" id="creative-file-input" accept="image/jpeg,image/png,image/webp,image/gif,video/mp4"
           style="width:100%;box-sizing:border-box;padding:8px;border:1.5px dashed var(--border);border-radius:8px;font-size:13px;background:var(--surface);color:var(--text);cursor:pointer;">
       </div>
+      <div id="creative-wa-wrap" style="display:none;margin-bottom:14px;">
+        <label style="font-size:12px;font-weight:600;color:var(--text2);display:block;margin-bottom:6px;">
+          <span style="color:#25D366;">WhatsApp</span> Broadcast Message <span style="font-size:11px;font-weight:400;">(optional update)</span>
+        </label>
+        <textarea id="creative-wa-message" rows="3" placeholder="Leave blank to keep existing message…"
+          style="width:100%;box-sizing:border-box;padding:9px 11px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;resize:vertical;background:var(--surface);color:var(--text);"></textarea>
+      </div>
       <div style="font-size:12px;color:var(--text2);margin-bottom:16px;background:var(--surface2);border-radius:6px;padding:10px;">
-        ? Your current creative will keep running until admin approves the change. No billing interruption.
+        Current creative keeps running until admin approves. No billing interruption. 1 update allowed per week.
       </div>
       <div id="creative-upload-status" style="font-size:13px;color:var(--primary);margin-bottom:10px;"></div>
       <div style="display:flex;gap:10px;justify-content:flex-end;">

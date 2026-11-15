@@ -47,12 +47,15 @@ router.get('/', authenticate, async (req, res, next) => {
         ARRAY_AGG(DISTINCT s.screen_code) FILTER (WHERE s.id IS NOT NULL) AS screens,
         c.rejection_reason, c.ai_review_status, c.ai_review_notes,
         ct.file_url AS creative_url, ct.type AS creative_type, ct.original_name AS creative_name,
+        ct.duration_sec AS creative_duration, ct.file_size AS creative_size,
+        pct.file_url AS pending_creative_url, pct.original_name AS pending_creative_name,
         COALESCE((SELECT SUM(pl.play_count) FROM play_logs pl WHERE pl.campaign_id = c.id), 0) AS play_count
       FROM campaigns c
       JOIN users u ON u.id = c.user_id
       LEFT JOIN campaign_screens cs ON cs.campaign_id = c.id
       LEFT JOIN screens s ON s.id = cs.screen_id
       LEFT JOIN content ct ON ct.id = c.content_id
+      LEFT JOIN content pct ON pct.id = c.pending_content_id
       WHERE 1=1
     `;
     const params = [];
@@ -60,7 +63,7 @@ router.get('/', authenticate, async (req, res, next) => {
     if (!isAdmin) { params.push(req.user.id); sql += ` AND c.user_id = $${params.length}`; }
     if (status) { params.push(status); sql += ` AND c.status = $${params.length}`; }
 
-    sql += ` GROUP BY c.id, u.first_name, u.last_name, u.business_name, u.email, ct.file_url, ct.type, ct.original_name
+    sql += ` GROUP BY c.id, u.first_name, u.last_name, u.business_name, u.email, ct.file_url, ct.type, ct.original_name, ct.duration_sec, ct.file_size, pct.file_url, pct.original_name
              ORDER BY c.created_at DESC LIMIT $${params.length + 1} OFFSET $${params.length + 2}`;
     params.push(limit, offset);
 
@@ -463,6 +466,111 @@ router.patch('/:id/admin-set-creative', authenticate, requireAdmin, async (req, 
       [content_id, req.params.id]
     );
     if (!result.rows.length) return res.status(404).json({ error: 'Campaign not found' });
+    res.json(result.rows[0]);
+  } catch (err) { next(err); }
+});
+
+// PUT /api/campaigns/:id/creative — user submits creative change request (1 per week)
+router.put('/:id/creative', authenticate, async (req, res, next) => {
+  try {
+    const { content_id, wa_message } = req.body;
+    if (!content_id) return res.status(400).json({ error: 'content_id required' });
+
+    const campResult = await query(
+      `SELECT id, user_id, status, package_name, creative_change_requested_at
+       FROM campaigns WHERE id=$1`,
+      [req.params.id]
+    );
+    if (!campResult.rows.length) return res.status(404).json({ error: 'Campaign not found' });
+    const c = campResult.rows[0];
+
+    if (!['admin','superadmin'].includes(req.user.role) && c.user_id !== req.user.id)
+      return res.status(403).json({ error: 'Access denied' });
+    if (!['live','approved'].includes(c.status))
+      return res.status(400).json({ error: 'Creative change allowed only on live or approved campaigns' });
+
+    // 1 update per week rate limit
+    if (c.creative_change_requested_at) {
+      const daysSince = (Date.now() - new Date(c.creative_change_requested_at)) / (1000 * 60 * 60 * 24);
+      if (daysSince < 7)
+        return res.status(429).json({ error: 'Creative update allowed once per week. Next update available in ' + Math.ceil(7 - daysSince) + ' day(s).' });
+    }
+
+    const contentRow = await query('SELECT id FROM content WHERE id=$1', [content_id]);
+    if (!contentRow.rows.length) return res.status(404).json({ error: 'Content not found' });
+
+    const updateFields = [
+      'pending_content_id=$1',
+      'creative_change_status=\'pending\'',
+      'creative_change_requested_at=NOW()',
+      'updated_at=NOW()',
+    ];
+    const params = [content_id];
+    if (wa_message !== undefined) { params.push(wa_message || null); updateFields.push(`pending_wa_message=$${params.length}`); }
+    params.push(req.params.id);
+
+    const result = await query(
+      `UPDATE campaigns SET ${updateFields.join(',')} WHERE id=$${params.length} RETURNING *`,
+      params
+    );
+    res.json(result.rows[0]);
+  } catch (err) { next(err); }
+});
+
+// POST /api/campaigns/:id/approve-creative — admin approves pending creative change
+router.post('/:id/approve-creative', authenticate, requireAdmin, async (req, res, next) => {
+  try {
+    const campResult = await query(
+      `SELECT id, user_id, status, package_name, pending_content_id, pending_wa_message
+       FROM campaigns WHERE id=$1 AND creative_change_status='pending'`,
+      [req.params.id]
+    );
+    if (!campResult.rows.length)
+      return res.status(404).json({ error: 'No pending creative change found' });
+    const c = campResult.rows[0];
+    if (!c.pending_content_id)
+      return res.status(400).json({ error: 'No pending content to approve' });
+
+    // Swap creative; update wa_caption_template if new message provided
+    const updateCols = [
+      'content_id=pending_content_id',
+      'pending_content_id=NULL',
+      'creative_change_status=\'approved\'',
+      'updated_at=NOW()',
+    ];
+    if (c.pending_wa_message !== null && c.pending_wa_message !== undefined) {
+      updateCols.push('wa_caption_template=pending_wa_message');
+    }
+    updateCols.push('pending_wa_message=NULL');
+
+    const result = await query(
+      `UPDATE campaigns SET ${updateCols.join(',')} WHERE id=$1 RETURNING *`,
+      [req.params.id]
+    );
+    const updated = result.rows[0];
+    res.json(updated);
+
+    // For omnichannel_growth: re-trigger all channels
+    const omniPkgs = ['omnichannel_growth', 'growth', 'complete'];
+    if (omniPkgs.includes(updated.package_name) && updated.status === 'live') {
+      postCampaignToSocial(updated.id).catch(e => console.error('[Creative Approve] FB/IG error:', e.message));
+      postCampaignToGoogle(updated.id).catch(e => console.error('[Creative Approve] GBP error:', e.message));
+      sendWaBroadcast(updated.id).catch(e => console.error('[Creative Approve] WA error:', e.message));
+    }
+  } catch (err) { next(err); }
+});
+
+// POST /api/campaigns/:id/reject-creative — admin rejects pending creative change
+router.post('/:id/reject-creative', authenticate, requireAdmin, async (req, res, next) => {
+  try {
+    const { reason } = req.body;
+    const result = await query(
+      `UPDATE campaigns SET pending_content_id=NULL, creative_change_status='rejected',
+       pending_wa_message=NULL, updated_at=NOW()
+       WHERE id=$1 AND creative_change_status='pending' RETURNING *`,
+      [req.params.id]
+    );
+    if (!result.rows.length) return res.status(404).json({ error: 'No pending creative change' });
     res.json(result.rows[0]);
   } catch (err) { next(err); }
 });

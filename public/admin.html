@@ -1152,6 +1152,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
         <div>
           <div style="font-size:12px;font-weight:700;color:var(--warning);">New Creative Pending Review</div>
           <div id="cdm-pending-name" style="font-size:11px;color:var(--text2);margin-top:2px;"></div>
+          <div id="cdm-pending-wa-msg" style="display:none;font-size:11px;color:#25D366;margin-top:3px;"></div>
         </div>
         <div style="display:flex;gap:8px;">
           <button class="btn btn-success btn-xs" id="cdm-approve-creative-btn">✓ Approve</button>
@@ -2728,6 +2729,15 @@ async function openCampaignDetail(id) {
     if (c.pending_creative_url && c.creative_change_status === 'pending') {
       pendingWrap.style.display = 'flex';
       document.getElementById('cdm-pending-name').textContent = c.pending_creative_name || 'New file';
+      const waMsgEl = document.getElementById('cdm-pending-wa-msg');
+      if (waMsgEl) {
+        if (c.pending_wa_message) {
+          waMsgEl.style.display = '';
+          waMsgEl.textContent = 'WA: ' + c.pending_wa_message;
+        } else {
+          waMsgEl.style.display = 'none';
+        }
+      }
       document.getElementById('cdm-approve-creative-btn').onclick = () => { closeModal('camp-detail-modal'); approveCreative(id); };
       document.getElementById('cdm-reject-creative-btn').onclick  = () => { closeModal('camp-detail-modal'); rejectCreative(id); };
     } else { pendingWrap.style.display = 'none'; }

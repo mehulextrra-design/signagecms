@@ -513,6 +513,14 @@ async function applyCriticalFixes(pool) {
   } catch (err) {
     console.warn('[DB] preferred_language warn:', err.message);
   }
+  // Creative change weekly update columns (migration 031)
+  try {
+    await pool.query(`ALTER TABLE campaigns ADD COLUMN IF NOT EXISTS creative_change_requested_at TIMESTAMPTZ`);
+    await pool.query(`ALTER TABLE campaigns ADD COLUMN IF NOT EXISTS pending_wa_message TEXT`);
+    console.log('[DB] creative_change columns ensured');
+  } catch (err) {
+    console.warn('[DB] creative_change columns warn:', err.message);
+  }
   console.log('[DB] Critical column fixes done');
 }
 
