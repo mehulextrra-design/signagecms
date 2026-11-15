@@ -163,12 +163,16 @@ const PACKAGES = {
   complete: { slot_duration_sec: 15, loop_multiplier: 2, name: 'complete', monthly: 3499, ppd: 117 },
   growth:   { slot_duration_sec: 20, loop_multiplier: 3, name: 'growth',   monthly: 5999, ppd: 200 },
 };
-// V3 pricing (updated rates, multi-month billing)
+// V4 pricing — 3 plans: trial=10s free, starter_screen=20s paid, omnichannel_growth=20s paid+social
+// loop_multiplier kept for backwards compat; both paid plans share the same 20s slot
 const V3_PACKAGES = {
-  trial:    { slot_duration_sec: 8,  loop_multiplier: 1, name: 'trial',    flat: 499,  fixedDays: 5, bucket: 'filler' },
-  starter:  { slot_duration_sec: 10, loop_multiplier: 1, name: 'starter',  monthly: 2999 },
-  complete: { slot_duration_sec: 15, loop_multiplier: 2, name: 'complete', monthly: 4999 },
-  growth:   { slot_duration_sec: 20, loop_multiplier: 3, name: 'growth',   monthly: 5999 },
+  trial:              { slot_duration_sec: 10, loop_multiplier: 1, name: 'trial',              flat: 0,    fixedDays: 7, bucket: 'filler' },
+  starter_screen:     { slot_duration_sec: 20, loop_multiplier: 2, name: 'starter_screen',     monthly: 3999 },
+  omnichannel_growth: { slot_duration_sec: 20, loop_multiplier: 2, name: 'omnichannel_growth', monthly: 5999 },
+  // legacy aliases so old campaigns/links still resolve
+  starter:  { slot_duration_sec: 20, loop_multiplier: 2, name: 'starter_screen',     monthly: 3999 },
+  complete: { slot_duration_sec: 20, loop_multiplier: 2, name: 'starter_screen',     monthly: 3999 },
+  growth:   { slot_duration_sec: 20, loop_multiplier: 2, name: 'omnichannel_growth', monthly: 5999 },
 };
 const V3_CYCLE_DISCOUNTS = { 1: 0, 3: 0.15, 6: 0.25 };
 const V3_WA_BASE         = { trial: 499, starter: 499, complete: 499, growth: 400 };
