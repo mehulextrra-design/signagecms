@@ -2252,9 +2252,9 @@ function renderCampaignsTable(campaigns){
   if(!campaigns.length){wrap.innerHTML=`<div class="empty-state"><div class="empty-icon"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg></div><div class="empty-title">No campaigns found</div></div>`;document.getElementById('camps-s-pager').innerHTML='';return;}
   setupPager('camps-s',campaigns,25,(slice)=>{
   wrap.innerHTML=`<div class="table-wrap"><table><thead><tr><th>Campaign</th><th>Creative</th><th>Status</th><th>Start</th><th>End</th><th>Amount</th><th>Payment</th><th>Action</th></tr></thead><tbody>${slice.map(c=>`
-    <tr>
-      <td><div class="td-bold">${c.title||c.campaign_code}</div><div style="font-size:11px;color:var(--text2);">${c.campaign_code||''}</div></td>
-      <td style="width:64px;">
+    <tr${c.status==='pending_payment'?` style="cursor:pointer;" onclick="openCampaignReviewModal('${c.id}')" title="Click to review & pay"`:''}>
+      <td><div class="td-bold">${c.title||c.campaign_code}</div><div style="font-size:11px;color:var(--text2);">${c.campaign_code||''}</div>${c.status==='pending_payment'?'<div style="font-size:10px;color:var(--warning);font-weight:600;margin-top:2px;">Tap to review &amp; pay</div>':''}</td>
+      <td style="width:64px;" onclick="event.stopPropagation()">
         ${c.creative_url&&c.creative_type==='image'
           ?`<img src="${c.creative_url}" alt="${c.creative_name||'creative'}" style="width:56px;height:42px;object-fit:cover;border-radius:4px;border:1px solid var(--border);cursor:zoom-in;" onclick="openLightbox('${c.creative_url}','${(c.creative_name||'').replace(/'/g,"\\'")}','image')" title="Click to preview">`
           :c.creative_url&&c.creative_type==='video'
@@ -2270,9 +2270,9 @@ function renderCampaignsTable(campaigns){
       <td style="font-size:13px;">${fmtDate(c.end_date)}</td>
       <td style="font-weight:600;">₹${parseFloat(c.amount_total||0).toLocaleString('en-IN')}</td>
       <td>${payBadge(c.payment_status)}</td>
-      <td>
+      <td onclick="event.stopPropagation()">
         <div class="camp-actions">
-        ${c.status==='pending_payment'?`<button class="ca-btn ca-primary" onclick="submitForApproval('${c.id}',this)" title="Complete Payment"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>Pay Now</button>`:''}
+        ${c.status==='pending_payment'?`<button class="ca-btn ca-primary" onclick="openCampaignReviewModal('${c.id}')" title="Review &amp; Pay"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>Pay Now</button>`:''}
         ${c.status==='pending_payment'&&['admin','superadmin'].includes(currentUser?.role)?`<button class="ca-btn" style="background:var(--warning,#f59e0b);color:#fff;font-size:10px;" onclick="adminTestPay('${c.id}',this)" title="Mark Paid (Test — bypass Razorpay)">Test Pay</button>`:''}
         ${c.status==='rejected'?`<button class="ca-btn ca-primary" onclick="navigate('new-campaign')" title="Book Again"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"/></svg></button>`:''}
         ${c.status==='live'?`<button class="ca-btn ca-default" onclick="campaignPause('${c.id}',this)" title="Pause Campaign"><svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg></button>`:''}
@@ -3926,8 +3926,53 @@ async function submitForApproval(id,btn){
       return;
     }
     const campaign={id};
-    await openRazorpay(campaign,btn,orig,async()=>{ toast('Payment successful! AI review running…','success'); await loadCampaigns(); });
+    await openRazorpay(campaign,btn,orig,async()=>{ toast('Payment successful! AI review running…','success'); closeCampReview(); await loadCampaigns(); });
   }catch(e){toast(e.message,'error');btn.innerHTML=orig;btn.disabled=false;}
+}
+
+function closeCampReview(){document.getElementById('camp-review-overlay').style.display='none';}
+
+function openCampaignReviewModal(id){
+  const c=allCampaigns.find(x=>String(x.id)===String(id));
+  if(!c)return;
+  const days=Math.max(1,Math.round((new Date(c.end_date)-new Date(c.start_date))/(1000*60*60*24))+1);
+  const amtBase=parseFloat(c.amount_base||0);
+  const amtGst=parseFloat(c.amount_gst||0);
+  const amtTotal=parseFloat(c.amount_total||0);
+  const walletUsed=parseFloat(c.wallet_used||0);
+  const discAmt=parseFloat(c.discount_amount||0);
+  const razorpayDue=Math.max(0,amtTotal-walletUsed);
+  const pkgLabel={'trial':'Trial (8s · 5 days)','starter':'Starter (10s)','complete':'Complete (15s)','growth':'Growth (20s)'}[c.package_name]||c.package_name||'—';
+  const startFmt=fmtDate(c.start_date),endFmt=fmtDate(c.end_date);
+  const fmtAmt=n=>'₹'+parseFloat(n).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
+  const screens=Array.isArray(c.screens)?c.screens.filter(Boolean):[];
+  document.getElementById('camp-review-subtitle').textContent=`${c.campaign_code||''} · ${(c.status||'').replace(/_/g,' ')}`;
+  document.getElementById('camp-review-body').innerHTML=`
+    ${c.creative_url?`<div style="margin-bottom:16px;border-radius:10px;overflow:hidden;border:1px solid var(--border);max-height:180px;display:flex;align-items:center;justify-content:center;background:var(--surface2);">${c.creative_type==='image'?`<img src="${c.creative_url}" style="max-width:100%;max-height:180px;object-fit:contain;">`:`<div style="display:flex;align-items:center;gap:8px;padding:16px;color:var(--text2);font-size:13px;">&#x1F3AC; ${c.creative_name||'Video creative'}</div>`}</div>`:'<div style="margin-bottom:16px;padding:16px;background:var(--surface2);border-radius:10px;text-align:center;color:var(--text3);font-size:12px;">No creative uploaded</div>'}
+    <div style="margin-bottom:14px;">
+      <div class="review-row"><span class="review-key">Campaign</span><span class="review-val" style="font-weight:600;">${c.title||c.campaign_code}</span></div>
+      <div class="review-row"><span class="review-key">Package</span><span class="review-val" style="color:var(--primary);font-weight:600;">${pkgLabel}</span></div>
+      <div class="review-row"><span class="review-key">Duration</span><span class="review-val">${days} days</span></div>
+      <div class="review-row"><span class="review-key">Period</span><span class="review-val">${startFmt} – ${endFmt}</span></div>
+      ${c.start_time?`<div class="review-row"><span class="review-key">Time Window</span><span class="review-val">${c.start_time.slice(0,5)} – ${(c.end_time||'').slice(0,5)}</span></div>`:''}
+      ${screens.length?`<div class="review-row"><span class="review-key">Screens</span><span class="review-val">${screens.length} screen${screens.length>1?'s':''}</span></div>`:''}
+      ${c.wa_broadcast_enabled?`<div class="review-row"><span class="review-key" style="color:#25D366;">WhatsApp Broadcast</span><span class="review-val" style="color:#25D366;">Enabled</span></div>`:''}
+    </div>
+    <div style="background:var(--surface2);border-radius:10px;padding:14px 16px;">
+      ${discAmt>0?`<div class="review-row"><span class="review-key" style="color:var(--success);">Discount</span><span class="review-val" style="color:var(--success);">−${fmtAmt(discAmt)}</span></div>`:''}
+      <div class="review-row"><span class="review-key">Subtotal</span><span class="review-val">${fmtAmt(amtBase)}</span></div>
+      <div class="review-row"><span class="review-key">GST (18%)</span><span class="review-val">${fmtAmt(amtGst)}</span></div>
+      ${walletUsed>0?`<div class="review-row"><span class="review-key" style="color:var(--primary);">Wallet Applied</span><span class="review-val" style="color:var(--primary);">−${fmtAmt(walletUsed)}</span></div>`:''}
+      <div class="review-row" style="font-size:15px;font-weight:700;border-bottom:none;"><span style="color:var(--text);">Total Due</span><span style="color:var(--primary);">${fmtAmt(razorpayDue)}</span></div>
+    </div>`;
+  const payBtn=document.getElementById('camp-review-pay-btn');
+  payBtn.innerHTML='Pay Now';payBtn.disabled=false;
+  if(razorpayDue<=0){
+    payBtn.textContent='Free / Already Paid';payBtn.disabled=true;
+  } else {
+    payBtn.onclick=function(){submitForApproval(id,payBtn);};
+  }
+  document.getElementById('camp-review-overlay').style.display='flex';
 }
 
 async function adminTestPay(id,btn){
@@ -4607,6 +4652,24 @@ async function saveQRSettings(){
         <button onclick="closeCreativeModal()" style="padding:9px 18px;border:1.5px solid var(--border);border-radius:8px;background:none;cursor:pointer;font-size:14px;color:var(--text);">Cancel</button>
         <button onclick="submitCreativeChange()" class="btn btn-primary" style="padding:9px 20px;font-size:14px;">Submit for Review</button>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- Campaign Review & Pay modal -->
+<div id="camp-review-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;align-items:center;justify-content:center;padding:12px;" onclick="if(event.target===this)closeCampReview()">
+  <div style="background:var(--surface);border-radius:var(--radius-lg);width:100%;max-width:500px;max-height:92vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+    <div style="padding:18px 20px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--surface);z-index:2;">
+      <div>
+        <div style="font-size:15px;font-weight:700;color:var(--text);">Campaign Review</div>
+        <div style="font-size:12px;color:var(--text2);" id="camp-review-subtitle"></div>
+      </div>
+      <button onclick="closeCampReview()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--text2);line-height:1;">×</button>
+    </div>
+    <div id="camp-review-body" style="padding:18px 20px 20px;"></div>
+    <div style="padding:14px 20px 20px;border-top:1px solid var(--border);display:flex;gap:10px;justify-content:flex-end;position:sticky;bottom:0;background:var(--surface);">
+      <button onclick="closeCampReview()" style="padding:9px 18px;border:1.5px solid var(--border);border-radius:8px;background:none;cursor:pointer;font-size:14px;color:var(--text);">Close</button>
+      <button id="camp-review-pay-btn" class="btn btn-primary" style="padding:9px 22px;font-size:14px;">Pay Now</button>
     </div>
   </div>
 </div>
