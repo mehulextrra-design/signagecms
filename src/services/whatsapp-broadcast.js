@@ -370,7 +370,7 @@ async function sendWaBroadcast(campaignId) {
 
   const campResult = await query(
     `SELECT c.id, c.user_id, c.title AS name, c.wa_broadcast_enabled, c.wa_caption_template,
-            c.wa_directory_source, c.wa_directory_segment_id,
+            c.wa_directory_source, c.wa_directory_segment_id, c.package_name,
             u.wa_enabled, u.mobile AS business_mobile, u.city AS business_city,
             con.file_url AS image_url, con.type AS content_type, u.business_name
      FROM campaigns c
@@ -384,7 +384,9 @@ async function sendWaBroadcast(campaignId) {
   const camp = campResult.rows[0];
   console.log(`[WA Broadcast] wa_enabled=${camp.wa_enabled} wa_broadcast_enabled=${camp.wa_broadcast_enabled} image_url=${camp.image_url} content_type=${camp.content_type}`);
 
-  if (!camp.wa_enabled)          { console.log(`[WA Broadcast] SKIP: wa_enabled=false`); return; }
+  // omnichannel_growth: WA inbuilt — skip wa_enabled gate; other plans still require it
+  const isOmni = camp.package_name === 'omnichannel_growth';
+  if (!isOmni && !camp.wa_enabled) { console.log(`[WA Broadcast] SKIP: wa_enabled=false`); return; }
   if (!camp.wa_broadcast_enabled){ console.log(`[WA Broadcast] SKIP: wa_broadcast_enabled=false`); return; }
   if (!camp.image_url)           { console.log(`[WA Broadcast] SKIP: no image_url`); return; }
 

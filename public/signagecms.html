@@ -2931,13 +2931,12 @@ async function loadProfile(){
       waTog.addEventListener('change',_syncWaCaption);
       _syncWaCaption();
     }
-    // Show WA section if feature enabled
-    if(u.wa_enabled){
+    // Show WA section if feature enabled OR on omnichannel_growth plan
+    const waEligible = u.wa_enabled || (u.active_package === 'omnichannel_growth');
+    if(waEligible){
       document.getElementById('wa-section').style.display='';
       loadWaStatus();
       loadWaContacts();
-      const waTogBox=document.getElementById('wa-campaign-toggle');
-      if(waTogBox)waTogBox.style.display='';
     }
   }catch(e){toast('Could not load profile','error');}
 }
@@ -3917,7 +3916,7 @@ function selectPkg(pkg){
   const _waTogBox=document.getElementById('wa-campaign-toggle');
   if(_waTogBox){
     const _waOnV2=_wizardV2&&(pkg==='growth'||pkg==='complete');
-    const _waOnV3=_wizardV3&&pkg==='omnichannel_growth'&&currentUser?.wa_enabled;
+    const _waOnV3=_wizardV3&&pkg==='omnichannel_growth'; // WA inbuilt in omnichannel_growth
     _waTogBox.style.display=(_waOnV2||_waOnV3)?'':'none';
   }
   // Show channel connect modal if omnichannel_growth selected and any channel missing
@@ -3956,15 +3955,25 @@ function openChannelConnect(){
     gbpBtn.className='ch-btn-connect'; gbpBtn.textContent='Connect'; gbpBtn.disabled=false;
   }
 
-  // WA row
+  // WA row — check session status too if wa_enabled
   const waStatus = document.getElementById('ch-wa-status');
   const waBtn    = document.getElementById('ch-btn-wa');
   if(waOk){
-    waStatus.innerHTML='<span class="ch-status-ok">✓ Enabled by admin</span>';
-    waBtn.className='ch-btn-connected'; waBtn.textContent='Enabled'; waBtn.disabled=true;
+    // wa_enabled but check if actually connected (session)
+    api('/wa/status').then(s=>{
+      if(s.status==='connected'){
+        waStatus.innerHTML='<span class="ch-status-ok">✓ Connected — '+_esc(s.phone||'')+'</span>';
+        waBtn.className='ch-btn-connected'; waBtn.textContent='Connected'; waBtn.disabled=true;
+      } else {
+        waStatus.innerHTML='<span class="ch-status-warn">Enabled — pairing code chahiye</span>';
+        waBtn.className='ch-btn-connect'; waBtn.textContent='Connect'; waBtn.disabled=false;
+      }
+    }).catch(()=>{
+      waStatus.innerHTML='<span class="ch-status-warn">Status check failed</span>';
+    });
   } else {
-    waStatus.innerHTML='<span class="ch-status-warn">Admin se enable karwao</span>';
-    waBtn.className='ch-btn-connect'; waBtn.textContent='Request'; waBtn.disabled=false;
+    waStatus.innerHTML='<span class="ch-status-miss">Not connected — aapke plan mein inbuilt hai</span>';
+    waBtn.className='ch-btn-connect'; waBtn.textContent='Connect'; waBtn.disabled=false;
   }
 
   document.getElementById('channel-connect-overlay').style.display='block';
@@ -3989,9 +3998,17 @@ function chConnectGBP(){
 }
 
 function chConnectWA(){
-  toast('Admin se WhatsApp feature enable karwao. Profile pe contact info diya hai.','info');
   closeChannelConnect();
-  navigate('profile');
+  // Open WA connect flow directly (disclaimer → pairing code)
+  setTimeout(()=>{
+    navigate('profile');
+    setTimeout(()=>{
+      const waSection=document.getElementById('wa-section');
+      if(waSection){ waSection.style.display=''; waSection.scrollIntoView({behavior:'smooth'}); }
+      const btn=document.getElementById('wa-action-btn');
+      if(btn) btn.click();
+    },400);
+  },100);
 }
 
 function _esc(s){ const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }

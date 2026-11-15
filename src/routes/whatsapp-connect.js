@@ -22,8 +22,13 @@ const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 5 *
 // ── Guard: wa_enabled must be true for this user ────────────────────────────
 
 async function requireWaEnabled(req, res, next) {
-  const r = await query(`SELECT wa_enabled FROM users WHERE id=$1`, [req.user.id]);
-  if (!r.rows.length || !r.rows[0].wa_enabled) {
+  const r = await query(
+    `SELECT u.wa_enabled,
+            EXISTS(SELECT 1 FROM campaigns c WHERE c.user_id=u.id AND c.package_name='omnichannel_growth' AND c.status IN ('pending_approval','approved','live','paused')) AS has_omni
+     FROM users u WHERE u.id=$1`,
+    [req.user.id]
+  );
+  if (!r.rows.length || (!r.rows[0].wa_enabled && !r.rows[0].has_omni)) {
     return res.status(403).json({ error: 'WhatsApp feature not enabled for your account' });
   }
   next();

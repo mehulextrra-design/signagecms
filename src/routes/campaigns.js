@@ -308,6 +308,10 @@ router.post('/', authenticate, async (req, res, next) => {
          VALUES ($1,$2,$3,$4,$5,$6,$7,'wallet','paid')`,
         [invNum, campaign.id, req.user.id, amount_base, amount_gst, amount_total, `WALLET-${code}`]
       );
+      // Auto-enable WA for omnichannel_growth (WA inbuilt)
+      if (campaign.package_name === 'omnichannel_growth') {
+        await client.query(`UPDATE users SET wa_enabled=true WHERE id=$1`, [req.user.id]);
+      }
       await client.query('COMMIT');
       res.status(201).json({ ...campaign, status: 'pending_approval', payment_status: 'paid', wallet_paid: true, invoice_number: invNum });
       reviewCampaign(campaign.id).catch(e => console.error('[AI Review]', e.message));
@@ -376,6 +380,11 @@ router.post('/:id/confirm-payment', authenticate, async (req, res, next) => {
        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,'paid')`,
       [invNum, campaign.id, req.user.id, campaign.amount_base, campaign.amount_gst, campaign.amount_total, payment_id, payment_method]
     );
+
+    // Auto-enable WA for omnichannel_growth (WA is inbuilt in this plan)
+    if (campaign.package_name === 'omnichannel_growth') {
+      await client.query(`UPDATE users SET wa_enabled=true WHERE id=$1`, [req.user.id]);
+    }
 
     await client.query('COMMIT');
     res.json({ campaign, invoice_number: invNum });
