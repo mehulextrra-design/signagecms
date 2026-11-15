@@ -3442,6 +3442,15 @@ function initWizard(){
   _expandedGroupId=null;
   const grid=document.getElementById('wizard-screens-grid');
   if(grid) grid.style.display='none';
+  // Reset WA directory state
+  _waDirectorySource='own';
+  _waDirectorySegmentId=null;
+  const srcOwn=document.getElementById('wa-source-own');
+  if(srcOwn) srcOwn.checked=true;
+  const segPicker=document.getElementById('wa-segment-picker');
+  if(segPicker) segPicker.style.display='none';
+  // Reset wallet state
+  walletApplied=false;
   // checkTrialUsed(); // TEMP: disabled for testing
 }
 
@@ -3653,6 +3662,14 @@ async function wizardNext(step){
   }else if(step===3){
     const start=document.getElementById('sch-start').value;
     if(!start){toast('Set a start date','error');return;}
+    // WA warning: user has WA enabled but didn't toggle WA broadcast ON (applies to v2 and v3)
+    if(currentUser&&currentUser.wa_enabled){
+      const waTog=document.getElementById('wa-broadcast-toggle');
+      if(waTog&&!waTog.checked&&document.getElementById('wa-campaign-toggle')?.style.display!=='none'){
+        const choice=await showWaSkipWarning();
+        if(choice==='back') return;
+      }
+    }
     if(_wizardV3){
       // V3: derive end date from billing cycle
       if(!selectedPkg){toast('Select a package','error');return;}
@@ -3664,14 +3681,6 @@ async function wizardNext(step){
     }
     const dur=document.getElementById('sch-duration').value;
     if(!dur){toast('Set a duration','error');return;}
-    // WA warning: user has WA enabled but didn't toggle WA broadcast ON
-    if(currentUser&&currentUser.wa_enabled){
-      const waTog=document.getElementById('wa-broadcast-toggle');
-      if(waTog&&!waTog.checked){
-        const choice=await showWaSkipWarning();
-        if(choice==='back') return; // user wants to go back and enable WA
-      }
-    }
     updateEndFromDuration();
     calcCost();renderReview();updateWizardUI(4);
   }
