@@ -177,11 +177,13 @@ class MainActivity : AppCompatActivity() {
         ws.allowFileAccess = true
         ws.loadWithOverviewMode = true
         ws.useWideViewPort = true
-        ws.setSupportZoom(true)
-        ws.builtInZoomControls = true
+        ws.setSupportZoom(false)
+        ws.builtInZoomControls = false
         ws.displayZoomControls = false
         ws.cacheMode = WebSettings.LOAD_DEFAULT
         ws.mediaPlaybackRequiresUserGesture = false
+
+        binding.webView.overScrollMode = View.OVER_SCROLL_NEVER
 
         binding.webView.addJavascriptInterface(ShareBridge(), "AndroidShare")
         binding.webView.addJavascriptInterface(ContactsBridge(), "AndroidContacts")
