@@ -1779,16 +1779,61 @@
             <svg width="36" height="36" viewBox="0 0 24 24" fill="#fff"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.14.564 4.148 1.546 5.887L0 24l6.302-1.513A11.933 11.933 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.794 9.794 0 01-5.064-1.41l-.363-.216-3.741.897.939-3.63-.237-.374A9.787 9.787 0 012.182 12C2.182 6.57 6.57 2.182 12 2.182S21.818 6.57 21.818 12 17.43 21.818 12 21.818z"/></svg>
           </div>
         </div>
-        <div style="font-size:22px;font-weight:800;">WhatsApp Broadcast</div>
-        <div style="font-size:13px;opacity:.88;margin-top:6px;line-height:1.5;">Apne number se customers ko campaign ka ad directly WhatsApp pe bhejo.</div>
+        <div id="cco-wa-title" style="font-size:22px;font-weight:800;">WhatsApp Broadcast</div>
+        <div id="cco-wa-subtitle" style="font-size:13px;opacity:.88;margin-top:6px;line-height:1.5;">Apne number se customers ko campaign ka ad directly WhatsApp pe bhejo.</div>
       </div>
-      <div class="cco-body">
+
+      <!-- State 0: default -->
+      <div class="cco-body" id="cco-wa-s0">
         <div id="ch-wa-status" style="font-size:13px;margin-bottom:18px;min-height:18px;"></div>
         <div class="cco-btn-row">
           <button onclick="closeChannelConnect()" class="cco-skip-btn">Skip</button>
           <button id="ch-btn-wa" onclick="chConnectWA()" class="cco-action-btn">Connect</button>
         </div>
       </div>
+
+      <!-- State 1: disclaimer -->
+      <div class="cco-body" id="cco-wa-s1" style="display:none;text-align:left;padding-top:16px;">
+        <div style="max-height:200px;overflow-y:auto;font-size:11.5px;color:var(--text,#333);line-height:1.65;border:1px solid var(--border,#e5e5e5);border-radius:8px;padding:12px;margin-bottom:12px;background:var(--bg,#f9f9f9);">
+          <strong>Terms of Use</strong><br><br>
+          This feature delivers automated messages through your linked WhatsApp number. It operates independently of Meta's official messaging programmes on a best-effort basis. extrravenue does not guarantee delivery or uninterrupted access.<br><br>
+          <strong>Platform Compliance:</strong> You are solely responsible for compliance with WhatsApp's Terms of Service. extrravenue has no control over platform-side enforcement, and your account standing is entirely at the platform's discretion.<br><br>
+          <strong>Liability:</strong> Karv Adtech LLP / extrravenue shall not be liable for any loss, account suspension, or business interruption arising from use of this feature.<br><br>
+          <strong>Your obligations:</strong>
+          <ul style="margin:6px 0 0 16px;padding:0;">
+            <li>Send only to contacts who have explicitly consented.</li>
+            <li>Comply with DPDP Act 2023 and TRAI regulations.</li>
+            <li>Do not use for spam or unsolicited bulk messaging.</li>
+          </ul>
+        </div>
+        <label style="display:flex;gap:8px;align-items:flex-start;cursor:pointer;margin-bottom:14px;">
+          <input type="checkbox" id="cco-wa-check" style="margin-top:3px;width:14px;height:14px;accent-color:#25d366;flex-shrink:0;"
+            onchange="const b=document.getElementById('cco-wa-agree');b.disabled=!this.checked;b.style.opacity=this.checked?'1':'0.45';">
+          <span style="font-size:11.5px;color:var(--text,#333);line-height:1.6;">Maine upar di gayi terms padh li hai aur main inn sab ke liye zimmedar hoon.</span>
+        </label>
+        <div class="cco-btn-row">
+          <button onclick="ccoWaBack()" class="cco-skip-btn">Back</button>
+          <button id="cco-wa-agree" disabled onclick="ccoWaAgree()" class="cco-action-btn" style="opacity:.45;background:#25d366;">I Agree &amp; Connect</button>
+        </div>
+      </div>
+
+      <!-- State 2: phone + pairing code -->
+      <div class="cco-body" id="cco-wa-s2" style="display:none;">
+        <div id="cco-wa-phone-wrap">
+          <input id="cco-wa-phone" type="tel" placeholder="WhatsApp number (10 digit)"
+            style="width:100%;box-sizing:border-box;padding:11px 14px;border:1.5px solid var(--border,#ddd);border-radius:10px;font-size:14px;margin-bottom:12px;font-family:inherit;color:var(--text,#111);background:var(--surface,#fff);">
+          <div class="cco-btn-row">
+            <button onclick="ccoWaBack()" class="cco-skip-btn">Back</button>
+            <button onclick="ccoWaGetCode()" id="cco-wa-get-btn" class="cco-action-btn" style="background:#25d366;">Get Code</button>
+          </div>
+        </div>
+        <div id="cco-wa-code-wrap" style="display:none;text-align:center;">
+          <div style="font-size:12px;color:var(--text2,#666);margin-bottom:8px;">WhatsApp &rarr; Linked Devices &rarr; Link a Device &rarr; Link with Phone Number. Enter code:</div>
+          <div id="cco-wa-code-display" style="font-size:30px;font-weight:800;letter-spacing:.18em;color:#128C7E;padding:14px;border-radius:10px;background:var(--bg,#f4f4f4);margin-bottom:12px;"></div>
+          <div id="cco-wa-poll-status" style="font-size:12px;color:var(--text2,#888);">Connection ka wait kar rahe hain…</div>
+        </div>
+      </div>
+
     </div>
 
   </div>
@@ -4054,6 +4099,12 @@ function closeChannelConnect(){
   document.getElementById('channel-connect-overlay').style.display='none';
   document.body.style.overflow='';
   try{ sessionStorage.removeItem('ch_pending_step'); }catch(_){}
+  // Reset WA card to default state
+  ['cco-wa-s0','cco-wa-s1','cco-wa-s2'].forEach((id,i)=>{
+    const el=document.getElementById(id); if(el) el.style.display=i===0?'':'none';
+  });
+  const t=document.getElementById('cco-wa-title'); if(t) t.textContent='WhatsApp Broadcast';
+  const s=document.getElementById('cco-wa-subtitle'); if(s) s.textContent='Apne number se customers ko campaign ka ad directly WhatsApp pe bhejo.';
 }
 
 async function chConnectFB(){
@@ -4098,16 +4149,81 @@ async function chConnectGBP(){
 }
 
 function chConnectWA(){
-  closeChannelConnect();
-  setTimeout(()=>{
-    navigate('profile');
-    setTimeout(()=>{
-      const waSection=document.getElementById('wa-section');
-      if(waSection){ waSection.style.display=''; waSection.scrollIntoView({behavior:'smooth'}); }
-      const btn=document.getElementById('wa-action-btn');
-      if(btn) btn.click();
-    },400);
-  },100);
+  // Show inline disclaimer inside the WA card
+  document.getElementById('cco-wa-s0').style.display='none';
+  document.getElementById('cco-wa-s1').style.display='';
+  document.getElementById('cco-wa-s2').style.display='none';
+  document.getElementById('cco-wa-title').textContent='Terms of Use';
+  document.getElementById('cco-wa-subtitle').textContent='Pairing shuru karne se pehle please review karein.';
+  // Reset checkbox
+  const cb=document.getElementById('cco-wa-check'); if(cb) cb.checked=false;
+  const ag=document.getElementById('cco-wa-agree'); if(ag){ ag.disabled=true; ag.style.opacity='0.45'; }
+}
+
+function ccoWaBack(){
+  document.getElementById('cco-wa-s0').style.display='';
+  document.getElementById('cco-wa-s1').style.display='none';
+  document.getElementById('cco-wa-s2').style.display='none';
+  document.getElementById('cco-wa-title').textContent='WhatsApp Broadcast';
+  document.getElementById('cco-wa-subtitle').textContent='Apne number se customers ko campaign ka ad directly WhatsApp pe bhejo.';
+}
+
+async function ccoWaAgree(){
+  document.getElementById('cco-wa-s1').style.display='none';
+  document.getElementById('cco-wa-s2').style.display='';
+  document.getElementById('cco-wa-phone-wrap').style.display='';
+  document.getElementById('cco-wa-code-wrap').style.display='none';
+  document.getElementById('cco-wa-title').textContent='Link WhatsApp';
+  document.getElementById('cco-wa-subtitle').textContent='Apna WhatsApp number enter karo.';
+  // Fire-and-forget legal audit
+  try{ await fetch('/api/wa/disclaimer-accept',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+localStorage.getItem('scms_token')},body:JSON.stringify({version:'v1'})}); }catch(_){}
+}
+
+async function ccoWaGetCode(){
+  const phone=document.getElementById('cco-wa-phone').value.trim();
+  if(!phone||phone.replace(/\D/g,'').length<10){ toast('Valid 10-digit number daalo','error'); return; }
+  const btn=document.getElementById('cco-wa-get-btn');
+  btn.disabled=true; btn.textContent='Requesting…';
+  try{
+    const r=await api('/wa/connect',{method:'POST',body:JSON.stringify({phone_number:phone})});
+    btn.disabled=false; btn.textContent='Get Code';
+    document.getElementById('cco-wa-phone-wrap').style.display='none';
+    document.getElementById('cco-wa-code-wrap').style.display='';
+    if(r.already_connected){
+      document.getElementById('cco-wa-code-display').textContent='';
+      document.getElementById('cco-wa-poll-status').textContent='Reconnecting…';
+    } else {
+      document.getElementById('cco-wa-code-display').textContent=r.code||'—';
+    }
+    // Poll until connected
+    var tries=0;
+    var poll=setInterval(async()=>{
+      tries++;
+      try{
+        const s=await api('/wa/status');
+        if(s.status==='connected'||tries>30){
+          clearInterval(poll);
+          if(s.status==='connected'){
+            document.getElementById('cco-wa-poll-status').textContent='✓ Connected!';
+            if(currentUser) currentUser.wa_enabled=true;
+            const waS=document.getElementById('ch-wa-status'), waB=document.getElementById('ch-btn-wa');
+            if(waS) waS.innerHTML='<span class="ch-status-ok">✓ Connected — '+_esc(s.phone||phone)+'</span>';
+            if(waB){ waB.className='cco-action-btn connected'; waB.textContent='Connected ✓'; waB.disabled=true; }
+            toast('WhatsApp connected!','success');
+            loadWaStatus(); // refresh profile section too
+            setTimeout(closeChannelConnect, 1500);
+          } else {
+            document.getElementById('cco-wa-poll-status').textContent='Timeout — dobara try karo.';
+            document.getElementById('cco-wa-phone-wrap').style.display='';
+            document.getElementById('cco-wa-code-wrap').style.display='none';
+          }
+        }
+      }catch(_){}
+    },3000);
+  }catch(e){
+    btn.disabled=false; btn.textContent='Get Code';
+    toast('Error: '+e.message,'error');
+  }
 }
 
 function _esc(s){ const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
