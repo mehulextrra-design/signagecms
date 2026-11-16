@@ -1,4 +1,4 @@
-const express = require('express');
+﻿const express = require('express');
 const https   = require('https');
 const { query } = require('../db');
 const { authenticate } = require('../middleware/auth');
@@ -9,7 +9,7 @@ const CLIENT_ID     = process.env.GOOGLE_CLIENT_ID;
 const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 const REDIRECT      = process.env.GOOGLE_REDIRECT_URI || 'https://signagecrm-production.up.railway.app/api/auth/google/callback';
 
-// ── helpers ────────────────────────────────────────────────────────────────────
+// â”€â”€ helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function googleGet(url, accessToken) {
   return new Promise((resolve, reject) => {
@@ -102,9 +102,9 @@ async function refreshAccessToken(refreshToken) {
   });
 }
 
-// ── OAuth routes ───────────────────────────────────────────────────────────────
+// â”€â”€ OAuth routes â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-// GET /api/auth/google/connect — returns OAuth URL
+// GET /api/auth/google/connect â€” returns OAuth URL
 router.get('/connect', authenticate, (req, res) => {
   if (!CLIENT_ID) return res.status(500).json({ error: 'Google OAuth not configured' });
   const state = Buffer.from(JSON.stringify({ userId: req.user.id })).toString('base64');
@@ -120,10 +120,10 @@ router.get('/connect', authenticate, (req, res) => {
   res.json({ url });
 });
 
-// GET /api/auth/google/callback — OAuth callback
+// GET /api/auth/google/callback â€” OAuth callback
 router.get('/callback', async (req, res) => {
   const { code, state, error } = req.query;
-  if (error) return res.redirect('/?gbp_error=' + encodeURIComponent(error));
+  if (error) return res.redirect('/signagecms.html?gbp_error=' + encodeURIComponent(error));
 
   try {
     const { userId } = JSON.parse(Buffer.from(decodeURIComponent(state), 'base64').toString());
@@ -164,7 +164,7 @@ router.get('/callback', async (req, res) => {
       console.warn('[Google OAuth] accounts fetch failed (quota?):', apiErr.message);
     }
 
-    // Always save tokens — even if account fetch failed, tokens are valid
+    // Always save tokens â€” even if account fetch failed, tokens are valid
     await query(
       `UPDATE users SET
         google_account_id=$1, google_location_id=$2, google_business_name=$3,
@@ -173,10 +173,10 @@ router.get('/callback', async (req, res) => {
       [accountName, locationId, businessName, accessToken, refreshToken, userId]
     );
 
-    res.redirect('/?gbp_connected=1');
+    res.redirect('/signagecms.html?gbp_connected=1');
   } catch (err) {
     console.error('[Google OAuth]', err.message);
-    res.redirect('/?gbp_error=' + encodeURIComponent(err.message));
+    res.redirect('/signagecms.html?gbp_error=' + encodeURIComponent(err.message));
   }
 });
 
@@ -206,7 +206,7 @@ router.get('/status', authenticate, async (req, res) => {
   });
 });
 
-// POST /api/auth/google/retry-fetch — retry fetching account/location using saved tokens
+// POST /api/auth/google/retry-fetch â€” retry fetching account/location using saved tokens
 router.post('/retry-fetch', authenticate, async (req, res) => {
   try {
     const result = await query(
@@ -253,7 +253,7 @@ router.post('/retry-fetch', authenticate, async (req, res) => {
   }
 });
 
-// ── Posting via Make.com native GBP module ────────────────────────────────────
+// â”€â”€ Posting via Make.com native GBP module â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 // Plans that include GBP posting
 const GBP_PLANS = ['complete', 'growth', 'omnichannel_growth'];
@@ -278,13 +278,13 @@ async function postCampaignToGoogle(campaignId) {
 
   const row = result.rows[0];
   if (!row?.google_location_id) {
-    console.log(`[GBP] skipped campaign ${campaignId} — user has no google_location_id`);
+    console.log(`[GBP] skipped campaign ${campaignId} â€” user has no google_location_id`);
     return;
   }
 
   // Only post to GBP if plan includes it
   if (!GBP_PLANS.includes(row.package_name)) {
-    console.log(`[GBP] Campaign ${row.campaign_code} plan '${row.package_name}' — GBP posting not included`);
+    console.log(`[GBP] Campaign ${row.campaign_code} plan '${row.package_name}' â€” GBP posting not included`);
     return;
   }
 
@@ -325,3 +325,4 @@ async function postCampaignToGoogle(campaignId) {
 
 module.exports = router;
 module.exports.postCampaignToGoogle = postCampaignToGoogle;
+

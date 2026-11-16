@@ -1,4 +1,4 @@
-const express = require('express');
+﻿const express = require('express');
 const https   = require('https');
 const { query } = require('../db');
 const { authenticate } = require('../middleware/auth');
@@ -23,7 +23,7 @@ function fbGet(path) {
   });
 }
 
-// GET /api/auth/instagram/connect — returns Facebook OAuth URL scoped for Instagram
+// GET /api/auth/instagram/connect â€” returns Facebook OAuth URL scoped for Instagram
 router.get('/connect', authenticate, (req, res) => {
   if (!APP_ID) return res.status(500).json({ error: 'Instagram OAuth not configured (FB_APP_ID missing)' });
   const state = Buffer.from(JSON.stringify({ userId: req.user.id })).toString('base64');
@@ -35,7 +35,7 @@ router.get('/connect', authenticate, (req, res) => {
 // GET /api/auth/instagram/callback
 router.get('/callback', async (req, res) => {
   const { code, state, error } = req.query;
-  if (error) return res.redirect('/?ig_error=' + encodeURIComponent(error));
+  if (error) return res.redirect('/signagecms.html?ig_error=' + encodeURIComponent(error));
 
   try {
     const { userId } = JSON.parse(Buffer.from(decodeURIComponent(state), 'base64').toString());
@@ -78,17 +78,17 @@ router.get('/callback', async (req, res) => {
       } catch (_) {}
     }
 
-    if (!igUserId) return res.redirect('/?ig_error=no_instagram_business_account');
+    if (!igUserId) return res.redirect('/signagecms.html?ig_error=no_instagram_business_account');
 
     await query(
       `UPDATE users SET ig_direct_user_id=$1, ig_direct_username=$2, ig_access_token=$3, ig_connected_at=NOW() WHERE id=$4`,
       [igUserId, igUsername, userToken, userId]
     );
 
-    res.redirect('/?ig_connected=1');
+    res.redirect('/signagecms.html?ig_connected=1');
   } catch (err) {
     console.error('[IG OAuth]', err.message);
-    res.redirect('/?ig_error=' + encodeURIComponent(err.message));
+    res.redirect('/signagecms.html?ig_error=' + encodeURIComponent(err.message));
   }
 });
 
@@ -121,3 +121,4 @@ router.get('/status', authenticate, async (req, res) => {
 });
 
 module.exports = router;
+

@@ -1,4 +1,4 @@
-const express = require('express');
+﻿const express = require('express');
 const https = require('https');
 const { query } = require('../db');
 const { authenticate } = require('../middleware/auth');
@@ -27,7 +27,7 @@ function fbGet(path) {
   });
 }
 
-// GET /api/auth/facebook/connect — returns OAuth URL for frontend
+// GET /api/auth/facebook/connect â€” returns OAuth URL for frontend
 router.get('/connect', authenticate, (req, res) => {
   const state = Buffer.from(JSON.stringify({ userId: req.user.id })).toString('base64');
   const scope = 'pages_show_list,pages_manage_posts,instagram_basic,instagram_content_publish';
@@ -35,10 +35,10 @@ router.get('/connect', authenticate, (req, res) => {
   res.json({ url });
 });
 
-// GET /api/auth/facebook/callback — OAuth callback from Facebook
+// GET /api/auth/facebook/callback â€” OAuth callback from Facebook
 router.get('/callback', async (req, res) => {
   const { code, state, error } = req.query;
-  if (error) return res.redirect('/?fb_error=' + encodeURIComponent(error));
+  if (error) return res.redirect('/signagecms.html?fb_error=' + encodeURIComponent(error));
 
   try {
     const { userId } = JSON.parse(Buffer.from(decodeURIComponent(state), 'base64').toString());
@@ -59,7 +59,7 @@ router.get('/callback', async (req, res) => {
     // Get user's pages
     const pagesData = await fbGet(`/me/accounts?access_token=${userToken}&fields=id,name,access_token`);
     if (!pagesData.data || !pagesData.data.length) {
-      return res.redirect('/?fb_error=no_pages');
+      return res.redirect('/signagecms.html?fb_error=no_pages');
     }
 
     // Use first page (user can select later)
@@ -85,10 +85,10 @@ router.get('/callback', async (req, res) => {
       [page.id, page.name, pageToken, igUserId, igUsername, userId]
     );
 
-    res.redirect('/?fb_connected=1');
+    res.redirect('/signagecms.html?fb_connected=1');
   } catch (err) {
     console.error('[FB OAuth]', err.message);
-    res.redirect('/?fb_error=' + encodeURIComponent(err.message));
+    res.redirect('/signagecms.html?fb_error=' + encodeURIComponent(err.message));
   }
 });
 
@@ -102,7 +102,7 @@ router.post('/disconnect', authenticate, async (req, res) => {
   res.json({ success: true });
 });
 
-// GET /api/auth/facebook/status — check connection status
+// GET /api/auth/facebook/status â€” check connection status
 router.get('/status', authenticate, async (req, res) => {
   const result = await query(
     'SELECT fb_page_id, fb_page_name, ig_user_id, ig_username, fb_connected_at FROM users WHERE id=$1',
@@ -119,7 +119,7 @@ router.get('/status', authenticate, async (req, res) => {
   });
 });
 
-// ── Social posting ────────────────────────────────────────────────────────────
+// â”€â”€ Social posting â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function fbApiPost(path, payload) {
   return new Promise((resolve, reject) => {
@@ -160,7 +160,7 @@ async function postCampaignToSocial(campaignId) {
 
   // Only post to social if plan includes it
   if (!SOCIAL_PLANS.includes(row.package_name)) {
-    console.log(`[Social] Campaign ${row.campaign_code} plan '${row.package_name}' — FB/IG posting not included`);
+    console.log(`[Social] Campaign ${row.campaign_code} plan '${row.package_name}' â€” FB/IG posting not included`);
     return;
   }
 
@@ -174,17 +174,17 @@ async function postCampaignToSocial(campaignId) {
         access_token: row.fb_page_access_token
       });
       if (photoRes.error) throw new Error(photoRes.error.message);
-      // Step 2: create feed post with photo attached — appears in page timeline
+      // Step 2: create feed post with photo attached â€” appears in page timeline
       fbRes = await fbApiPost(`/${row.fb_page_id}/feed`, {
         attached_media: [{ media_fbid: photoRes.id }],
         access_token: row.fb_page_access_token
       });
     } else if (row.file_url && row.content_type === 'video') {
-      // Video post — just log, video upload needs multipart not JSON
-      console.log(`[Social] Video campaign ${row.campaign_code} — video upload not supported yet`);
+      // Video post â€” just log, video upload needs multipart not JSON
+      console.log(`[Social] Video campaign ${row.campaign_code} â€” video upload not supported yet`);
       return;
     } else {
-      console.log(`[Social] No media for campaign ${row.campaign_code} — skipping FB post`);
+      console.log(`[Social] No media for campaign ${row.campaign_code} â€” skipping FB post`);
       return;
     }
     if (fbRes.error) throw new Error(fbRes.error.message);
@@ -234,3 +234,4 @@ async function postCampaignToSocial(campaignId) {
 
 module.exports = router;
 module.exports.postCampaignToSocial = postCampaignToSocial;
+
