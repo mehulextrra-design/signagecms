@@ -123,7 +123,7 @@ router.get('/connect', authenticate, (req, res) => {
 // GET /api/auth/google/callback — OAuth callback
 router.get('/callback', async (req, res) => {
   const { code, state, error } = req.query;
-  if (error) return res.send(`<html><body><script>if(window.opener)window.opener.postMessage("gbp_error:${encodeURIComponent(error)}","*");window.close();</script><p>Error. You can close this window.</p></body></html>`);
+  if (error) return res.redirect('/?gbp_error=' + encodeURIComponent(error));
 
   try {
     const { userId } = JSON.parse(Buffer.from(decodeURIComponent(state), 'base64').toString());
@@ -173,35 +173,10 @@ router.get('/callback', async (req, res) => {
       [accountName, locationId, businessName, accessToken, refreshToken, userId]
     );
 
-    const appUrl = process.env.APP_URL || 'https://extrravenue.com';
-    res.send(`<html><body style="font-family:sans-serif;text-align:center;padding:40px;color:#128C7E">
-<p style="font-size:16px;font-weight:600;">&#10003; Google Business Profile Connected!</p>
-<p style="font-size:13px;color:#666;">Redirecting back…</p>
-<script>
-  if(window.opener){
-    try{window.opener.postMessage("gbp_connected","*");}catch(e){}
-    window.close();
-  }
-  // Fallback for WebView / popup-close blocked — redirect back to app
-  setTimeout(function(){
-    window.location.replace('${appUrl}/signagecms.html?gbp_connected=1');
-  }, 400);
-</script></body></html>`);
+    res.redirect('/?gbp_connected=1');
   } catch (err) {
     console.error('[Google OAuth]', err.message);
-    const appUrl = process.env.APP_URL || 'https://extrravenue.com';
-    res.send(`<html><body style="font-family:sans-serif;text-align:center;padding:40px;color:#dc2626">
-<p style="font-size:16px;font-weight:600;">Connection failed</p>
-<p style="font-size:13px;color:#666;">${err.message}</p>
-<script>
-  if(window.opener){
-    try{window.opener.postMessage("gbp_error:${encodeURIComponent(err.message)}","*");}catch(e){}
-    window.close();
-  }
-  setTimeout(function(){
-    window.location.replace('${appUrl}/signagecms.html?gbp_error=${encodeURIComponent(err.message)}');
-  }, 400);
-</script></body></html>`);
+    res.redirect('/?gbp_error=' + encodeURIComponent(err.message));
   }
 });
 
