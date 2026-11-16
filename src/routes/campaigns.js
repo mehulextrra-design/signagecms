@@ -186,7 +186,8 @@ router.post('/', authenticate, async (req, res, next) => {
   const client = await getClient();
   try {
     await client.query('BEGIN');
-    const { screen_ids, content_id, title, start_date, end_date, start_time, end_time, coupon_code, package_name, wallet_amount, wa_broadcast_enabled, wa_caption_template, is_v3, billing_months, wa_directory_source, wa_directory_segment_id } = req.body;
+    const { screen_ids, content_id, title, start_date, end_date, start_time, end_time, coupon_code, package_name, wallet_amount, wa_caption_template, is_v3, billing_months, wa_directory_source, wa_directory_segment_id } = req.body;
+    let wa_broadcast_enabled = req.body.wa_broadcast_enabled;
 
     if (!screen_ids?.length) throw { status: 400, message: 'At least one screen required' };
 
