@@ -1724,8 +1724,10 @@
       </div>
       <div class="cco-body">
         <div id="ch-fb-status" style="font-size:13px;margin-bottom:18px;min-height:18px;"></div>
-        <button id="ch-btn-fb" onclick="chConnectFB()" class="cco-action-btn"></button>
-        <button onclick="chSkip()" class="cco-skip-btn">Skip</button>
+        <div class="cco-btn-row">
+          <button onclick="chSkip()" class="cco-skip-btn">Skip</button>
+          <button id="ch-btn-fb" onclick="chConnectFB()" class="cco-action-btn">Connect</button>
+        </div>
       </div>
     </div>
 
@@ -1742,8 +1744,10 @@
       </div>
       <div class="cco-body">
         <div id="ch-ig-status" style="font-size:13px;margin-bottom:18px;min-height:18px;"></div>
-        <button id="ch-btn-ig" onclick="chConnectIG()" class="cco-action-btn"></button>
-        <button onclick="chSkip()" class="cco-skip-btn">Skip</button>
+        <div class="cco-btn-row">
+          <button onclick="chSkip()" class="cco-skip-btn">Skip</button>
+          <button id="ch-btn-ig" onclick="chConnectIG()" class="cco-action-btn">Connect</button>
+        </div>
       </div>
     </div>
 
@@ -1760,8 +1764,10 @@
       </div>
       <div class="cco-body">
         <div id="ch-gbp-status" style="font-size:13px;margin-bottom:18px;min-height:18px;"></div>
-        <button id="ch-btn-gbp" onclick="chConnectGBP()" class="cco-action-btn"></button>
-        <button onclick="chSkip()" class="cco-skip-btn">Skip</button>
+        <div class="cco-btn-row">
+          <button onclick="chSkip()" class="cco-skip-btn">Skip</button>
+          <button id="ch-btn-gbp" onclick="chConnectGBP()" class="cco-action-btn">Connect</button>
+        </div>
       </div>
     </div>
 
@@ -1778,8 +1784,10 @@
       </div>
       <div class="cco-body">
         <div id="ch-wa-status" style="font-size:13px;margin-bottom:18px;min-height:18px;"></div>
-        <button id="ch-btn-wa" onclick="chConnectWA()" class="cco-action-btn"></button>
-        <button onclick="closeChannelConnect()" class="cco-skip-btn">Skip</button>
+        <div class="cco-btn-row">
+          <button onclick="closeChannelConnect()" class="cco-skip-btn">Skip</button>
+          <button id="ch-btn-wa" onclick="chConnectWA()" class="cco-action-btn">Connect</button>
+        </div>
       </div>
     </div>
 
@@ -1793,11 +1801,12 @@
 .cco-dot.active{background:#fff;width:22px;border-radius:4px;}
 .cco-hero{padding:44px 28px 28px;color:#fff;text-align:center;}
 .cco-body{background:var(--surface,#fff);padding:22px 28px 28px;text-align:center;}
-.cco-action-btn{width:100%;padding:13px;border-radius:12px;border:none;font-size:15px;font-weight:700;cursor:pointer;background:linear-gradient(135deg,#7b68c8,#5b4fb8);color:#fff;margin-bottom:10px;transition:opacity .15s;}
+.cco-btn-row{display:flex;gap:10px;align-items:center;}
+.cco-action-btn{flex:1;padding:13px;border-radius:12px;border:none;font-size:15px;font-weight:700;cursor:pointer;background:linear-gradient(135deg,#7b68c8,#5b4fb8);color:#fff;transition:opacity .15s;}
 .cco-action-btn:hover{opacity:.88;}
 .cco-action-btn.connected{background:#f0fdf4;color:#15803d;border:1.5px solid #bbf7d0;cursor:default;}
-.cco-skip-btn{background:none;border:none;font-size:13px;color:var(--text3,#888);cursor:pointer;padding:6px 12px;font-weight:500;}
-.cco-skip-btn:hover{color:var(--text1,#333);}
+.cco-skip-btn{flex:0 0 auto;background:none;border:1.5px solid var(--border,#ddd);border-radius:12px;font-size:14px;color:var(--text2,#666);cursor:pointer;padding:12px 20px;font-weight:600;}
+.cco-skip-btn:hover{background:var(--surface2,#f5f5f5);}
 .ch-status-ok{color:#15803d;font-weight:600;}
 .ch-status-miss{color:#dc2626;font-weight:500;}
 .ch-status-warn{color:#d97706;font-weight:500;}
@@ -3994,7 +4003,7 @@ function openChannelConnect(startStep){
     fbB.className='cco-action-btn connected'; fbB.textContent='Connected ✓'; fbB.disabled=true;
   } else {
     fbS.innerHTML='<span class="ch-status-miss">Facebook Page abhi connect nahi hai</span>';
-    fbB.className='cco-action-btn'; fbB.textContent='Facebook se Connect karein'; fbB.disabled=false;
+    fbB.className='cco-action-btn'; fbB.textContent='Connect'; fbB.disabled=false;
   }
 
   // IG card
@@ -4004,7 +4013,7 @@ function openChannelConnect(startStep){
     igB.className='cco-action-btn connected'; igB.textContent='Connected ✓'; igB.disabled=true;
   } else {
     igS.innerHTML='<span class="ch-status-miss">Instagram Business account connect nahi hai</span>';
-    igB.className='cco-action-btn'; igB.textContent='Instagram se Connect karein'; igB.disabled=false;
+    igB.className='cco-action-btn'; igB.textContent='Connect'; igB.disabled=false;
   }
 
   // GBP card
@@ -4014,7 +4023,7 @@ function openChannelConnect(startStep){
     gbpB.className='cco-action-btn connected'; gbpB.textContent='Connected ✓'; gbpB.disabled=true;
   } else {
     gbpS.innerHTML='<span class="ch-status-miss">Google Business Profile connect nahi hai</span>';
-    gbpB.className='cco-action-btn'; gbpB.textContent='Google se Connect karein'; gbpB.disabled=false;
+    gbpB.className='cco-action-btn'; gbpB.textContent='Connect'; gbpB.disabled=false;
   }
 
   // WA card (async)
@@ -4026,12 +4035,12 @@ function openChannelConnect(startStep){
         waB.className='cco-action-btn connected'; waB.textContent='Connected ✓'; waB.disabled=true;
       } else {
         waS.innerHTML='<span class="ch-status-warn">Number enabled — pairing code se connect karein</span>';
-        waB.className='cco-action-btn'; waB.textContent='WhatsApp Connect karein'; waB.disabled=false;
+        waB.className='cco-action-btn'; waB.textContent='Connect'; waB.disabled=false;
       }
-    }).catch(()=>{ waS.innerHTML=''; waB.className='cco-action-btn'; waB.textContent='WhatsApp Connect karein'; waB.disabled=false; });
+    }).catch(()=>{ waS.innerHTML=''; waB.className='cco-action-btn'; waB.textContent='Connect'; waB.disabled=false; });
   } else {
     waS.innerHTML='<span class="ch-status-miss">Aapke plan mein inbuilt — abhi connect karein</span>';
-    waB.className='cco-action-btn'; waB.textContent='WhatsApp Connect karein'; waB.disabled=false;
+    waB.className='cco-action-btn'; waB.textContent='Connect'; waB.disabled=false;
   }
 
   // Start at saved step (after OAuth return) or first unconnected
