@@ -2133,6 +2133,11 @@ function navigate(page, fromPopstate){
 
 // Android / browser back button — navigate within SPA, don't exit the app
 window.addEventListener('popstate', function(e){
+  // If back button pressed while channel connect modal is open, close it instead of navigating
+  if(e.state && e.state.modal==='channel-connect'){
+    closeChannelConnect();
+    return;
+  }
   const page = (e.state && e.state.page) || 'dashboard';
   navigate(page, true);
 });
@@ -3956,7 +3961,9 @@ var _cchQueue = []; // step indices of channels still to connect
 var _cchQIdx  = 0; // position in queue
 var _chStep   = 0; // current slide index (kept for WA inline state refs)
 var _ccoWaPollRef = null; // guard: only one WA poll interval at a time
+var _ccoWaConnected = false; // guard: prevent double-toast from race condition
 var _preModalWizardStep = 0; // wizard step saved before modal opens, restored on close
+var _ccoModalHistoryPushed = false; // tracks if we pushed a history state for the modal
 
 function _cchBuildDots(){
   var wrap=document.getElementById('cco-dots-wrap');
@@ -4041,11 +4048,17 @@ function openChannelConnect(startStep){
   _preModalWizardStep = wizardStep||0;
   document.getElementById('channel-connect-overlay').style.display='flex';
   document.body.style.overflow='hidden';
+  // Push history state so Android back button closes modal instead of navigating away
+  if(!_ccoModalHistoryPushed){
+    history.pushState({modal:'channel-connect',page:'new-campaign'},'','#new-campaign');
+    _ccoModalHistoryPushed=true;
+  }
 }
 
 function closeChannelConnect(focusWaCaption){
   document.getElementById('channel-connect-overlay').style.display='none';
   document.body.style.overflow='';
+  _ccoModalHistoryPushed=false;
   try{ sessionStorage.removeItem('ch_pending_step'); }catch(_){}
   // Reset WA card to default state
   ['cco-wa-s0','cco-wa-s1','cco-wa-s2'].forEach((id,i)=>{
@@ -4150,8 +4163,9 @@ async function ccoWaGetCode(){
     } else {
       document.getElementById('cco-wa-code-display').textContent=r.code||'—';
     }
-    // Poll until connected (guard: clear any previous poll first)
+    // Poll until connected (guard: clear any previous poll first, reset connected flag)
     if(_ccoWaPollRef){ clearInterval(_ccoWaPollRef); _ccoWaPollRef=null; }
+    _ccoWaConnected=false;
     var tries=0;
     _ccoWaPollRef=setInterval(async()=>{
       tries++;
@@ -4159,7 +4173,8 @@ async function ccoWaGetCode(){
         const s=await api('/wa/status');
         if(s.status==='connected'||tries>30){
           clearInterval(_ccoWaPollRef); _ccoWaPollRef=null;
-          if(s.status==='connected'){
+          if(s.status==='connected'&&!_ccoWaConnected){
+            _ccoWaConnected=true; // prevent race condition double-toast
             document.getElementById('cco-wa-poll-status').textContent='✓ Connected!';
             if(currentUser) currentUser.wa_enabled=true;
             const waS=document.getElementById('ch-wa-status'), waB=document.getElementById('ch-btn-wa');
