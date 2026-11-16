@@ -1696,77 +1696,90 @@
 
 <div id="toast-area"></div>
 
-<!-- Channel Connect Modal — one card at a time, backdrop blur -->
+<!-- Channel Connect Modal — one card at a time, backdrop blur, 4 channels -->
 <div id="channel-connect-overlay" style="display:none;position:fixed;inset:0;z-index:1200;align-items:center;justify-content:center;padding:20px 16px;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);background:rgba(10,10,20,.45);">
   <div id="cco-card" style="width:100%;max-width:400px;border-radius:22px;overflow:hidden;box-shadow:0 24px 64px rgba(0,0,0,.35);animation:cco-in .28s cubic-bezier(.22,.61,.36,1);">
 
-    <!-- Progress dots -->
+    <!-- Progress dots (4) -->
     <div style="position:absolute;top:18px;left:50%;transform:translateX(-50%);display:flex;gap:7px;z-index:2;">
       <div class="cco-dot" id="cco-dot-0"></div>
       <div class="cco-dot" id="cco-dot-1"></div>
       <div class="cco-dot" id="cco-dot-2"></div>
+      <div class="cco-dot" id="cco-dot-3"></div>
     </div>
 
     <!-- Close -->
     <button onclick="closeChannelConnect()" style="position:absolute;top:16px;right:18px;z-index:3;background:rgba(255,255,255,.18);border:none;color:#fff;width:30px;height:30px;border-radius:50%;font-size:15px;cursor:pointer;line-height:1;">×</button>
 
-    <!-- === CARD 0 : Facebook + Instagram === -->
+    <!-- === CARD 0 : Facebook === -->
     <div class="cco-slide" id="cco-slide-0">
-      <div class="cco-hero" style="background:linear-gradient(135deg,#1877f2 0%,#bc1888 100%);">
-        <div style="display:flex;gap:14px;justify-content:center;margin-bottom:18px;">
-          <div style="width:60px;height:60px;border-radius:16px;background:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,.2);">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="#1877f2"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>
-          </div>
-          <div style="width:60px;height:60px;border-radius:16px;background:linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,.2);">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><circle cx="17.5" cy="6.5" r="1.2" fill="#fff" stroke="none"/></svg>
+      <div class="cco-hero" style="background:linear-gradient(135deg,#1877f2 0%,#0d5fcc 100%);">
+        <div style="display:flex;justify-content:center;margin-bottom:18px;">
+          <div style="width:64px;height:64px;border-radius:18px;background:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,.2);">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="#1877f2"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>
           </div>
         </div>
-        <div style="font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;opacity:.75;margin-bottom:6px;">Channel 1 of 3</div>
-        <div style="font-size:22px;font-weight:800;">Facebook + Instagram</div>
-        <div style="font-size:13px;opacity:.88;margin-top:6px;line-height:1.5;">Campaign live hone pe aapka ad automatically Facebook Page aur Instagram pe post ho jayega.</div>
+        <div style="font-size:22px;font-weight:800;">Facebook</div>
+        <div style="font-size:13px;opacity:.88;margin-top:6px;line-height:1.5;">Campaign live hone pe aapka ad automatically Facebook Page pe post ho jayega.</div>
       </div>
       <div class="cco-body">
         <div id="ch-fb-status" style="font-size:13px;margin-bottom:18px;min-height:18px;"></div>
         <button id="ch-btn-fb" onclick="chConnectFB()" class="cco-action-btn"></button>
-        <button onclick="chSkip()" class="cco-skip-btn">Baad mein karenge &rsaquo;</button>
+        <button onclick="chSkip()" class="cco-skip-btn">Skip</button>
       </div>
     </div>
 
-    <!-- === CARD 1 : Google Business Profile === -->
+    <!-- === CARD 1 : Instagram === -->
     <div class="cco-slide" id="cco-slide-1" style="display:none;">
-      <div class="cco-hero" style="background:linear-gradient(135deg,#4285F4 0%,#34a853 100%);">
+      <div class="cco-hero" style="background:linear-gradient(135deg,#f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%);">
         <div style="display:flex;justify-content:center;margin-bottom:18px;">
-          <div style="width:60px;height:60px;border-radius:16px;background:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,.2);">
-            <svg width="34" height="34" viewBox="0 0 48 48"><path fill="#4285F4" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#34A853" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#EA4335" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/><path fill="none" d="M0 0h48v48H0z"/></svg>
+          <div style="width:64px;height:64px;border-radius:18px;background:linear-gradient(135deg,#f09433,#dc2743,#bc1888);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,.2);">
+            <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><circle cx="17.5" cy="6.5" r="1.2" fill="#fff" stroke="none"/></svg>
           </div>
         </div>
-        <div style="font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;opacity:.75;margin-bottom:6px;">Channel 2 of 3</div>
+        <div style="font-size:22px;font-weight:800;">Instagram</div>
+        <div style="font-size:13px;opacity:.88;margin-top:6px;line-height:1.5;">Campaign ka ad aapke Instagram Business account pe bhi post ho jayega.</div>
+      </div>
+      <div class="cco-body">
+        <div id="ch-ig-status" style="font-size:13px;margin-bottom:18px;min-height:18px;"></div>
+        <button id="ch-btn-ig" onclick="chConnectIG()" class="cco-action-btn"></button>
+        <button onclick="chSkip()" class="cco-skip-btn">Skip</button>
+      </div>
+    </div>
+
+    <!-- === CARD 2 : Google Business Profile === -->
+    <div class="cco-slide" id="cco-slide-2" style="display:none;">
+      <div class="cco-hero" style="background:linear-gradient(135deg,#4285F4 0%,#34a853 100%);">
+        <div style="display:flex;justify-content:center;margin-bottom:18px;">
+          <div style="width:64px;height:64px;border-radius:18px;background:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,.2);">
+            <svg width="36" height="36" viewBox="0 0 48 48"><path fill="#4285F4" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#34A853" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#EA4335" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+          </div>
+        </div>
         <div style="font-size:22px;font-weight:800;">Google Business</div>
         <div style="font-size:13px;opacity:.88;margin-top:6px;line-height:1.5;">Aapka ad Google Maps aur Google Search pe apne business profile par post hoga.</div>
       </div>
       <div class="cco-body">
         <div id="ch-gbp-status" style="font-size:13px;margin-bottom:18px;min-height:18px;"></div>
         <button id="ch-btn-gbp" onclick="chConnectGBP()" class="cco-action-btn"></button>
-        <button onclick="chSkip()" class="cco-skip-btn">Baad mein karenge &rsaquo;</button>
+        <button onclick="chSkip()" class="cco-skip-btn">Skip</button>
       </div>
     </div>
 
-    <!-- === CARD 2 : WhatsApp === -->
-    <div class="cco-slide" id="cco-slide-2" style="display:none;">
+    <!-- === CARD 3 : WhatsApp === -->
+    <div class="cco-slide" id="cco-slide-3" style="display:none;">
       <div class="cco-hero" style="background:linear-gradient(135deg,#128C7E 0%,#25D366 100%);">
         <div style="display:flex;justify-content:center;margin-bottom:18px;">
-          <div style="width:60px;height:60px;border-radius:16px;background:#25D366;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,.2);">
-            <svg width="34" height="34" viewBox="0 0 24 24" fill="#fff"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.14.564 4.148 1.546 5.887L0 24l6.302-1.513A11.933 11.933 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.794 9.794 0 01-5.064-1.41l-.363-.216-3.741.897.939-3.63-.237-.374A9.787 9.787 0 012.182 12C2.182 6.57 6.57 2.182 12 2.182S21.818 6.57 21.818 12 17.43 21.818 12 21.818z"/></svg>
+          <div style="width:64px;height:64px;border-radius:18px;background:#25D366;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,.2);">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="#fff"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.14.564 4.148 1.546 5.887L0 24l6.302-1.513A11.933 11.933 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.794 9.794 0 01-5.064-1.41l-.363-.216-3.741.897.939-3.63-.237-.374A9.787 9.787 0 012.182 12C2.182 6.57 6.57 2.182 12 2.182S21.818 6.57 21.818 12 17.43 21.818 12 21.818z"/></svg>
           </div>
         </div>
-        <div style="font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;opacity:.75;margin-bottom:6px;">Channel 3 of 3</div>
         <div style="font-size:22px;font-weight:800;">WhatsApp Broadcast</div>
-        <div style="font-size:13px;opacity:.88;margin-top:6px;line-height:1.5;">Apne number se apne customers ko campaign ka ad directly WhatsApp pe bhejo.</div>
+        <div style="font-size:13px;opacity:.88;margin-top:6px;line-height:1.5;">Apne number se customers ko campaign ka ad directly WhatsApp pe bhejo.</div>
       </div>
       <div class="cco-body">
         <div id="ch-wa-status" style="font-size:13px;margin-bottom:18px;min-height:18px;"></div>
         <button id="ch-btn-wa" onclick="chConnectWA()" class="cco-action-btn"></button>
-        <button onclick="closeChannelConnect()" class="cco-skip-btn">Campaign continue karein ></button>
+        <button onclick="closeChannelConnect()" class="cco-skip-btn">Skip</button>
       </div>
     </div>
 
@@ -1775,19 +1788,17 @@
 
 <style>
 @keyframes cco-in{from{opacity:0;transform:scale(.92) translateY(18px);}to{opacity:1;transform:none;}}
-@keyframes cco-slide-left{from{opacity:0;transform:translateX(40px);}to{opacity:1;transform:none;}}
-@keyframes cco-slide-right{from{opacity:0;transform:translateX(-40px);}to{opacity:1;transform:none;}}
 #channel-connect-overlay{display:flex!important;}
 #channel-connect-overlay[style*="display:none"]{display:none!important;}
 #cco-card{position:relative;}
 .cco-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.35);transition:all .2s;}
 .cco-dot.active{background:#fff;width:22px;border-radius:4px;}
-.cco-hero{padding:40px 28px 28px;color:#fff;text-align:center;}
+.cco-hero{padding:44px 28px 28px;color:#fff;text-align:center;}
 .cco-body{background:var(--surface,#fff);padding:22px 28px 28px;text-align:center;}
 .cco-action-btn{width:100%;padding:13px;border-radius:12px;border:none;font-size:15px;font-weight:700;cursor:pointer;background:linear-gradient(135deg,#7b68c8,#5b4fb8);color:#fff;margin-bottom:10px;transition:opacity .15s;}
 .cco-action-btn:hover{opacity:.88;}
 .cco-action-btn.connected{background:#f0fdf4;color:#15803d;border:1.5px solid #bbf7d0;cursor:default;}
-.cco-skip-btn{background:none;border:none;font-size:13px;color:var(--text3,#888);cursor:pointer;padding:4px 8px;font-weight:500;}
+.cco-skip-btn{background:none;border:none;font-size:13px;color:var(--text3,#888);cursor:pointer;padding:6px 12px;font-weight:500;}
 .cco-skip-btn:hover{color:var(--text1,#333);}
 .ch-status-ok{color:#15803d;font-weight:600;}
 .ch-status-miss{color:#dc2626;font-weight:500;}
@@ -1960,12 +1971,21 @@ window.addEventListener('DOMContentLoaded',()=>{
   const _igError=new URLSearchParams(location.search).get('ig_error');
   if(_fbConnected||_fbError||_gbpConnected||_gbpError||_igConnected||_igError) history.replaceState({},'','/#profile');
   if(token) loadUserInfo().then(()=>{
-    if(_fbConnected){showPage('profile');toast('Facebook connected successfully!','success');}
-    if(_fbError){toast('Facebook error: '+decodeURIComponent(_fbError),'error');}
-    if(_gbpConnected){showPage('profile');toast('Google Business Profile connected!','success');}
-    if(_gbpError){toast('Google error: '+decodeURIComponent(_gbpError),'error');}
-    if(_igConnected){showPage('profile');toast('Instagram connected successfully!','success');}
-    if(_igError){toast('Instagram error: '+decodeURIComponent(_igError),'error');}
+    // Check if we need to reopen the channel connect modal after OAuth return
+    var _chPending=null;
+    try{ _chPending=sessionStorage.getItem('ch_pending_step'); sessionStorage.removeItem('ch_pending_step'); }catch(_){}
+    if(_fbConnected){
+      toast('Facebook connected successfully!','success');
+      if(_chPending!=null){ openChannelConnect(parseInt(_chPending)||1); } else { showPage('profile'); }
+    }
+    if(_fbError){toast('Facebook error: '+decodeURIComponent(_fbError),'error'); if(_chPending!=null) openChannelConnect(0); else showPage('profile');}
+    if(_gbpConnected){toast('Google Business Profile connected!','success'); if(_chPending!=null){ openChannelConnect(parseInt(_chPending)||3); } else { showPage('profile'); }}
+    if(_gbpError){toast('Google error: '+decodeURIComponent(_gbpError),'error'); if(_chPending!=null) openChannelConnect(2); else showPage('profile');}
+    if(_igConnected){
+      toast('Instagram connected successfully!','success');
+      if(_chPending!=null){ openChannelConnect(parseInt(_chPending)||2); } else { showPage('profile'); }
+    }
+    if(_igError){toast('Instagram error: '+decodeURIComponent(_igError),'error'); if(_chPending!=null) openChannelConnect(1); else showPage('profile');}
   }).catch(()=>{clearToken();showAuthScreen();});
   else showAuthScreen();
   const d=s=>s.toISOString().slice(0,10);
@@ -3942,105 +3962,132 @@ function selectPkg(pkg){
   if(_wizardV3 && pkg==='omnichannel_growth') openChannelConnect();
 }
 
-// ── Channel Connect Modal (one-by-one carousel) ───────────────────────────────
+// ── Channel Connect Modal (4-card carousel: FB, IG, GBP, WA) ─────────────────
 var _chStep = 0;
-var _chSteps = [0,1,2]; // FB=0, GBP=1, WA=2
+var _CH_TOTAL = 4;
 
 function _cchGoTo(step){
-  // hide all slides
-  [0,1,2].forEach(i=>{
+  for(var i=0;i<_CH_TOTAL;i++){
     var s=document.getElementById('cco-slide-'+i);
     if(s) s.style.display= i===step ? '' : 'none';
-  });
-  // update dots
-  [0,1,2].forEach(i=>{
     var d=document.getElementById('cco-dot-'+i);
-    if(d){ d.className='cco-dot'+(i===step?' active':''); }
-  });
-  _chStep = step;
-  // animate card
+    if(d) d.className='cco-dot'+(i===step?' active':'');
+  }
+  _chStep=step;
   var card=document.getElementById('cco-card');
   if(card){ card.style.animation='none'; void card.offsetWidth; card.style.animation='cco-in .28s cubic-bezier(.22,.61,.36,1)'; }
 }
 
-function chSkip(){ if(_chStep<2) _cchGoTo(_chStep+1); else closeChannelConnect(); }
+function chSkip(){ if(_chStep<_CH_TOTAL-1) _cchGoTo(_chStep+1); else closeChannelConnect(); }
 
-function openChannelConnect(){
+function openChannelConnect(startStep){
   const u = currentUser||{};
   const fbOk  = !!u.fb_page_id;
+  const igOk  = !!u.ig_username;
   const gbpOk = !!u.google_location_id;
   const waOk  = !!u.wa_enabled;
 
-  // All connected → no need to show
-  if(fbOk && gbpOk && waOk) return;
+  if(fbOk && igOk && gbpOk && waOk) return;
 
-  // — FB+IG card —
-  const fbStatus = document.getElementById('ch-fb-status');
-  const fbBtn    = document.getElementById('ch-btn-fb');
+  // FB card
+  const fbS=document.getElementById('ch-fb-status'), fbB=document.getElementById('ch-btn-fb');
   if(fbOk){
-    fbStatus.innerHTML='<span class="ch-status-ok">✓ Connected — '+_esc(u.fb_page_name||'Page')+'</span>';
-    fbBtn.className='cco-action-btn connected'; fbBtn.textContent='Connected ✓'; fbBtn.disabled=true;
+    fbS.innerHTML='<span class="ch-status-ok">✓ Connected — '+_esc(u.fb_page_name||'Facebook Page')+'</span>';
+    fbB.className='cco-action-btn connected'; fbB.textContent='Connected ✓'; fbB.disabled=true;
   } else {
-    fbStatus.innerHTML='<span class="ch-status-miss">Facebook aur Instagram abhi connect nahi hai</span>';
-    fbBtn.className='cco-action-btn'; fbBtn.textContent='Facebook se Connect karein'; fbBtn.disabled=false;
+    fbS.innerHTML='<span class="ch-status-miss">Facebook Page abhi connect nahi hai</span>';
+    fbB.className='cco-action-btn'; fbB.textContent='Facebook se Connect karein'; fbB.disabled=false;
   }
 
-  // — GBP card —
-  const gbpStatus = document.getElementById('ch-gbp-status');
-  const gbpBtn    = document.getElementById('ch-btn-gbp');
+  // IG card
+  const igS=document.getElementById('ch-ig-status'), igB=document.getElementById('ch-btn-ig');
+  if(igOk){
+    igS.innerHTML='<span class="ch-status-ok">✓ Connected — @'+_esc(u.ig_username)+'</span>';
+    igB.className='cco-action-btn connected'; igB.textContent='Connected ✓'; igB.disabled=true;
+  } else {
+    igS.innerHTML='<span class="ch-status-miss">Instagram Business account connect nahi hai</span>';
+    igB.className='cco-action-btn'; igB.textContent='Instagram se Connect karein'; igB.disabled=false;
+  }
+
+  // GBP card
+  const gbpS=document.getElementById('ch-gbp-status'), gbpB=document.getElementById('ch-btn-gbp');
   if(gbpOk){
-    gbpStatus.innerHTML='<span class="ch-status-ok">✓ Connected — '+_esc(u.google_business_name||'Business')+'</span>';
-    gbpBtn.className='cco-action-btn connected'; gbpBtn.textContent='Connected ✓'; gbpBtn.disabled=true;
+    gbpS.innerHTML='<span class="ch-status-ok">✓ Connected — '+_esc(u.google_business_name||'Google Business')+'</span>';
+    gbpB.className='cco-action-btn connected'; gbpB.textContent='Connected ✓'; gbpB.disabled=true;
   } else {
-    gbpStatus.innerHTML='<span class="ch-status-miss">Google Business Profile abhi connect nahi hai</span>';
-    gbpBtn.className='cco-action-btn'; gbpBtn.textContent='Google se Connect karein'; gbpBtn.disabled=false;
+    gbpS.innerHTML='<span class="ch-status-miss">Google Business Profile connect nahi hai</span>';
+    gbpB.className='cco-action-btn'; gbpB.textContent='Google se Connect karein'; gbpB.disabled=false;
   }
 
-  // — WA card — async status check
-  const waStatus = document.getElementById('ch-wa-status');
-  const waBtn    = document.getElementById('ch-btn-wa');
+  // WA card (async)
+  const waS=document.getElementById('ch-wa-status'), waB=document.getElementById('ch-btn-wa');
   if(waOk){
     api('/wa/status').then(s=>{
       if(s.status==='connected'){
-        waStatus.innerHTML='<span class="ch-status-ok">✓ Connected — '+_esc(s.phone||'')+'</span>';
-        waBtn.className='cco-action-btn connected'; waBtn.textContent='Connected ✓'; waBtn.disabled=true;
+        waS.innerHTML='<span class="ch-status-ok">✓ Connected — '+_esc(s.phone||'')+'</span>';
+        waB.className='cco-action-btn connected'; waB.textContent='Connected ✓'; waB.disabled=true;
       } else {
-        waStatus.innerHTML='<span class="ch-status-warn">Number enabled hai — pairing code se connect karein</span>';
-        waBtn.className='cco-action-btn'; waBtn.textContent='WhatsApp Connect karein'; waBtn.disabled=false;
+        waS.innerHTML='<span class="ch-status-warn">Number enabled — pairing code se connect karein</span>';
+        waB.className='cco-action-btn'; waB.textContent='WhatsApp Connect karein'; waB.disabled=false;
       }
-    }).catch(()=>{
-      waStatus.innerHTML='<span class="ch-status-warn">Status check failed</span>';
-      waBtn.className='cco-action-btn'; waBtn.textContent='WhatsApp Connect karein'; waBtn.disabled=false;
-    });
+    }).catch(()=>{ waS.innerHTML=''; waB.className='cco-action-btn'; waB.textContent='WhatsApp Connect karein'; waB.disabled=false; });
   } else {
-    waStatus.innerHTML='<span class="ch-status-miss">WhatsApp abhi connect nahi — aapke plan mein inbuilt hai</span>';
-    waBtn.className='cco-action-btn'; waBtn.textContent='WhatsApp Connect karein'; waBtn.disabled=false;
+    waS.innerHTML='<span class="ch-status-miss">Aapke plan mein inbuilt — abhi connect karein</span>';
+    waB.className='cco-action-btn'; waB.textContent='WhatsApp Connect karein'; waB.disabled=false;
   }
 
-  // Find first unconnected card
-  var firstStep = fbOk ? (gbpOk ? 2 : 1) : 0;
-  _cchGoTo(firstStep);
-
-  var ov=document.getElementById('channel-connect-overlay');
-  ov.style.display='flex';
+  // Start at saved step (after OAuth return) or first unconnected
+  var first = startStep != null ? startStep : (fbOk ? (igOk ? (gbpOk ? 3 : 2) : 1) : 0);
+  _cchGoTo(first);
+  document.getElementById('channel-connect-overlay').style.display='flex';
   document.body.style.overflow='hidden';
 }
 
 function closeChannelConnect(){
   document.getElementById('channel-connect-overlay').style.display='none';
   document.body.style.overflow='';
+  try{ sessionStorage.removeItem('ch_pending_step'); }catch(_){}
 }
 
-function chConnectFB(){
-  closeChannelConnect();
-  navigate('profile');
-  setTimeout(()=>{ const el=document.getElementById('fb-connect-btn'); if(el) el.scrollIntoView({behavior:'smooth'}); },400);
+async function chConnectFB(){
+  try{
+    try{ sessionStorage.setItem('ch_pending_step','1'); }catch(_){}
+    const data=await api('/auth/facebook/connect');
+    window.location.href=data.url;
+  }catch(e){ toast('Could not start Facebook login','error'); }
 }
 
-function chConnectGBP(){
-  closeChannelConnect();
-  navigate('profile');
-  setTimeout(()=>{ const el=document.getElementById('gbp-connect-btn'); if(el) el.scrollIntoView({behavior:'smooth'}); else { const s=document.getElementById('wa-section'); if(s) s.scrollIntoView({behavior:'smooth'}); } },400);
+async function chConnectIG(){
+  try{
+    try{ sessionStorage.setItem('ch_pending_step','2'); }catch(_){}
+    const data=await api('/auth/instagram/connect');
+    window.location.href=data.url;
+  }catch(e){ toast('Could not start Instagram login','error'); }
+}
+
+async function chConnectGBP(){
+  try{
+    const popup=window.open('','google_oauth','width=520,height=620,top=100,left=200');
+    const data=await api('/auth/google/connect');
+    if(!popup){ toast('Allow popups for this site and try again','error'); return; }
+    popup.location.href=data.url;
+    function onGbpMsg(e){
+      if(e.data==='gbp_connected'){
+        window.removeEventListener('message',onGbpMsg);
+        if(currentUser) currentUser.google_location_id='pending';
+        const gbpS=document.getElementById('ch-gbp-status'), gbpB=document.getElementById('ch-btn-gbp');
+        if(gbpS) gbpS.innerHTML='<span class="ch-status-ok">✓ Connected!</span>';
+        if(gbpB){ gbpB.className='cco-action-btn connected'; gbpB.textContent='Connected ✓'; gbpB.disabled=true; }
+        toast('Google Business Profile connected!','success');
+        setTimeout(()=>_cchGoTo(3), 1200);
+      } else if(typeof e.data==='string'&&e.data.startsWith('gbp_error:')){
+        window.removeEventListener('message',onGbpMsg);
+        toast('Connection failed: '+decodeURIComponent(e.data.replace('gbp_error:','')),'error');
+      }
+    }
+    window.addEventListener('message',onGbpMsg);
+    const timer=setInterval(()=>{ if(!popup||popup.closed){ clearInterval(timer); window.removeEventListener('message',onGbpMsg); }},1000);
+  }catch(e){ toast('Could not start Google login: '+(e.message||e),'error'); }
 }
 
 function chConnectWA(){
@@ -4058,7 +4105,6 @@ function chConnectWA(){
 
 function _esc(s){ const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
 
-// Close on backdrop click (outside the card)
 document.getElementById('channel-connect-overlay').addEventListener('click', function(e){
   if(e.target===this) closeChannelConnect();
 });
