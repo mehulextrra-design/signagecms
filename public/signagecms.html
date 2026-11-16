@@ -1712,6 +1712,22 @@
 </style>
 
 <script>
+// Prevent overscroll bounce in Android WebView
+(function(){
+  var _sy=0;
+  document.addEventListener('touchstart',function(e){ _sy=e.touches[0].clientY; },{passive:true});
+  document.addEventListener('touchmove',function(e){
+    var el=e.target;
+    while(el&&el!==document.body){
+      var st=el.scrollTop, sh=el.scrollHeight, ch=el.clientHeight;
+      var dy=e.touches[0].clientY-_sy;
+      if(sh>ch){ if((st<=0&&dy>0)||(st+ch>=sh&&dy<0)){ e.preventDefault(); } return; }
+      el=el.parentElement;
+    }
+    e.preventDefault();
+  },{passive:false});
+})();
+
 const API = 'https://www.extrravenue.com/api';
 let token = null, currentUser = null;
 
