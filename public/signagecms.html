@@ -867,7 +867,7 @@
             <div style="display:flex;align-items:flex-end;gap:12px;margin-bottom:12px;flex-wrap:wrap;">
               <div style="flex:1;min-width:180px;">
                 <label class="form-label" data-i18n="lbl_camp_name" style="margin-bottom:4px;">Campaign Name</label>
-                <input type="text" id="cmp-name" class="form-input" placeholder="e.g. Domino's Weekend Offer — July">
+                <input type="text" id="cmp-name" class="form-input" placeholder="e.g. Domino's Weekend Offer — July" ontouchstart="this.focus()">
               </div>
               <div id="storage-bar-wrap" style="flex-shrink:0;min-width:190px;background:var(--surface);border:1.5px solid var(--border);border-radius:8px;padding:6px 10px;margin-bottom:2px;">
                 <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px;">
@@ -886,7 +886,7 @@
             </div>
             <!-- Upload tab -->
             <div id="creative-upload-section">
-              <div class="upload-zone" id="upload-zone" onclick="document.getElementById('file-input').click()" ondragover="handleDragOver(event)" ondrop="handleDrop(event)" style="padding:22px 24px;">
+              <div class="upload-zone" id="upload-zone" onclick="document.activeElement.blur();document.getElementById('file-input').click()" ondragover="handleDragOver(event)" ondrop="handleDrop(event)" style="padding:22px 24px;">
                 <div class="upload-icon" style="width:40px;height:40px;margin:0 auto 8px;"><svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="#7b68c8"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg></div>
                 <div class="upload-title" style="font-size:14px;">Drag &amp; drop or click to browse</div>
                 <div class="upload-sub">MP4 · MOV · JPG · PNG · max 200 MB</div>
@@ -3955,6 +3955,8 @@ function selectPkg(pkg){
 var _cchQueue = []; // step indices of channels still to connect
 var _cchQIdx  = 0; // position in queue
 var _chStep   = 0; // current slide index (kept for WA inline state refs)
+var _ccoWaPollRef = null; // guard: only one WA poll interval at a time
+var _preModalWizardStep = 0; // wizard step saved before modal opens, restored on close
 
 function _cchBuildDots(){
   var wrap=document.getElementById('cco-dots-wrap');
@@ -4036,11 +4038,12 @@ function openChannelConnect(startStep){
     startQIdx=idx>=0?idx:0;
   }
   _cchGoToQ(startQIdx);
+  _preModalWizardStep = wizardStep||0;
   document.getElementById('channel-connect-overlay').style.display='flex';
   document.body.style.overflow='hidden';
 }
 
-function closeChannelConnect(){
+function closeChannelConnect(focusWaCaption){
   document.getElementById('channel-connect-overlay').style.display='none';
   document.body.style.overflow='';
   try{ sessionStorage.removeItem('ch_pending_step'); }catch(_){}
@@ -4050,6 +4053,20 @@ function closeChannelConnect(){
   });
   const t=document.getElementById('cco-wa-title'); if(t) t.textContent='WhatsApp Broadcast';
   const s=document.getElementById('cco-wa-subtitle'); if(s) s.textContent='Apne number se customers ko campaign ka ad directly WhatsApp pe bhejo.';
+  // Restore wizard step (prevents Android back / popstate from resetting to step 1)
+  if(_preModalWizardStep>0){ updateWizardUI(_preModalWizardStep); _preModalWizardStep=0; }
+  // After WA connect: show WA section, check toggle, focus textarea
+  if(focusWaCaption){
+    _updateV3PlanCard(selectedPkg);
+    const tog=document.getElementById('wa-broadcast-toggle');
+    const capWrap=document.getElementById('wa-caption-wrap');
+    if(tog) tog.checked=true;
+    if(capWrap) capWrap.style.display='';
+    setTimeout(()=>{
+      const ta=document.getElementById('wa-caption-template');
+      if(ta){ ta.scrollIntoView({behavior:'smooth',block:'center'}); ta.focus(); }
+    },200);
+  }
 }
 
 function _savePendingPage(){
@@ -4133,14 +4150,15 @@ async function ccoWaGetCode(){
     } else {
       document.getElementById('cco-wa-code-display').textContent=r.code||'—';
     }
-    // Poll until connected
+    // Poll until connected (guard: clear any previous poll first)
+    if(_ccoWaPollRef){ clearInterval(_ccoWaPollRef); _ccoWaPollRef=null; }
     var tries=0;
-    var poll=setInterval(async()=>{
+    _ccoWaPollRef=setInterval(async()=>{
       tries++;
       try{
         const s=await api('/wa/status');
         if(s.status==='connected'||tries>30){
-          clearInterval(poll);
+          clearInterval(_ccoWaPollRef); _ccoWaPollRef=null;
           if(s.status==='connected'){
             document.getElementById('cco-wa-poll-status').textContent='✓ Connected!';
             if(currentUser) currentUser.wa_enabled=true;
@@ -4151,7 +4169,7 @@ async function ccoWaGetCode(){
             loadWaStatus();
             // remove WA from queue; if more remain advance, else close
             _cchQueue=_cchQueue.filter(x=>x!==3);
-            setTimeout(()=>{ _cchQueue.length?chSkip():closeChannelConnect(); }, 1500);
+            setTimeout(()=>{ _cchQueue.length?chSkip():closeChannelConnect(true); }, 1500);
           } else {
             document.getElementById('cco-wa-poll-status').textContent='Timeout — dobara try karo.';
             document.getElementById('cco-wa-phone-wrap').style.display='';
@@ -4514,6 +4532,7 @@ async function adminTestPay(id,btn){
 }
 
 function switchCreativeTab(tab){
+  document.activeElement.blur();
   document.getElementById('tab-upload').classList.toggle('active',tab==='upload');
   document.getElementById('tab-library').classList.toggle('active',tab==='library');
   document.getElementById('creative-upload-section').style.display=tab==='upload'?'':'none';
