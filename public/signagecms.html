@@ -4125,26 +4125,9 @@ async function chConnectIG(){
 
 async function chConnectGBP(){
   try{
-    const popup=window.open('','google_oauth','width=520,height=620,top=100,left=200');
+    try{ sessionStorage.setItem('ch_pending_step','3'); }catch(_){}
     const data=await api('/auth/google/connect');
-    if(!popup){ toast('Allow popups for this site and try again','error'); return; }
-    popup.location.href=data.url;
-    function onGbpMsg(e){
-      if(e.data==='gbp_connected'){
-        window.removeEventListener('message',onGbpMsg);
-        if(currentUser) currentUser.google_location_id='pending';
-        const gbpS=document.getElementById('ch-gbp-status'), gbpB=document.getElementById('ch-btn-gbp');
-        if(gbpS) gbpS.innerHTML='<span class="ch-status-ok">✓ Connected!</span>';
-        if(gbpB){ gbpB.className='cco-action-btn connected'; gbpB.textContent='Connected ✓'; gbpB.disabled=true; }
-        toast('Google Business Profile connected!','success');
-        setTimeout(()=>_cchGoTo(3), 1200);
-      } else if(typeof e.data==='string'&&e.data.startsWith('gbp_error:')){
-        window.removeEventListener('message',onGbpMsg);
-        toast('Connection failed: '+decodeURIComponent(e.data.replace('gbp_error:','')),'error');
-      }
-    }
-    window.addEventListener('message',onGbpMsg);
-    const timer=setInterval(()=>{ if(!popup||popup.closed){ clearInterval(timer); window.removeEventListener('message',onGbpMsg); }},1000);
+    window.location.href=data.url;
   }catch(e){ toast('Could not start Google login: '+(e.message||e),'error'); }
 }
 
