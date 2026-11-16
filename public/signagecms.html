@@ -1058,7 +1058,7 @@
               <div id="wa-caption-wrap" style="display:block;">
                 <label style="font-size:12px;font-weight:600;color:var(--text2);display:block;margin-bottom:8px;">Message Customize Karo</label>
                 <div style="background:rgba(37,211,102,0.07);border:1px solid rgba(37,211,102,0.2);border-radius:7px 7px 0 0;padding:7px 10px;font-size:12px;color:var(--text3);font-style:italic;">Namaste [Contact Name],</div>
-                <textarea id="wa-caption-template" rows="3" placeholder="Aapke liye special offer hai! Hamara naya campaign dekhiye — {{Campaign}}." style="width:100%;box-sizing:border-box;background:var(--card-bg,var(--bg));color:var(--text);border:1px solid rgba(37,211,102,0.3);border-top:none;border-bottom:none;border-radius:0;padding:8px 10px;font-size:12px;resize:vertical;outline:none;font-family:inherit;"></textarea>
+                <textarea id="wa-caption-template" rows="5" placeholder="Aapke liye special offer hai! Hamara naya campaign dekhiye — {{Campaign}}." style="width:100%;box-sizing:border-box;background:var(--card-bg,var(--bg));color:var(--text);border:1px solid rgba(37,211,102,0.3);border-top:none;border-bottom:none;border-radius:0;padding:10px 12px;font-size:14px;resize:vertical;outline:none;font-family:inherit;min-height:100px;"></textarea>
                 <div style="background:rgba(37,211,102,0.07);border:1px solid rgba(37,211,102,0.2);border-radius:0 0 7px 7px;padding:7px 10px;font-size:12px;color:var(--text3);font-style:italic;">[Business Name]<br>📞 [Aapka Number]</div>
                 <div style="font-size:11px;color:var(--text3);margin-top:5px;">Middle message mein use kar sako: <code>{{Campaign}}</code> <code>{{City}}</code></div>
               </div>
@@ -1707,6 +1707,7 @@
 .ch-status-ok{color:#15803d;font-weight:600;}
 .ch-status-miss{color:#dc2626;font-weight:500;}
 .ch-status-warn{color:#d97706;font-weight:500;}
+#wa-caption-template::placeholder,#wa-modal-caption-input::placeholder{color:var(--text2,#555);opacity:1;}
 </style>
 
 <script>
@@ -5131,7 +5132,7 @@ async function saveQRSettings(){
         </div>
         <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:8px;">Message Customize Karo</div>
         <div style="background:rgba(37,211,102,0.07);border:1px solid rgba(37,211,102,0.25);border-radius:8px 8px 0 0;padding:7px 10px;font-size:12px;color:var(--text3);font-style:italic;">Namaste [Contact Name],</div>
-        <textarea id="wa-modal-caption-input" rows="4" placeholder="Aapke liye special offer hai! Hamara naya campaign dekhiye — {{Campaign}}." style="width:100%;box-sizing:border-box;background:var(--bg);color:var(--text);border:1px solid rgba(37,211,102,0.3);border-top:none;border-bottom:none;border-radius:0;padding:8px 10px;font-size:12px;resize:vertical;outline:none;font-family:inherit;"></textarea>
+        <textarea id="wa-modal-caption-input" rows="5" placeholder="Aapke liye special offer hai! Hamara naya campaign dekhiye — {{Campaign}}." style="width:100%;box-sizing:border-box;background:var(--bg);color:var(--text);border:1px solid rgba(37,211,102,0.3);border-top:none;border-bottom:none;border-radius:0;padding:10px 12px;font-size:14px;resize:vertical;outline:none;font-family:inherit;min-height:100px;"></textarea>
         <div style="background:rgba(37,211,102,0.07);border:1px solid rgba(37,211,102,0.25);border-radius:0 0 8px 8px;padding:7px 10px;font-size:12px;color:var(--text3);font-style:italic;">[Business Name] 📞 [Aapka Number]</div>
         <div style="font-size:11px;color:var(--text3);margin-top:5px;">Variables: <code>{{Campaign}}</code> <code>{{City}}</code></div>
 
