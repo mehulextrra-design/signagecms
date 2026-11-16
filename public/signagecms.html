@@ -323,14 +323,21 @@
   .schedule-grid { display:grid;grid-template-columns:1fr 1fr;gap:16px; }
   .form-hint { font-size:12px;color:var(--text2);margin-top:4px; }
 
-  /* V3 PLAN CHIPS */
-  .v3-plan-chip { padding:8px 16px;border:1.5px solid var(--border);border-radius:50px;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;background:var(--surface);color:var(--text2);transition:all 0.15s;white-space:nowrap; }
-  .v3-plan-chip:hover { border-color:var(--primary);color:var(--primary); }
-  .v3-plan-chip.active { border-color:var(--primary);background:rgba(13,148,136,0.08);color:var(--primary); }
-  .v3-plan-chip[data-pkg="trial"].active { border-color:#f59e0b;background:rgba(245,158,11,0.08);color:#b45309; }
-  .v3-billing-chip { padding:7px 14px;border:1.5px solid var(--border);border-radius:50px;cursor:pointer;font-family:inherit;font-size:12px;font-weight:500;background:var(--surface);color:var(--text2);transition:all 0.15s;white-space:nowrap; }
-  .v3-billing-chip.active { border-color:var(--primary);background:rgba(13,148,136,0.08);color:var(--primary);font-weight:600; }
-  .v3-billing-chip:hover { border-color:var(--primary); }
+  /* V3 PLAN SELECTOR — horizontal option rows */
+  .v3-plan-chip { display:flex;align-items:center;gap:12px;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;cursor:pointer;background:var(--surface);transition:border-color .18s,background .18s,box-shadow .18s;text-align:left;width:100%;font-family:inherit; }
+  .v3-plan-chip:hover { border-color:var(--primary);box-shadow:0 1px 6px rgba(123,104,200,.1); }
+  .v3-plan-chip.active { border-color:var(--primary);background:rgba(123,104,200,.06);box-shadow:0 1px 8px rgba(123,104,200,.13); }
+  .v3-plan-chip[data-pkg="trial"].active { border-color:#f59e0b;background:rgba(245,158,11,.06);box-shadow:0 1px 8px rgba(245,158,11,.13); }
+  .v3-plan-radio { width:16px;height:16px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;transition:all .18s;position:relative;box-sizing:border-box; }
+  .v3-plan-chip.active .v3-plan-radio { border-color:var(--primary);background:var(--primary); }
+  .v3-plan-chip.active .v3-plan-radio::after { content:'';position:absolute;width:5px;height:5px;background:#fff;border-radius:50%;top:50%;left:50%;transform:translate(-50%,-50%); }
+  .v3-plan-chip[data-pkg="trial"].active .v3-plan-radio { border-color:#f59e0b;background:#f59e0b; }
+  /* BILLING PERIOD — segmented pill control */
+  .v3-billing-seg { display:inline-flex;gap:4px;background:var(--surface2);border:1.5px solid var(--border);border-radius:50px;padding:4px;flex-wrap:wrap; }
+  .v3-billing-chip { padding:8px 18px;border:none;border-radius:50px;cursor:pointer;font-family:inherit;font-size:13px;font-weight:500;background:transparent;color:var(--text2);transition:all .2s;white-space:nowrap; }
+  .v3-billing-chip.active { background:var(--primary);color:#fff;font-weight:600; }
+  .v3-billing-chip.active .v3-disc { color:rgba(255,255,255,.85)!important; }
+  .v3-billing-chip:hover:not(.active) { color:var(--primary); }
   .select-input { width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:14px;color:var(--text);background:var(--surface);font-family:inherit;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394A3B8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;background-size:16px;padding-right:32px; }
   .select-input:focus { outline:none;border-color:var(--primary); }
 
@@ -901,23 +908,62 @@
             <div class="section-title" style="margin-bottom:6px;">Set Your Schedule</div>
             <div style="font-size:13px;color:var(--text2);margin-bottom:16px;">Choose plan and when your ad runs.</div>
 
-            <!-- Plan chips -->
-            <div style="margin-bottom:14px;">
+            <!-- Plan selection — horizontal option rows -->
+            <div style="margin-bottom:16px;">
               <div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">Select Plan</div>
-              <div style="display:flex;gap:8px;flex-wrap:wrap;">
-                <button class="v3-plan-chip" data-pkg="trial" onclick="selectPkg('trial')">Trial <span style="font-size:9px;background:#f59e0b;color:#fff;padding:2px 7px;border-radius:8px;font-weight:700;margin-left:3px;vertical-align:middle;">FREE</span></button>
-                <button class="v3-plan-chip" data-pkg="starter_screen" onclick="selectPkg('starter_screen')">Starter Screen</button>
-                <button class="v3-plan-chip active" data-pkg="omnichannel_growth" onclick="selectPkg('omnichannel_growth')">Omnichannel Growth <span style="font-size:9px;background:var(--primary);color:#fff;padding:2px 7px;border-radius:8px;font-weight:700;margin-left:3px;vertical-align:middle;">★</span></button>
+              <div style="display:flex;flex-direction:column;gap:6px;">
+                <button class="v3-plan-chip" data-pkg="trial" onclick="selectPkg('trial')">
+                  <div class="v3-plan-radio"></div>
+                  <div style="flex:1;min-width:0;">
+                    <div style="font-size:13px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:6px;flex-wrap:wrap;">Trial <span style="font-size:9px;background:#f59e0b;color:#fff;padding:2px 8px;border-radius:8px;font-weight:700;letter-spacing:.3px;">FREE · 7 DAYS</span></div>
+                    <div style="font-size:11px;color:var(--text3);margin-top:1px;">Digital Screen only · 10 sec slot</div>
+                  </div>
+                  <div style="text-align:right;flex-shrink:0;">
+                    <div id="v3chip-price-trial" style="font-size:13px;font-weight:800;color:#f59e0b;">₹0</div>
+                    <div style="display:flex;gap:3px;margin-top:3px;justify-content:flex-end;">
+                      <span class="pkg-ch ch-screen" style="width:22px;height:22px;padding:3px;"><svg width="13" height="13"><use href="#pkg-ico-screen"/></svg></span>
+                    </div>
+                  </div>
+                </button>
+                <button class="v3-plan-chip" data-pkg="starter_screen" onclick="selectPkg('starter_screen')">
+                  <div class="v3-plan-radio"></div>
+                  <div style="flex:1;min-width:0;">
+                    <div style="font-size:13px;font-weight:700;color:var(--text);">Starter Screen</div>
+                    <div style="font-size:11px;color:var(--text3);margin-top:1px;">Digital Screen only · 20 sec slot</div>
+                  </div>
+                  <div style="text-align:right;flex-shrink:0;">
+                    <div id="v3chip-price-starter_screen" style="font-size:13px;font-weight:800;color:var(--primary);">₹3,999<span style="font-size:9px;font-weight:400;color:var(--text3)">/mo</span></div>
+                    <div style="display:flex;gap:3px;margin-top:3px;justify-content:flex-end;">
+                      <span class="pkg-ch ch-screen" style="width:22px;height:22px;padding:3px;"><svg width="13" height="13"><use href="#pkg-ico-screen"/></svg></span>
+                    </div>
+                  </div>
+                </button>
+                <button class="v3-plan-chip active" data-pkg="omnichannel_growth" onclick="selectPkg('omnichannel_growth')">
+                  <div class="v3-plan-radio"></div>
+                  <div style="flex:1;min-width:0;">
+                    <div style="font-size:13px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:6px;flex-wrap:wrap;">Omnichannel Growth <span style="font-size:9px;background:var(--primary);color:#fff;padding:2px 8px;border-radius:8px;font-weight:700;letter-spacing:.3px;">★ POPULAR</span></div>
+                    <div style="font-size:11px;color:var(--text3);margin-top:1px;">Screen + Social + WA · 20 sec slot</div>
+                  </div>
+                  <div style="text-align:right;flex-shrink:0;">
+                    <div id="v3chip-price-omnichannel_growth" style="font-size:13px;font-weight:800;color:var(--primary);">₹5,999<span style="font-size:9px;font-weight:400;color:var(--text3)">/mo</span></div>
+                    <div style="display:flex;gap:3px;margin-top:3px;justify-content:flex-end;">
+                      <span class="pkg-ch ch-screen" style="width:22px;height:22px;padding:3px;"><svg width="13" height="13"><use href="#pkg-ico-screen"/></svg></span>
+                      <span class="pkg-ch ch-fb" style="width:22px;height:22px;padding:3px;"><svg width="13" height="13"><use href="#pkg-ico-fb"/></svg></span>
+                      <span class="pkg-ch ch-ig" style="width:22px;height:22px;padding:3px;"><svg width="13" height="13"><use href="#pkg-ico-ig"/></svg></span>
+                      <span class="pkg-ch ch-gbp" style="width:22px;height:22px;padding:3px;"><svg width="13" height="13"><use href="#pkg-ico-gbp"/></svg></span>
+                    </div>
+                  </div>
+                </button>
               </div>
             </div>
 
-            <!-- Billing chips — hidden for Trial -->
-            <div id="v3-billing-row" style="margin-bottom:16px;">
-              <div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">Billing Period</div>
-              <div style="display:flex;gap:8px;flex-wrap:wrap;">
-                <button class="v3-billing-chip" id="v3chip-1mo" onclick="setV3Cycle('1mo')">1 Month</button>
-                <button class="v3-billing-chip" id="v3chip-3mo" onclick="setV3Cycle('3mo')">3 Months <span style="font-size:11px;color:#16a34a;font-weight:700;">−15%</span></button>
-                <button class="v3-billing-chip" id="v3chip-6mo" onclick="setV3Cycle('6mo')">6 Months <span style="font-size:11px;color:#16a34a;font-weight:700;">−25%</span></button>
+            <!-- Billing period — segmented pill (hidden for Trial) -->
+            <div id="v3-billing-row" style="margin-bottom:18px;">
+              <div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;">Billing Period</div>
+              <div class="v3-billing-seg">
+                <button class="v3-billing-chip" id="v3chip-1mo" onclick="setV3Cycle('1mo')">Monthly</button>
+                <button class="v3-billing-chip" id="v3chip-3mo" onclick="setV3Cycle('3mo')">3 Months <span class="v3-disc" style="color:#16a34a;font-weight:700;">−15%</span></button>
+                <button class="v3-billing-chip" id="v3chip-6mo" onclick="setV3Cycle('6mo')">6 Months <span class="v3-disc" style="color:#16a34a;font-weight:700;">−25%</span></button>
               </div>
             </div>
 
@@ -947,29 +993,34 @@
             </select>
 
             <!-- Plan info card -->
-            <div id="v3-plan-info-card" style="background:var(--surface2);border:1.5px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:14px;">
-              <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px;">
-                <div>
-                  <div style="font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px;">Package Rate</div>
-                  <div id="sum-cpd" style="font-size:20px;font-weight:800;color:var(--primary);line-height:1.2;">—</div>
-                </div>
-                <div id="v3-plan-channels-wrap" style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;padding-top:4px;"></div>
-              </div>
-              <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;padding-top:12px;border-top:1px solid var(--border);">
-                <div>
-                  <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;font-weight:600;">Screens</div>
-                  <div id="sum-screens" style="font-size:17px;font-weight:700;color:var(--primary);">—</div>
-                </div>
-                <div>
-                  <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;font-weight:600;">Plays / Day</div>
-                  <div id="sum-impressions" style="font-size:17px;font-weight:700;">—</div>
-                </div>
-                <div>
-                  <div id="sum-impressions-mo-label" style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;font-weight:600;">Plays / Month</div>
-                  <div id="sum-impressions-mo" style="font-size:17px;font-weight:700;">—</div>
+            <div id="v3-plan-info-card" style="border:1.5px solid var(--primary);border-radius:12px;overflow:hidden;margin-bottom:14px;background:var(--surface);">
+              <!-- Header: plan name + price + channels -->
+              <div style="padding:14px 16px;background:rgba(123,104,200,0.07);border-bottom:1px solid rgba(123,104,200,0.15);">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+                  <div>
+                    <div id="v3-plan-card-name" style="font-size:10px;font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px;">Omnichannel Growth</div>
+                    <div id="sum-cpd" style="font-size:22px;font-weight:800;color:var(--text);line-height:1.1;">—</div>
+                  </div>
+                  <div id="v3-plan-channels-wrap" style="display:flex;gap:5px;flex-wrap:wrap;align-items:center;"></div>
                 </div>
               </div>
-              <div id="v3-plan-features" style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);font-size:12px;color:var(--text2);line-height:1.9;"></div>
+              <!-- Stats strip -->
+              <div style="display:grid;grid-template-columns:1fr 1fr 1fr;border-bottom:1px solid var(--border);">
+                <div style="padding:10px 12px;border-right:1px solid var(--border);">
+                  <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;font-weight:600;">Screens</div>
+                  <div id="sum-screens" style="font-size:19px;font-weight:700;color:var(--primary);margin-top:2px;">—</div>
+                </div>
+                <div style="padding:10px 12px;border-right:1px solid var(--border);">
+                  <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;font-weight:600;">Plays / Day</div>
+                  <div id="sum-impressions" style="font-size:19px;font-weight:700;margin-top:2px;">—</div>
+                </div>
+                <div style="padding:10px 12px;">
+                  <div id="sum-impressions-mo-label" style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;font-weight:600;">Plays / Month</div>
+                  <div id="sum-impressions-mo" style="font-size:19px;font-weight:700;margin-top:2px;">—</div>
+                </div>
+              </div>
+              <!-- Features -->
+              <div id="v3-plan-features" style="padding:12px 16px;font-size:12px;color:var(--text2);line-height:2;"></div>
             </div>
 
             <!-- Hidden stubs: preserve all IDs used by existing JS -->
@@ -3765,6 +3816,18 @@ function setV3Cycle(cycle){
       totalEl.style.color=c.d>0?'var(--success)':'var(--text2)';
     }
   });
+  // Update chip price previews
+  [{key:'starter_screen',base:3999},{key:'omnichannel_growth',base:5999}].forEach(({key,base})=>{
+    const discMonthly=Math.round(base*(1-c.d));
+    const chipEl=document.getElementById('v3chip-price-'+key);
+    if(chipEl){
+      if(c.d>0){
+        chipEl.innerHTML=`<s style="font-size:9px;font-weight:400;color:var(--text3)">₹${base.toLocaleString('en-IN')}</s> ₹${discMonthly.toLocaleString('en-IN')}<span style="font-size:9px;font-weight:400;color:var(--text3)">/mo</span>`;
+      } else {
+        chipEl.innerHTML=`₹${base.toLocaleString('en-IN')}<span style="font-size:9px;font-weight:400;color:var(--text3)">/mo</span>`;
+      }
+    }
+  });
   // Sync duration dropdown to billing cycle for v3 paid plans
   if(_wizardV3&&selectedPkg!=='trial'){
     const durEl=document.getElementById('sch-duration');
@@ -3831,30 +3894,43 @@ function _updateV3PlanCard(pkg){
   // Show/hide billing row
   const billingRow=document.getElementById('v3-billing-row');
   if(billingRow) billingRow.style.display=(pkg==='trial')?'none':'';
+  // Update plan card name label
+  const nameEl=document.getElementById('v3-plan-card-name');
+  if(nameEl){
+    const nameMap={trial:'Trial · Free',starter_screen:'Starter Screen',omnichannel_growth:'Omnichannel Growth'};
+    nameEl.textContent=nameMap[pkg]||pkg;
+    nameEl.style.color=pkg==='trial'?'#b45309':'var(--primary)';
+  }
+  // Update plan card header background and border
+  const card=document.getElementById('v3-plan-info-card');
+  const hdr=card?card.querySelector('div[style*="rgba(123"]'):null;
+  if(card){
+    card.style.borderColor=pkg==='trial'?'#f59e0b':(pkg==='starter_screen'?'var(--border)':'var(--primary)');
+    if(hdr){
+      hdr.style.background=pkg==='trial'?'rgba(245,158,11,0.07)':'rgba(123,104,200,0.07)';
+      hdr.style.borderBottomColor=pkg==='trial'?'rgba(245,158,11,0.18)':'rgba(123,104,200,0.15)';
+    }
+  }
   // Update channel icons in plan card
   const chWrap=document.getElementById('v3-plan-channels-wrap');
   if(chWrap){
+    const WAIcon=`<span class="pkg-ch" title="WhatsApp" style="background:#25D366;color:#fff;border-radius:5px;padding:2px;display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M11.998 0C5.373 0 0 5.373 0 12c0 2.127.558 4.117 1.531 5.845L0 24l6.335-1.508A11.956 11.956 0 0012 23.999c6.627 0 12-5.373 12-12 0-6.626-5.373-12-12-12zm0 21.818a9.822 9.822 0 01-5.011-1.372l-.36-.214-3.726.887.916-3.618-.234-.373a9.776 9.776 0 01-1.498-5.228c0-5.411 4.405-9.818 9.816-9.818 5.412 0 9.819 4.407 9.819 9.818 0 5.412-4.407 9.818-9.822 9.918z"/></svg></span>`;
     const chMap={
-      trial:`<span class="pkg-ch ch-screen" title="Screen"><svg width="16" height="16"><use href="#pkg-ico-screen"/></svg></span>`,
-      starter_screen:`<span class="pkg-ch ch-screen" title="Screen"><svg width="16" height="16"><use href="#pkg-ico-screen"/></svg></span>`,
-      omnichannel_growth:`<span class="pkg-ch ch-screen"><svg width="16" height="16"><use href="#pkg-ico-screen"/></svg></span><span class="pkg-ch ch-fb"><svg width="16" height="16"><use href="#pkg-ico-fb"/></svg></span><span class="pkg-ch ch-ig"><svg width="16" height="16"><use href="#pkg-ico-ig"/></svg></span><span class="pkg-ch ch-gbp"><svg width="16" height="16"><use href="#pkg-ico-gbp"/></svg></span><span class="pkg-ch" title="WhatsApp" style="background:#25D366;color:#fff;border-radius:5px;padding:1px;display:inline-flex;align-items:center;justify-content:center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M11.998 0C5.373 0 0 5.373 0 12c0 2.127.558 4.117 1.531 5.845L0 24l6.335-1.508A11.956 11.956 0 0012 23.999c6.627 0 12-5.373 12-12 0-6.626-5.373-12-12-12zm0 21.818a9.822 9.822 0 01-5.011-1.372l-.36-.214-3.726.887.916-3.618-.234-.373a9.776 9.776 0 01-1.498-5.228c0-5.411 4.405-9.818 9.816-9.818 5.412 0 9.819 4.407 9.819 9.818 0 5.412-4.407 9.818-9.822 9.918z"/></svg></span>`
+      trial:`<span class="pkg-ch ch-screen" title="Screen" style="width:26px;height:26px;"><svg width="15" height="15"><use href="#pkg-ico-screen"/></svg></span>`,
+      starter_screen:`<span class="pkg-ch ch-screen" title="Screen" style="width:26px;height:26px;"><svg width="15" height="15"><use href="#pkg-ico-screen"/></svg></span>`,
+      omnichannel_growth:`<span class="pkg-ch ch-screen" style="width:26px;height:26px;"><svg width="15" height="15"><use href="#pkg-ico-screen"/></svg></span><span class="pkg-ch ch-fb" style="width:26px;height:26px;"><svg width="15" height="15"><use href="#pkg-ico-fb"/></svg></span><span class="pkg-ch ch-ig" style="width:26px;height:26px;"><svg width="15" height="15"><use href="#pkg-ico-ig"/></svg></span><span class="pkg-ch ch-gbp" style="width:26px;height:26px;"><svg width="15" height="15"><use href="#pkg-ico-gbp"/></svg></span>${WAIcon}`
     };
     chWrap.innerHTML=chMap[pkg]||chMap.trial;
   }
-  // Update features list in plan card
+  // Update features list
   const featEl=document.getElementById('v3-plan-features');
   if(featEl){
     const featMap={
-      trial:'<div>✓ 7-day free trial</div><div>✓ Digital Screen only · 10 sec slot</div><div>✓ Proof-of-Play report + QR Code</div><div>✓ 1 campaign only · no card needed</div>',
+      trial:'<div>✓ 7-day free trial · no card needed</div><div>✓ Digital Screen · 10 sec ad slot</div><div>✓ Proof-of-Play report + QR Code</div><div>✓ 1 campaign only</div>',
       starter_screen:'<div>✓ Digital Screen · 20 sec ad slot</div><div>✓ Proof-of-Play report + QR Code</div><div>✓ Unlimited campaigns</div>',
-      omnichannel_growth:'<div>✓ Screen + Facebook + Instagram + GBP</div><div>✓ WhatsApp broadcast (inbuilt · free)</div><div>✓ 20 sec slot · PoP report · QR · Unlimited reposts</div>'
+      omnichannel_growth:'<div>✓ Screen + Facebook + Instagram + Google Business</div><div>✓ WhatsApp broadcast — inbuilt · free</div><div>✓ 20 sec slot · Proof-of-Play · QR · Unlimited reposts</div>'
     };
     featEl.innerHTML=featMap[pkg]||'';
-  }
-  // Update plan card border color
-  const card=document.getElementById('v3-plan-info-card');
-  if(card){
-    card.style.borderColor=pkg==='trial'?'#f59e0b':(pkg==='omnichannel_growth'?'var(--primary)':'var(--border)');
   }
 }
 
