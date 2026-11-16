@@ -322,6 +322,15 @@
   /* SCHEDULE */
   .schedule-grid { display:grid;grid-template-columns:1fr 1fr;gap:16px; }
   .form-hint { font-size:12px;color:var(--text2);margin-top:4px; }
+
+  /* V3 PLAN CHIPS */
+  .v3-plan-chip { padding:8px 16px;border:1.5px solid var(--border);border-radius:50px;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;background:var(--surface);color:var(--text2);transition:all 0.15s;white-space:nowrap; }
+  .v3-plan-chip:hover { border-color:var(--primary);color:var(--primary); }
+  .v3-plan-chip.active { border-color:var(--primary);background:rgba(13,148,136,0.08);color:var(--primary); }
+  .v3-plan-chip[data-pkg="trial"].active { border-color:#f59e0b;background:rgba(245,158,11,0.08);color:#b45309; }
+  .v3-billing-chip { padding:7px 14px;border:1.5px solid var(--border);border-radius:50px;cursor:pointer;font-family:inherit;font-size:12px;font-weight:500;background:var(--surface);color:var(--text2);transition:all 0.15s;white-space:nowrap; }
+  .v3-billing-chip.active { border-color:var(--primary);background:rgba(13,148,136,0.08);color:var(--primary);font-weight:600; }
+  .v3-billing-chip:hover { border-color:var(--primary); }
   .select-input { width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:14px;color:var(--text);background:var(--surface);font-family:inherit;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394A3B8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;background-size:16px;padding-right:32px; }
   .select-input:focus { outline:none;border-color:var(--primary); }
 
@@ -890,60 +899,81 @@
           <!-- Step 3 -->
           <div class="wizard-panel" id="wp3">
             <div class="section-title" style="margin-bottom:6px;">Set Your Schedule</div>
-            <div style="font-size:13px;color:var(--text2);margin-bottom:20px;">Choose when your ad runs.</div>
-            <div class="schedule-grid">
+            <div style="font-size:13px;color:var(--text2);margin-bottom:16px;">Choose plan and when your ad runs.</div>
+
+            <!-- Plan chips -->
+            <div style="margin-bottom:14px;">
+              <div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">Select Plan</div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                <button class="v3-plan-chip" data-pkg="trial" onclick="selectPkg('trial')">Trial <span style="font-size:9px;background:#f59e0b;color:#fff;padding:2px 7px;border-radius:8px;font-weight:700;margin-left:3px;vertical-align:middle;">FREE</span></button>
+                <button class="v3-plan-chip" data-pkg="starter_screen" onclick="selectPkg('starter_screen')">Starter Screen</button>
+                <button class="v3-plan-chip active" data-pkg="omnichannel_growth" onclick="selectPkg('omnichannel_growth')">Omnichannel Growth <span style="font-size:9px;background:var(--primary);color:#fff;padding:2px 7px;border-radius:8px;font-weight:700;margin-left:3px;vertical-align:middle;">★</span></button>
+              </div>
+            </div>
+
+            <!-- Billing chips — hidden for Trial -->
+            <div id="v3-billing-row" style="margin-bottom:16px;">
+              <div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">Billing Period</div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                <button class="v3-billing-chip" id="v3chip-1mo" onclick="setV3Cycle('1mo')">1 Month</button>
+                <button class="v3-billing-chip" id="v3chip-3mo" onclick="setV3Cycle('3mo')">3 Months <span style="font-size:11px;color:#16a34a;font-weight:700;">−15%</span></button>
+                <button class="v3-billing-chip" id="v3chip-6mo" onclick="setV3Cycle('6mo')">6 Months <span style="font-size:11px;color:#16a34a;font-weight:700;">−25%</span></button>
+              </div>
+            </div>
+
+            <!-- Schedule fields -->
+            <div class="schedule-grid" style="margin-bottom:4px;">
               <div class="form-group">
                 <label class="form-label" data-i18n="lbl_start_date">Start Date</label>
                 <input type="date" id="sch-start" class="form-input" onchange="onStartDateChange()">
                 <div class="form-hint" data-i18n="hint_start_date">Campaign starts after approval.</div>
               </div>
               <div class="form-group">
-                <label class="form-label" data-i18n="lbl_duration">Duration</label>
-                <select id="sch-duration" class="select-input" onchange="updateEndFromDuration()">
-                  <option value="15">15 Days — Half Month</option>
-                  <option value="30" selected>30 Days — 1 Month</option>
-                  <option value="60">60 Days — 2 Months</option>
-                  <option value="90">90 Days — 3 Months</option>
-                  <option value="180" style="display:none">180 Days — 6 Months</option>
-                </select>
-                <div class="form-hint" id="sch-end-display" style="color:var(--primary);font-weight:500;"></div>
-              </div>
-              <div class="form-group">
-                <label class="form-label" data-i18n="lbl_start_time">Campaign Start Time</label>
+                <label class="form-label" data-i18n="lbl_start_time">Start Time</label>
                 <input type="time" id="sch-time-start" class="form-input" min="00:00" max="23:59" onchange="onStartTimeChange()">
-                <div class="form-hint" data-i18n="hint_start_time">(auto-set to now)</div>
-              </div>
-              <div class="form-group">
-                <label class="form-label" data-i18n="lbl_end_time">Campaign End Time</label>
-                <input type="time" id="sch-time-end" class="form-input" min="00:00" max="23:59" readonly style="background:var(--surface2);cursor:not-allowed;opacity:0.8;">
-                <div class="form-hint" data-i18n="hint_end_time">(auto: 1 min before start)</div>
+                <div class="form-hint">(auto-set to now)</div>
               </div>
             </div>
-            <!-- hidden end date kept for backend compatibility -->
+            <div class="form-hint" id="sch-end-display" style="color:var(--primary);font-weight:500;margin-bottom:16px;"></div>
+
+            <!-- Hidden inputs for backend compatibility -->
             <input type="hidden" id="sch-end">
-            <!-- Network summary bar -->
-            <div id="pkg-network-summary" style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin-bottom:14px;display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-              <div>
-                <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;font-weight:600;">Screens</div>
-                <div style="font-size:18px;font-weight:700;color:var(--primary)" id="sum-screens">—</div>
+            <input type="hidden" id="sch-time-end" value="23:59">
+            <select id="sch-duration" style="display:none;" onchange="updateEndFromDuration()">
+              <option value="7">7 Days</option>
+              <option value="30" selected>30 Days</option>
+              <option value="90">90 Days</option>
+              <option value="180">180 Days</option>
+            </select>
+
+            <!-- Plan info card -->
+            <div id="v3-plan-info-card" style="background:var(--surface2);border:1.5px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:14px;">
+              <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px;">
+                <div>
+                  <div style="font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px;">Package Rate</div>
+                  <div id="sum-cpd" style="font-size:20px;font-weight:800;color:var(--primary);line-height:1.2;">—</div>
+                </div>
+                <div id="v3-plan-channels-wrap" style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;padding-top:4px;"></div>
               </div>
-              <div>
-                <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;font-weight:600;">Package Rate</div>
-                <div style="font-size:18px;font-weight:700;color:var(--primary)" id="sum-cpd">—</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;padding-top:12px;border-top:1px solid var(--border);">
+                <div>
+                  <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;font-weight:600;">Screens</div>
+                  <div id="sum-screens" style="font-size:17px;font-weight:700;color:var(--primary);">—</div>
+                </div>
+                <div>
+                  <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;font-weight:600;">Plays / Day</div>
+                  <div id="sum-impressions" style="font-size:17px;font-weight:700;">—</div>
+                </div>
+                <div>
+                  <div id="sum-impressions-mo-label" style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;font-weight:600;">Plays / Month</div>
+                  <div id="sum-impressions-mo" style="font-size:17px;font-weight:700;">—</div>
+                </div>
               </div>
-              <div>
-                <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;font-weight:600;">Plays / Day</div>
-                <div style="font-size:18px;font-weight:700;" id="sum-impressions">—</div>
-              </div>
-              <div>
-                <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;font-weight:600;" id="sum-impressions-mo-label">Plays / Month</div>
-                <div style="font-size:18px;font-weight:700;" id="sum-impressions-mo">—</div>
-              </div>
+              <div id="v3-plan-features" style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);font-size:12px;color:var(--text2);line-height:1.9;"></div>
             </div>
 
-            <div class="form-group" style="margin-top:4px;">
-              <label class="form-label">Select Package <span style="color:var(--text3);font-weight:400;">(entire network · all screens)</span></label>
-              <!-- Channel icon defs (reused by pkg cards) -->
+            <!-- Hidden stubs: preserve all IDs used by existing JS -->
+            <div style="display:none;" aria-hidden="true">
               <svg width="0" height="0" style="position:absolute;overflow:hidden;" aria-hidden="true">
                 <defs>
                   <linearGradient id="pkg-ig-grad" x1="0%" y1="100%" x2="100%" y2="0%">
@@ -971,234 +1001,45 @@
                   </symbol>
                 </defs>
               </svg>
-              <!-- Wizard version toggle chip -->
-              <div id="wv2-chip" style="display:none;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
-                <span style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.4px;">Pricing</span>
-                <div style="display:flex;gap:0;border:1.5px solid var(--border);border-radius:7px;overflow:hidden;font-size:12px;">
-                  <button id="wv-btn-v1" onclick="setWizardVersion('v1')" style="padding:4px 10px;border:none;cursor:pointer;font-family:inherit;font-size:12px;font-weight:500;background:var(--primary);color:#fff;">v1</button>
-                  <button id="wv-btn-v2" onclick="setWizardVersion('v2')" style="padding:4px 10px;border:none;cursor:pointer;font-family:inherit;font-size:12px;font-weight:500;background:var(--surface2);color:var(--text2);border-left:1px solid var(--border);">v2</button>
-                  <button id="wv-btn-v3" onclick="setWizardVersion('v3')" style="padding:4px 10px;border:none;cursor:pointer;font-family:inherit;font-size:12px;font-weight:500;background:var(--surface2);color:var(--text2);border-left:1px solid var(--border);">v3 ✦</button>
-                </div>
-                <span id="wv-desc" style="font-size:11px;color:var(--text3);">v1 · Starter ₹1,499</span>
-              </div>
-              <div class="pkg-selector" id="pkg-selector">
-                <div class="pkg-opt" data-pkg="trial" onclick="selectPkg('trial')" style="border-color:#f59e0b;">
-                  <div class="pkg-name">Trial <span class="pkg-trial-badge">5 DAYS</span></div>
-                  <div class="pkg-slot">8 sec</div>
-                  <div class="pkg-price" style="font-size:22px;">FREE<span style="font-size:11px;font-weight:400;color:var(--text3)"> · ₹0</span></div>
-                  <div class="pkg-ppd">5 days · 1 campaign</div>
-                  <div id="pkg-imp-trial" class="pkg-imp"></div>
-                  <div class="pkg-channels">
-                    <span class="pkg-ch ch-screen" title="Digital Screen"><svg width="16" height="16"><use href="#pkg-ico-screen"/></svg></span>
-                  </div>
-                  <div class="pkg-desc"><span style="color:var(--text3);font-size:10px;">Best suited for:</span><br>First-time advertisers, event promos</div>
-                </div>
-                <div class="pkg-opt" data-pkg="starter" onclick="selectPkg('starter')">
-                  <div class="pkg-name">Starter</div>
-                  <div class="pkg-slot">10 sec</div>
-                  <div class="pkg-price">₹1,499<span style="font-size:11px;font-weight:400;color:var(--text3)">/mo</span></div>
-                  <div class="pkg-ppd">˜ ₹50/day</div>
-                  <div id="pkg-imp-starter" class="pkg-imp"></div>
-                  <div class="pkg-channels">
-                    <span class="pkg-ch ch-screen" title="Digital Screen"><svg width="16" height="16"><use href="#pkg-ico-screen"/></svg></span>
-                  </div>
-                  <div class="pkg-desc"><span style="color:var(--text3);font-size:10px;">Best suited for:</span><br>Tea shops, salons, tuition</div>
-                </div>
-                <div class="pkg-opt selected" data-pkg="complete" onclick="selectPkg('complete')">
-                  <div class="pkg-name">Complete ★</div>
-                  <div class="pkg-slot">15 sec</div>
-                  <div class="pkg-price">₹3,499<span style="font-size:11px;font-weight:400;color:var(--text3)">/mo</span></div>
-                  <div class="pkg-ppd">˜ ₹117/day</div>
-                  <div id="pkg-imp-complete" class="pkg-imp"></div>
-                  <div class="pkg-channels">
-                    <span class="pkg-ch ch-screen" title="Digital Screen"><svg width="16" height="16"><use href="#pkg-ico-screen"/></svg></span>
-                    <span class="pkg-ch ch-fb" title="Facebook"><svg width="16" height="16"><use href="#pkg-ico-fb"/></svg></span>
-                    <span class="pkg-ch ch-ig" title="Instagram"><svg width="16" height="16"><use href="#pkg-ico-ig"/></svg></span>
-                    <span class="pkg-ch ch-gbp" title="Google Business Profile"><svg width="16" height="16"><use href="#pkg-ico-gbp"/></svg></span>
-                  </div>
-                  <div class="pkg-desc"><span style="color:var(--text3);font-size:10px;">Best suited for:</span><br>Restaurants, clinics, coaching</div>
-                </div>
-                <div class="pkg-opt" data-pkg="growth" onclick="selectPkg('growth')">
-                  <div class="pkg-name">Growth</div>
-                  <div class="pkg-slot">20 sec</div>
-                  <div class="pkg-price">₹5,999<span style="font-size:11px;font-weight:400;color:var(--text3)">/mo</span></div>
-                  <div class="pkg-ppd">˜ ₹200/day</div>
-                  <div id="pkg-imp-growth" class="pkg-imp"></div>
-                  <div class="pkg-channels">
-                    <span class="pkg-ch ch-screen" title="Digital Screen"><svg width="16" height="16"><use href="#pkg-ico-screen"/></svg></span>
-                    <span class="pkg-ch ch-fb" title="Facebook"><svg width="16" height="16"><use href="#pkg-ico-fb"/></svg></span>
-                    <span class="pkg-ch ch-ig" title="Instagram"><svg width="16" height="16"><use href="#pkg-ico-ig"/></svg></span>
-                    <span class="pkg-ch ch-gbp" title="Google Business Profile"><svg width="16" height="16"><use href="#pkg-ico-gbp"/></svg></span>
-                    <span class="pkg-ch ch-card" title="Digital Card (Coming Soon)"><svg width="16" height="16"><use href="#pkg-ico-card"/></svg></span>
-                  </div>
-                  <div class="pkg-desc"><span style="color:var(--text3);font-size:10px;">Best suited for:</span><br>Real estate, jewellers, hospitals</div>
-                </div>
-              </div>
-
-              <!-- V2 pkg-selector (new pricing) — hidden by default -->
-              <div class="pkg-selector" id="pkg-selector-v2" style="display:none;">
-                <div class="pkg-opt" data-pkg="trial" onclick="selectPkg('trial')" style="border-color:#f59e0b;">
-                  <div class="pkg-name">Trial <span class="pkg-trial-badge">5 DAYS</span></div>
-                  <div class="pkg-slot">8 sec</div>
-                  <div class="pkg-price" style="font-size:22px;">FREE<span style="font-size:11px;font-weight:400;color:var(--text3)"> · ₹0</span></div>
-                  <div class="pkg-ppd">5 days · 1 campaign</div>
-                  <div id="pkg-imp-v2-trial" class="pkg-imp"></div>
-                  <div class="pkg-channels">
-                    <span class="pkg-ch ch-screen" title="Digital Screen"><svg width="16" height="16"><use href="#pkg-ico-screen"/></svg></span>
-                  </div>
-                  <div class="pkg-desc"><span style="color:var(--text3);font-size:10px;">Channels:</span><br>Digital Screen only</div>
-                </div>
-                <div class="pkg-opt" data-pkg="starter" onclick="selectPkg('starter')">
-                  <div class="pkg-name">Starter</div>
-                  <div class="pkg-slot">10 sec</div>
-                  <div class="pkg-price">₹2,999<span style="font-size:11px;font-weight:400;color:var(--text3)">/mo</span></div>
-                  <div id="pkg-imp-v2-starter" class="pkg-imp"></div>
-                  <div class="pkg-channels">
-                    <span class="pkg-ch ch-screen" title="Digital Screen"><svg width="16" height="16"><use href="#pkg-ico-screen"/></svg></span>
-                  </div>
-                  <div class="pkg-desc"><span style="color:var(--text3);font-size:10px;">Channels:</span><br>Digital Screen only</div>
-                </div>
-                <div class="pkg-opt selected" data-pkg="complete" onclick="selectPkg('complete')" style="border-color:var(--primary);">
-                  <div class="pkg-name">Complete ⭐<span style="font-size:10px;background:var(--primary);color:#fff;padding:2px 6px;border-radius:4px;margin-left:4px;">Popular</span></div>
-                  <div class="pkg-slot">15 sec</div>
-                  <div class="pkg-price">₹4,999<span style="font-size:11px;font-weight:400;color:var(--text3)">/mo</span></div>
-                  <div id="pkg-imp-v2-complete" class="pkg-imp"></div>
-                  <div class="pkg-channels">
-                    <span class="pkg-ch ch-screen" title="Digital Screen"><svg width="16" height="16"><use href="#pkg-ico-screen"/></svg></span>
-                    <span class="pkg-ch ch-fb" title="Facebook"><svg width="16" height="16"><use href="#pkg-ico-fb"/></svg></span>
-                    <span class="pkg-ch ch-ig" title="Instagram"><svg width="16" height="16"><use href="#pkg-ico-ig"/></svg></span>
-                    <span class="pkg-ch ch-gbp" title="Google Business Profile"><svg width="16" height="16"><use href="#pkg-ico-gbp"/></svg></span>
-                  </div>
-                  <div class="pkg-desc"><span style="color:var(--text3);font-size:10px;">Channels:</span><br>Screen + FB/IG/GBP · QR Lead Gen · 4 reposts/mo</div>
-                </div>
-                <div class="pkg-opt" data-pkg="growth" onclick="selectPkg('growth')">
-                  <div class="pkg-name">Growth</div>
-                  <div class="pkg-slot">20 sec</div>
-                  <div class="pkg-price" id="growth-v2-price">₹5,999<span style="font-size:11px;font-weight:400;color:var(--text3)">/mo</span></div>
-                  <div id="pkg-imp-v2-growth" class="pkg-imp"></div>
-                  <div class="pkg-channels">
-                    <span class="pkg-ch ch-screen" title="Digital Screen"><svg width="16" height="16"><use href="#pkg-ico-screen"/></svg></span>
-                    <span class="pkg-ch ch-fb" title="Facebook"><svg width="16" height="16"><use href="#pkg-ico-fb"/></svg></span>
-                    <span class="pkg-ch ch-ig" title="Instagram"><svg width="16" height="16"><use href="#pkg-ico-ig"/></svg></span>
-                    <span class="pkg-ch ch-gbp" title="Google Business Profile"><svg width="16" height="16"><use href="#pkg-ico-gbp"/></svg></span>
-                    <span class="pkg-ch ch-card" title="Digital Card (Coming Soon)"><svg width="16" height="16"><use href="#pkg-ico-card"/></svg></span>
-                  </div>
-                  <div class="pkg-desc"><span style="color:var(--text3);font-size:10px;">Channels:</span><br>Screen + FB/IG/GBP + Card · QR · Unlimited reposts · <span id="growth-v2-wa">WA 10K/week</span></div>
-                </div>
-              </div>
-
-              <!-- WA upgrade addon (Growth v2 only) -->
-              <div id="wa-upgrade-v2" style="display:none;border:1px solid #25D366;border-radius:10px;padding:12px 14px;margin-top:8px;margin-bottom:4px;">
-                <div style="display:flex;align-items:center;gap:12px;">
-                  <label class="toggle-switch" style="flex-shrink:0;">
-                    <input type="checkbox" id="wa-upgrade-v2-toggle" onchange="toggleWaUpgradeV2(this)">
-                    <span class="toggle-slider"></span>
-                  </label>
-                  <div>
-                    <div style="font-size:13px;font-weight:600;color:var(--text);">WA Upgrade: 20K messages/week <span style="color:#25D366;">+₹400</span></div>
-                    <div style="font-size:11px;color:var(--text2);">Growth plan ke contacts limit double ho jaayegi — 20,000 messages/week</div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- V4 pkg selector: billing cycle tabs + 3 plan cards -->
-              <div id="pkg-selector-v3" style="display:none;">
-                <div style="display:flex;justify-content:center;margin-bottom:20px;">
-                  <div style="display:inline-flex;gap:4px;background:#fff;border:1.5px solid var(--border);border-radius:50px;padding:4px;">
-                    <button id="v3c-1mo" onclick="setV3Cycle('1mo')" style="padding:9px 22px;border:none;border-radius:50px;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;background:var(--primary);color:#fff;transition:all 0.2s ease;white-space:nowrap;">Monthly</button>
-                    <button id="v3c-3mo" onclick="setV3Cycle('3mo')" style="padding:9px 22px;border:none;border-radius:50px;cursor:pointer;font-family:inherit;font-size:13px;font-weight:500;background:transparent;color:var(--text2);transition:all 0.2s ease;white-space:nowrap;">3 Months <span style="font-size:10px;background:#16a34a;color:#fff;padding:2px 6px;border-radius:10px;margin-left:3px;font-weight:600;">−15%</span></button>
-                    <button id="v3c-6mo" onclick="setV3Cycle('6mo')" style="padding:9px 22px;border:none;border-radius:50px;cursor:pointer;font-family:inherit;font-size:13px;font-weight:500;background:transparent;color:var(--text2);transition:all 0.2s ease;white-space:nowrap;">6 Months <span style="font-size:10px;background:#16a34a;color:#fff;padding:2px 6px;border-radius:10px;margin-left:3px;font-weight:600;">−25%</span></button>
-                  </div>
-                  <span id="v3-cycle-desc" style="display:none;"></span>
-                </div>
-                <div class="pkg-selector">
-                  <!-- Trial -->
-                  <div class="pkg-opt" data-pkg="trial" onclick="selectPkg('trial')" style="border-color:#f59e0b;padding-top:22px;">
-                    <div style="position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:#f59e0b;color:#fff;padding:3px 14px;border-radius:20px;font-size:10px;font-weight:700;white-space:nowrap;letter-spacing:.4px;">FREE TRIAL · 7 DAYS</div>
-                    <div style="font-size:15px;font-weight:700;margin-bottom:6px;">Trial</div>
-                    <div class="pkg-slot" style="margin-bottom:12px;">10 sec ad slot</div>
-                    <div style="min-height:56px;display:flex;flex-direction:column;align-items:center;justify-content:center;margin-bottom:12px;">
-                      <div style="font-size:28px;font-weight:800;color:#f59e0b;line-height:1;margin-bottom:4px;">FREE</div>
-                      <div style="font-size:11px;color:var(--text3);">₹0 · no card needed</div>
-                    </div>
-                    <div id="pkg-imp-v3-trial" style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:12px;">~1,200 plays / day</div>
-                    <div style="display:flex;align-items:center;justify-content:center;gap:8px;min-height:32px;margin-bottom:12px;">
-                      <span class="pkg-ch ch-screen" title="Digital Screen"><svg width="16" height="16"><use href="#pkg-ico-screen"/></svg></span>
-                      <span class="pkg-ch" title="QR Code" style="color:var(--text2);"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="6" height="6" rx="1"/><rect x="15" y="3" width="6" height="6" rx="1"/><rect x="3" y="15" width="6" height="6" rx="1"/><rect x="5" y="5" width="2" height="2" fill="currentColor" stroke="none"/><rect x="17" y="5" width="2" height="2" fill="currentColor" stroke="none"/><rect x="5" y="17" width="2" height="2" fill="currentColor" stroke="none"/><path d="M15 15h2v2h-2zM19 15h2v2h-2zM15 19h2v2h-2zM19 19h2v2h-2z" fill="currentColor" stroke="none"/></svg></span>
-                    </div>
-                    <div style="border-top:1px solid var(--border);padding-top:10px;text-align:left;">
-                      <div class="v3-features" style="font-size:12px;color:var(--text2);line-height:1.9;">
-                        <div>✓ Proof-of-Play report</div>
-                        <div>✓ Basic QR Code</div>
-                        <div>✓ 1 campaign only</div>
-                      </div>
-                    </div>
-                  </div>
-                  <!-- Starter Screen -->
-                  <div class="pkg-opt" data-pkg="starter_screen" onclick="selectPkg('starter_screen')" style="padding-top:22px;">
-                    <div style="font-size:15px;font-weight:700;margin-bottom:6px;">Starter Screen</div>
-                    <div class="pkg-slot" style="margin-bottom:12px;">20 sec ad slot</div>
-                    <div style="min-height:56px;display:flex;flex-direction:column;align-items:center;justify-content:center;margin-bottom:12px;">
-                      <div id="v3-price-starter" style="font-size:28px;font-weight:800;color:var(--primary);line-height:1;margin-bottom:4px;">₹3,999<span style="font-size:14px;font-weight:500;color:var(--text3)">/month</span></div>
-                      <div id="v3-total-starter" style="font-size:11px;color:var(--success);font-weight:600;display:none;"></div>
-                    </div>
-                    <div id="pkg-imp-v3-starter" style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:12px;"></div>
-                    <div style="display:flex;align-items:center;justify-content:center;gap:8px;min-height:32px;margin-bottom:12px;">
-                      <span class="pkg-ch ch-screen" title="Digital Screen"><svg width="16" height="16"><use href="#pkg-ico-screen"/></svg></span>
-                      <span class="pkg-ch" title="QR Code" style="color:var(--text2);"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="6" height="6" rx="1"/><rect x="15" y="3" width="6" height="6" rx="1"/><rect x="3" y="15" width="6" height="6" rx="1"/><rect x="5" y="5" width="2" height="2" fill="currentColor" stroke="none"/><rect x="17" y="5" width="2" height="2" fill="currentColor" stroke="none"/><rect x="5" y="17" width="2" height="2" fill="currentColor" stroke="none"/><path d="M15 15h2v2h-2zM19 15h2v2h-2zM15 19h2v2h-2zM19 19h2v2h-2z" fill="currentColor" stroke="none"/></svg></span>
-                    </div>
-                    <div style="border-top:1px solid var(--border);padding-top:10px;text-align:left;">
-                      <div class="v3-features" style="font-size:12px;color:var(--text2);line-height:1.9;">
-                        <div>✓ Proof-of-Play report</div>
-                        <div>✓ QR Code included</div>
-                        <div>✓ Screen only</div>
-                      </div>
-                    </div>
-                  </div>
-                  <!-- Omnichannel Growth -->
-                  <div class="pkg-opt" data-pkg="omnichannel_growth" onclick="selectPkg('omnichannel_growth')" style="border-color:var(--primary);background:rgba(123,104,200,0.04);padding-top:22px;">
-                    <div style="position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:var(--primary);color:#fff;padding:3px 14px;border-radius:20px;font-size:10px;font-weight:700;white-space:nowrap;letter-spacing:.4px;">⭐ MOST POPULAR</div>
-                    <div style="font-size:15px;font-weight:700;margin-bottom:6px;">Omnichannel Growth</div>
-                    <div class="pkg-slot" style="margin-bottom:12px;background:rgba(123,104,200,0.12);color:var(--primary);">20 sec ad slot</div>
-                    <div style="min-height:56px;display:flex;flex-direction:column;align-items:center;justify-content:center;margin-bottom:12px;">
-                      <div id="v3-price-growth" style="font-size:28px;font-weight:800;color:var(--primary);line-height:1;margin-bottom:4px;">₹5,999<span style="font-size:14px;font-weight:500;color:var(--text3)">/month</span></div>
-                      <div id="v3-total-growth" style="font-size:11px;color:var(--success);font-weight:600;display:none;"></div>
-                    </div>
-                    <div id="pkg-imp-v3-growth" style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:12px;"></div>
-                    <div style="display:flex;align-items:center;justify-content:center;gap:6px;min-height:32px;margin-bottom:12px;">
-                      <span class="pkg-ch ch-screen"><svg width="16" height="16"><use href="#pkg-ico-screen"/></svg></span>
-                      <span class="pkg-ch ch-fb"><svg width="16" height="16"><use href="#pkg-ico-fb"/></svg></span>
-                      <span class="pkg-ch ch-ig"><svg width="16" height="16"><use href="#pkg-ico-ig"/></svg></span>
-                      <span class="pkg-ch ch-gbp"><svg width="16" height="16"><use href="#pkg-ico-gbp"/></svg></span>
-                      <span class="pkg-ch" title="WhatsApp" style="background:#25D366;color:#fff;border-radius:5px;padding:1px;display:inline-flex;align-items:center;justify-content:center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M11.998 0C5.373 0 0 5.373 0 12c0 2.127.558 4.117 1.531 5.845L0 24l6.335-1.508A11.956 11.956 0 0012 23.999c6.627 0 12-5.373 12-12 0-6.626-5.373-12-12-12zm0 21.818a9.822 9.822 0 01-5.011-1.372l-.36-.214-3.726.887.916-3.618-.234-.373a9.776 9.776 0 01-1.498-5.228c0-5.411 4.405-9.818 9.816-9.818 5.412 0 9.819 4.407 9.819 9.818 0 5.412-4.407 9.818-9.822 9.918z"/></svg></span>
-                      <span class="pkg-ch" title="QR Code" style="color:var(--primary);"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="6" height="6" rx="1"/><rect x="15" y="3" width="6" height="6" rx="1"/><rect x="3" y="15" width="6" height="6" rx="1"/><rect x="5" y="5" width="2" height="2" fill="currentColor" stroke="none"/><rect x="17" y="5" width="2" height="2" fill="currentColor" stroke="none"/><rect x="5" y="17" width="2" height="2" fill="currentColor" stroke="none"/><path d="M15 15h2v2h-2zM19 15h2v2h-2zM15 19h2v2h-2zM19 19h2v2h-2z" fill="currentColor" stroke="none"/></svg></span>
-                    </div>
-                    <div style="border-top:1px solid rgba(123,104,200,0.2);padding-top:10px;text-align:left;">
-                      <div class="v3-features" style="font-size:12px;color:var(--text2);line-height:1.9;">
-                        <div>✓ Screen + Social Media + GBP</div>
-                        <div>✓ WhatsApp broadcast</div>
-                        <div>✓ PoP report · QR · Unlimited reposts</div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <!-- end pkg-selector-v3 -->
-
-              <p style="font-size:12px;color:var(--text3);margin-top:8px;">Video duration must be = your plan's slot. Longer content = rejected at upload.</p>
+              <!-- pkg-selector stubs (applyWizardV2 reads these) -->
+              <div id="pkg-selector"></div>
+              <div id="pkg-selector-v2"></div>
+              <div id="pkg-selector-v3"></div>
+              <div id="wa-upgrade-v2"></div>
+              <div id="wv2-chip"></div>
+              <div id="wv-btn-v1"></div><div id="wv-btn-v2"></div><div id="wv-btn-v3"></div>
+              <div id="wv-desc"></div>
+              <div id="v3-cycle-desc"></div>
+              <!-- billing cycle btns (setV3Cycle updates these) -->
+              <button id="v3c-1mo"></button><button id="v3c-3mo"></button><button id="v3c-6mo"></button>
+              <!-- price/total stubs (setV3Cycle updates these) -->
+              <div id="v3-price-starter"></div><div id="v3-total-starter"></div>
+              <div id="v3-price-growth"></div><div id="v3-total-growth"></div>
+              <!-- impression stubs -->
+              <div id="pkg-imp-trial"></div><div id="pkg-imp-starter"></div><div id="pkg-imp-complete"></div><div id="pkg-imp-growth"></div>
+              <div id="pkg-imp-v2-trial"></div><div id="pkg-imp-v2-starter"></div><div id="pkg-imp-v2-complete"></div><div id="pkg-imp-v2-growth"></div>
+              <div id="pkg-imp-v3-trial"></div><div id="pkg-imp-v3-starter"></div><div id="pkg-imp-v3-growth"></div>
+              <!-- pkg-opt stubs (selectPkg toggles .selected on these) -->
+              <div class="pkg-opt" data-pkg="trial"></div>
+              <div class="pkg-opt" data-pkg="starter"></div>
+              <div class="pkg-opt" data-pkg="starter_screen"></div>
+              <div class="pkg-opt" data-pkg="complete"></div>
+              <div class="pkg-opt" data-pkg="growth"></div>
+              <div class="pkg-opt" data-pkg="omnichannel_growth"></div>
+              <!-- v2 growth addon stubs -->
+              <div id="growth-v2-price"></div><div id="growth-v2-wa"></div>
+              <!-- wa-upgrade-v2-toggle stub -->
+              <input type="checkbox" id="wa-upgrade-v2-toggle">
             </div>
-            <!-- WA Broadcast toggle (shown only if wa_enabled) -->
-            <div id="wa-campaign-toggle" style="display:none;border:1px solid #25D366;border-radius:10px;padding:12px 14px;margin-bottom:16px;display:none;">
+
+            <!-- WA Broadcast toggle (shown only for omnichannel_growth) -->
+            <div id="wa-campaign-toggle" style="display:none;border:1px solid #25D366;border-radius:10px;padding:12px 14px;margin-bottom:16px;">
               <input type="checkbox" id="wa-broadcast-toggle" checked style="display:none;">
               <div style="font-size:12px;font-weight:600;color:#25D366;margin-bottom:8px;">WhatsApp Broadcast</div>
-              <!-- Caption customize -->
               <div id="wa-caption-wrap" style="display:block;">
                 <label style="font-size:12px;font-weight:600;color:var(--text2);display:block;margin-bottom:8px;">Message Customize Karo</label>
-                <!-- Fixed greeting -->
                 <div style="background:rgba(37,211,102,0.07);border:1px solid rgba(37,211,102,0.2);border-radius:7px 7px 0 0;padding:7px 10px;font-size:12px;color:var(--text3);font-style:italic;">Namaste [Contact Name],</div>
-                <!-- Editable middle -->
                 <textarea id="wa-caption-template" rows="3" placeholder="Aapke liye special offer hai! Hamara naya campaign dekhiye — {{Campaign}}." style="width:100%;box-sizing:border-box;background:var(--card-bg,var(--bg));color:var(--text);border:1px solid rgba(37,211,102,0.3);border-top:none;border-bottom:none;border-radius:0;padding:8px 10px;font-size:12px;resize:vertical;outline:none;font-family:inherit;"></textarea>
-                <!-- Fixed footer -->
                 <div style="background:rgba(37,211,102,0.07);border:1px solid rgba(37,211,102,0.2);border-radius:0 0 7px 7px;padding:7px 10px;font-size:12px;color:var(--text3);font-style:italic;">[Business Name]<br>📞 [Aapka Number]</div>
                 <div style="font-size:11px;color:var(--text3);margin-top:5px;">Middle message mein use kar sako: <code>{{Campaign}}</code> <code>{{City}}</code></div>
               </div>
@@ -3824,7 +3665,7 @@ async function wizardNext(step){
       }catch(e){toast(e.message,'error');document.getElementById('btn-next-2').innerHTML='Continue ?';document.getElementById('btn-next-2').disabled=false;return;}
       document.getElementById('btn-next-2').innerHTML='Continue ?';
     }
-    updateWizardUI(3);updateNetworkSummary();applyWizardV2();
+    updateWizardUI(3);updateNetworkSummary();applyWizardV2();_updateV3PlanCard(selectedPkg);
     // Auto-set start time to current time
     const _now=new Date();
     document.getElementById('sch-time-start').value=`${String(_now.getHours()).padStart(2,'0')}:${String(_now.getMinutes()).padStart(2,'0')}`;
@@ -3896,6 +3737,8 @@ function setV3Cycle(cycle){
   ['1mo','3mo','6mo'].forEach(c=>{
     const btn=document.getElementById('v3c-'+c);
     if(btn){btn.style.background=c===cycle?'var(--primary)':'transparent';btn.style.color=c===cycle?'#fff':'var(--text2)';btn.style.fontWeight=c===cycle?'600':'500';}
+    const chip=document.getElementById('v3chip-'+c);
+    if(chip){chip.classList.toggle('active',c===cycle);}
   });
   const descMap={'1mo':'1 month billing','3mo':'3 months · 15% off','6mo':'6 months · 25% off'};
   const d=document.getElementById('v3-cycle-desc');if(d)d.textContent=descMap[cycle]||'';
@@ -3982,10 +3825,44 @@ function toggleWaUpgradeV2(el){
 }
 let selectedPkg='omnichannel_growth';
 
+function _updateV3PlanCard(pkg){
+  // Update plan chips active state
+  document.querySelectorAll('.v3-plan-chip').forEach(el=>el.classList.toggle('active',el.dataset.pkg===pkg));
+  // Show/hide billing row
+  const billingRow=document.getElementById('v3-billing-row');
+  if(billingRow) billingRow.style.display=(pkg==='trial')?'none':'';
+  // Update channel icons in plan card
+  const chWrap=document.getElementById('v3-plan-channels-wrap');
+  if(chWrap){
+    const chMap={
+      trial:`<span class="pkg-ch ch-screen" title="Screen"><svg width="16" height="16"><use href="#pkg-ico-screen"/></svg></span>`,
+      starter_screen:`<span class="pkg-ch ch-screen" title="Screen"><svg width="16" height="16"><use href="#pkg-ico-screen"/></svg></span>`,
+      omnichannel_growth:`<span class="pkg-ch ch-screen"><svg width="16" height="16"><use href="#pkg-ico-screen"/></svg></span><span class="pkg-ch ch-fb"><svg width="16" height="16"><use href="#pkg-ico-fb"/></svg></span><span class="pkg-ch ch-ig"><svg width="16" height="16"><use href="#pkg-ico-ig"/></svg></span><span class="pkg-ch ch-gbp"><svg width="16" height="16"><use href="#pkg-ico-gbp"/></svg></span><span class="pkg-ch" title="WhatsApp" style="background:#25D366;color:#fff;border-radius:5px;padding:1px;display:inline-flex;align-items:center;justify-content:center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M11.998 0C5.373 0 0 5.373 0 12c0 2.127.558 4.117 1.531 5.845L0 24l6.335-1.508A11.956 11.956 0 0012 23.999c6.627 0 12-5.373 12-12 0-6.626-5.373-12-12-12zm0 21.818a9.822 9.822 0 01-5.011-1.372l-.36-.214-3.726.887.916-3.618-.234-.373a9.776 9.776 0 01-1.498-5.228c0-5.411 4.405-9.818 9.816-9.818 5.412 0 9.819 4.407 9.819 9.818 0 5.412-4.407 9.818-9.822 9.918z"/></svg></span>`
+    };
+    chWrap.innerHTML=chMap[pkg]||chMap.trial;
+  }
+  // Update features list in plan card
+  const featEl=document.getElementById('v3-plan-features');
+  if(featEl){
+    const featMap={
+      trial:'<div>✓ 7-day free trial</div><div>✓ Digital Screen only · 10 sec slot</div><div>✓ Proof-of-Play report + QR Code</div><div>✓ 1 campaign only · no card needed</div>',
+      starter_screen:'<div>✓ Digital Screen · 20 sec ad slot</div><div>✓ Proof-of-Play report + QR Code</div><div>✓ Unlimited campaigns</div>',
+      omnichannel_growth:'<div>✓ Screen + Facebook + Instagram + GBP</div><div>✓ WhatsApp broadcast (inbuilt · free)</div><div>✓ 20 sec slot · PoP report · QR · Unlimited reposts</div>'
+    };
+    featEl.innerHTML=featMap[pkg]||'';
+  }
+  // Update plan card border color
+  const card=document.getElementById('v3-plan-info-card');
+  if(card){
+    card.style.borderColor=pkg==='trial'?'#f59e0b':(pkg==='omnichannel_growth'?'var(--primary)':'var(--border)');
+  }
+}
+
 function selectPkg(pkg){
   selectedPkg=pkg;
   document.querySelectorAll('.pkg-opt').forEach(el=>el.classList.toggle('selected',el.dataset.pkg===pkg));
-  // Trial locks duration to 3 days; paid plans get normal options
+  _updateV3PlanCard(pkg);
+  // Trial locks duration to 7 days; paid plans sync to billing cycle
   const durEl=document.getElementById('sch-duration');
   if(pkg==='trial'){
     durEl.innerHTML=`<option value="7">7 Days (Trial · FREE)</option>`;
@@ -3993,7 +3870,7 @@ function selectPkg(pkg){
     durEl.disabled=true;
   } else {
     if(durEl.disabled){
-      durEl.innerHTML=`<option value="15">15 Days — Half Month</option><option value="30" selected>30 Days — 1 Month</option><option value="60">60 Days — 2 Months</option><option value="90">90 Days — 3 Months</option>`;
+      durEl.innerHTML=`<option value="30" selected>30 Days</option><option value="90">90 Days</option><option value="180">180 Days</option>`;
       durEl.value='30';
     }
     durEl.disabled=false;
