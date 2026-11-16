@@ -2023,22 +2023,22 @@ window.addEventListener('DOMContentLoaded',()=>{
     try{ _chPending=sessionStorage.getItem('ch_pending_step'); sessionStorage.removeItem('ch_pending_step'); }catch(_){}
     var _pendingPage=null;
     try{ _pendingPage=sessionStorage.getItem('ch_pending_page'); sessionStorage.removeItem('ch_pending_page'); }catch(_){}
-    function _restoreAndOpen(step){
+    function _restoreAndOpen(){
       navigate(_pendingPage||'new-campaign');
-      openChannelConnect(step);
+      openChannelConnect();
     }
     if(_fbConnected){
       toast('Facebook connected successfully!','success');
-      if(_chPending!=null){ _restoreAndOpen(parseInt(_chPending)||1); } else { navigate('profile'); }
+      if(_chPending!=null){ _restoreAndOpen(); } else { navigate('profile'); }
     }
-    if(_fbError){toast('Facebook error: '+decodeURIComponent(_fbError),'error'); if(_chPending!=null) _restoreAndOpen(0); else navigate('profile');}
-    if(_gbpConnected){toast('Google Business Profile connected!','success'); if(_chPending!=null){ _restoreAndOpen(parseInt(_chPending)||3); } else { navigate('profile'); }}
-    if(_gbpError){toast('Google error: '+decodeURIComponent(_gbpError),'error'); if(_chPending!=null) _restoreAndOpen(2); else navigate('profile');}
+    if(_fbError){toast('Facebook error: '+decodeURIComponent(_fbError),'error'); if(_chPending!=null) _restoreAndOpen(); else navigate('profile');}
+    if(_gbpConnected){toast('Google Business Profile connected!','success'); if(_chPending!=null){ _restoreAndOpen(); } else { navigate('profile'); }}
+    if(_gbpError){toast('Google error: '+decodeURIComponent(_gbpError),'error'); if(_chPending!=null) _restoreAndOpen(); else navigate('profile');}
     if(_igConnected){
       toast('Instagram connected successfully!','success');
-      if(_chPending!=null){ _restoreAndOpen(parseInt(_chPending)||2); } else { navigate('profile'); }
+      if(_chPending!=null){ _restoreAndOpen(); } else { navigate('profile'); }
     }
-    if(_igError){toast('Instagram error: '+decodeURIComponent(_igError),'error'); if(_chPending!=null) _restoreAndOpen(1); else navigate('profile');}
+    if(_igError){toast('Instagram error: '+decodeURIComponent(_igError),'error'); if(_chPending!=null) _restoreAndOpen(); else navigate('profile');}
   }).catch(()=>{clearToken();showAuthScreen();});
   else showAuthScreen();
   const d=s=>s.toISOString().slice(0,10);

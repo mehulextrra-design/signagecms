@@ -182,7 +182,7 @@ router.post('/login', [
 router.get('/me', authenticate, async (req, res, next) => {
   try {
     const result = await query(
-      'SELECT id, email, role, first_name, last_name, mobile, business_name, business_type, gst_number, city, wa_enabled, preferred_language, venue_partner_id, created_at, fb_page_id, fb_page_name, ig_username, google_location_id, google_business_name FROM users WHERE id = $1',
+      'SELECT id, email, role, first_name, last_name, mobile, business_name, business_type, gst_number, city, wa_enabled, preferred_language, venue_partner_id, created_at, fb_page_id, fb_page_name, ig_username, google_account_id, google_location_id, google_business_name FROM users WHERE id = $1',
       [req.user.id]
     );
     res.json(result.rows[0]);
