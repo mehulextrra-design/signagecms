@@ -1086,7 +1086,6 @@
                       <div style="min-width:0;">
                         <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;">Wallet Balance</div>
                         <div style="font-size:16px;font-weight:700;color:var(--primary);line-height:1.2;" id="wallet-avail-lbl">₹0</div>
-                        <div style="font-size:11px;color:var(--text2);margin-top:2px;" id="wallet-apply-hint"></div>
                       </div>
                     </div>
                     <button class="btn btn-primary" id="wallet-apply-btn" onclick="toggleWalletApply()" style="font-size:12px;padding:7px 16px;flex-shrink:0;white-space:nowrap;">Apply</button>
@@ -4313,12 +4312,12 @@ function renderPricing(){
     walletRow.style.display='block';
     availLbl.textContent='₹'+walletBalance.toLocaleString('en-IN',{minimumFractionDigits:2});
     if(walletApplied){
-      hintEl.textContent=walletUse===afterDisc?'Full amount covered by wallet — no payment needed!':`₹${walletUse.toLocaleString('en-IN')} from wallet, ₹${due.toLocaleString('en-IN')} via Razorpay`;
+      if(hintEl) hintEl.textContent=walletUse===afterDisc?'Full amount covered by wallet — no payment needed!':`₹${walletUse.toLocaleString('en-IN')} from wallet, ₹${due.toLocaleString('en-IN')} via Razorpay`;
       applyBtn.textContent='Remove';
       applyBtn.className='btn btn-ghost';
       applyBtn.style.cssText='font-size:12px;padding:7px 16px;flex-shrink:0;white-space:nowrap;color:var(--danger);border-color:var(--danger);';
     } else {
-      hintEl.textContent=`Apply ₹${Math.min(walletBalance,afterDisc).toLocaleString('en-IN')} from wallet to reduce payment`;
+      if(hintEl) hintEl.textContent='';
       applyBtn.textContent='Apply';
       applyBtn.className='btn btn-primary';
       applyBtn.style.cssText='font-size:12px;padding:7px 16px;flex-shrink:0;white-space:nowrap;';
