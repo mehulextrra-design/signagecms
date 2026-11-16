@@ -4040,7 +4040,7 @@ function openChannelConnect(startStep){
   const ok = {
     0: !!u.fb_page_id,
     1: !!u.ig_username,
-    2: !!u.google_location_id,
+    2: !!(u.google_account_id||u.google_location_id),
     3: !!u.wa_enabled
   };
 
