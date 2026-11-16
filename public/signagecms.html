@@ -2021,18 +2021,24 @@ window.addEventListener('DOMContentLoaded',()=>{
     // Check if we need to reopen the channel connect modal after OAuth return
     var _chPending=null;
     try{ _chPending=sessionStorage.getItem('ch_pending_step'); sessionStorage.removeItem('ch_pending_step'); }catch(_){}
+    var _pendingPage=null;
+    try{ _pendingPage=sessionStorage.getItem('ch_pending_page'); sessionStorage.removeItem('ch_pending_page'); }catch(_){}
+    function _restoreAndOpen(step){
+      navigate(_pendingPage||'new-campaign');
+      openChannelConnect(step);
+    }
     if(_fbConnected){
       toast('Facebook connected successfully!','success');
-      if(_chPending!=null){ openChannelConnect(parseInt(_chPending)||1); } else { showPage('profile'); }
+      if(_chPending!=null){ _restoreAndOpen(parseInt(_chPending)||1); } else { navigate('profile'); }
     }
-    if(_fbError){toast('Facebook error: '+decodeURIComponent(_fbError),'error'); if(_chPending!=null) openChannelConnect(0); else showPage('profile');}
-    if(_gbpConnected){toast('Google Business Profile connected!','success'); if(_chPending!=null){ openChannelConnect(parseInt(_chPending)||3); } else { showPage('profile'); }}
-    if(_gbpError){toast('Google error: '+decodeURIComponent(_gbpError),'error'); if(_chPending!=null) openChannelConnect(2); else showPage('profile');}
+    if(_fbError){toast('Facebook error: '+decodeURIComponent(_fbError),'error'); if(_chPending!=null) _restoreAndOpen(0); else navigate('profile');}
+    if(_gbpConnected){toast('Google Business Profile connected!','success'); if(_chPending!=null){ _restoreAndOpen(parseInt(_chPending)||3); } else { navigate('profile'); }}
+    if(_gbpError){toast('Google error: '+decodeURIComponent(_gbpError),'error'); if(_chPending!=null) _restoreAndOpen(2); else navigate('profile');}
     if(_igConnected){
       toast('Instagram connected successfully!','success');
-      if(_chPending!=null){ openChannelConnect(parseInt(_chPending)||2); } else { showPage('profile'); }
+      if(_chPending!=null){ _restoreAndOpen(parseInt(_chPending)||2); } else { navigate('profile'); }
     }
-    if(_igError){toast('Instagram error: '+decodeURIComponent(_igError),'error'); if(_chPending!=null) openChannelConnect(1); else showPage('profile');}
+    if(_igError){toast('Instagram error: '+decodeURIComponent(_igError),'error'); if(_chPending!=null) _restoreAndOpen(1); else navigate('profile');}
   }).catch(()=>{clearToken();showAuthScreen();});
   else showAuthScreen();
   const d=s=>s.toISOString().slice(0,10);
@@ -4110,8 +4116,16 @@ function closeChannelConnect(){
   const s=document.getElementById('cco-wa-subtitle'); if(s) s.textContent='Apne number se customers ko campaign ka ad directly WhatsApp pe bhejo.';
 }
 
+function _savePendingPage(){
+  try{
+    const pg=document.querySelector('.page.active');
+    sessionStorage.setItem('ch_pending_page', pg?pg.id.replace('page-',''):'new-campaign');
+  }catch(_){}
+}
+
 async function chConnectFB(){
   try{
+    _savePendingPage();
     try{ sessionStorage.setItem('ch_pending_step','1'); }catch(_){}
     const data=await api('/auth/facebook/connect');
     window.location.href=data.url;
@@ -4120,6 +4134,7 @@ async function chConnectFB(){
 
 async function chConnectIG(){
   try{
+    _savePendingPage();
     try{ sessionStorage.setItem('ch_pending_step','2'); }catch(_){}
     const data=await api('/auth/instagram/connect');
     window.location.href=data.url;
@@ -4128,6 +4143,7 @@ async function chConnectIG(){
 
 async function chConnectGBP(){
   try{
+    _savePendingPage();
     try{ sessionStorage.setItem('ch_pending_step','3'); }catch(_){}
     const data=await api('/auth/google/connect');
     window.location.href=data.url;
