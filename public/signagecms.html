@@ -1700,13 +1700,8 @@
 <div id="channel-connect-overlay" style="display:none;position:fixed;inset:0;z-index:1200;align-items:center;justify-content:center;padding:20px 16px;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);background:rgba(10,10,20,.45);">
   <div id="cco-card" style="width:100%;max-width:400px;border-radius:22px;overflow:hidden;box-shadow:0 24px 64px rgba(0,0,0,.35);animation:cco-in .28s cubic-bezier(.22,.61,.36,1);">
 
-    <!-- Progress dots (4) -->
-    <div style="position:absolute;top:18px;left:50%;transform:translateX(-50%);display:flex;gap:7px;z-index:2;">
-      <div class="cco-dot" id="cco-dot-0"></div>
-      <div class="cco-dot" id="cco-dot-1"></div>
-      <div class="cco-dot" id="cco-dot-2"></div>
-      <div class="cco-dot" id="cco-dot-3"></div>
-    </div>
+    <!-- Progress dots (dynamic — only unconnected channels) -->
+    <div id="cco-dots-wrap" style="position:absolute;top:18px;left:50%;transform:translateX(-50%);display:flex;gap:7px;z-index:2;"></div>
 
     <!-- Close -->
     <button onclick="closeChannelConnect()" style="position:absolute;top:16px;right:18px;z-index:3;background:rgba(255,255,255,.18);border:none;color:#fff;width:30px;height:30px;border-radius:50%;font-size:15px;cursor:pointer;line-height:1;">×</button>
@@ -4014,83 +4009,91 @@ function selectPkg(pkg){
   if(_wizardV3 && pkg==='omnichannel_growth') openChannelConnect();
 }
 
-// ── Channel Connect Modal (4-card carousel: FB, IG, GBP, WA) ─────────────────
-var _chStep = 0;
-var _CH_TOTAL = 4;
+// ── Channel Connect Modal (queue-based: only unconnected channels shown) ──────
+var _cchQueue = []; // step indices of channels still to connect
+var _cchQIdx  = 0; // position in queue
+var _chStep   = 0; // current slide index (kept for WA inline state refs)
 
-function _cchGoTo(step){
-  for(var i=0;i<_CH_TOTAL;i++){
-    var s=document.getElementById('cco-slide-'+i);
-    if(s) s.style.display= i===step ? '' : 'none';
-    var d=document.getElementById('cco-dot-'+i);
-    if(d) d.className='cco-dot'+(i===step?' active':'');
-  }
+function _cchBuildDots(){
+  var wrap=document.getElementById('cco-dots-wrap');
+  if(!wrap) return;
+  wrap.innerHTML=_cchQueue.length>1 ? _cchQueue.map((_,i)=>`<div class="cco-dot" id="cco-qdot-${i}"></div>`).join('') : '';
+}
+
+function _cchGoToQ(qIdx){
+  if(qIdx<0||qIdx>=_cchQueue.length){ closeChannelConnect(); return; }
+  _cchQIdx=qIdx;
+  var step=_cchQueue[qIdx];
   _chStep=step;
+  // Show only this slide
+  [0,1,2,3].forEach(i=>{ var s=document.getElementById('cco-slide-'+i); if(s) s.style.display=i===step?'':'none'; });
+  // Update dots
+  _cchQueue.forEach((_,i)=>{ var d=document.getElementById('cco-qdot-'+i); if(d) d.className='cco-dot'+(i===qIdx?' active':''); });
   var card=document.getElementById('cco-card');
   if(card){ card.style.animation='none'; void card.offsetWidth; card.style.animation='cco-in .28s cubic-bezier(.22,.61,.36,1)'; }
 }
 
-function chSkip(){ if(_chStep<_CH_TOTAL-1) _cchGoTo(_chStep+1); else closeChannelConnect(); }
+function chSkip(){ if(_cchQIdx<_cchQueue.length-1) _cchGoToQ(_cchQIdx+1); else closeChannelConnect(); }
 
 function openChannelConnect(startStep){
   const u = currentUser||{};
-  const fbOk  = !!u.fb_page_id;
-  const igOk  = !!u.ig_username;
-  const gbpOk = !!u.google_location_id;
-  const waOk  = !!u.wa_enabled;
+  const ok = {
+    0: !!u.fb_page_id,
+    1: !!u.ig_username,
+    2: !!u.google_location_id,
+    3: !!u.wa_enabled
+  };
 
-  if(fbOk && igOk && gbpOk && waOk) return;
+  // Build queue of only unconnected channels
+  _cchQueue = [0,1,2,3].filter(i=>!ok[i]);
+  if(!_cchQueue.length) return; // everything already connected
 
-  // FB card
-  const fbS=document.getElementById('ch-fb-status'), fbB=document.getElementById('ch-btn-fb');
-  if(fbOk){
-    fbS.innerHTML='<span class="ch-status-ok">✓ Connected — '+_esc(u.fb_page_name||'Facebook Page')+'</span>';
-    fbB.className='cco-action-btn connected'; fbB.textContent='Connected ✓'; fbB.disabled=true;
-  } else {
+  // Populate status/button for each unconnected card
+  if(!ok[0]){
+    const fbS=document.getElementById('ch-fb-status'),fbB=document.getElementById('ch-btn-fb');
     fbS.innerHTML='<span class="ch-status-miss">Facebook Page abhi connect nahi hai</span>';
     fbB.className='cco-action-btn'; fbB.textContent='Connect'; fbB.disabled=false;
   }
-
-  // IG card
-  const igS=document.getElementById('ch-ig-status'), igB=document.getElementById('ch-btn-ig');
-  if(igOk){
-    igS.innerHTML='<span class="ch-status-ok">✓ Connected — @'+_esc(u.ig_username)+'</span>';
-    igB.className='cco-action-btn connected'; igB.textContent='Connected ✓'; igB.disabled=true;
-  } else {
+  if(!ok[1]){
+    const igS=document.getElementById('ch-ig-status'),igB=document.getElementById('ch-btn-ig');
     igS.innerHTML='<span class="ch-status-miss">Instagram Business account connect nahi hai</span>';
     igB.className='cco-action-btn'; igB.textContent='Connect'; igB.disabled=false;
   }
-
-  // GBP card
-  const gbpS=document.getElementById('ch-gbp-status'), gbpB=document.getElementById('ch-btn-gbp');
-  if(gbpOk){
-    gbpS.innerHTML='<span class="ch-status-ok">✓ Connected — '+_esc(u.google_business_name||'Google Business')+'</span>';
-    gbpB.className='cco-action-btn connected'; gbpB.textContent='Connected ✓'; gbpB.disabled=true;
-  } else {
+  if(!ok[2]){
+    const gbpS=document.getElementById('ch-gbp-status'),gbpB=document.getElementById('ch-btn-gbp');
     gbpS.innerHTML='<span class="ch-status-miss">Google Business Profile connect nahi hai</span>';
     gbpB.className='cco-action-btn'; gbpB.textContent='Connect'; gbpB.disabled=false;
   }
-
-  // WA card (async)
-  const waS=document.getElementById('ch-wa-status'), waB=document.getElementById('ch-btn-wa');
-  if(waOk){
+  if(!ok[3]){
+    const waS=document.getElementById('ch-wa-status'),waB=document.getElementById('ch-btn-wa');
+    // reset WA inline states
+    ['cco-wa-s0','cco-wa-s1','cco-wa-s2'].forEach((id,i)=>{ const el=document.getElementById(id); if(el) el.style.display=i===0?'':'none'; });
+    document.getElementById('cco-wa-title').textContent='WhatsApp Broadcast';
+    document.getElementById('cco-wa-subtitle').textContent='Apne number se customers ko campaign ka ad directly WhatsApp pe bhejo.';
+    // async WA session check
     api('/wa/status').then(s=>{
       if(s.status==='connected'){
         waS.innerHTML='<span class="ch-status-ok">✓ Connected — '+_esc(s.phone||'')+'</span>';
         waB.className='cco-action-btn connected'; waB.textContent='Connected ✓'; waB.disabled=true;
+        // remove WA from queue if actually connected
+        _cchQueue=_cchQueue.filter(x=>x!==3); _cchBuildDots();
+        if(!_cchQueue.length) closeChannelConnect();
       } else {
-        waS.innerHTML='<span class="ch-status-warn">Number enabled — pairing code se connect karein</span>';
+        waS.innerHTML='<span class="ch-status-miss">Aapke plan mein inbuilt — abhi connect karein</span>';
         waB.className='cco-action-btn'; waB.textContent='Connect'; waB.disabled=false;
       }
-    }).catch(()=>{ waS.innerHTML=''; waB.className='cco-action-btn'; waB.textContent='Connect'; waB.disabled=false; });
-  } else {
-    waS.innerHTML='<span class="ch-status-miss">Aapke plan mein inbuilt — abhi connect karein</span>';
-    waB.className='cco-action-btn'; waB.textContent='Connect'; waB.disabled=false;
+    }).catch(()=>{ document.getElementById('ch-wa-status').innerHTML=''; });
   }
 
-  // Start at saved step (after OAuth return) or first unconnected
-  var first = startStep != null ? startStep : (fbOk ? (igOk ? (gbpOk ? 3 : 2) : 1) : 0);
-  _cchGoTo(first);
+  _cchBuildDots();
+
+  // Find start position: if startStep given, find it in queue; else begin at 0
+  var startQIdx=0;
+  if(startStep!=null){
+    var idx=_cchQueue.indexOf(startStep);
+    startQIdx=idx>=0?idx:0;
+  }
+  _cchGoToQ(startQIdx);
   document.getElementById('channel-connect-overlay').style.display='flex';
   document.body.style.overflow='hidden';
 }
@@ -4193,8 +4196,10 @@ async function ccoWaGetCode(){
             if(waS) waS.innerHTML='<span class="ch-status-ok">✓ Connected — '+_esc(s.phone||phone)+'</span>';
             if(waB){ waB.className='cco-action-btn connected'; waB.textContent='Connected ✓'; waB.disabled=true; }
             toast('WhatsApp connected!','success');
-            loadWaStatus(); // refresh profile section too
-            setTimeout(closeChannelConnect, 1500);
+            loadWaStatus();
+            // remove WA from queue; if more remain advance, else close
+            _cchQueue=_cchQueue.filter(x=>x!==3);
+            setTimeout(()=>{ _cchQueue.length?chSkip():closeChannelConnect(); }, 1500);
           } else {
             document.getElementById('cco-wa-poll-status').textContent='Timeout — dobara try karo.';
             document.getElementById('cco-wa-phone-wrap').style.display='';
