@@ -908,12 +908,8 @@
 
           <!-- Step 3 -->
           <div class="wizard-panel" id="wp3">
-            <div class="section-title" style="margin-bottom:6px;">Set Your Schedule</div>
-            <div style="font-size:13px;color:var(--text2);margin-bottom:16px;">Choose plan and when your ad runs.</div>
-
             <!-- Plan selection — segmented pill (same style as billing period) -->
             <div style="margin-bottom:20px;">
-              <div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px;">Select Plan</div>
               <div class="v3-plan-seg">
                 <button class="v3-plan-chip" data-pkg="trial" onclick="selectPkg('trial')">
                   <span class="v3-plan-badge">FREE</span>
@@ -931,7 +927,6 @@
 
             <!-- Billing period — centered segmented pill, greyed for Trial -->
             <div style="margin-bottom:18px;text-align:center;">
-              <div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;">Billing Period</div>
               <div class="v3-billing-seg" id="v3-billing-seg">
                 <button class="v3-billing-chip" id="v3chip-1mo" onclick="setV3Cycle('1mo')">Monthly</button>
                 <button class="v3-billing-chip" id="v3chip-3mo" onclick="setV3Cycle('3mo')">3 Months <span class="v3-disc" style="color:#16a34a;font-weight:700;">−15%</span></button>
