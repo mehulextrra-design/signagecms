@@ -107,7 +107,7 @@ router.delete('/groups/:id', authenticate, requireAdmin, async (req, res, next) 
 router.get('/:id', async (req, res, next) => {
   try {
     const result = await query(
-      'SELECT * FROM screens WHERE id = $1 OR screen_code = $1',
+      'SELECT * FROM screens WHERE id::text = $1 OR screen_code = $1',
       [req.params.id]
     );
     if (!result.rows.length) return res.status(404).json({ error: 'Screen not found' });
@@ -125,7 +125,7 @@ router.get('/:id/availability', authenticate, async (req, res, next) => {
        FROM campaigns c
        JOIN campaign_screens cs ON cs.campaign_id = c.id
        JOIN screens s ON s.id = cs.screen_id
-       WHERE (s.id = $1 OR s.screen_code = $1)
+       WHERE (s.id::text = $1 OR s.screen_code = $1)
          AND c.status NOT IN ('cancelled','rejected')
          AND c.start_date <= $3 AND c.end_date >= $2`,
       [req.params.id, start, end]
