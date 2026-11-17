@@ -531,6 +531,14 @@ async function applyCriticalFixes(pool) {
   } catch (err) {
     console.warn('[DB] wa_directory columns warn:', err.message);
   }
+  // Fix incorrect daily_impressions values (migration 033)
+  // 54000 was total seconds (wrong), 5000 was placeholder — correct = 2700 (54000s / 20s media)
+  try {
+    await pool.query(`UPDATE screens SET daily_impressions = 2700 WHERE daily_impressions IN (54000, 5000, 150, 0) OR daily_impressions IS NULL`);
+    console.log('[DB] daily_impressions corrected to 2700');
+  } catch (err) {
+    console.warn('[DB] daily_impressions fix warn:', err.message);
+  }
   console.log('[DB] Critical column fixes done');
 }
 

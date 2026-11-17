@@ -1413,7 +1413,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
       </div>
       <div class="form-row">
         <div class="form-group"><label class="form-label">Price / Day (₹)</label><input type="number" class="form-input" id="sc-price" value="900"></div>
-        <div class="form-group"><label class="form-label">Daily Impressions</label><input type="number" class="form-input" id="sc-impressions" value="5000"></div>
+        <div class="form-group"><label class="form-label">Daily Impressions</label><input type="number" class="form-input" id="sc-impressions" value="2700"></div>
       </div>
       <div class="form-row">
         <div class="form-group"><label class="form-label">Latitude</label><input type="number" class="form-input" id="sc-lat" placeholder="19.0760" step="any"></div>
@@ -3214,7 +3214,7 @@ async function loadScreens() {
         <td style="font-size:12px;color:var(--text2);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${s.location||'—'}<br>${s.city||''}</td>
         <td><span class="zone-tag zone-${s.zone||'A'}">${s.zone||'A'}</span></td>
         <td style="font-size:12px;font-variant-numeric:tabular-nums;">${s.width_px}×${s.height_px}</td>
-        <td style="font-variant-numeric:tabular-nums;font-weight:600;">${(s.daily_impressions||5000).toLocaleString('en-IN')}</td>
+        <td style="font-variant-numeric:tabular-nums;font-weight:600;">${(s.daily_impressions||2700).toLocaleString('en-IN')}</td>
         <td>
           <span style="display:inline-flex;align-items:center;gap:5px;">
             <span class="status-dot dot-${s.status||'offline'}"></span>
@@ -3256,7 +3256,7 @@ async function openScreenModal(screen = null) {
   document.getElementById('sc-width').value = screen?.width_px || 1920;
   document.getElementById('sc-height').value = screen?.height_px || 1080;
   document.getElementById('sc-price').value = screen?.price_per_day || 900;
-  document.getElementById('sc-impressions').value = screen?.daily_impressions || 5000;
+  document.getElementById('sc-impressions').value = screen?.daily_impressions || 2700;
   document.getElementById('sc-lat').value = screen?.latitude || '';
   document.getElementById('sc-lng').value = screen?.longitude || '';
   document.getElementById('sc-status-group').style.display = screen ? 'block' : 'none';
