@@ -2930,8 +2930,8 @@ function renderApprovals(arr) {
       const aiBadge = aiStatus === 'approved'
         ? `<span style="color:var(--success);font-size:12px;font-weight:600;" title="${aiNote}">? Clean</span>`
         : aiStatus === 'rejected'
-        ? `<span style="color:var(--danger);font-size:12px;font-weight:600;" title="${aiNote}">? Flagged</span>`
-        : `<span style="color:var(--warning);font-size:12px;" title="${aiNote || 'Pending review'}">? Pending${aiNote ? '<br><small style=\'color:var(--text2);font-size:10px;\'>'+aiNote.substring(0,50)+'</small>' : ''}</span>`;
+        ? `<span style="color:var(--danger);font-size:12px;font-weight:600;" title="${aiNote}">&#9888; Flagged</span>`
+        : `<span style="color:var(--warning);font-size:12px;" title="${aiNote || 'Pending review'}">&#9679; Pending${aiNote ? '<br><small style=\'color:var(--text2);font-size:10px;\'>'+aiNote.substring(0,50)+'</small>' : ''}</span>`;
       const creativeTd = c.creative_url && c.creative_type === 'image'
         ? `<td onclick="event.stopPropagation()" style="width:70px;"><img src="${c.creative_url}" alt="creative" style="width:64px;height:48px;object-fit:cover;border-radius:6px;border:1px solid var(--border);cursor:zoom-in;" onclick="openLightbox('${c.creative_url}','${(c.creative_name||'').replace(/'/g,"\\'")}','image')" title="Click to preview"></td>`
         : c.creative_url && c.creative_type === 'video'

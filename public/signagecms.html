@@ -4401,7 +4401,7 @@ async function applyCoupon(){
     const _sub=campaignCost.total-campaignCost.gst;
     const data=await api('/coupons/validate',{method:'POST',body:JSON.stringify({code,amount:_sub})});
     const disc=data.discount_amount||0;campaignCost.discount=disc;campaignCost.gst=Math.round((_sub-disc)*0.18);
-    renderPricing();document.getElementById('coupon-msg').innerHTML=`<span style="color:var(--success);">? Saved ₹${disc.toLocaleString('en-IN')}</span>`;
+    renderPricing();document.getElementById('coupon-msg').innerHTML=`<span style="color:var(--success);">&#10003; Saved &#8377;${disc.toLocaleString('en-IN')}</span>`;
     toast(`Coupon applied! ₹${disc.toLocaleString('en-IN')} off`,'success');
   }catch(e){document.getElementById('coupon-msg').innerHTML=`<span style="color:var(--danger);">${e.message}</span>`;}
 }
