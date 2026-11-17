@@ -107,6 +107,9 @@ app.get('/favicon.ico', (req, res) => {
 // Redirect old v1 landing page to current v2
 app.get('/extrravenue-signage.html', (req, res) => res.redirect(301, '/extrravenue-signage-v2.html'));
 
+// Blog article slug renames (301 to preserve SEO equity)
+app.get('/blog/venue-partner-income.html', (req, res) => res.redirect(301, '/blog/venue-partner-benefits.html'));
+
 // Public domain root → landing page; Railway URL root → CMS (index.html)
 app.get('/', (req, res, next) => {
   const host = req.hostname;
