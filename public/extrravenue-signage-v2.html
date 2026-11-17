@@ -2623,12 +2623,12 @@ function loadPreset(key){
             <div class="plan-stat-lbl">plays/day</div>
           </div>
           <div class="plan-stat">
-            <div class="plan-stat-num">~81,000</div>
-            <div class="plan-stat-lbl">plays/month</div>
+            <div class="plan-stat-num" id="lp-stat-starter-plays">~81,000</div>
+            <div class="plan-stat-lbl" id="lp-lbl-starter-plays">plays/month</div>
           </div>
           <div class="plan-stat">
-            <div class="plan-stat-num">2,43,000+</div>
-            <div class="plan-stat-lbl">viewer impressions/month</div>
+            <div class="plan-stat-num" id="lp-stat-starter-imp">2,43,000+</div>
+            <div class="plan-stat-lbl" id="lp-lbl-starter-imp">viewer impressions/month</div>
           </div>
         </div>
         <div class="channels">
@@ -2658,12 +2658,12 @@ function loadPreset(key){
             <div class="plan-stat-lbl">plays/day</div>
           </div>
           <div class="plan-stat">
-            <div class="plan-stat-num">~81,000</div>
-            <div class="plan-stat-lbl">plays/month</div>
+            <div class="plan-stat-num" id="lp-stat-growth-plays">~81,000</div>
+            <div class="plan-stat-lbl" id="lp-lbl-growth-plays">plays/month</div>
           </div>
           <div class="plan-stat">
-            <div class="plan-stat-num">2,43,000+</div>
-            <div class="plan-stat-lbl">viewer impressions/month</div>
+            <div class="plan-stat-num" id="lp-stat-growth-imp">2,43,000+</div>
+            <div class="plan-stat-lbl" id="lp-lbl-growth-imp">viewer impressions/month</div>
           </div>
         </div>
         <div class="channels">
@@ -3102,12 +3102,18 @@ document.querySelectorAll('.counter').forEach(el => co.observe(el));
 // Billing cycle toggle
 var _lpCycle = '1mo';
 var _lpPrices = {
-  '1mo': { starter: { price: '&#8377;3,999', orig: '', slot: '20 sec ad slot &nbsp;&middot;&nbsp; ₹87/screen/month' },
-            growth:  { price: '&#8377;5,999', orig: '', slot: '20 sec ad slot &nbsp;&middot;&nbsp; ₹131/screen/month' } },
-  '3mo': { starter: { price: '&#8377;3,399', orig: '&#8377;3,999', slot: '20 sec ad slot &nbsp;&middot;&nbsp; ₹74/screen/month' },
-            growth:  { price: '&#8377;5,099', orig: '&#8377;5,999', slot: '20 sec ad slot &nbsp;&middot;&nbsp; ₹111/screen/month' } },
-  '6mo': { starter: { price: '&#8377;2,999', orig: '&#8377;3,999', slot: '20 sec ad slot &nbsp;&middot;&nbsp; ₹65/screen/month' },
-            growth:  { price: '&#8377;4,499', orig: '&#8377;5,999', slot: '20 sec ad slot &nbsp;&middot;&nbsp; ₹98/screen/month' } }
+  '1mo': { starter: { price: '&#8377;3,999', orig: '', slot: '20 sec ad slot &nbsp;&middot;&nbsp; ₹87/screen/month',
+                       plays: '~81,000', playsLbl: 'plays/month', imp: '2,43,000+', impLbl: 'viewer impressions/month' },
+            growth:  { price: '&#8377;5,999', orig: '', slot: '20 sec ad slot &nbsp;&middot;&nbsp; ₹131/screen/month',
+                       plays: '~81,000', playsLbl: 'plays/month', imp: '2,43,000+', impLbl: 'viewer impressions/month' } },
+  '3mo': { starter: { price: '&#8377;3,399', orig: '&#8377;3,999', slot: '20 sec ad slot &nbsp;&middot;&nbsp; ₹74/screen/month',
+                       plays: '~2,43,000', playsLbl: 'plays/3 months', imp: '7,29,000+', impLbl: 'viewer impressions/3 months' },
+            growth:  { price: '&#8377;5,099', orig: '&#8377;5,999', slot: '20 sec ad slot &nbsp;&middot;&nbsp; ₹111/screen/month',
+                       plays: '~2,43,000', playsLbl: 'plays/3 months', imp: '7,29,000+', impLbl: 'viewer impressions/3 months' } },
+  '6mo': { starter: { price: '&#8377;2,999', orig: '&#8377;3,999', slot: '20 sec ad slot &nbsp;&middot;&nbsp; ₹65/screen/month',
+                       plays: '~4,86,000', playsLbl: 'plays/6 months', imp: '14,58,000+', impLbl: 'viewer impressions/6 months' },
+            growth:  { price: '&#8377;4,499', orig: '&#8377;5,999', slot: '20 sec ad slot &nbsp;&middot;&nbsp; ₹98/screen/month',
+                       plays: '~4,86,000', playsLbl: 'plays/6 months', imp: '14,58,000+', impLbl: 'viewer impressions/6 months' } }
 };
 function lpSetCycle(cycle, btn) {
   _lpCycle = cycle;
@@ -3116,12 +3122,20 @@ function lpSetCycle(cycle, btn) {
   var d = _lpPrices[cycle];
   if(!d) return;
   ['starter','growth'].forEach(function(k){
-    var priceEl = document.getElementById('lp-price-'+k);
-    var origEl  = document.getElementById('lp-orig-'+k);
-    var slotEl  = document.getElementById('lp-slot-'+k);
+    var priceEl    = document.getElementById('lp-price-'+k);
+    var origEl     = document.getElementById('lp-orig-'+k);
+    var slotEl     = document.getElementById('lp-slot-'+k);
+    var playsEl    = document.getElementById('lp-stat-'+k+'-plays');
+    var playsLblEl = document.getElementById('lp-lbl-'+k+'-plays');
+    var impEl      = document.getElementById('lp-stat-'+k+'-imp');
+    var impLblEl   = document.getElementById('lp-lbl-'+k+'-imp');
     if(priceEl) priceEl.innerHTML = d[k].price;
     if(origEl){ origEl.innerHTML = d[k].orig; origEl.style.display = d[k].orig ? '' : 'none'; }
     if(slotEl) slotEl.innerHTML = d[k].slot;
+    if(playsEl) playsEl.textContent = d[k].plays;
+    if(playsLblEl) playsLblEl.textContent = d[k].playsLbl;
+    if(impEl) impEl.textContent = d[k].imp;
+    if(impLblEl) impLblEl.textContent = d[k].impLbl;
   });
 }
 
