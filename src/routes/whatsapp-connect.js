@@ -213,11 +213,11 @@ router.get('/contacts', authenticate, requireWaEnabled, async (req, res) => {
     }
 
     // Legacy (no page param) — used by profile page small preview
-    const r = await query(
-      `SELECT id, name, phone, created_at FROM wa_contacts WHERE user_id=$1 ORDER BY created_at DESC LIMIT 500`,
-      [req.user.id]
-    );
-    res.json({ contacts: r.rows, total: r.rows.length });
+    const [countRes, r] = await Promise.all([
+      query(`SELECT COUNT(*) FROM wa_contacts WHERE user_id=$1`, [req.user.id]),
+      query(`SELECT id, name, phone, created_at FROM wa_contacts WHERE user_id=$1 ORDER BY created_at DESC LIMIT 500`, [req.user.id])
+    ]);
+    res.json({ contacts: r.rows, total: parseInt(countRes.rows[0].count) });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
