@@ -892,6 +892,74 @@ async function sendPasswordExpiryReminderEmail({ to, name, resetUrl }) {
   return sendMail({ to, subject: 'extrravenue — Password Update Reminder', html });
 }
 
+// ── Creative change approved email ───────────────────────────────────────────
+async function sendCreativeApprovedEmail(campaignId) {
+  try {
+    const { rows } = await query(
+      `SELECT c.title, c.campaign_code, u.email, u.first_name, u.last_name, u.business_name
+       FROM campaigns c JOIN users u ON u.id = c.user_id WHERE c.id = $1`,
+      [campaignId]
+    );
+    if (!rows.length) return;
+    const c = rows[0];
+    const name = c.business_name || `${c.first_name} ${c.last_name}`.trim();
+
+    const body = `
+      <div class="tag">Creative Updated</div>
+      <h2>Naya Creative Approve Ho Gaya!</h2>
+      <p class="sub">Hi ${name}, aapka naya media approve ho gaya aur screens par chal raha hai.</p>
+      <div class="info-card">
+        <div class="info-row"><span class="ir-label">Campaign</span><span class="ir-value">${c.title}</span></div>
+        <div class="info-row"><span class="ir-label">Code</span><span class="ir-value">${c.campaign_code}</span></div>
+      </div>
+      <a class="btn" href="${process.env.APP_URL || 'https://signagecrm-production.up.railway.app'}">Dashboard Dekho &rarr;</a>`;
+
+    await sendMail({
+      to: c.email,
+      subject: `Creative Approved – ${c.campaign_code} | SignageCMS`,
+      html: wrap(body),
+    });
+    console.log(`[Email] Creative approval sent to ${c.email} — ${c.campaign_code}`);
+  } catch (err) {
+    console.error('[Email] sendCreativeApprovedEmail error:', err.message);
+  }
+}
+
+// ── Creative change rejected email ───────────────────────────────────────────
+async function sendCreativeRejectedEmail(campaignId, reason) {
+  try {
+    const { rows } = await query(
+      `SELECT c.title, c.campaign_code, u.email, u.first_name, u.last_name, u.business_name
+       FROM campaigns c JOIN users u ON u.id = c.user_id WHERE c.id = $1`,
+      [campaignId]
+    );
+    if (!rows.length) return;
+    const c = rows[0];
+    const name = c.business_name || `${c.first_name} ${c.last_name}`.trim();
+
+    const body = `
+      <div class="tag" style="background:#ef4444;">Creative Rejected</div>
+      <h2>Naya Creative Approve Nahi Hua</h2>
+      <p class="sub">Hi ${name}, aapka naya media review mein reject kar diya gaya. Pehla creative chal raha hai.</p>
+      <div class="info-card">
+        <div class="info-row"><span class="ir-label">Campaign</span><span class="ir-value">${c.title}</span></div>
+        <div class="info-row"><span class="ir-label">Code</span><span class="ir-value">${c.campaign_code}</span></div>
+        ${reason ? `<div class="info-row"><span class="ir-label">Reason</span><span class="ir-value" style="color:#ef4444;">${reason}</span></div>` : ''}
+      </div>
+      <p style="font-size:14px;color:#aaa;">Dobara upload karne ke liye dashboard par jaayein.</p>
+      <a class="btn" href="${process.env.APP_URL || 'https://signagecrm-production.up.railway.app'}">Dashboard Dekho &rarr;</a>`;
+
+    await sendMail({
+      to: c.email,
+      subject: `Creative Rejected – ${c.campaign_code} | SignageCMS`,
+      html: wrap(body),
+    });
+    console.log(`[Email] Creative rejection sent to ${c.email} — ${c.campaign_code}`);
+  } catch (err) {
+    console.error('[Email] sendCreativeRejectedEmail error:', err.message);
+  }
+}
+
 async function sendDbBackupFailedEmail({ to, dateStr, errorMsg }) {
   const html = wrap(`
     <div class="tag" style="background:#ef4444;">Backup Failed</div>
@@ -929,6 +997,7 @@ module.exports = {
   sendInvoiceEmail, sendApprovedEmail, sendRejectedEmail,
   sendPausedEmail, sendResumedEmail, sendOnHoldEmail,
   sendWalletCreditEmail,
+  sendCreativeApprovedEmail, sendCreativeRejectedEmail,
   sendExpiryReminderEmail, sendCampaignCompletedEmail,
   sendDailyPoPReport, sendDailyPoPEmailAll, sendNewUserAlertEmail,
   sendVenuePartnerWelcomeEmail,

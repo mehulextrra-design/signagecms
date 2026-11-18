@@ -473,10 +473,47 @@ async function sendDailyPoPAllWA() {
   return sent;
 }
 
+async function sendCreativeApprovedWA(campaignId) {
+  const d = await _campaignUser(campaignId);
+  if (!d || !d.mobile) return;
+  const name = d.business_name || d.first_name || 'Advertiser';
+  const msg =
+`✅ *Naya Creative Approve Ho Gaya!*
+
+Hi ${name}, aapka naya media approve ho gaya aur screens par chal raha hai.
+
+*Campaign:* ${d.campaign_code}
+
+Dashboard pe jaake verify karein:
+🔗 signagecrm-production.up.railway.app
+
+— Team SignageCMS`;
+  return sendWhatsApp(d.mobile, msg);
+}
+
+async function sendCreativeRejectedWA(campaignId, reason) {
+  const d = await _campaignUser(campaignId);
+  if (!d || !d.mobile) return;
+  const name = d.business_name || d.first_name || 'Advertiser';
+  const msg =
+`❌ *Naya Creative Approve Nahi Hua*
+
+Hi ${name}, aapka naya media reject kar diya gaya. Pehla creative chal raha hai.
+
+*Campaign:* ${d.campaign_code}${reason ? `\n*Reason:* ${reason}` : ''}
+
+Dobara upload karne ke liye dashboard par jaayein:
+🔗 signagecrm-production.up.railway.app
+
+— Team SignageCMS`;
+  return sendWhatsApp(d.mobile, msg);
+}
+
 module.exports = {
   sendWhatsApp,
   sendWeeklyReports, sendReportForUser, buildWeeklyReport,
   sendCampaignApprovedWA, sendInvoiceConfirmedWA,
   sendExpiryReminderWA, sendCampaignCompletedWA,
   sendDailyPoPWA, sendDailyPoPAllWA,
+  sendCreativeApprovedWA, sendCreativeRejectedWA,
 };

@@ -4,8 +4,8 @@ const Razorpay = require('razorpay');
 const { query, getClient } = require('../db');
 const { authenticate, requireAdmin } = require('../middleware/auth');
 const { reviewCampaign } = require('../services/aiReview');
-const { sendInvoiceEmail, sendApprovedEmail, sendRejectedEmail, sendPausedEmail, sendResumedEmail, sendOnHoldEmail, sendWalletCreditEmail } = require('../services/email');
-const { sendCampaignApprovedWA, sendInvoiceConfirmedWA } = require('../services/whatsapp');
+const { sendInvoiceEmail, sendApprovedEmail, sendRejectedEmail, sendPausedEmail, sendResumedEmail, sendOnHoldEmail, sendWalletCreditEmail, sendCreativeApprovedEmail, sendCreativeRejectedEmail } = require('../services/email');
+const { sendCampaignApprovedWA, sendInvoiceConfirmedWA, sendCreativeApprovedWA, sendCreativeRejectedWA } = require('../services/whatsapp');
 const { sendWaBroadcast } = require('../services/whatsapp-broadcast');
 const { creditWallet, debitWallet } = require('../services/wallet');
 const { postCampaignToSocial } = require('./facebook');
@@ -563,12 +563,24 @@ router.post('/:id/approve-creative', authenticate, requireAdmin, async (req, res
     const updated = result.rows[0];
     res.json(updated);
 
+    // Reload all screens showing this campaign (content_version hash tracks campaign.id not content_id)
+    query(
+      `INSERT INTO remote_commands (screen_id, command, payload)
+       SELECT cs.screen_id, 'reload', '{"reason":"creative_change"}'
+       FROM campaign_screens cs WHERE cs.campaign_id = $1`,
+      [updated.id]
+    ).catch(e => console.error('[Creative Approve] screen reload error:', e.message));
+
+    // Notify advertiser
+    sendCreativeApprovedEmail(updated.id).catch(e => console.error('[Creative Approve] email error:', e.message));
+    sendCreativeApprovedWA(updated.id).catch(e => console.error('[Creative Approve] WA notify error:', e.message));
+
     // For omnichannel_growth: re-trigger all channels
     const omniPkgs = ['omnichannel_growth', 'growth', 'complete'];
     if (omniPkgs.includes(updated.package_name) && updated.status === 'live') {
       postCampaignToSocial(updated.id).catch(e => console.error('[Creative Approve] FB/IG error:', e.message));
       postCampaignToGoogle(updated.id).catch(e => console.error('[Creative Approve] GBP error:', e.message));
-      sendWaBroadcast(updated.id).catch(e => console.error('[Creative Approve] WA error:', e.message));
+      sendWaBroadcast(updated.id).catch(e => console.error('[Creative Approve] WA broadcast error:', e.message));
     }
   } catch (err) { next(err); }
 });
@@ -585,6 +597,10 @@ router.post('/:id/reject-creative', authenticate, requireAdmin, async (req, res,
     );
     if (!result.rows.length) return res.status(404).json({ error: 'No pending creative change' });
     res.json(result.rows[0]);
+
+    // Notify advertiser
+    sendCreativeRejectedEmail(result.rows[0].id, reason).catch(e => console.error('[Creative Reject] email error:', e.message));
+    sendCreativeRejectedWA(result.rows[0].id, reason).catch(e => console.error('[Creative Reject] WA notify error:', e.message));
   } catch (err) { next(err); }
 });
 

@@ -1198,13 +1198,14 @@ textarea.form-input{resize:vertical;min-height:80px;}
         <div id="cdm-creative-inner" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;"></div>
       </div>
       <!-- Pending creative banner -->
-      <div id="cdm-pending-wrap" style="display:none;background:var(--warning-light);border-bottom:1px solid var(--border);padding:10px 20px;display:none;align-items:center;justify-content:space-between;gap:10px;">
-        <div>
+      <div id="cdm-pending-wrap" style="display:none;background:var(--warning-light);border-bottom:1px solid var(--border);padding:12px 20px;display:none;gap:12px;align-items:flex-start;">
+        <div id="cdm-pending-preview" style="flex-shrink:0;width:80px;height:60px;border-radius:6px;overflow:hidden;background:#000;display:flex;align-items:center;justify-content:center;"></div>
+        <div style="flex:1;min-width:0;">
           <div style="font-size:12px;font-weight:700;color:var(--warning);">New Creative Pending Review</div>
-          <div id="cdm-pending-name" style="font-size:11px;color:var(--text2);margin-top:2px;"></div>
+          <div id="cdm-pending-name" style="font-size:11px;color:var(--text2);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></div>
           <div id="cdm-pending-wa-msg" style="display:none;font-size:11px;color:#25D366;margin-top:3px;"></div>
         </div>
-        <div style="display:flex;gap:8px;">
+        <div style="display:flex;gap:8px;flex-shrink:0;">
           <button class="btn btn-success btn-xs" id="cdm-approve-creative-btn">✓ Approve</button>
           <button class="btn btn-ghost btn-xs" id="cdm-reject-creative-btn">✗ Reject</button>
         </div>
@@ -2619,6 +2620,50 @@ function openModal(id) {
 }
 function closeModal(id) {
   document.getElementById(id).classList.add('hidden');
+}
+
+// Promise-based confirm dialog
+function showConfirm(msg, { title = 'Confirm', okLabel = 'OK', danger = false } = {}) {
+  return new Promise(resolve => {
+    const overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;display:flex;align-items:center;justify-content:center;';
+    overlay.innerHTML = `<div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px;max-width:380px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,.4);">
+      <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:10px;">${title}</div>
+      <div style="font-size:13px;color:var(--text2);margin-bottom:20px;">${msg}</div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;">
+        <button id="_sc_cancel" style="padding:7px 16px;border-radius:7px;border:1px solid var(--border);background:transparent;color:var(--text2);font-size:13px;cursor:pointer;">Cancel</button>
+        <button id="_sc_ok" style="padding:7px 16px;border-radius:7px;border:none;background:${danger ? '#ef4444' : 'var(--accent)'};color:#fff;font-size:13px;font-weight:600;cursor:pointer;">${okLabel}</button>
+      </div></div>`;
+    document.body.appendChild(overlay);
+    const cleanup = v => { document.body.removeChild(overlay); resolve(v); };
+    overlay.querySelector('#_sc_ok').onclick = () => cleanup(true);
+    overlay.querySelector('#_sc_cancel').onclick = () => cleanup(false);
+  });
+}
+
+// Promise-based prompt dialog
+function showPrompt(msg, { title = 'Input', okLabel = 'OK', danger = false } = {}) {
+  return new Promise(resolve => {
+    const overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;display:flex;align-items:center;justify-content:center;';
+    overlay.innerHTML = `<div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px;max-width:380px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,.4);">
+      <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:10px;">${title}</div>
+      <div style="font-size:13px;color:var(--text2);margin-bottom:12px;">${msg}</div>
+      <textarea id="_sp_input" rows="3" style="width:100%;box-sizing:border-box;padding:8px;border-radius:7px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:13px;resize:vertical;"></textarea>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px;">
+        <button id="_sp_cancel" style="padding:7px 16px;border-radius:7px;border:1px solid var(--border);background:transparent;color:var(--text2);font-size:13px;cursor:pointer;">Cancel</button>
+        <button id="_sp_ok" style="padding:7px 16px;border-radius:7px;border:none;background:${danger ? '#ef4444' : 'var(--accent)'};color:#fff;font-size:13px;font-weight:600;cursor:pointer;">${okLabel}</button>
+      </div></div>`;
+    document.body.appendChild(overlay);
+    const inp = overlay.querySelector('#_sp_input');
+    inp.focus();
+    const cleanup = v => { document.body.removeChild(overlay); resolve(v); };
+    overlay.querySelector('#_sp_ok').onclick = () => { const v = inp.value.trim(); if (!v) return; cleanup(v); };
+    overlay.querySelector('#_sp_cancel').onclick = () => cleanup(null);
+  });
+}
+
+
   // Stop any playing video inside modal
   document.getElementById(id)?.querySelectorAll('video').forEach(v=>{ v.pause(); v.src=''; });
 }
@@ -2790,9 +2835,23 @@ async function openCampaignDetail(id) {
           waMsgEl.style.display = 'none';
         }
       }
+      // Show pending media preview
+      const previewEl = document.getElementById('cdm-pending-preview');
+      if (previewEl) {
+        const isVideo = /\.(mp4|webm|mov|avi|mkv|m4v)$/i.test(c.pending_creative_url || '');
+        if (isVideo) {
+          previewEl.innerHTML = `<video src="${c.pending_creative_url}" muted playsinline style="width:100%;height:100%;object-fit:cover;"></video>`;
+        } else {
+          previewEl.innerHTML = `<img src="${c.pending_creative_url}" style="width:100%;height:100%;object-fit:cover;">`;
+        }
+      }
       document.getElementById('cdm-approve-creative-btn').onclick = () => { closeModal('camp-detail-modal'); approveCreative(id); };
       document.getElementById('cdm-reject-creative-btn').onclick  = () => { closeModal('camp-detail-modal'); rejectCreative(id); };
-    } else { pendingWrap.style.display = 'none'; }
+    } else {
+      pendingWrap.style.display = 'none';
+      const previewEl = document.getElementById('cdm-pending-preview');
+      if (previewEl) previewEl.innerHTML = '';
+    }
 
     // Advertiser
     document.getElementById('cdm-advertiser').textContent = (c.first_name||'') + ' ' + (c.last_name||'') + (c.business_name ? ' · ' + c.business_name : '');
@@ -3014,20 +3073,21 @@ async function forceLiveCampaign(id) {
 }
 
 async function approveCreative(id) {
-  if(!confirm('Approve this creative change? New creative will go live immediately.')) return;
+  const ok = await showConfirm('Naya creative approve karein? Screens reload hongi aur advertiser ko notify kiya jayega.', { title: 'Creative Approve', okLabel: 'Approve', danger: false });
+  if (!ok) return;
   try {
     await api(`/campaigns/${id}/approve-creative`, { method: 'POST' });
-    showToast('Creative change approved', 'success');
+    showToast('Creative change approved — screens reloading', 'success');
     loadCampaigns();
   } catch(e) { showToast('Error: ' + e.message, 'error'); }
 }
 
 async function rejectCreative(id) {
-  const reason = prompt('Reason for rejecting creative change (shown to advertiser):');
-  if(!reason) return;
+  const reason = await showPrompt('Rejection reason (advertiser ko dikhega):', { title: 'Creative Reject', okLabel: 'Reject', danger: true });
+  if (!reason) return;
   try {
     await api(`/campaigns/${id}/reject-creative`, { method: 'POST', body: JSON.stringify({ reason }) });
-    showToast('Creative change rejected', 'success');
+    showToast('Creative change rejected — advertiser notified', 'success');
     loadCampaigns();
   } catch(e) { showToast('Error: ' + e.message, 'error'); }
 }
