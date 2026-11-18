@@ -196,13 +196,24 @@ app.get('/api/config', (req, res) => {
 });
 
 // Public gallery — reads img/carousel/ folder, no auth needed
+// Videos excluded: each video is duplicated 6x in the drift carousel causing massive payload
+// WebP preferred over PNG/JPG when both exist
 app.get('/api/gallery', (req, res) => {
   const fs = require('fs');
   const dir = path.join(__dirname, '../public/img/carousel');
-  const ALLOWED = /\.(jpe?g|png|webp|gif|mp4|webm|mov)$/i;
+  const ALLOWED = /\.(jpe?g|png|webp|gif)$/i;
+  const VIDEO = /\.(mp4|webm|mov)$/i;
   try {
-    const files = fs.readdirSync(dir)
-      .filter(f => ALLOWED.test(f) && !f.startsWith('.'))
+    const all = fs.readdirSync(dir).filter(f => !f.startsWith('.'));
+    const webpNames = new Set(all.filter(f => /\.webp$/i.test(f)).map(f => f.replace(/\.webp$/i, '')));
+    const files = all
+      .filter(f => {
+        if (VIDEO.test(f)) return false;
+        if (!ALLOWED.test(f)) return false;
+        const base = f.replace(/\.[^.]+$/, '');
+        if (webpNames.has(base) && !/\.webp$/i.test(f)) return false;
+        return true;
+      })
       .map(f => 'img/carousel/' + f);
     res.json(files);
   } catch (e) {
