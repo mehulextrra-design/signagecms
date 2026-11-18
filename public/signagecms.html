@@ -2045,7 +2045,21 @@ async function doLogin(){
   const btn=document.getElementById('login-btn');btn.innerHTML='<div class="loading-spinner"></div>';btn.disabled=true;
   try{
     const r=await fetch(`${API}/auth/login-otp`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mobile,otp})});
-    const data=await r.json();if(!r.ok)throw new Error(data.error||'Login failed');
+    const data=await r.json();
+    if(r.status===404){
+      // Not registered — auto-redirect to signup with pre-filled mobile + OTP
+      if(_loginOtpTimer)clearInterval(_loginOtpTimer);
+      document.getElementById('reg-mobile').value=mobile;
+      document.getElementById('reg-otp').value=otp;
+      document.getElementById('otp-group').classList.remove('hidden');
+      document.getElementById('otp-sent-msg').textContent='✓ OTP verified — bas details bharo aur account banao!';
+      document.getElementById('send-otp-btn').textContent='Resend OTP';
+      document.getElementById('register-btn').disabled=false;
+      showRegister();
+      toast('New user? Bas naam aur email daalo neeche.','info');
+      return;
+    }
+    if(!r.ok)throw new Error(data.error||'Login failed');
     if(_loginOtpTimer)clearInterval(_loginOtpTimer);
     setToken(data.token);currentUser=data.user;showApp();toast(`Welcome back, ${currentUser.name||currentUser.email}!`,'success');
     loadUserInfo().then(()=>updateSidebarUser()).catch(()=>{});
