@@ -402,6 +402,10 @@
   /* NOTIFICATIONS */
   .notif-bell { position:relative;width:34px;height:34px;border:1.5px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text2);flex-shrink:0;transition:background 0.15s; }
   .notif-bell:hover { background:var(--surface2); }
+  .lang-btn{position:relative;width:34px;height:34px;border:1.5px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;color:var(--text2);flex-shrink:0;transition:background 0.15s;padding:0;}
+  .lang-btn:hover{background:var(--surface2);}
+  .lang-btn .lang-icon{line-height:1;display:flex;}
+  .lang-btn .lang-code{font-size:8px;font-weight:700;letter-spacing:0.03em;line-height:1;color:var(--accent);}
   .notif-badge { position:absolute;top:-5px;right:-5px;min-width:16px;height:16px;background:var(--danger);color:#fff;border-radius:8px;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid var(--surface);padding:0 3px; }
   .notif-panel { position:fixed;top:60px;right:20px;width:340px;max-height:460px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow-lg);z-index:500;display:flex;flex-direction:column;overflow:hidden; }
   .notif-panel-hdr { padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0; }
@@ -587,6 +591,10 @@
       <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
       <span class="notif-badge hidden" id="notif-badge-mobile">0</span>
     </button>
+    <button class="lang-btn" id="lang-btn-mobile" onclick="cycleLang()" title="Change Language" style="border-color:rgba(255,255,255,0.15);background:rgba(255,255,255,0.08);color:#fff;">
+      <span class="lang-icon"><svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path stroke-linecap="round" d="M2 12h20M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20"/></svg></span>
+      <span class="lang-code" id="lang-code-mobile" style="color:#fff;opacity:.85;">EN</span>
+    </button>
   </div>
   <nav class="sidebar">
     <div class="sidebar-header">
@@ -654,6 +662,10 @@
         <button class="notif-bell" id="notif-bell" onclick="toggleNotifPanel()" title="Notifications">
           <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
           <span class="notif-badge hidden" id="notif-badge">0</span>
+        </button>
+        <button class="lang-btn" id="lang-btn" onclick="cycleLang()" title="Change Language">
+          <span class="lang-icon"><svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path stroke-linecap="round" d="M2 12h20M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20"/></svg></span>
+          <span class="lang-code" id="lang-code">EN</span>
         </button>
         <button class="btn btn-primary btn-sm" onclick="navigate('new-campaign')">
           <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
@@ -1756,6 +1768,8 @@ let token = null, currentUser = null;
 
 // ── Language / i18n ──────────────────────────────────────────────────
 let _lang = localStorage.getItem('ui_lang') || 'en';
+// Update lang button labels after DOM is ready
+document.addEventListener('DOMContentLoaded',()=>{ if(typeof _updateLangBtns==='function')_updateLangBtns(); });
 const TRANSLATIONS = {
   en: {
     // Nav
@@ -1862,9 +1876,27 @@ const TRANSLATIONS = {
   }
 };
 function t(key){return(TRANSLATIONS[_lang]||TRANSLATIONS.en)[key]||(TRANSLATIONS.en)[key]||key;}
+const _LANG_CYCLE=['en','hi','hinglish'];
+const _LANG_CODES={en:'EN',hi:'हि',hinglish:'HG'};
+function cycleLang(){
+  const next=_LANG_CYCLE[(_LANG_CYCLE.indexOf(_lang)+1)%_LANG_CYCLE.length];
+  applyLang(next);
+  // sync profile dropdown if visible
+  const sel=document.getElementById('prof-lang');
+  if(sel)sel.value=next;
+}
+function _updateLangBtns(){
+  const c=_LANG_CODES[_lang]||'EN';
+  const d=document.getElementById('lang-code');
+  const m=document.getElementById('lang-code-mobile');
+  if(d)d.textContent=c;
+  if(m)m.textContent=c;
+}
+
 function applyLang(lang){
   _lang=lang;
   localStorage.setItem('ui_lang',lang);
+  _updateLangBtns();
   // Nav labels
   const nm={'dashboard':'nav_dashboard','analytics':'nav_analytics','pop':'nav_pop',
     'campaigns':'nav_campaigns','new-campaign':'nav_book','screens':'nav_browse',
