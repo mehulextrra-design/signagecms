@@ -2808,30 +2808,12 @@ function loadPreset(key){
     <button onclick="evSetConsent('granted')" style="background:linear-gradient(135deg,#D44A9A,#1D91D3);border:none;color:#fff;padding:8px 20px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;font-family:inherit;">Got it</button>
   </div>
 </div>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-5J5SPC6E1T"></script>
 <script>
-(function(){
-  var CONSENT_KEY = 'ev-consent';
-  var GA_ID = 'G-5J5SPC6E1T';
-  function evGetConsent(){ try{ return localStorage.getItem(CONSENT_KEY); }catch(e){ return null; } }
-  window.evSetConsent = function(val){
-    try{ localStorage.setItem(CONSENT_KEY, val); }catch(e){}
-    document.getElementById('ev-cookie-banner').style.display='none';
-    if(val==='granted'){ evLoadGA(); }
-  }
-  function evLoadGA(){
-    if(window._evGALoaded) return; window._evGALoaded = true;
-    var s = document.createElement('script'); s.async = true;
-    s.src = 'https://www.googletagmanager.com/gtag/js?id=' + GA_ID;
-    document.head.appendChild(s);
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);} window.gtag = gtag;
-    gtag('js', new Date()); gtag('config', GA_ID, {anonymize_ip:true});
-  }
-  window.evShowCookieBanner = function(){ document.getElementById('ev-cookie-banner').style.display='flex'; };
-  var consent = evGetConsent();
-  if(consent === null){ document.getElementById('ev-cookie-banner').style.display='flex'; }
-  else if(consent === 'granted'){ evLoadGA(); }
-})();
+window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}
+gtag('js',new Date());gtag('config','G-5J5SPC6E1T',{anonymize_ip:true});
+window.evSetConsent=function(val){try{localStorage.setItem('ev-consent',val);}catch(e){}document.getElementById('ev-cookie-banner').style.display='none';};
+window.evShowCookieBanner=function(){document.getElementById('ev-cookie-banner').style.display='flex';};
 </script>
 
 <script>
