@@ -2903,13 +2903,14 @@ document.querySelectorAll('[data-reveal]').forEach(el => ro.observe(el));
 (function(){
   var slides = document.querySelectorAll('.ss-slide');
   var dots = document.querySelectorAll('.ss-dot');
+  if(!slides.length) return;
   var cur = 0;
   var total = slides.length;
   function goTo(i){
-    slides[cur].classList.remove('on');
+    if(slides[cur]) slides[cur].classList.remove('on');
     dots[cur] && dots[cur].classList.remove('on');
     cur = (i + total) % total;
-    slides[cur].classList.add('on');
+    if(slides[cur]) slides[cur].classList.add('on');
     dots[cur] && dots[cur].classList.add('on');
   }
   dots.forEach(function(d){ d.addEventListener('click', function(){ goTo(+d.dataset.i); }); });

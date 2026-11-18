@@ -65,10 +65,10 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net", "https://checkout.razorpay.com", "https://maps.googleapis.com", "https://maps.gstatic.com"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net", "https://checkout.razorpay.com", "https://maps.googleapis.com", "https://maps.gstatic.com", "https://www.googletagmanager.com", "https://cdn.tailwindcss.com", "https://unpkg.com"],
       scriptSrcAttr: ["'unsafe-inline'"],
-      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
-      fontSrc: ["'self'", "https://fonts.gstatic.com"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://cdnjs.cloudflare.com"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com", "https://cdnjs.cloudflare.com"],
       imgSrc: ["'self'", "data:", "blob:", "*", "https://maps.gstatic.com", "https://maps.googleapis.com"],
       connectSrc: ["'self'", "*"],
       frameSrc: ["'self'", "https://api.razorpay.com", "https://checkout.razorpay.com"],
