@@ -2620,6 +2620,8 @@ function openModal(id) {
 }
 function closeModal(id) {
   document.getElementById(id).classList.add('hidden');
+  // Stop any playing video inside modal
+  document.getElementById(id)?.querySelectorAll('video').forEach(v=>{ v.pause(); v.src=''; });
 }
 
 // Promise-based confirm dialog
@@ -2663,10 +2665,6 @@ function showPrompt(msg, { title = 'Input', okLabel = 'OK', danger = false } = {
   });
 }
 
-
-  // Stop any playing video inside modal
-  document.getElementById(id)?.querySelectorAll('video').forEach(v=>{ v.pause(); v.src=''; });
-}
 
 // -- DASHBOARD -------------------------------------------------------------
 async function loadDashboard() {
