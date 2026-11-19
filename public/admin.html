@@ -4680,8 +4680,9 @@ function openMapScraper() {
   setTimeout(() => {
     if (!_scraperMap) {
       _scraperMap = L.map('scraper-map').setView([19.0760, 72.8777], 13);
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-        attribution: '© OpenStreetMap contributors © CARTO', maxZoom: 19
+      L.tileLayer('https://mt{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+        subdomains: ['0','1','2','3'],
+        attribution: '© Google Maps', maxZoom: 20
       }).addTo(_scraperMap);
       _scraperMap.on('click', e => {
         _scraperLat = e.latlng.lat; _scraperLng = e.latlng.lng;
