@@ -4679,7 +4679,7 @@ function openMapScraper() {
   document.getElementById('map-scraper-modal').classList.remove('hidden');
   setTimeout(() => {
     if (!_scraperMap) {
-      _scraperMap = L.map('scraper-map').setView([19.0760, 72.8777], 13);
+      _scraperMap = L.map('scraper-map').setView([20.5937, 78.9629], 5); // India default
       L.tileLayer('https://mt{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
         subdomains: ['0','1','2','3'],
         attribution: '© Google Maps', maxZoom: 20
@@ -4688,6 +4688,20 @@ function openMapScraper() {
         _scraperLat = e.latlng.lat; _scraperLng = e.latlng.lng;
         _scraperUpdateMapCenter();
       });
+      // Auto-center on user's current location
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          pos => {
+            const { latitude: lat, longitude: lng } = pos.coords;
+            _scraperMap.setView([lat, lng], 14);
+            _scraperLat = lat; _scraperLng = lng;
+            _scraperUpdateMapCenter();
+            document.getElementById('scraper-loc-display').textContent = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+            document.getElementById('scraper-search-btn').disabled = false;
+          },
+          () => {} // silently ignore if denied
+        );
+      }
     }
     _scraperMap.invalidateSize();
     scraperLoadHistory();
