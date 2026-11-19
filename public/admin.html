@@ -4587,8 +4587,8 @@ function pagerReset(name) { if (_pagers[name]) _pagers[name].page = 1; }
 </script>
 
 <!-- MAP SCRAPER MODAL ──────────────────────────────────────────────────── -->
-<div class="modal-backdrop hidden" id="map-scraper-modal" style="z-index:1200;">
-  <div class="modal" style="max-width:960px;width:97%;height:92vh;display:flex;flex-direction:column;padding:0;overflow:hidden;">
+<div class="modal-backdrop hidden" id="map-scraper-modal" style="z-index:1200;padding:0;">
+  <div class="modal" style="max-width:100%;width:100%;height:100vh;margin:0;border-radius:0;display:flex;flex-direction:column;padding:0;overflow:hidden;">
     <!-- Header -->
     <div class="modal-header" style="flex-shrink:0;">
       <span class="modal-title">
@@ -4641,8 +4641,14 @@ function pagerReset(name) { if (_pagers[name]) _pagers[name].page = 1; }
           </button>
         </div>
         <!-- Results (scrollable) -->
-        <div id="scraper-results-panel" style="flex:1;overflow-y:auto;padding:10px 12px;">
+        <div id="scraper-results-panel" style="flex:1;overflow-y:auto;padding:10px 12px 0;">
           <div id="scraper-results-body" style="color:var(--text3);font-size:11px;text-align:center;padding-top:20px;">Map pe click karo center set karne ke liye, phir Search karo</div>
+        </div>
+        <!-- Save All fixed bottom bar -->
+        <div id="scraper-save-all-bar" style="display:none;flex-shrink:0;padding:10px 12px;border-top:1px solid var(--border);background:var(--surface);">
+          <button class="btn btn-primary" style="width:100%;font-size:12px;padding:8px;" onclick="_scraperSaveAll()">
+            Save All (<span id="scraper-unsaved-count">0</span> with phone)
+          </button>
         </div>
       </div>
     </div>
@@ -4746,13 +4752,15 @@ function _scraperRenderResults() {
   const unsaved = _scraperResults.filter(r => !r.saved && !r.saving && r.phone).length;
   const total = _scraperResults.length;
   if (!total) { body.innerHTML = '<div style="color:var(--text3);text-align:center;padding-top:16px;">No results found</div>'; return; }
+  // Update Save All bottom bar
+  const bar = document.getElementById('scraper-save-all-bar');
+  const countEl = document.getElementById('scraper-unsaved-count');
+  if (bar) bar.style.display = unsaved > 0 ? 'block' : 'none';
+  if (countEl) countEl.textContent = unsaved;
   body.innerHTML = `
-    <div style="position:sticky;top:0;background:var(--surface);padding:6px 0 8px;z-index:1;border-bottom:1px solid var(--border);margin-bottom:8px;">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-        <span style="font-size:12px;font-weight:700;">${total} results</span>
-        <span style="font-size:11px;color:var(--success);font-weight:600;">${saved} saved</span>
-      </div>
-      ${unsaved > 0 ? `<button class="btn btn-primary" style="width:100%;font-size:11px;padding:6px;" onclick="_scraperSaveAll()">Save All (${unsaved} with phone)</button>` : ''}
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+      <span style="font-size:12px;font-weight:700;">${total} results</span>
+      <span style="font-size:11px;color:var(--success);font-weight:600;">${saved} saved</span>
     </div>
     ${_scraperResults.map((r, i) => `
       <div style="border:1px solid var(--border);border-radius:8px;padding:8px 10px;margin-bottom:6px;background:${r.saved ? 'rgba(34,197,94,.08)' : 'var(--surface2)'};">
@@ -4872,14 +4880,14 @@ async function scraperSearch() {
     });
     if (_scraperResults.length > 1) _scraperMap.fitBounds(L.latLngBounds(_scraperResults.map(r => [r.lat, r.lon])), { padding:[40,40] });
 
-    // Fetch phone+website+email in batches of 5
+    // Phase 1: Fetch phone+website+address in batches of 5
     const BATCH = 5;
     for (let i = 0; i < _scraperResults.length; i += BATCH) {
       await Promise.all(_scraperResults.slice(i, i + BATCH).map((r, bi) =>
         new Promise(resolve => {
           if (!r.placeId) { _scraperResults[i+bi].fetching = false; resolve(); return; }
           svc.getDetails({ placeId: r.placeId, fields: ['formatted_phone_number','international_phone_number','website','address_components'] },
-            async (place, status) => {
+            (place, status) => {
               if (status === window.google.maps.places.PlacesServiceStatus.OK && place) {
                 _scraperResults[i+bi].phone = place.international_phone_number || place.formatted_phone_number || '';
                 _scraperResults[i+bi].website = place.website || '';
@@ -4888,13 +4896,6 @@ async function scraperSearch() {
                     if (c.types.includes('locality')) _scraperResults[i+bi].city = c.long_name;
                     if (c.types.includes('sublocality_level_1') || c.types.includes('sublocality')) _scraperResults[i+bi].area = c.long_name;
                   }
-                }
-                // Scrape email via backend (CORS-safe)
-                if (place.website) {
-                  try {
-                    const ed = await api('/admin-contacts/scrape-email?website=' + encodeURIComponent(place.website));
-                    if (ed.email) _scraperResults[i+bi].email = ed.email;
-                  } catch {}
                 }
               }
               _scraperResults[i+bi].fetching = false;
@@ -4907,6 +4908,20 @@ async function scraperSearch() {
     }
 
     document.body.removeChild(tmp);
+
+    // Phase 2: Email scraping in background (don't block button reset)
+    ;(async () => {
+      for (let i = 0; i < _scraperResults.length; i += BATCH) {
+        await Promise.all(_scraperResults.slice(i, i + BATCH).map(async (r, bi) => {
+          if (!r.website) return;
+          try {
+            const ed = await api('/admin-contacts/scrape-email?website=' + encodeURIComponent(r.website));
+            if (ed.email) { _scraperResults[i+bi].email = ed.email; _scraperRenderResults(); }
+          } catch {}
+        }));
+      }
+    })();
+
   } catch(e) {
     document.getElementById('scraper-results-body').innerHTML = `<div style="color:var(--danger,red);font-size:11px;padding:8px;">Error: ${e.message}</div>`;
   }
