@@ -320,7 +320,7 @@ router.delete('/:id', authenticate, requireAdmin, async (req, res, next) => {
 });
 
 // ── Google Places scraper (L2 place_id dedup + L3 job history) ───────────────
-// POST /api/admin-contacts/scrape-places
+// POST /api/admin-contacts/scrape-places — fires async, returns job_id immediately
 router.post('/scrape-places', authenticate, requireAdmin, async (req, res, next) => {
   try {
     await ensureTables();
@@ -331,76 +331,78 @@ router.post('/scrape-places', authenticate, requireAdmin, async (req, res, next)
     const apiKey = process.env.GOOGLE_MAPS_API_KEY;
     if (!apiKey) return res.status(500).json({ error: 'GOOGLE_MAPS_API_KEY not set in env' });
 
-    // L3: record job
     const jobRes = await query(
       `INSERT INTO scrape_jobs (lat, lng, radius, keyword, status) VALUES ($1,$2,$3,$4,'running') RETURNING id`,
       [parseFloat(lat), parseFloat(lng), parseInt(radius), keyword.trim()]
     );
     const jobId = jobRes.rows[0].id;
 
-    // Step 1: Nearby Search — up to 60 results (3 pages × 20), only costs $0.096 total
-    let nearbyPlaces;
-    try {
-      nearbyPlaces = await fetchNearbyPlaces(parseFloat(lat), parseFloat(lng), parseInt(radius), keyword.trim(), apiKey);
-    } catch (err) {
-      await query(`UPDATE scrape_jobs SET status='failed',error=$1,completed_at=NOW() WHERE id=$2`, [err.message, jobId]);
-      return res.status(502).json({ error: err.message });
-    }
+    // Return immediately — process in background
+    res.json({ job_id: jobId, status: 'running' });
 
-    const found = nearbyPlaces.length;
-    if (!found) {
-      await query(`UPDATE scrape_jobs SET status='completed',found=0,completed_at=NOW() WHERE id=$1`, [jobId]);
-      return res.json({ job_id: jobId, found: 0, already_saved: 0, new_fetched: 0, skipped_no_phone: 0, saved: 0, with_email: 0 });
-    }
-
-    // L2: check which place_ids already in DB — skip Place Details for those (saves ~$1 per re-search)
-    const allPlaceIds = nearbyPlaces.map(p => p.place_id).filter(Boolean);
-    const existingRes = await query(
-      `SELECT google_place_id FROM admin_contacts WHERE google_place_id = ANY($1)`, [allPlaceIds]
-    );
-    const existingSet = new Set(existingRes.rows.map(r => r.google_place_id));
-    const newPlaces = nearbyPlaces.filter(p => p.place_id && !existingSet.has(p.place_id));
-    const alreadySaved = found - newPlaces.length;
-
-    // Step 2: Place Details only for new places (5 concurrent)
-    let saved = 0, skippedNoPhone = 0, withEmail = 0;
-
-    await chunkAsync(newPlaces, async (place) => {
+    // Background processing (not awaited)
+    setImmediate(async () => {
       try {
-        const details = await fetchPlaceDetails(place.place_id, apiKey);
-        if (!details) return;
+        const nearbyPlaces = await fetchNearbyPlaces(parseFloat(lat), parseFloat(lng), parseInt(radius), keyword.trim(), apiKey);
+        const found = nearbyPlaces.length;
 
-        const phone = normalizePhone(details.formatted_phone_number || details.international_phone_number);
-        if (!phone) { skippedNoPhone++; return; }
+        if (!found) {
+          await query(`UPDATE scrape_jobs SET status='completed',found=0,completed_at=NOW() WHERE id=$1`, [jobId]);
+          return;
+        }
 
-        const { city, area } = parseCityArea(details.address_components);
-        const bizType = (details.types || []).find(t => !['point_of_interest','establishment','food'].includes(t)) || null;
-        const email = await scrapeEmail(details.website);
-        if (email) withEmail++;
-
-        const r = await query(
-          `INSERT INTO admin_contacts (name,phone,city,area,industry,business_type,google_place_id,email,source)
-           VALUES ($1,$2,$3,$4,$5,$6,$7,$8,'google_places')
-           ON CONFLICT (phone) DO UPDATE SET
-             google_place_id = COALESCE(EXCLUDED.google_place_id, admin_contacts.google_place_id),
-             email            = COALESCE(EXCLUDED.email, admin_contacts.email),
-             is_active        = true`,
-          [details.name || place.name, phone, city||null, area||null,
-           keyword.trim(), bizType, place.place_id, email||null]
+        const allPlaceIds = nearbyPlaces.map(p => p.place_id).filter(Boolean);
+        const existingRes = await query(
+          `SELECT google_place_id FROM admin_contacts WHERE google_place_id = ANY($1)`, [allPlaceIds]
         );
-        if (r.rowCount) saved++;
-      } catch { /* skip individual failures silently */ }
-    }, 5);
+        const existingSet = new Set(existingRes.rows.map(r => r.google_place_id));
+        const newPlaces = nearbyPlaces.filter(p => p.place_id && !existingSet.has(p.place_id));
+        const alreadySaved = found - newPlaces.length;
 
-    // L3: update job record with final stats
-    await query(
-      `UPDATE scrape_jobs SET status='completed',found=$1,already_saved=$2,new_fetched=$3,
-       skipped_no_phone=$4,saved=$5,with_email=$6,completed_at=NOW() WHERE id=$7`,
-      [found, alreadySaved, newPlaces.length, skippedNoPhone, saved, withEmail, jobId]
-    );
+        let saved = 0, skippedNoPhone = 0, withEmail = 0;
 
-    res.json({ job_id: jobId, found, already_saved: alreadySaved, new_fetched: newPlaces.length,
-               skipped_no_phone: skippedNoPhone, saved, with_email: withEmail });
+        await chunkAsync(newPlaces, async (place) => {
+          try {
+            const details = await fetchPlaceDetails(place.place_id, apiKey);
+            if (!details) return;
+            const phone = normalizePhone(details.formatted_phone_number || details.international_phone_number);
+            if (!phone) { skippedNoPhone++; return; }
+            const { city, area } = parseCityArea(details.address_components);
+            const bizType = (details.types || []).find(t => !['point_of_interest','establishment','food'].includes(t)) || null;
+            const email = await scrapeEmail(details.website);
+            if (email) withEmail++;
+            const r = await query(
+              `INSERT INTO admin_contacts (name,phone,city,area,industry,business_type,google_place_id,email,source)
+               VALUES ($1,$2,$3,$4,$5,$6,$7,$8,'google_places')
+               ON CONFLICT (phone) DO UPDATE SET
+                 google_place_id = COALESCE(EXCLUDED.google_place_id, admin_contacts.google_place_id),
+                 email            = COALESCE(EXCLUDED.email, admin_contacts.email),
+                 is_active        = true`,
+              [details.name || place.name, phone, city||null, area||null,
+               keyword.trim(), bizType, place.place_id, email||null]
+            );
+            if (r.rowCount) saved++;
+          } catch { /* skip individual failures silently */ }
+        }, 5);
+
+        await query(
+          `UPDATE scrape_jobs SET status='completed',found=$1,already_saved=$2,new_fetched=$3,
+           skipped_no_phone=$4,saved=$5,with_email=$6,completed_at=NOW() WHERE id=$7`,
+          [found, alreadySaved, newPlaces.length, skippedNoPhone, saved, withEmail, jobId]
+        );
+      } catch (err) {
+        await query(`UPDATE scrape_jobs SET status='failed',error=$1,completed_at=NOW() WHERE id=$2`, [err.message, jobId]).catch(() => {});
+      }
+    });
+  } catch (err) { next(err); }
+});
+
+// GET /api/admin-contacts/scrape-jobs/:id — poll single job status
+router.get('/scrape-jobs/:id', authenticate, requireAdmin, async (req, res, next) => {
+  try {
+    const r = await query(`SELECT * FROM scrape_jobs WHERE id=$1`, [parseInt(req.params.id)]);
+    if (!r.rows.length) return res.status(404).json({ error: 'not found' });
+    res.json(r.rows[0]);
   } catch (err) { next(err); }
 });
 

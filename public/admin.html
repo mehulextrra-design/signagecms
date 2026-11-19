@@ -4733,6 +4733,29 @@ function scraperUpdateBtn() {
   document.getElementById('scraper-search-btn').disabled = !(hasLoc && hasCat);
 }
 
+function _scraperShowResults(data, keyword) {
+  document.getElementById('scraper-results-title').textContent = `"${keyword}" — ${data.found} businesses found`;
+  document.getElementById('scraper-results-meta').textContent = `${_scraperRadius >= 1000 ? _scraperRadius/1000+'km' : _scraperRadius+'m'} radius`;
+  const rows = [
+    { label: 'Total found by Google', val: data.found, style: '' },
+    { label: 'Already in contacts (skipped API cost)', val: data.already_saved, style: 'color:var(--text3)' },
+    { label: 'New places checked', val: data.new_fetched, style: '' },
+    { label: 'Skipped (no phone number)', val: data.skipped_no_phone, style: 'color:var(--warning)' },
+    { label: 'Saved to contacts', val: data.saved, style: 'color:var(--success);font-weight:600;' },
+    { label: 'With email found', val: data.with_email, style: 'color:var(--primary)' },
+  ];
+  document.getElementById('scraper-results-body').innerHTML = `
+    <table style="width:100%;border-collapse:collapse;">
+      ${rows.map(r=>`<tr>
+        <td style="padding:4px 0;color:var(--text2);">${r.label}</td>
+        <td style="padding:4px 0;text-align:right;font-weight:600;font-variant-numeric:tabular-nums;${r.style}">${r.val}</td>
+      </tr>`).join('')}
+    </table>
+    ${data.saved > 0 ? `<div style="margin-top:10px;font-size:12px;color:var(--success);font-weight:600;">✓ ${data.saved} new contacts added to WA Directory</div>` : ''}`;
+  scraperLoadHistory();
+  if (data.saved > 0) { _contactsMeta = null; loadContactsPage(true); }
+}
+
 async function scraperSearch() {
   const keyword = document.getElementById('scraper-keyword').value.trim();
   const btn = document.getElementById('scraper-search-btn');
@@ -4743,38 +4766,38 @@ async function scraperSearch() {
   panel.style.display = 'block';
   document.getElementById('scraper-results-title').textContent = 'Searching Google Places…';
   document.getElementById('scraper-results-meta').textContent = '';
-  document.getElementById('scraper-results-body').innerHTML = '<span style="color:var(--text3);">This may take 10–15 seconds for new places (Place Details API)…</span>';
+  document.getElementById('scraper-results-body').innerHTML = '<span style="color:var(--text3);">Fetching businesses nearby… <span id="scraper-dots">.</span></span>';
+
+  // Animate dots while waiting
+  let dotCount = 0;
+  const dotTimer = setInterval(() => {
+    const el = document.getElementById('scraper-dots');
+    if (el) { dotCount = (dotCount + 1) % 4; el.textContent = '.'.repeat(dotCount + 1); }
+  }, 600);
 
   try {
-    const data = await api('/admin-contacts/scrape-places', {
+    const job = await api('/admin-contacts/scrape-places', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ lat: _scraperLat, lng: _scraperLng, radius: _scraperRadius, keyword })
     });
 
-    document.getElementById('scraper-results-title').textContent = `"${keyword}" — ${data.found} businesses found`;
-    document.getElementById('scraper-results-meta').textContent = `${_scraperRadius >= 1000 ? _scraperRadius/1000+'km' : _scraperRadius+'m'} radius`;
+    // Poll until job completes
+    let data = job;
+    while (data.status === 'running') {
+      await new Promise(r => setTimeout(r, 2500));
+      data = await api(`/admin-contacts/scrape-jobs/${job.job_id}`);
+    }
+    clearInterval(dotTimer);
 
-    const rows = [
-      { label: 'Total found by Google', val: data.found, style: '' },
-      { label: 'Already in contacts (skipped API cost)', val: data.already_saved, style: 'color:var(--text3)' },
-      { label: 'New places checked', val: data.new_fetched, style: '' },
-      { label: 'Skipped (no phone number)', val: data.skipped_no_phone, style: 'color:var(--warning)' },
-      { label: 'Saved to contacts', val: data.saved, style: 'color:var(--success);font-weight:600;' },
-      { label: 'With email found', val: data.with_email, style: 'color:var(--primary)' },
-    ];
-    document.getElementById('scraper-results-body').innerHTML = `
-      <table style="width:100%;border-collapse:collapse;">
-        ${rows.map(r=>`<tr>
-          <td style="padding:4px 0;color:var(--text2);">${r.label}</td>
-          <td style="padding:4px 0;text-align:right;font-weight:600;font-variant-numeric:tabular-nums;${r.style}">${r.val}</td>
-        </tr>`).join('')}
-      </table>
-      ${data.saved > 0 ? `<div style="margin-top:10px;font-size:12px;color:var(--success);font-weight:600;">✓ ${data.saved} new contacts added to WA Directory</div>` : ''}`;
-
-    scraperLoadHistory();
-    if (data.saved > 0) { _contactsMeta = null; loadContactsPage(true); }
+    if (data.status === 'failed') {
+      document.getElementById('scraper-results-title').textContent = 'Search failed';
+      document.getElementById('scraper-results-body').textContent = data.error || 'Unknown error';
+    } else {
+      _scraperShowResults(data, keyword);
+    }
   } catch(e) {
+    clearInterval(dotTimer);
     document.getElementById('scraper-results-title').textContent = 'Error';
     document.getElementById('scraper-results-body').textContent = e.message;
   }
