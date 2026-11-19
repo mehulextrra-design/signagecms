@@ -8,6 +8,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Magra:wght@400;700&family=Inter:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -1038,6 +1040,10 @@ textarea.form-input{resize:vertical;min-height:80px;}
           <div style="display:flex;gap:8px;flex-wrap:wrap;">
             <button class="btn btn-sm btn-ghost" onclick="document.getElementById('contacts-import-row').style.display=document.getElementById('contacts-import-row').style.display==='none'?'flex':'none'">Import CSV</button>
             <button class="btn btn-sm btn-ghost" onclick="openSegmentModal()">+ Segment</button>
+            <button class="btn btn-sm" style="background:var(--primary);color:#fff;" onclick="openMapScraper()">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align:-2px"><path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><circle cx="12" cy="11" r="3"/></svg>
+              Find on Maps
+            </button>
             <button class="btn btn-sm btn-ghost" onclick="loadContactsPage()">Refresh</button>
           </div>
         </div>
@@ -4577,6 +4583,217 @@ function pagerGo(name, page) {
   _pagers[name].page = page; _drawPager(name);
 }
 function pagerReset(name) { if (_pagers[name]) _pagers[name].page = 1; }
+</script>
+
+<!-- MAP SCRAPER MODAL ──────────────────────────────────────────────────── -->
+<div class="modal-backdrop hidden" id="map-scraper-modal" style="z-index:1200;">
+  <div class="modal" style="max-width:960px;width:97%;height:92vh;display:flex;flex-direction:column;padding:0;overflow:hidden;">
+    <!-- Header -->
+    <div class="modal-header" style="flex-shrink:0;">
+      <span class="modal-title">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align:-3px;margin-right:6px;color:var(--primary)"><path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><circle cx="12" cy="11" r="3"/></svg>
+        Find Businesses on Map
+      </span>
+      <button class="modal-close" onclick="closeModal('map-scraper-modal')">&times;</button>
+    </div>
+    <!-- Body: map + sidebar -->
+    <div style="display:flex;flex:1;overflow:hidden;">
+      <!-- Map -->
+      <div style="flex:1;position:relative;">
+        <div id="scraper-map" style="height:100%;width:100%;"></div>
+        <div id="scraper-map-hint" style="position:absolute;bottom:14px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.72);color:#fff;font-size:12px;padding:6px 14px;border-radius:20px;z-index:999;pointer-events:none;white-space:nowrap;">Click on map to set search center</div>
+      </div>
+      <!-- Sidebar -->
+      <div style="width:280px;flex-shrink:0;display:flex;flex-direction:column;border-left:1px solid var(--border);overflow-y:auto;padding:16px;gap:12px;">
+        <!-- Location -->
+        <div>
+          <div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px;">Center Location</div>
+          <div id="scraper-loc-display" style="font-size:12px;padding:7px 10px;border:1.5px solid var(--border);border-radius:7px;background:var(--surface2);color:var(--text3);">Click map to select</div>
+        </div>
+        <!-- Radius -->
+        <div>
+          <div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px;">Search Radius</div>
+          <div style="display:flex;gap:5px;flex-wrap:wrap;" id="scraper-radius-chips">
+            <span class="scraper-chip" data-r="500" onclick="scraperSetRadius(500)">500 m</span>
+            <span class="scraper-chip scraper-chip-active" data-r="1000" onclick="scraperSetRadius(1000)">1 km</span>
+            <span class="scraper-chip" data-r="2000" onclick="scraperSetRadius(2000)">2 km</span>
+            <span class="scraper-chip" data-r="5000" onclick="scraperSetRadius(5000)">5 km</span>
+          </div>
+        </div>
+        <!-- Category -->
+        <div>
+          <div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px;">Category / Keyword</div>
+          <input id="scraper-keyword" class="form-input" type="text" placeholder="gym, salon, clinic…" oninput="scraperUpdateBtn()">
+          <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:6px;">
+            <span class="scraper-qp" onclick="scraperSetKeyword('gym')">Gym</span>
+            <span class="scraper-qp" onclick="scraperSetKeyword('restaurant')">Restaurant</span>
+            <span class="scraper-qp" onclick="scraperSetKeyword('salon')">Salon</span>
+            <span class="scraper-qp" onclick="scraperSetKeyword('clinic')">Clinic</span>
+            <span class="scraper-qp" onclick="scraperSetKeyword('cafe')">Cafe</span>
+            <span class="scraper-qp" onclick="scraperSetKeyword('hotel')">Hotel</span>
+            <span class="scraper-qp" onclick="scraperSetKeyword('school')">School</span>
+            <span class="scraper-qp" onclick="scraperSetKeyword('jewellery')">Jewellery</span>
+          </div>
+        </div>
+        <!-- Search btn -->
+        <button id="scraper-search-btn" class="btn btn-primary" onclick="scraperSearch()" disabled style="margin-top:4px;">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          Search Google Places
+        </button>
+        <!-- Info -->
+        <div style="font-size:11px;color:var(--text3);line-height:1.6;padding:8px;background:var(--surface2);border-radius:7px;">
+          <strong style="color:var(--text2);">How it works:</strong><br>
+          Places without phone are skipped. Already-saved places are detected by place_id (no extra API cost). Email scraped from website if available.
+        </div>
+        <!-- Job History -->
+        <div>
+          <div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;">Recent Searches</div>
+          <div id="scraper-history" style="font-size:11px;color:var(--text3);">Loading…</div>
+        </div>
+      </div>
+    </div>
+    <!-- Results panel -->
+    <div id="scraper-results-panel" style="display:none;border-top:1px solid var(--border);padding:14px 16px;flex-shrink:0;max-height:280px;overflow-y:auto;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+        <div id="scraper-results-title" style="font-size:13px;font-weight:600;"></div>
+        <div style="font-size:12px;color:var(--text3);" id="scraper-results-meta"></div>
+      </div>
+      <div style="font-size:12px;color:var(--text2);" id="scraper-results-body"></div>
+    </div>
+  </div>
+</div>
+
+<style>
+.scraper-chip{padding:4px 10px;border-radius:16px;border:1.5px solid var(--border);background:var(--surface2);color:var(--text2);font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap;user-select:none;}
+.scraper-chip:hover,.scraper-chip-active{background:var(--primary);border-color:var(--primary);color:#fff;}
+.scraper-qp{font-size:11px;padding:2px 7px;border-radius:5px;background:var(--surface2);border:1px solid var(--border);color:var(--text2);cursor:pointer;}
+.scraper-qp:hover{background:var(--primary-light);color:var(--primary);border-color:var(--primary);}
+</style>
+
+<script>
+// ── Map Scraper ──────────────────────────────────────────────────────────────
+let _scraperMap = null, _scraperMarker = null, _scraperCircle = null;
+let _scraperLat = null, _scraperLng = null, _scraperRadius = 1000;
+
+function openMapScraper() {
+  document.getElementById('map-scraper-modal').classList.remove('hidden');
+  setTimeout(() => {
+    if (!_scraperMap) {
+      _scraperMap = L.map('scraper-map').setView([19.0760, 72.8777], 13);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap', maxZoom: 19
+      }).addTo(_scraperMap);
+      _scraperMap.on('click', e => {
+        _scraperLat = e.latlng.lat; _scraperLng = e.latlng.lng;
+        _scraperUpdateMapCenter();
+      });
+    }
+    _scraperMap.invalidateSize();
+    scraperLoadHistory();
+  }, 120);
+}
+
+function _scraperUpdateMapCenter() {
+  if (!_scraperLat) return;
+  const ll = [_scraperLat, _scraperLng];
+  if (_scraperMarker) _scraperMarker.remove();
+  _scraperMarker = L.marker(ll, {
+    icon: L.divIcon({
+      html: `<div style="width:14px;height:14px;border-radius:50%;background:#7b68c8;border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.4);"></div>`,
+      iconSize:[14,14], iconAnchor:[7,7], className:''
+    })
+  }).addTo(_scraperMap);
+  if (_scraperCircle) _scraperCircle.remove();
+  _scraperCircle = L.circle(ll, {
+    radius: _scraperRadius, color:'#7b68c8', fillColor:'#7b68c8', fillOpacity:.12, weight:2
+  }).addTo(_scraperMap);
+  document.getElementById('scraper-loc-display').textContent = `${_scraperLat.toFixed(5)}, ${_scraperLng.toFixed(5)}`;
+  document.getElementById('scraper-loc-display').style.cssText = 'font-size:12px;padding:7px 10px;border:1.5px solid #22c55e;border-radius:7px;background:var(--surface2);color:var(--text);font-variant-numeric:tabular-nums;';
+  document.getElementById('scraper-map-hint').style.display = 'none';
+  scraperUpdateBtn();
+}
+
+function scraperSetRadius(r) {
+  _scraperRadius = r;
+  document.querySelectorAll('.scraper-chip[data-r]').forEach(c => {
+    c.classList.toggle('scraper-chip-active', parseInt(c.dataset.r) === r);
+  });
+  if (_scraperCircle) _scraperCircle.setRadius(r);
+}
+
+function scraperSetKeyword(kw) {
+  document.getElementById('scraper-keyword').value = kw;
+  scraperUpdateBtn();
+}
+
+function scraperUpdateBtn() {
+  const hasLoc = _scraperLat !== null;
+  const hasCat = document.getElementById('scraper-keyword').value.trim().length > 0;
+  document.getElementById('scraper-search-btn').disabled = !(hasLoc && hasCat);
+}
+
+async function scraperSearch() {
+  const keyword = document.getElementById('scraper-keyword').value.trim();
+  const btn = document.getElementById('scraper-search-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span style="display:inline-block;width:13px;height:13px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;"></span> Searching…';
+
+  const panel = document.getElementById('scraper-results-panel');
+  panel.style.display = 'block';
+  document.getElementById('scraper-results-title').textContent = 'Searching Google Places…';
+  document.getElementById('scraper-results-meta').textContent = '';
+  document.getElementById('scraper-results-body').innerHTML = '<span style="color:var(--text3);">This may take 10–15 seconds for new places (Place Details API)…</span>';
+
+  try {
+    const data = await api('/admin-contacts/scrape-places', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ lat: _scraperLat, lng: _scraperLng, radius: _scraperRadius, keyword })
+    });
+
+    document.getElementById('scraper-results-title').textContent = `"${keyword}" — ${data.found} businesses found`;
+    document.getElementById('scraper-results-meta').textContent = `${_scraperRadius >= 1000 ? _scraperRadius/1000+'km' : _scraperRadius+'m'} radius`;
+
+    const rows = [
+      { label: 'Total found by Google', val: data.found, style: '' },
+      { label: 'Already in contacts (skipped API cost)', val: data.already_saved, style: 'color:var(--text3)' },
+      { label: 'New places checked', val: data.new_fetched, style: '' },
+      { label: 'Skipped (no phone number)', val: data.skipped_no_phone, style: 'color:var(--warning)' },
+      { label: 'Saved to contacts', val: data.saved, style: 'color:var(--success);font-weight:600;' },
+      { label: 'With email found', val: data.with_email, style: 'color:var(--primary)' },
+    ];
+    document.getElementById('scraper-results-body').innerHTML = `
+      <table style="width:100%;border-collapse:collapse;">
+        ${rows.map(r=>`<tr>
+          <td style="padding:4px 0;color:var(--text2);">${r.label}</td>
+          <td style="padding:4px 0;text-align:right;font-weight:600;font-variant-numeric:tabular-nums;${r.style}">${r.val}</td>
+        </tr>`).join('')}
+      </table>
+      ${data.saved > 0 ? `<div style="margin-top:10px;font-size:12px;color:var(--success);font-weight:600;">✓ ${data.saved} new contacts added to WA Directory</div>` : ''}`;
+
+    scraperLoadHistory();
+    if (data.saved > 0) { _contactsMeta = null; loadContactsPage(true); }
+  } catch(e) {
+    document.getElementById('scraper-results-title').textContent = 'Error';
+    document.getElementById('scraper-results-body').textContent = e.message;
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg> Search Google Places';
+}
+
+async function scraperLoadHistory() {
+  const el = document.getElementById('scraper-history');
+  try {
+    const jobs = await api('/admin-contacts/scrape-jobs');
+    if (!jobs.length) { el.innerHTML = '<span style="color:var(--text3);">No searches yet</span>'; return; }
+    el.innerHTML = jobs.slice(0, 8).map(j => `
+      <div style="padding:5px 0;border-bottom:1px solid var(--border);">
+        <div style="font-weight:600;color:var(--text2);">${j.keyword} — ${j.radius>=1000?j.radius/1000+'km':j.radius+'m'}</div>
+        <div style="color:var(--text3);font-size:10px;">${j.saved||0} saved · ${j.already_saved||0} skipped · ${fmtDate(j.created_at)}</div>
+      </div>`).join('');
+  } catch { el.textContent = ''; }
+}
 </script>
 </body>
 </html>

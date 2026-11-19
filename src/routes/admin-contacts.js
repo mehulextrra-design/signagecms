@@ -6,6 +6,8 @@
  */
 
 const express = require('express');
+const https = require('https');
+const http = require('http');
 const { query, getClient } = require('../db');
 const { authenticate, requireAdmin } = require('../middleware/auth');
 const multer = require('multer');
@@ -38,6 +40,10 @@ async function ensureTables() {
     created_at       TIMESTAMPTZ DEFAULT NOW(),
     UNIQUE(phone)
   )`);
+  // L2: place_id dedup — skip Place Details API for already-saved businesses
+  await query(`ALTER TABLE admin_contacts ADD COLUMN IF NOT EXISTS google_place_id VARCHAR(200)`);
+  await query(`ALTER TABLE admin_contacts ADD COLUMN IF NOT EXISTS email VARCHAR(200)`);
+  await query(`CREATE UNIQUE INDEX IF NOT EXISTS ac_place_id_idx ON admin_contacts(google_place_id) WHERE google_place_id IS NOT NULL`);
   await query(`CREATE INDEX IF NOT EXISTS ac_city_idx      ON admin_contacts(city)`);
   await query(`CREATE INDEX IF NOT EXISTS ac_industry_idx  ON admin_contacts(industry)`);
   await query(`CREATE INDEX IF NOT EXISTS ac_cooldown_idx  ON admin_contacts(last_messaged_at)`);
@@ -51,7 +57,113 @@ async function ensureTables() {
     created_by  UUID REFERENCES users(id),
     created_at  TIMESTAMPTZ DEFAULT NOW()
   )`);
+  // L3: search job history — track every scrape run for transparency
+  await query(`CREATE TABLE IF NOT EXISTS scrape_jobs (
+    id               SERIAL PRIMARY KEY,
+    lat              DECIMAL(10,7) NOT NULL,
+    lng              DECIMAL(10,7) NOT NULL,
+    radius           INTEGER NOT NULL,
+    keyword          VARCHAR(100),
+    status           VARCHAR(20) DEFAULT 'running',
+    found            INTEGER DEFAULT 0,
+    already_saved    INTEGER DEFAULT 0,
+    new_fetched      INTEGER DEFAULT 0,
+    skipped_no_phone INTEGER DEFAULT 0,
+    saved            INTEGER DEFAULT 0,
+    with_email       INTEGER DEFAULT 0,
+    error            TEXT,
+    created_at       TIMESTAMPTZ DEFAULT NOW(),
+    completed_at     TIMESTAMPTZ
+  )`);
   _ensured = true;
+}
+
+// ── Google Places helpers ────────────────────────────────────────────────────
+function placesGet(url) {
+  return new Promise((resolve, reject) => {
+    const req = https.get(url, (res) => {
+      let data = '';
+      res.on('data', chunk => data += chunk);
+      res.on('end', () => { try { resolve(JSON.parse(data)); } catch { reject(new Error('JSON parse error')); } });
+    });
+    req.setTimeout(12000, () => { req.destroy(); reject(new Error('timeout')); });
+    req.on('error', reject);
+  });
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+async function fetchNearbyPlaces(lat, lng, radius, keyword, apiKey) {
+  const places = [];
+  let url = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=${radius}&keyword=${encodeURIComponent(keyword)}&key=${apiKey}`;
+  for (let page = 0; page < 3; page++) {
+    if (page > 0) await sleep(2200); // Google requires a short delay between pages
+    const data = await placesGet(url);
+    if (data.status !== 'OK' && data.status !== 'ZERO_RESULTS') {
+      throw new Error(`Places API: ${data.status}${data.error_message ? ' — ' + data.error_message : ''}`);
+    }
+    if (data.results) places.push(...data.results);
+    if (!data.next_page_token) break;
+    url = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?pagetoken=${encodeURIComponent(data.next_page_token)}&key=${apiKey}`;
+  }
+  return places;
+}
+
+async function fetchPlaceDetails(placeId, apiKey) {
+  const fields = 'name,formatted_phone_number,international_phone_number,formatted_address,address_components,website,types';
+  const url = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=${encodeURIComponent(fields)}&key=${apiKey}`;
+  const data = await placesGet(url);
+  if (data.status !== 'OK') return null;
+  return data.result;
+}
+
+function normalizePhone(raw) {
+  if (!raw) return null;
+  let d = raw.replace(/\D/g, '');
+  if (d.startsWith('91') && d.length === 12) d = d.slice(2);
+  if (d.startsWith('0') && d.length === 11) d = d.slice(1);
+  return d.length === 10 ? d : null;
+}
+
+function parseCityArea(components) {
+  let city = '', area = '';
+  if (!components) return { city, area };
+  for (const c of components) {
+    if (c.types.includes('locality')) city = c.long_name;
+    if (c.types.includes('sublocality_level_1') || c.types.includes('sublocality')) area = c.long_name;
+    if (!city && c.types.includes('administrative_area_level_2')) city = c.long_name;
+  }
+  return { city, area };
+}
+
+async function scrapeEmail(websiteUrl) {
+  if (!websiteUrl) return null;
+  return new Promise(resolve => {
+    try {
+      const urlObj = new URL(websiteUrl);
+      const mod = urlObj.protocol === 'https:' ? https : http;
+      let data = '';
+      const req = mod.get(websiteUrl, { headers: { 'User-Agent': 'Mozilla/5.0' } }, (res) => {
+        res.on('data', chunk => { data += chunk; if (data.length > 60000) req.destroy(); });
+        res.on('end', () => {
+          const m = data.match(/[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}/);
+          resolve(m && !m[0].includes('example') && !m[0].includes('wix') ? m[0] : null);
+        });
+      });
+      req.setTimeout(5000, () => { req.destroy(); resolve(null); });
+      req.on('error', () => resolve(null));
+    } catch { resolve(null); }
+  });
+}
+
+// Process array in parallel chunks of N
+async function chunkAsync(arr, fn, size = 5) {
+  const results = [];
+  for (let i = 0; i < arr.length; i += size) {
+    const batch = await Promise.all(arr.slice(i, i + size).map(fn));
+    results.push(...batch);
+  }
+  return results;
 }
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
@@ -204,6 +316,100 @@ router.delete('/:id', authenticate, requireAdmin, async (req, res, next) => {
   try {
     await query(`DELETE FROM admin_contacts WHERE id=$1`, [req.params.id]);
     res.json({ ok: true });
+  } catch (err) { next(err); }
+});
+
+// ── Google Places scraper (L2 place_id dedup + L3 job history) ───────────────
+// POST /api/admin-contacts/scrape-places
+router.post('/scrape-places', authenticate, requireAdmin, async (req, res, next) => {
+  try {
+    await ensureTables();
+    const { lat, lng, radius, keyword } = req.body;
+    if (!lat || !lng || !radius || !keyword) {
+      return res.status(400).json({ error: 'lat, lng, radius, keyword required' });
+    }
+    const apiKey = process.env.GOOGLE_MAPS_API_KEY;
+    if (!apiKey) return res.status(500).json({ error: 'GOOGLE_MAPS_API_KEY not set in env' });
+
+    // L3: record job
+    const jobRes = await query(
+      `INSERT INTO scrape_jobs (lat, lng, radius, keyword, status) VALUES ($1,$2,$3,$4,'running') RETURNING id`,
+      [parseFloat(lat), parseFloat(lng), parseInt(radius), keyword.trim()]
+    );
+    const jobId = jobRes.rows[0].id;
+
+    // Step 1: Nearby Search — up to 60 results (3 pages × 20), only costs $0.096 total
+    let nearbyPlaces;
+    try {
+      nearbyPlaces = await fetchNearbyPlaces(parseFloat(lat), parseFloat(lng), parseInt(radius), keyword.trim(), apiKey);
+    } catch (err) {
+      await query(`UPDATE scrape_jobs SET status='failed',error=$1,completed_at=NOW() WHERE id=$2`, [err.message, jobId]);
+      return res.status(502).json({ error: err.message });
+    }
+
+    const found = nearbyPlaces.length;
+    if (!found) {
+      await query(`UPDATE scrape_jobs SET status='completed',found=0,completed_at=NOW() WHERE id=$1`, [jobId]);
+      return res.json({ job_id: jobId, found: 0, already_saved: 0, new_fetched: 0, skipped_no_phone: 0, saved: 0, with_email: 0 });
+    }
+
+    // L2: check which place_ids already in DB — skip Place Details for those (saves ~$1 per re-search)
+    const allPlaceIds = nearbyPlaces.map(p => p.place_id).filter(Boolean);
+    const existingRes = await query(
+      `SELECT google_place_id FROM admin_contacts WHERE google_place_id = ANY($1)`, [allPlaceIds]
+    );
+    const existingSet = new Set(existingRes.rows.map(r => r.google_place_id));
+    const newPlaces = nearbyPlaces.filter(p => p.place_id && !existingSet.has(p.place_id));
+    const alreadySaved = found - newPlaces.length;
+
+    // Step 2: Place Details only for new places (5 concurrent)
+    let saved = 0, skippedNoPhone = 0, withEmail = 0;
+
+    await chunkAsync(newPlaces, async (place) => {
+      try {
+        const details = await fetchPlaceDetails(place.place_id, apiKey);
+        if (!details) return;
+
+        const phone = normalizePhone(details.formatted_phone_number || details.international_phone_number);
+        if (!phone) { skippedNoPhone++; return; }
+
+        const { city, area } = parseCityArea(details.address_components);
+        const bizType = (details.types || []).find(t => !['point_of_interest','establishment','food'].includes(t)) || null;
+        const email = await scrapeEmail(details.website);
+        if (email) withEmail++;
+
+        const r = await query(
+          `INSERT INTO admin_contacts (name,phone,city,area,industry,business_type,google_place_id,email,source)
+           VALUES ($1,$2,$3,$4,$5,$6,$7,$8,'google_places')
+           ON CONFLICT (phone) DO UPDATE SET
+             google_place_id = COALESCE(EXCLUDED.google_place_id, admin_contacts.google_place_id),
+             email            = COALESCE(EXCLUDED.email, admin_contacts.email),
+             is_active        = true`,
+          [details.name || place.name, phone, city||null, area||null,
+           keyword.trim(), bizType, place.place_id, email||null]
+        );
+        if (r.rowCount) saved++;
+      } catch { /* skip individual failures silently */ }
+    }, 5);
+
+    // L3: update job record with final stats
+    await query(
+      `UPDATE scrape_jobs SET status='completed',found=$1,already_saved=$2,new_fetched=$3,
+       skipped_no_phone=$4,saved=$5,with_email=$6,completed_at=NOW() WHERE id=$7`,
+      [found, alreadySaved, newPlaces.length, skippedNoPhone, saved, withEmail, jobId]
+    );
+
+    res.json({ job_id: jobId, found, already_saved: alreadySaved, new_fetched: newPlaces.length,
+               skipped_no_phone: skippedNoPhone, saved, with_email: withEmail });
+  } catch (err) { next(err); }
+});
+
+// GET /api/admin-contacts/scrape-jobs — search history (L3)
+router.get('/scrape-jobs', authenticate, requireAdmin, async (req, res, next) => {
+  try {
+    await ensureTables();
+    const r = await query(`SELECT * FROM scrape_jobs ORDER BY created_at DESC LIMIT 100`);
+    res.json(r.rows);
   } catch (err) { next(err); }
 });
 
