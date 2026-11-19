@@ -4742,20 +4742,25 @@ function scraperUpdateBtn() {
 function _scraperRenderResults() {
   const body = document.getElementById('scraper-results-body');
   const saved = _scraperResults.filter(r => r.saved).length;
+  const unsaved = _scraperResults.filter(r => !r.saved && !r.saving && r.phone).length;
   const total = _scraperResults.length;
   if (!total) { body.innerHTML = '<div style="color:var(--text3);text-align:center;padding-top:16px;">No results found</div>'; return; }
   body.innerHTML = `
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;position:sticky;top:0;background:var(--surface);padding:4px 0;z-index:1;">
-      <span style="font-size:12px;font-weight:700;">${total} results</span>
-      <span style="font-size:11px;color:var(--success);font-weight:600;">${saved} saved</span>
+    <div style="position:sticky;top:0;background:var(--surface);padding:6px 0 8px;z-index:1;border-bottom:1px solid var(--border);margin-bottom:8px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+        <span style="font-size:12px;font-weight:700;">${total} results</span>
+        <span style="font-size:11px;color:var(--success);font-weight:600;">${saved} saved</span>
+      </div>
+      ${unsaved > 0 ? `<button class="btn btn-primary" style="width:100%;font-size:11px;padding:6px;" onclick="_scraperSaveAll()">Save All (${unsaved} with phone)</button>` : ''}
     </div>
     ${_scraperResults.map((r, i) => `
-      <div style="border:1px solid var(--border);border-radius:8px;padding:8px 10px;margin-bottom:6px;background:${r.saved ? 'var(--success-bg,rgba(34,197,94,.08))' : 'var(--surface2)'};">
+      <div style="border:1px solid var(--border);border-radius:8px;padding:8px 10px;margin-bottom:6px;background:${r.saved ? 'rgba(34,197,94,.08)' : 'var(--surface2)'};">
         <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:6px;">
           <div style="min-width:0;flex:1;">
             <div style="font-size:12px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${r.name}</div>
             <div style="font-size:10px;color:var(--text3);margin-top:1px;">${r.address||''}</div>
             <div style="font-size:11px;color:var(--text2);margin-top:3px;">${r.phone || (r.fetching ? '<em style="color:var(--text3)">fetching…</em>' : '<span style="color:var(--text3)">no phone</span>')}</div>
+            ${r.email ? `<div style="font-size:10px;color:var(--primary);margin-top:2px;">✉ ${r.email}</div>` : ''}
           </div>
           <div style="flex-shrink:0;">
             ${r.saved
@@ -4784,10 +4789,19 @@ async function _scraperSaveLead(i) {
       body: JSON.stringify({ name: r.name, phone: r.phone, city: r.city, area: r.area, industry: r.keyword, place_id: r.placeId, website: r.website })
     });
     _scraperResults[i].saved = !!data.saved;
+    if (data.email) _scraperResults[i].email = data.email;
   } catch {}
   _scraperResults[i].saving = false;
   _scraperRenderResults();
   _contactsMeta = null; loadContactsPage(true);
+}
+
+async function _scraperSaveAll() {
+  const toSave = _scraperResults.map((r, i) => ({ r, i })).filter(({ r }) => !r.saved && !r.saving && r.phone);
+  if (!toSave.length) return;
+  for (const { i } of toSave) {
+    await _scraperSaveLead(i);
+  }
 }
 
 async function scraperSearch() {
