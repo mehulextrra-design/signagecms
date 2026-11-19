@@ -406,6 +406,34 @@ router.get('/scrape-jobs/:id', authenticate, requireAdmin, async (req, res, next
   } catch (err) { next(err); }
 });
 
+// GET /api/admin-contacts/gmaps-key — returns API key to frontend (admin only)
+router.get('/gmaps-key', authenticate, requireAdmin, (req, res) => {
+  const key = process.env.GOOGLE_MAPS_API_KEY || '';
+  res.json({ key });
+});
+
+// POST /api/admin-contacts/scrape-save — save one lead from client-side Places result
+router.post('/scrape-save', authenticate, requireAdmin, async (req, res, next) => {
+  try {
+    await ensureTables();
+    const { name, phone: rawPhone, city, area, industry, place_id, website } = req.body;
+    const phone = normalizePhone(rawPhone);
+    if (!phone) return res.status(400).json({ error: 'invalid phone' });
+    const email = await scrapeEmail(website);
+    const r = await query(
+      `INSERT INTO admin_contacts (name,phone,city,area,industry,google_place_id,email,source)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,'google_places')
+       ON CONFLICT (phone) DO UPDATE SET
+         google_place_id = COALESCE(EXCLUDED.google_place_id, admin_contacts.google_place_id),
+         email           = COALESCE(EXCLUDED.email, admin_contacts.email),
+         is_active       = true
+       RETURNING id`,
+      [name||null, phone, city||null, area||null, industry||null, place_id||null, email||null]
+    );
+    res.json({ saved: r.rowCount > 0, email: email||null });
+  } catch (err) { next(err); }
+});
+
 // GET /api/admin-contacts/scrape-jobs — search history (L3)
 router.get('/scrape-jobs', authenticate, requireAdmin, async (req, res, next) => {
   try {
