@@ -419,13 +419,14 @@ router.get('/gmaps-key', authenticate, requireAdmin, (req, res) => {
 });
 
 // POST /api/admin-contacts/scrape-save — save one lead from client-side Places result
+// email already fetched client-side via /scrape-email; pass it in body to skip re-scraping
 router.post('/scrape-save', authenticate, requireAdmin, async (req, res, next) => {
   try {
     await ensureTables();
-    const { name, phone: rawPhone, city, area, industry, place_id, website } = req.body;
+    const { name, phone: rawPhone, city, area, industry, place_id, email: emailFromClient } = req.body;
     const phone = normalizePhone(rawPhone);
     if (!phone) return res.status(400).json({ error: 'invalid phone' });
-    const email = await scrapeEmail(website);
+    const email = emailFromClient || null;
     const r = await query(
       `INSERT INTO admin_contacts (name,phone,city,area,industry,google_place_id,email,source)
        VALUES ($1,$2,$3,$4,$5,$6,$7,'google_places')
@@ -434,7 +435,7 @@ router.post('/scrape-save', authenticate, requireAdmin, async (req, res, next) =
          email           = COALESCE(EXCLUDED.email, admin_contacts.email),
          is_active       = true
        RETURNING id`,
-      [name||null, phone, city||null, area||null, industry||null, place_id||null, email||null]
+      [name||null, phone, city||null, area||null, industry||null, place_id||null, email]
     );
     res.json({ saved: r.rowCount > 0, email: email||null });
   } catch (err) { next(err); }

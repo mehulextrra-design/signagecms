@@ -4795,7 +4795,7 @@ async function _scraperSaveLead(i) {
     const data = await api('/admin-contacts/scrape-save', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: r.name, phone: r.phone, city: r.city, area: r.area, industry: r.keyword, place_id: r.placeId, website: r.website })
+      body: JSON.stringify({ name: r.name, phone: r.phone, city: r.city, area: r.area, industry: r.keyword, place_id: r.placeId, email: r.email || null })
     });
     _scraperResults[i].saved = !!data.saved;
     if (data.email) _scraperResults[i].email = data.email;
@@ -4818,7 +4818,7 @@ async function _scraperSaveAll() {
       const data = await api('/admin-contacts/scrape-save', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: r.name, phone: r.phone, city: r.city, area: r.area, industry: r.keyword, place_id: r.placeId, website: r.website })
+        body: JSON.stringify({ name: r.name, phone: r.phone, city: r.city, area: r.area, industry: r.keyword, place_id: r.placeId, email: r.email || null })
       });
       _scraperResults[i].saved = !!data.saved;
       if (data.email) _scraperResults[i].email = data.email;
