@@ -136,24 +136,58 @@ function parseCityArea(components) {
   return { city, area };
 }
 
-async function scrapeEmail(websiteUrl) {
-  if (!websiteUrl) return null;
+const EMAIL_BLOCKLIST = ['example', 'wix', 'noreply', 'no-reply', 'donotreply', 'sentry', 'support@sentry',
+  'wordpress', 'schema.org', 'w3.org', 'googleapis', 'cloudflare', 'facebook', 'instagram',
+  'placeholder', 'email@email', 'test@test', 'info@info'];
+
+function fetchPageEmail(url) {
   return new Promise(resolve => {
     try {
-      const urlObj = new URL(websiteUrl);
+      const urlObj = new URL(url);
       const mod = urlObj.protocol === 'https:' ? https : http;
       let data = '';
-      const req = mod.get(websiteUrl, { headers: { 'User-Agent': 'Mozilla/5.0' } }, (res) => {
-        res.on('data', chunk => { data += chunk; if (data.length > 60000) req.destroy(); });
+      const req = mod.get(url, {
+        headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36' },
+        timeout: 6000
+      }, (res) => {
+        // follow one redirect
+        if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
+          try {
+            const redir = new URL(res.headers.location, url).href;
+            fetchPageEmail(redir).then(resolve);
+          } catch { resolve(null); }
+          return;
+        }
+        res.on('data', chunk => { data += chunk; if (data.length > 80000) req.destroy(); });
         res.on('end', () => {
-          const m = data.match(/[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}/);
-          resolve(m && !m[0].includes('example') && !m[0].includes('wix') ? m[0] : null);
+          // prefer mailto: href first (more reliable than regex on raw HTML)
+          const mailto = data.match(/mailto:([a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,})/);
+          const regex  = data.match(/[a-zA-Z0-9._%+\-]{2,}@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}/g);
+          const candidates = [mailto && mailto[1], ...(regex||[])].filter(Boolean);
+          const email = candidates.find(e =>
+            e.length < 80 &&
+            !EMAIL_BLOCKLIST.some(b => e.toLowerCase().includes(b))
+          );
+          resolve(email || null);
         });
       });
-      req.setTimeout(5000, () => { req.destroy(); resolve(null); });
+      req.setTimeout(6000, () => { req.destroy(); resolve(null); });
       req.on('error', () => resolve(null));
     } catch { resolve(null); }
   });
+}
+
+async function scrapeEmail(websiteUrl) {
+  if (!websiteUrl) return null;
+  try {
+    const base = new URL(websiteUrl);
+    // Try homepage first
+    const email = await fetchPageEmail(websiteUrl);
+    if (email) return email;
+    // Try /contact page
+    const contactUrl = `${base.protocol}//${base.host}/contact`;
+    return await fetchPageEmail(contactUrl);
+  } catch { return null; }
 }
 
 // Process array in parallel chunks of N
@@ -234,8 +268,8 @@ router.get('/meta', authenticate, async (req, res, next) => {
   try {
     await ensureTables();
     const [cities, industries] = await Promise.all([
-      query(`SELECT DISTINCT city FROM admin_contacts WHERE city IS NOT NULL AND is_active=true ORDER BY city`),
-      query(`SELECT DISTINCT industry FROM admin_contacts WHERE industry IS NOT NULL AND is_active=true ORDER BY industry`)
+      query(`SELECT DISTINCT TRIM(city) as city FROM admin_contacts WHERE city IS NOT NULL AND is_active=true ORDER BY city`),
+      query(`SELECT DISTINCT LOWER(TRIM(industry)) as industry FROM admin_contacts WHERE industry IS NOT NULL AND is_active=true ORDER BY industry`)
     ]);
     res.json({ cities: cities.rows.map(r=>r.city), industries: industries.rows.map(r=>r.industry) });
   } catch (err) { next(err); }
@@ -427,17 +461,26 @@ router.post('/scrape-save', authenticate, requireAdmin, async (req, res, next) =
     const phone = normalizePhone(rawPhone);
     if (!phone) return res.status(400).json({ error: 'invalid phone' });
     const email = emailFromClient || null;
+    // Normalize city and industry (trim whitespace, lowercase industry)
+    const normCity = city ? city.trim() : null;
+    const normArea = area ? area.trim() : null;
+    const normIndustry = industry ? industry.toLowerCase().trim() : null;
     const r = await query(
       `INSERT INTO admin_contacts (name,phone,city,area,industry,google_place_id,email,source)
        VALUES ($1,$2,$3,$4,$5,$6,$7,'google_places')
        ON CONFLICT (phone) DO UPDATE SET
          google_place_id = COALESCE(EXCLUDED.google_place_id, admin_contacts.google_place_id),
          email           = COALESCE(EXCLUDED.email, admin_contacts.email),
+         name            = COALESCE(EXCLUDED.name, admin_contacts.name),
+         city            = COALESCE(EXCLUDED.city, admin_contacts.city),
+         area            = COALESCE(EXCLUDED.area, admin_contacts.area),
+         industry        = COALESCE(EXCLUDED.industry, admin_contacts.industry),
          is_active       = true
-       RETURNING id`,
-      [name||null, phone, city||null, area||null, industry||null, place_id||null, email]
+       RETURNING id, (xmax::text::int > 0) as was_update`,
+      [name||null, phone, normCity, normArea, normIndustry, place_id||null, email]
     );
-    res.json({ saved: r.rowCount > 0, email: email||null });
+    const row = r.rows[0];
+    res.json({ saved: !!row, updated: row?.was_update === true, email: email||null });
   } catch (err) { next(err); }
 });
 

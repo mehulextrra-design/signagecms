@@ -4417,11 +4417,19 @@ async function loadContactsMeta() {
     _contactsMeta = await api('/admin-contacts/meta');
     const cityEl = document.getElementById('contacts-filter-city');
     const indEl = document.getElementById('contacts-filter-industry');
+    // Clear existing options (keep first "All" option only) to prevent duplicates on refresh
+    while (cityEl.options.length > 1) cityEl.remove(1);
+    while (indEl.options.length > 1) indEl.remove(1);
+    // Dedupe on frontend too (case-insensitive) in case of data inconsistencies
+    const seen = new Set();
     (_contactsMeta.cities||[]).forEach(c => {
+      if (!c || seen.has(c.toLowerCase())) return; seen.add(c.toLowerCase());
       const o = document.createElement('option'); o.value=c; o.textContent=c; cityEl.appendChild(o);
     });
-    (_contactsMeta.industries||[]).forEach(i => {
-      const o = document.createElement('option'); o.value=i; o.textContent=i; indEl.appendChild(o);
+    seen.clear();
+    (_contactsMeta.industries||[]).forEach(ind => {
+      if (!ind || seen.has(ind.toLowerCase())) return; seen.add(ind.toLowerCase());
+      const o = document.createElement('option'); o.value=ind; o.textContent=ind; indEl.appendChild(o);
     });
   } catch(e) { console.warn('[Contacts] meta load error:', e.message); }
   return _contactsMeta;
@@ -4773,7 +4781,9 @@ function _scraperRenderResults() {
           </div>
           <div style="flex-shrink:0;">
             ${r.saved
-              ? `<span style="font-size:10px;color:var(--success);font-weight:700;">✓ Saved</span>`
+              ? r.updated
+                ? `<span style="font-size:10px;color:var(--warning,#f59e0b);font-weight:700;">↻ Updated</span>`
+                : `<span style="font-size:10px;color:var(--success);font-weight:700;">✓ Saved</span>`
               : r.saving
                 ? `<span style="font-size:10px;color:var(--text3);">Saving…</span>`
                 : r.phone
@@ -4798,6 +4808,7 @@ async function _scraperSaveLead(i) {
       body: JSON.stringify({ name: r.name, phone: r.phone, city: r.city, area: r.area, industry: r.keyword, place_id: r.placeId, email: r.email || null })
     });
     _scraperResults[i].saved = !!data.saved;
+    _scraperResults[i].updated = !!data.updated;
     if (data.email) _scraperResults[i].email = data.email;
   } catch {}
   _scraperResults[i].saving = false;
@@ -4821,6 +4832,7 @@ async function _scraperSaveAll() {
         body: JSON.stringify({ name: r.name, phone: r.phone, city: r.city, area: r.area, industry: r.keyword, place_id: r.placeId, email: r.email || null })
       });
       _scraperResults[i].saved = !!data.saved;
+      _scraperResults[i].updated = !!data.updated;
       if (data.email) _scraperResults[i].email = data.email;
     } catch {}
     _scraperResults[i].saving = false;
