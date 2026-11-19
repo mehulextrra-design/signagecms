@@ -4872,14 +4872,14 @@ async function scraperSearch() {
     });
     if (_scraperResults.length > 1) _scraperMap.fitBounds(L.latLngBounds(_scraperResults.map(r => [r.lat, r.lon])), { padding:[40,40] });
 
-    // Fetch phone+website in batches of 5
+    // Fetch phone+website+email in batches of 5
     const BATCH = 5;
     for (let i = 0; i < _scraperResults.length; i += BATCH) {
       await Promise.all(_scraperResults.slice(i, i + BATCH).map((r, bi) =>
         new Promise(resolve => {
           if (!r.placeId) { _scraperResults[i+bi].fetching = false; resolve(); return; }
           svc.getDetails({ placeId: r.placeId, fields: ['formatted_phone_number','international_phone_number','website','address_components'] },
-            (place, status) => {
+            async (place, status) => {
               if (status === window.google.maps.places.PlacesServiceStatus.OK && place) {
                 _scraperResults[i+bi].phone = place.international_phone_number || place.formatted_phone_number || '';
                 _scraperResults[i+bi].website = place.website || '';
@@ -4888,6 +4888,13 @@ async function scraperSearch() {
                     if (c.types.includes('locality')) _scraperResults[i+bi].city = c.long_name;
                     if (c.types.includes('sublocality_level_1') || c.types.includes('sublocality')) _scraperResults[i+bi].area = c.long_name;
                   }
+                }
+                // Scrape email via backend (CORS-safe)
+                if (place.website) {
+                  try {
+                    const ed = await api('/admin-contacts/scrape-email?website=' + encodeURIComponent(place.website));
+                    if (ed.email) _scraperResults[i+bi].email = ed.email;
+                  } catch {}
                 }
               }
               _scraperResults[i+bi].fetching = false;

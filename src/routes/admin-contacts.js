@@ -406,6 +406,12 @@ router.get('/scrape-jobs/:id', authenticate, requireAdmin, async (req, res, next
   } catch (err) { next(err); }
 });
 
+// GET /api/admin-contacts/scrape-email?website=... — scrape email from a website (called after phone fetch)
+router.get('/scrape-email', authenticate, requireAdmin, async (req, res) => {
+  const email = await scrapeEmail(req.query.website || null);
+  res.json({ email: email || null });
+});
+
 // GET /api/admin-contacts/gmaps-key — returns API key to frontend (admin only)
 router.get('/gmaps-key', authenticate, requireAdmin, (req, res) => {
   const key = process.env.GOOGLE_MAPS_API_KEY || '';
