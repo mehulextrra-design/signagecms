@@ -48,9 +48,13 @@ router.get('/proof-of-play', authenticate, async (req, res, next) => {
     if (end)   { params.push(end);   sql += ` AND pl.played_at < ($${params.length}::date + interval '1 day')`; }
     sql += ' ORDER BY pl.played_at DESC LIMIT 5000';
 
-    const [result, totalRes] = await Promise.all([
+    const [result, totalRes, dailyRes] = await Promise.all([
       query(sql, params),
       query('SELECT COUNT(*) AS total, COALESCE(SUM(play_count),0) AS total_plays FROM play_logs'),
+      query(`SELECT played_at::date AS day, COUNT(*) AS entries, COALESCE(SUM(play_count),0) AS plays
+             FROM play_logs
+             WHERE played_at >= NOW() - interval '14 days'
+             GROUP BY day ORDER BY day DESC`),
     ]);
 
     const rows = result.rows;
@@ -83,6 +87,7 @@ router.get('/proof-of-play', authenticate, async (req, res, next) => {
       total_plays: totalPlays,
       total_in_db: parseInt(totalRes.rows[0].total),
       total_plays_in_db: parseInt(totalRes.rows[0].total_plays),
+      daily_breakdown: dailyRes.rows.map(r => ({ day: r.day, entries: parseInt(r.entries), plays: parseInt(r.plays) })),
     });
   } catch (err) { next(err); }
 });

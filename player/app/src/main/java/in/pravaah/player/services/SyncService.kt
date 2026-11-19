@@ -29,6 +29,7 @@ class SyncService : Service() {
     companion object {
         private const val TAG = "SyncService"
         private const val CHANNEL_ID = "pravaah_sync"
+        private const val PENDING_LOGS_FILE = "pending_play_logs.json"
         const val ACTION_SCHEDULE_UPDATED = "in.pravaah.player.SCHEDULE_UPDATED"
         const val EXTRA_CAMPAIGNS_JSON = "campaigns_json"
 
@@ -58,14 +59,26 @@ class SyncService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        if (intent?.action == "UPLOAD_PLAY_LOGS") {
-            val json = intent.getStringExtra("logs_json")
-            if (json != null) {
-                val logs: List<PlayLog> = Gson().fromJson(json, object : com.google.gson.reflect.TypeToken<List<PlayLog>>() {}.type)
-                serviceScope.launch { uploadLogs(logs) }
+        when (intent?.action) {
+            "UPLOAD_PLAY_LOGS" -> {
+                val json = intent.getStringExtra("logs_json")
+                if (json != null) {
+                    val logs: List<PlayLog> = Gson().fromJson(json, object : com.google.gson.reflect.TypeToken<List<PlayLog>>() {}.type)
+                    serviceScope.launch { uploadLogs(logs) }
+                }
+            }
+            "UPLOAD_PLAY_LOGS_STARTUP" -> {
+                // On app startup, re-upload any logs that failed in a previous session
+                serviceScope.launch {
+                    val saved = loadAndClearSavedLogs()
+                    if (saved.isNotEmpty()) {
+                        Log.d(TAG, "Recovering ${saved.size} unsent play logs from previous session")
+                        uploadLogs(saved)
+                    }
+                }
             }
         }
-        return START_STICKY  // restart if killed
+        return START_STICKY
     }
 
     // ── Heartbeat loop ────────────────────────────────────────────────────
@@ -85,7 +98,6 @@ class SyncService : Service() {
             return
         }
 
-        // If we were offline, report recovery
         offlineFrom?.let { from ->
             try {
                 ApiClient.getInstance(this).reportOffline(
@@ -140,17 +152,11 @@ class SyncService : Service() {
                 val scheduleResponse = response.body() ?: return
                 val campaigns = scheduleResponse.campaigns
 
-                // Pre-download content for all active campaigns
                 campaigns.forEach { slot ->
-                    launch {
-                        cache.downloadIfNeeded(slot)
-                    }
+                    launch { cache.downloadIfNeeded(slot) }
                 }
-
-                // Evict unused cache
                 cache.evictExpired(campaigns.map { it.campaignId }.toSet())
 
-                // Broadcast to PlayerActivity
                 val json = Gson().toJson(campaigns)
                 sendBroadcast(Intent(ACTION_SCHEDULE_UPDATED).apply {
                     putExtra(EXTRA_CAMPAIGNS_JSON, json)
@@ -163,13 +169,64 @@ class SyncService : Service() {
         }
     }
 
+    // ── Proof of Play upload — with persistent backup on failure ──────────
     private suspend fun uploadLogs(logs: List<PlayLog>) {
-        if (!isNetworkAvailable() || logs.isEmpty()) return
+        if (!isNetworkAvailable() || logs.isEmpty()) {
+            // Network not available — persist so retry happens at next flush
+            savePendingLogs(logs)
+            return
+        }
         try {
-            ApiClient.getInstance(this).uploadProofOfPlay(PlayLogsRequest(logs))
-            Log.d(TAG, "Uploaded ${logs.size} play logs")
+            val response = ApiClient.getInstance(this).uploadProofOfPlay(PlayLogsRequest(logs))
+            if (response.isSuccessful) {
+                Log.d(TAG, "Uploaded ${logs.size} play logs (inserted=${response.body()?.inserted})")
+                // Confirmed success — remove backup file
+                java.io.File(filesDir, PENDING_LOGS_FILE).delete()
+            } else {
+                Log.w(TAG, "PoP upload HTTP ${response.code()} — persisting for retry")
+                savePendingLogs(logs)
+            }
         } catch (e: Exception) {
-            Log.e(TAG, "Log upload failed: ${e.message}")
+            Log.e(TAG, "Log upload failed: ${e.message} — persisting for retry")
+            savePendingLogs(logs)
+        }
+    }
+
+    private fun savePendingLogs(logs: List<PlayLog>) {
+        if (logs.isEmpty()) return
+        try {
+            // Merge with any already-saved logs (in case of repeated failures)
+            val existing = loadSavedLogsRaw()
+            val merged = (existing + logs).takeLast(2000) // cap at 2000 to prevent unbounded growth
+            java.io.File(filesDir, PENDING_LOGS_FILE).writeText(Gson().toJson(merged))
+        } catch (e: Exception) {
+            Log.e(TAG, "Could not persist play logs: ${e.message}")
+        }
+    }
+
+    private fun loadSavedLogsRaw(): List<PlayLog> {
+        val file = java.io.File(filesDir, PENDING_LOGS_FILE)
+        if (!file.exists()) return emptyList()
+        return try {
+            val type = object : com.google.gson.reflect.TypeToken<List<PlayLog>>() {}.type
+            Gson().fromJson<List<PlayLog>>(file.readText(), type) ?: emptyList()
+        } catch (e: Exception) {
+            emptyList()
+        }
+    }
+
+    // Called by PlayerActivity on startup to recover logs from previous session
+    fun loadAndClearSavedLogs(): List<PlayLog> {
+        val file = java.io.File(filesDir, PENDING_LOGS_FILE)
+        if (!file.exists()) return emptyList()
+        return try {
+            val type = object : com.google.gson.reflect.TypeToken<List<PlayLog>>() {}.type
+            Gson().fromJson<List<PlayLog>>(file.readText(), type) ?: emptyList()
+        } catch (e: Exception) {
+            Log.w(TAG, "Could not read saved play logs: ${e.message}")
+            emptyList()
+        } finally {
+            file.delete()
         }
     }
 

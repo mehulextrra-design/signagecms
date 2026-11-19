@@ -48,7 +48,8 @@ data class CampaignSlot(
     @SerializedName("duration_sec") val durationSec: Double,
     @SerializedName("width_px") val widthPx: Int?,
     @SerializedName("height_px") val heightPx: Int?,
-    @SerializedName("file_size") val fileSize: Long?
+    @SerializedName("file_size") val fileSize: Long?,
+    @SerializedName("content_tier") val contentTier: String = "paid"
 )
 
 // ── Heartbeat ────────────────────────────────────────────────────────────────
@@ -78,7 +79,8 @@ data class PlayLog(
     @SerializedName("content_id") val contentId: String,
     @SerializedName("played_at") val playedAt: String,  // ISO-8601
     @SerializedName("duration_sec") val durationSec: Double,
-    @SerializedName("play_count") val playCount: Int = 1
+    @SerializedName("play_count") val playCount: Int = 1,
+    @SerializedName("content_tier") val contentTier: String = "paid"
 )
 
 data class PlayLogsRequest(val plays: List<PlayLog>)
