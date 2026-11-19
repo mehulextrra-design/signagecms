@@ -1075,7 +1075,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
         <div class="table-card">
           <div class="table-wrap">
             <table>
-              <thead><tr><th>Name</th><th>Phone</th><th>City</th><th>Area</th><th>Industry</th><th>Last Sent</th><th>DND</th><th></th></tr></thead>
+              <thead><tr><th>Name</th><th>Phone</th><th>Email</th><th>City</th><th>Area</th><th>Industry</th><th>Last Sent</th><th>DND</th><th></th></tr></thead>
               <tbody id="contacts-table"></tbody>
             </table>
           </div>
@@ -4435,7 +4435,7 @@ async function loadContactsPage(resetPage) {
   const industry = document.getElementById('contacts-filter-industry').value;
   const search = document.getElementById('contacts-search').value;
   const tbody = document.getElementById('contacts-table');
-  tbody.innerHTML = loadingRow(8);
+  tbody.innerHTML = loadingRow(9);
   try {
     const params = new URLSearchParams({ page: _contactsPage, limit: 50 });
     if (city) params.set('city', city);
@@ -4444,11 +4444,12 @@ async function loadContactsPage(resetPage) {
     const data = await api('/admin-contacts?' + params.toString());
     const list = data.contacts || [];
     document.getElementById('contacts-total-badge').textContent = `${data.total || 0} contacts`;
-    if (!list.length) { tbody.innerHTML = emptyRow(8, 'No contacts found'); document.getElementById('contacts-pager').innerHTML=''; return; }
+    if (!list.length) { tbody.innerHTML = emptyRow(9, 'No contacts found'); document.getElementById('contacts-pager').innerHTML=''; return; }
     tbody.innerHTML = list.map(c => `
       <tr>
         <td style="font-size:13px;">${c.name||'—'}</td>
         <td style="font-size:12px;font-family:monospace;">${c.phone}</td>
+        <td style="font-size:11px;color:var(--primary);">${c.email ? `<a href="mailto:${c.email}" style="color:var(--primary);text-decoration:none;">${c.email}</a>` : '—'}</td>
         <td style="font-size:12px;">${c.city||'—'}</td>
         <td style="font-size:12px;">${c.area||'—'}</td>
         <td style="font-size:12px;">${c.industry||'—'}</td>
@@ -4470,7 +4471,7 @@ async function loadContactsPage(resetPage) {
         <button class="btn btn-ghost btn-xs" onclick="_contactsPage=${Math.min(pages,_contactsPage+1)};loadContactsPage()" ${_contactsPage>=pages?'disabled':''}>Next</button>
       </div>`;
     } else { pager.innerHTML = ''; }
-  } catch(e) { tbody.innerHTML = emptyRow(8, 'Error: ' + e.message); }
+  } catch(e) { tbody.innerHTML = emptyRow(9, 'Error: ' + e.message); }
 }
 
 async function loadContactsSegments() {
@@ -4799,9 +4800,25 @@ async function _scraperSaveLead(i) {
 async function _scraperSaveAll() {
   const toSave = _scraperResults.map((r, i) => ({ r, i })).filter(({ r }) => !r.saved && !r.saving && r.phone);
   if (!toSave.length) return;
-  for (const { i } of toSave) {
-    await _scraperSaveLead(i);
-  }
+  // Mark all as saving immediately
+  toSave.forEach(({ i }) => { _scraperResults[i].saving = true; });
+  _scraperRenderResults();
+  // Save all in parallel
+  await Promise.all(toSave.map(async ({ i }) => {
+    const r = _scraperResults[i];
+    try {
+      const data = await api('/admin-contacts/scrape-save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: r.name, phone: r.phone, city: r.city, area: r.area, industry: r.keyword, place_id: r.placeId, website: r.website })
+      });
+      _scraperResults[i].saved = !!data.saved;
+      if (data.email) _scraperResults[i].email = data.email;
+    } catch {}
+    _scraperResults[i].saving = false;
+  }));
+  _scraperRenderResults();
+  _contactsMeta = null; loadContactsPage(true);
 }
 
 async function scraperSearch() {
