@@ -2324,16 +2324,44 @@ async function loadFiller() {
       return;
     }
     const screenMap = {};
-    (_allScreensCache||[]).forEach(s => { screenMap[s.id] = s.name||s.screen_code; });
+    const allScreens = _allScreensCache||[];
+    allScreens.forEach(s => { screenMap[s.id] = s.name||s.screen_code; });
+    const totalScreenCount = allScreens.length;
+    let groups = [];
+    try { groups = await api('/screens/groups'); } catch(_) {}
+    // Build map: sorted screen-id set → group name
+    const groupLabelMap = {};
+    groups.forEach(g => {
+      const key = (g.screens||[]).map(s=>s.id).sort().join(',');
+      if (key) groupLabelMap[key] = g.name;
+    });
+
+    function _screensBadge(sids) {
+      if (!sids || sids.length === 0 || sids.length >= totalScreenCount)
+        return `<span class="status-badge" style="background:var(--surface2);color:var(--text2);font-size:11px;">All</span>`;
+      const key = [...sids].sort().join(',');
+      if (groupLabelMap[key])
+        return `<span class="status-badge" style="background:var(--primary-light);color:var(--primary);font-size:11px;">${groupLabelMap[key]}</span>`;
+      // Check if all selected screens belong to exactly one group subset
+      for (const g of groups) {
+        const gids = new Set((g.screens||[]).map(s=>s.id));
+        if (sids.every(id => gids.has(id))) {
+          if (sids.length === gids.size)
+            return `<span class="status-badge" style="background:var(--primary-light);color:var(--primary);font-size:11px;">${g.name}</span>`;
+        }
+      }
+      const labels = sids.map(id => `<span class="status-badge" style="background:var(--primary-light);color:var(--primary);font-size:10px;margin:1px;">${screenMap[id]||id.slice(0,6)}</span>`);
+      if (labels.length > 4) return labels.slice(0,3).join('') + `<span class="status-badge" style="background:var(--surface2);color:var(--text3);font-size:10px;margin:1px;">+${labels.length-3}</span>`;
+      return labels.join('');
+    }
+
     tbody.innerHTML = items.map(f => {
       const isVideo = f.type === 'video';
       const thumb = isVideo
         ? `<div style="width:60px;height:38px;background:var(--surface2);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:18px;">▶</div>`
         : `<img src="${f.file_url}" style="width:60px;height:38px;object-fit:cover;border-radius:4px;background:var(--surface2);" onerror="this.style.background='var(--surface2)'">`;
       const sids = f.screen_ids || [];
-      const screensBadge = sids.length === 0
-        ? `<span class="status-badge" style="background:var(--surface2);color:var(--text2);font-size:11px;">All</span>`
-        : sids.map(id => `<span class="status-badge" style="background:var(--primary-light);color:var(--primary);font-size:10px;margin:1px;">${screenMap[id]||id.slice(0,6)}</span>`).join('');
+      const screensBadge = _screensBadge(sids);
       return `<tr>
         <td>${thumb}</td>
         <td style="font-weight:600;">${f.title||'—'}</td>
