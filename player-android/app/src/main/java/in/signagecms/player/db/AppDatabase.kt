@@ -54,13 +54,43 @@ abstract class AppDatabase : RoomDatabase() {
         @Volatile
         private var INSTANCE: AppDatabase? = null
 
+        // Migration 1→2: added contentTier to campaigns
+        private val MIGRATION_1_2 = object : androidx.room.migration.Migration(1, 2) {
+            override fun migrate(db: androidx.sqlite.db.SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE campaigns ADD COLUMN contentTier TEXT NOT NULL DEFAULT 'paid'")
+            }
+        }
+
+        // Migration 2→3: added play_log_queue table (preserves any existing data)
+        private val MIGRATION_2_3 = object : androidx.room.migration.Migration(2, 3) {
+            override fun migrate(db: androidx.sqlite.db.SupportSQLiteDatabase) {
+                db.execSQL("""
+                    CREATE TABLE IF NOT EXISTS play_log_queue (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                        campaignId TEXT NOT NULL,
+                        contentId TEXT NOT NULL,
+                        playedAt TEXT NOT NULL,
+                        durationSec REAL NOT NULL,
+                        playCount INTEGER NOT NULL DEFAULT 1,
+                        contentTier TEXT DEFAULT 'paid',
+                        synced INTEGER NOT NULL DEFAULT 0,
+                        createdAt INTEGER NOT NULL
+                    )
+                """.trimIndent())
+            }
+        }
+
         fun getInstance(context: Context): AppDatabase =
             INSTANCE ?: synchronized(this) {
                 INSTANCE ?: Room.databaseBuilder(
                     context.applicationContext,
                     AppDatabase::class.java,
                     "player.db"
-                ).fallbackToDestructiveMigration()
+                )
+                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
+                    // Fallback only for versions we have no migration for — won't delete play_log_queue
+                    // as long as migrations above are applied in order.
+                    .fallbackToDestructiveMigrationFrom(1)
                     .build()
                     .also { INSTANCE = it }
             }

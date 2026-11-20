@@ -39,6 +39,7 @@ const instagramRoutes = require('./routes/instagram');
 const blogRoutes = require('./routes/blog');
 const waRoutes  = require('./routes/whatsapp-connect');
 const leadRoutes = require('./routes/leads');
+const adminContactsRoutes = require('./routes/admin-contacts');
 
 const { query: dbInit } = require('./db');
 dbInit(`CREATE TABLE IF NOT EXISTS player_pairing_codes (
@@ -64,10 +65,10 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net", "https://checkout.razorpay.com", "https://maps.googleapis.com", "https://maps.gstatic.com"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net", "https://checkout.razorpay.com", "https://maps.googleapis.com", "https://maps.gstatic.com", "https://www.googletagmanager.com", "https://cdn.tailwindcss.com", "https://unpkg.com"],
       scriptSrcAttr: ["'unsafe-inline'"],
-      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
-      fontSrc: ["'self'", "https://fonts.gstatic.com"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://cdnjs.cloudflare.com"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com", "https://cdnjs.cloudflare.com"],
       imgSrc: ["'self'", "data:", "blob:", "*", "https://maps.gstatic.com", "https://maps.googleapis.com"],
       connectSrc: ["'self'", "*"],
       frameSrc: ["'self'", "https://api.razorpay.com", "https://checkout.razorpay.com"],
@@ -80,7 +81,7 @@ app.use(cors({
   origin: _allowedOrigins.length
     ? (origin, cb) => {
         if (!origin || _allowedOrigins.includes(origin)) return cb(null, true);
-        cb(new Error('CORS: origin not allowed'));
+        cb(null, false); // silently reject — no thrown error
       }
     : '*',
   credentials: true,
@@ -105,6 +106,9 @@ app.get('/favicon.ico', (req, res) => {
 
 // Redirect old v1 landing page to current v2
 app.get('/extrravenue-signage.html', (req, res) => res.redirect(301, '/extrravenue-signage-v2.html'));
+
+// Blog article slug renames (301 to preserve SEO equity)
+app.get('/blog/venue-partner-income.html', (req, res) => res.redirect(301, '/blog/venue-partner-benefits.html'));
 
 // Public domain root → landing page; Railway URL root → CMS (index.html)
 app.get('/', (req, res, next) => {
@@ -182,6 +186,7 @@ app.use('/api/auth/instagram', instagramRoutes);
 app.use('/api/blog', blogRoutes);
 app.use('/api/wa', waRoutes);
 app.use('/api/leads', leadRoutes);
+app.use('/api/admin-contacts', adminContactsRoutes);
 
 // Public config — exposes safe client-side keys (no auth needed)
 app.get('/api/config', (req, res) => {
@@ -191,13 +196,24 @@ app.get('/api/config', (req, res) => {
 });
 
 // Public gallery — reads img/carousel/ folder, no auth needed
+// Videos excluded: each video is duplicated 6x in the drift carousel causing massive payload
+// WebP preferred over PNG/JPG when both exist
 app.get('/api/gallery', (req, res) => {
   const fs = require('fs');
   const dir = path.join(__dirname, '../public/img/carousel');
-  const ALLOWED = /\.(jpe?g|png|webp|gif|mp4|webm|mov)$/i;
+  const ALLOWED = /\.(jpe?g|png|webp|gif)$/i;
+  const VIDEO = /\.(mp4|webm|mov)$/i;
   try {
-    const files = fs.readdirSync(dir)
-      .filter(f => ALLOWED.test(f) && !f.startsWith('.'))
+    const all = fs.readdirSync(dir).filter(f => !f.startsWith('.'));
+    const webpNames = new Set(all.filter(f => /\.webp$/i.test(f)).map(f => f.replace(/\.webp$/i, '')));
+    const files = all
+      .filter(f => {
+        if (VIDEO.test(f)) return false;
+        if (!ALLOWED.test(f)) return false;
+        const base = f.replace(/\.[^.]+$/, '');
+        if (webpNames.has(base) && !/\.webp$/i.test(f)) return false;
+        return true;
+      })
       .map(f => 'img/carousel/' + f);
     res.json(files);
   } catch (e) {
@@ -400,6 +416,10 @@ app.use((req, res) => {
 
 // Global error handler
 app.use((err, req, res, next) => {
+  // Payload too large (express body-parser limit) — 413, don't send to Sentry
+  if (err.type === 'entity.too.large') {
+    return res.status(413).json({ error: 'Request body too large' });
+  }
   console.error('[ERROR]', err.stack);
   if (process.env.SENTRY_DSN) Sentry.captureException(err);
   const status = err.status || 500;
@@ -502,6 +522,37 @@ async function applyCriticalFixes(pool) {
   } catch (err) {
     console.warn('[DB] WA tables fix warn:', err.message);
   }
+  // preferred_language for advertiser UI (migration 030)
+  try {
+    await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS preferred_language VARCHAR(10) NOT NULL DEFAULT 'en'`);
+    console.log('[DB] preferred_language column ensured');
+  } catch (err) {
+    console.warn('[DB] preferred_language warn:', err.message);
+  }
+  // Creative change weekly update columns (migration 031)
+  try {
+    await pool.query(`ALTER TABLE campaigns ADD COLUMN IF NOT EXISTS creative_change_requested_at TIMESTAMPTZ`);
+    await pool.query(`ALTER TABLE campaigns ADD COLUMN IF NOT EXISTS pending_wa_message TEXT`);
+    console.log('[DB] creative_change columns ensured');
+  } catch (err) {
+    console.warn('[DB] creative_change columns warn:', err.message);
+  }
+  // Admin contacts directory columns on campaigns (migration 032)
+  try {
+    await pool.query(`ALTER TABLE campaigns ADD COLUMN IF NOT EXISTS wa_directory_source VARCHAR(20) DEFAULT 'own'`);
+    await pool.query(`ALTER TABLE campaigns ADD COLUMN IF NOT EXISTS wa_directory_segment_id INTEGER`);
+    console.log('[DB] wa_directory columns ensured');
+  } catch (err) {
+    console.warn('[DB] wa_directory columns warn:', err.message);
+  }
+  // Fix incorrect daily_impressions values (migration 033)
+  // 54000 was total seconds (wrong), 5000 was placeholder — correct = 2700 (54000s / 20s media)
+  try {
+    await pool.query(`UPDATE screens SET daily_impressions = 2700 WHERE daily_impressions IN (54000, 5000, 150, 0) OR daily_impressions IS NULL`);
+    console.log('[DB] daily_impressions corrected to 2700');
+  } catch (err) {
+    console.warn('[DB] daily_impressions fix warn:', err.message);
+  }
   console.log('[DB] Critical column fixes done');
 }
 
@@ -549,10 +600,16 @@ process.on('unhandledRejection', (reason) => {
 
 const PORT = process.env.PORT || 3000;
 runMigrations().then(() => {
-  app.listen(PORT, () => {
+  const server = app.listen(PORT, () => {
     console.log(`SignageCMS API running on port ${PORT}`);
     startScheduler();
     restoreActiveSessions();
+  });
+
+  // Handle malformed HTTP requests from bots/scanners (prevents Parse Error crashes)
+  server.on('clientError', (err, socket) => {
+    if (err.code === 'ECONNRESET' || !socket.writable) return;
+    socket.end('HTTP/1.1 400 Bad Request\r\n\r\n');
   });
 });
 

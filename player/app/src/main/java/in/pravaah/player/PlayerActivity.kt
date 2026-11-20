@@ -82,6 +82,10 @@ class PlayerActivity : Activity() {
 
         // Flush PoP logs every 5 minutes
         handler.postDelayed(logFlushRunnable, 5 * 60 * 1000L)
+
+        // Recover any logs that failed to upload in a previous session
+        val service = Intent(this, SyncService::class.java).apply { action = "UPLOAD_PLAY_LOGS_STARTUP" }
+        startService(service)
     }
 
     private fun startPlayback() {
@@ -166,7 +170,8 @@ class PlayerActivity : Activity() {
             campaignId = slot.campaignId,
             contentId = slot.contentId,
             playedAt = playedAt,
-            durationSec = slot.durationSec
+            durationSec = slot.durationSec,
+            contentTier = slot.contentTier
         ))
     }
 

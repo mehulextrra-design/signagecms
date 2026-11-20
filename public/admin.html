@@ -2,12 +2,14 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <title>extrravenue — Admin</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Magra:wght@400;700&family=Inter:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -211,8 +213,8 @@ textarea.form-input{resize:vertical;min-height:80px;}
 .mobile-topbar{display:none;position:fixed;top:0;left:0;right:0;height:52px;background:var(--sidebar-bg);z-index:300;align-items:center;padding:0 16px;gap:12px;}
 .mobile-topbar-title{font-size:15px;font-weight:700;color:var(--text);flex:1;}
 .mobile-topbar-badge{font-size:9px;font-weight:700;background:rgba(123,104,200,0.3);color:var(--primary);border-radius:4px;padding:2px 6px;}
-.hamburger{width:36px;height:36px;border:none;background:rgba(255,255,255,0.08);border-radius:var(--radius-sm);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;flex-shrink:0;}
-.hamburger span{width:18px;height:2px;background:#fff;border-radius:1px;display:block;transition:all 0.2s;}
+.hamburger{width:36px;height:36px;border:none;background:rgba(123,104,200,0.12);border-radius:var(--radius-sm);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;flex-shrink:0;}
+.hamburger span{width:18px;height:2px;background:var(--sidebar-text);border-radius:1px;display:block;transition:all 0.2s;}
 
 /* -- SIDEBAR DRAWER (mobile) -- */
 .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:350;}
@@ -239,7 +241,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
   .mobile-topbar{display:flex;}
   .main{padding-top:52px;}
   .topbar{display:none;}
-  .content{padding:14px;padding-bottom:24px;}
+  .content{padding:14px;padding-bottom:calc(24px + env(safe-area-inset-bottom, 0px));}
 
   /* Stats */
   .stat-grid{grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;}
@@ -295,6 +297,12 @@ textarea.form-input{resize:vertical;min-height:80px;}
   #page-pop .section-head > div{flex-wrap:wrap;gap:6px;}
   #page-pop .section-head > div input{width:calc(50% - 3px);}
 }
+.pager-bar{display:flex;align-items:center;gap:10px;padding:10px 4px;font-size:13px;color:var(--text2);flex-wrap:wrap;}
+.pager-info{flex:1;min-width:80px;}
+.pager-pages{min-width:90px;text-align:center;}
+.pager-btn{padding:5px 14px;border-radius:6px;border:1.5px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;}
+.pager-btn:disabled{opacity:0.4;cursor:default;}
+.pager-btn:not(:disabled):hover{background:var(--bg2);}
 </style>
 </head>
 <body>
@@ -465,6 +473,10 @@ textarea.form-input{resize:vertical;min-height:80px;}
       <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
       Blog Manager
     </button>
+    <button class="sidebar-item" id="nav-contacts" onclick="navigate('contacts')">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+      WA Contacts
+    </button>
     <button class="sidebar-item" id="nav-activity" onclick="navigate('activity')">
       <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
       Activity Log
@@ -549,6 +561,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
         </div>
         <div class="table-card">
           <div class="table-wrap"><table><thead><tr><th>Code</th><th>Title</th><th>Advertiser</th><th>Dates</th><th>Amount</th><th>Status</th><th>Action</th></tr></thead><tbody id="camp-table"></tbody></table></div>
+          <div id="camp-pager"></div>
         </div>
       </div>
 
@@ -587,6 +600,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
         </div>
         <div class="table-card">
           <div class="table-wrap"><table><thead><tr><th>Code</th><th>Name</th><th>Location</th><th>Zone</th><th>Resolution</th><th>Est. Impr/Day</th><th>Status</th><th>Last Heartbeat</th><th>Actions</th></tr></thead><tbody id="screens-table"></tbody></table></div>
+          <div id="screens-pager"></div>
         </div>
 
         <!-- Screen Groups -->
@@ -736,6 +750,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
         </div>
         <div class="table-card">
           <div class="table-wrap"><table><thead><tr><th>Name</th><th>Email</th><th>Business</th><th>City</th><th>GST</th><th>Joined</th><th>Status</th><th>Actions</th></tr></thead><tbody id="adv-table"></tbody></table></div>
+          <div id="adv-pager"></div>
         </div>
       </div>
 
@@ -752,6 +767,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
         </div>
         <div class="table-card">
           <div class="table-wrap"><table><thead><tr><th>Invoice #</th><th>Campaign</th><th>Advertiser</th><th>Amount</th><th>GST</th><th>Total</th><th>Status</th><th>Date</th></tr></thead><tbody id="inv-table"></tbody></table></div>
+          <div id="inv-pager"></div>
         </div>
       </div>
 
@@ -763,6 +779,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
         </div>
         <div class="table-card">
           <div class="table-wrap"><table><thead><tr><th>Code</th><th>Type</th><th>Value</th><th>Min Order</th><th>Used / Limit</th><th>Valid Period</th><th>Status</th><th>Actions</th></tr></thead><tbody id="coupons-table"></tbody></table></div>
+          <div id="coupons-pager"></div>
         </div>
       </div>
 
@@ -834,9 +851,11 @@ textarea.form-input{resize:vertical;min-height:80px;}
           <span style="font-size:12px;color:var(--text2);">Total plays: <strong id="pop-stat-plays" style="color:var(--primary);">—</strong></span>
           <span style="font-size:12px;color:var(--text2);">Total in DB: <strong id="pop-stat-db">—</strong></span>
         </div>
+        <div id="pop-daily-breakdown" style="margin-bottom:10px;"></div>
         <div class="table-card">
           <div style="font-size:12px;color:var(--text2);padding:8px 4px 4px;" id="pop-count"></div>
           <div class="table-wrap"><table><thead><tr><th>Screen</th><th>Advertiser</th><th>Campaign</th><th>Played At</th><th>Played Until</th><th>Duration (s)</th><th>Plays</th><th>Tier</th></tr></thead><tbody id="pop-table"></tbody></table></div>
+          <div id="pop-pager"></div>
         </div>
       </div>
 
@@ -919,6 +938,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
               </tr></thead>
               <tbody id="venues-table"></tbody>
             </table>
+            <div id="venues-pager"></div>
           </div>
         </div>
 
@@ -963,6 +983,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
               </tr></thead>
               <tbody id="leads-table"><tr><td colspan="8" style="text-align:center;color:var(--text3);padding:32px;">Loading…</td></tr></tbody>
             </table>
+            <div id="leads-pager"></div>
           </div>
         </div>
 
@@ -1008,6 +1029,57 @@ textarea.form-input{resize:vertical;min-height:80px;}
             <table><thead><tr><th>Title</th><th>Category</th><th>Status</th><th>Created</th><th>Actions</th></tr></thead>
             <tbody id="blog-posts-table"></tbody></table>
           </div>
+          <div id="blog-pager"></div>
+        </div>
+      </div>
+
+      <!-- WA CONTACTS DIRECTORY -->
+      <div id="page-contacts" class="page">
+        <div class="section-head">
+          <h2>WA Contacts Directory</h2>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn btn-sm btn-ghost" onclick="document.getElementById('contacts-import-row').style.display=document.getElementById('contacts-import-row').style.display==='none'?'flex':'none'">Import CSV</button>
+            <button class="btn btn-sm btn-ghost" onclick="openSegmentModal()">+ Segment</button>
+            <button class="btn btn-sm" style="background:var(--primary);color:#fff;" onclick="openMapScraper()">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align:-2px"><path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><circle cx="12" cy="11" r="3"/></svg>
+              Find on Maps
+            </button>
+            <button class="btn btn-sm btn-ghost" onclick="loadContactsPage()">Refresh</button>
+          </div>
+        </div>
+
+        <!-- Import row -->
+        <div id="contacts-import-row" style="display:none;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px;padding:12px;background:var(--surface);border-radius:var(--r);border:1px solid var(--border);">
+          <span style="font-size:13px;font-weight:600;">CSV columns: name, phone/mobile, city, area, industry, business_type (phone required)</span>
+          <input type="file" id="contacts-csv-input" accept=".csv" style="font-size:13px;">
+          <button class="btn btn-sm btn-primary" onclick="importContactsCsv()">Upload</button>
+          <span id="contacts-import-status" style="font-size:12px;color:var(--text2);"></span>
+        </div>
+
+        <!-- Filters -->
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
+          <select id="contacts-filter-city" onchange="loadContactsPage()" style="font-size:13px;padding:6px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface);color:var(--text);">
+            <option value="">All Cities</option>
+          </select>
+          <select id="contacts-filter-industry" onchange="loadContactsPage()" style="font-size:13px;padding:6px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface);color:var(--text);">
+            <option value="">All Industries</option>
+          </select>
+          <input id="contacts-search" type="text" placeholder="Search name or phone..." oninput="loadContactsPage()" style="font-size:13px;padding:6px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface);color:var(--text);width:200px;">
+          <span id="contacts-total-badge" style="font-size:12px;color:var(--text2);align-self:center;"></span>
+        </div>
+
+        <!-- Segments -->
+        <div id="contacts-segments-wrap" style="margin-bottom:12px;"></div>
+
+        <!-- Table -->
+        <div class="table-card">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Name</th><th>Phone</th><th>Email</th><th>City</th><th>Area</th><th>Industry</th><th>Last Sent</th><th>DND</th><th></th></tr></thead>
+              <tbody id="contacts-table"></tbody>
+            </table>
+          </div>
+          <div id="contacts-pager"></div>
         </div>
       </div>
 
@@ -1016,6 +1088,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
         <div class="section-head"><h2>Activity Log</h2><button class="btn btn-ghost btn-sm" onclick="loadActivity()">Refresh</button></div>
         <div class="table-card">
           <div class="table-wrap"><table><thead><tr><th>Time</th><th>Admin</th><th>Action</th><th>Entity</th><th>Details</th></tr></thead><tbody id="activity-table"></tbody></table></div>
+          <div id="activity-pager"></div>
         </div>
       </div>
 
@@ -1132,12 +1205,14 @@ textarea.form-input{resize:vertical;min-height:80px;}
         <div id="cdm-creative-inner" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;"></div>
       </div>
       <!-- Pending creative banner -->
-      <div id="cdm-pending-wrap" style="display:none;background:var(--warning-light);border-bottom:1px solid var(--border);padding:10px 20px;display:none;align-items:center;justify-content:space-between;gap:10px;">
-        <div>
+      <div id="cdm-pending-wrap" style="display:none;background:var(--warning-light);border-bottom:1px solid var(--border);padding:12px 20px;display:none;gap:12px;align-items:flex-start;">
+        <div id="cdm-pending-preview" style="flex-shrink:0;width:80px;height:60px;border-radius:6px;overflow:hidden;background:#000;display:flex;align-items:center;justify-content:center;"></div>
+        <div style="flex:1;min-width:0;">
           <div style="font-size:12px;font-weight:700;color:var(--warning);">New Creative Pending Review</div>
-          <div id="cdm-pending-name" style="font-size:11px;color:var(--text2);margin-top:2px;"></div>
+          <div id="cdm-pending-name" style="font-size:11px;color:var(--text2);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></div>
+          <div id="cdm-pending-wa-msg" style="display:none;font-size:11px;color:#25D366;margin-top:3px;"></div>
         </div>
-        <div style="display:flex;gap:8px;">
+        <div style="display:flex;gap:8px;flex-shrink:0;">
           <button class="btn btn-success btn-xs" id="cdm-approve-creative-btn">✓ Approve</button>
           <button class="btn btn-ghost btn-xs" id="cdm-reject-creative-btn">✗ Reject</button>
         </div>
@@ -1346,7 +1421,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
       </div>
       <div class="form-row">
         <div class="form-group"><label class="form-label">Price / Day (₹)</label><input type="number" class="form-input" id="sc-price" value="900"></div>
-        <div class="form-group"><label class="form-label">Daily Impressions</label><input type="number" class="form-input" id="sc-impressions" value="5000"></div>
+        <div class="form-group"><label class="form-label">Daily Impressions</label><input type="number" class="form-input" id="sc-impressions" value="2700"></div>
       </div>
       <div class="form-row">
         <div class="form-group"><label class="form-label">Latitude</label><input type="number" class="form-input" id="sc-lat" placeholder="19.0760" step="any"></div>
@@ -1733,7 +1808,8 @@ const pageTitles = {
   venues: 'Venue Partners',
   filler: 'Filler Content',
   'vc-approvals': 'Venue Content Approvals',
-  blog: 'Blog Manager'
+  blog: 'Blog Manager',
+  contacts: 'WA Contacts Directory'
 };
 
 function navigate(page) {
@@ -1770,7 +1846,8 @@ function navigate(page) {
     venues: loadVenues,
     filler: loadFiller,
     'vc-approvals': loadApprovals,
-    blog: loadBlogPosts
+    blog: loadBlogPosts,
+    contacts: loadContactsPage
   };
   if (loaders[page]) loaders[page]();
 }
@@ -1837,8 +1914,10 @@ function filterLeads() {
     return matchQ && matchSt;
   });
   const tbody = document.getElementById('leads-table');
-  if (!rows.length) { tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--text3);padding:32px;">No leads found</td></tr>'; return; }
-  tbody.innerHTML = rows.map(l => {
+  if (!rows.length) { tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--text3);padding:32px;">No leads found</td></tr>'; document.getElementById('leads-pager').innerHTML=''; return; }
+  pagerReset('leads');
+  setupPager('leads', rows, 25, (slice) => {
+  document.getElementById('leads-table').innerHTML = slice.map(l => {
     const badge = LEAD_STATUS_BADGE[l.status]||'badge-gray';
     const label = LEAD_STATUS_LABELS[l.status]||l.status;
     const cat = LEAD_CAT_LABELS[l.venue_category]||l.venue_category||'—';
@@ -1859,6 +1938,7 @@ function filterLeads() {
       </td>
     </tr>`;
   }).join('');
+  }, 'leads-pager');
 }
 
 function esc(s){ const d=document.createElement('div');d.textContent=s||'';return d.innerHTML; }
@@ -1968,8 +2048,9 @@ async function loadVenues() {
     document.getElementById('vn-revenue').textContent = '₹'+fmt(venues.reduce((a,v)=>a+parseFloat(v.total_revenue_earned||0),0));
     document.getElementById('vn-pending-approval').textContent = pendingCount || '0';
 
-    if (!venues.length) { tbody.innerHTML = emptyRow(8,'No venue partners yet — add your first one!'); return; }
-    tbody.innerHTML = venues.map(v => {
+    if (!venues.length) { tbody.innerHTML = emptyRow(8,'No venue partners yet — add your first one!'); document.getElementById('venues-pager').innerHTML=''; return; }
+    setupPager('venues', venues, 25, (slice) => {
+    document.getElementById('venues-table').innerHTML = slice.map(v => {
       const approvalBadge = v.approval_status === 'approved'
         ? '<span class="badge badge-green">Approved</span>'
         : v.approval_status === 'rejected'
@@ -2017,6 +2098,7 @@ async function loadVenues() {
         </td>
       </tr>`;
     }).join('');
+    }, 'venues-pager');
   } catch(e) { tbody.innerHTML = emptyRow(8, 'Error: '+e.message); }
 }
 
@@ -2549,6 +2631,48 @@ function closeModal(id) {
   document.getElementById(id)?.querySelectorAll('video').forEach(v=>{ v.pause(); v.src=''; });
 }
 
+// Promise-based confirm dialog
+function showConfirm(msg, { title = 'Confirm', okLabel = 'OK', danger = false } = {}) {
+  return new Promise(resolve => {
+    const overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;display:flex;align-items:center;justify-content:center;';
+    overlay.innerHTML = `<div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px;max-width:380px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,.4);">
+      <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:10px;">${title}</div>
+      <div style="font-size:13px;color:var(--text2);margin-bottom:20px;">${msg}</div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;">
+        <button id="_sc_cancel" style="padding:7px 16px;border-radius:7px;border:1px solid var(--border);background:transparent;color:var(--text2);font-size:13px;cursor:pointer;">Cancel</button>
+        <button id="_sc_ok" style="padding:7px 16px;border-radius:7px;border:none;background:${danger ? '#ef4444' : 'var(--accent)'};color:#fff;font-size:13px;font-weight:600;cursor:pointer;">${okLabel}</button>
+      </div></div>`;
+    document.body.appendChild(overlay);
+    const cleanup = v => { document.body.removeChild(overlay); resolve(v); };
+    overlay.querySelector('#_sc_ok').onclick = () => cleanup(true);
+    overlay.querySelector('#_sc_cancel').onclick = () => cleanup(false);
+  });
+}
+
+// Promise-based prompt dialog
+function showPrompt(msg, { title = 'Input', okLabel = 'OK', danger = false } = {}) {
+  return new Promise(resolve => {
+    const overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;display:flex;align-items:center;justify-content:center;';
+    overlay.innerHTML = `<div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px;max-width:380px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,.4);">
+      <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:10px;">${title}</div>
+      <div style="font-size:13px;color:var(--text2);margin-bottom:12px;">${msg}</div>
+      <textarea id="_sp_input" rows="3" style="width:100%;box-sizing:border-box;padding:8px;border-radius:7px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:13px;resize:vertical;"></textarea>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px;">
+        <button id="_sp_cancel" style="padding:7px 16px;border-radius:7px;border:1px solid var(--border);background:transparent;color:var(--text2);font-size:13px;cursor:pointer;">Cancel</button>
+        <button id="_sp_ok" style="padding:7px 16px;border-radius:7px;border:none;background:${danger ? '#ef4444' : 'var(--accent)'};color:#fff;font-size:13px;font-weight:600;cursor:pointer;">${okLabel}</button>
+      </div></div>`;
+    document.body.appendChild(overlay);
+    const inp = overlay.querySelector('#_sp_input');
+    inp.focus();
+    const cleanup = v => { document.body.removeChild(overlay); resolve(v); };
+    overlay.querySelector('#_sp_ok').onclick = () => { const v = inp.value.trim(); if (!v) return; cleanup(v); };
+    overlay.querySelector('#_sp_cancel').onclick = () => cleanup(null);
+  });
+}
+
+
 // -- DASHBOARD -------------------------------------------------------------
 async function loadDashboard() {
   // Check pending venue content badge
@@ -2629,9 +2753,10 @@ async function loadCampaigns() {
 }
 
 function renderCampaigns(data) {
+  if(!data.length) { document.getElementById('camp-table').innerHTML = emptyRow(7); document.getElementById('camp-pager').innerHTML=''; return; }
+  setupPager('camps', data, 25, (slice) => {
   const tbody = document.getElementById('camp-table');
-  if(!data.length) { tbody.innerHTML = emptyRow(7); return; }
-  tbody.innerHTML = data.map(c => `
+  tbody.innerHTML = slice.map(c => `
     <tr style="cursor:pointer;" onclick="openCampaignDetail('${c.id}')">
       <td><code style="font-size:11px;background:var(--surface2);padding:2px 6px;border-radius:4px;">${c.campaign_code}</code></td>
       <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500;">${c.title}</td>
@@ -2667,6 +2792,7 @@ function renderCampaigns(data) {
         ` : '—'}
       </td>
     </tr>`).join('');
+  }, 'camp-pager');
 }
 
 async function openCampaignDetail(id) {
@@ -2705,9 +2831,32 @@ async function openCampaignDetail(id) {
     if (c.pending_creative_url && c.creative_change_status === 'pending') {
       pendingWrap.style.display = 'flex';
       document.getElementById('cdm-pending-name').textContent = c.pending_creative_name || 'New file';
+      const waMsgEl = document.getElementById('cdm-pending-wa-msg');
+      if (waMsgEl) {
+        if (c.pending_wa_message) {
+          waMsgEl.style.display = '';
+          waMsgEl.textContent = 'WA: ' + c.pending_wa_message;
+        } else {
+          waMsgEl.style.display = 'none';
+        }
+      }
+      // Show pending media preview
+      const previewEl = document.getElementById('cdm-pending-preview');
+      if (previewEl) {
+        const isVideo = /\.(mp4|webm|mov|avi|mkv|m4v)$/i.test(c.pending_creative_url || '');
+        if (isVideo) {
+          previewEl.innerHTML = `<video src="${c.pending_creative_url}" muted playsinline style="width:100%;height:100%;object-fit:cover;"></video>`;
+        } else {
+          previewEl.innerHTML = `<img src="${c.pending_creative_url}" style="width:100%;height:100%;object-fit:cover;">`;
+        }
+      }
       document.getElementById('cdm-approve-creative-btn').onclick = () => { closeModal('camp-detail-modal'); approveCreative(id); };
       document.getElementById('cdm-reject-creative-btn').onclick  = () => { closeModal('camp-detail-modal'); rejectCreative(id); };
-    } else { pendingWrap.style.display = 'none'; }
+    } else {
+      pendingWrap.style.display = 'none';
+      const previewEl = document.getElementById('cdm-pending-preview');
+      if (previewEl) previewEl.innerHTML = '';
+    }
 
     // Advertiser
     document.getElementById('cdm-advertiser').textContent = (c.first_name||'') + ' ' + (c.last_name||'') + (c.business_name ? ' · ' + c.business_name : '');
@@ -2803,6 +2952,7 @@ async function openCampaignDetail(id) {
 }
 
 function filterCampaigns() {
+  pagerReset('camps');
   const q = document.getElementById('camp-search').value.toLowerCase();
   const s = document.getElementById('camp-status-filter').value;
   renderCampaigns(allCampaigns.filter(c =>
@@ -2844,8 +2994,8 @@ function renderApprovals(arr) {
       const aiBadge = aiStatus === 'approved'
         ? `<span style="color:var(--success);font-size:12px;font-weight:600;" title="${aiNote}">? Clean</span>`
         : aiStatus === 'rejected'
-        ? `<span style="color:var(--danger);font-size:12px;font-weight:600;" title="${aiNote}">? Flagged</span>`
-        : `<span style="color:var(--warning);font-size:12px;" title="${aiNote || 'Pending review'}">? Pending${aiNote ? '<br><small style=\'color:var(--text2);font-size:10px;\'>'+aiNote.substring(0,50)+'</small>' : ''}</span>`;
+        ? `<span style="color:var(--danger);font-size:12px;font-weight:600;" title="${aiNote}">&#9888; Flagged</span>`
+        : `<span style="color:var(--warning);font-size:12px;" title="${aiNote || 'Pending review'}">&#9679; Pending${aiNote ? '<br><small style=\'color:var(--text2);font-size:10px;\'>'+aiNote.substring(0,50)+'</small>' : ''}</span>`;
       const creativeTd = c.creative_url && c.creative_type === 'image'
         ? `<td onclick="event.stopPropagation()" style="width:70px;"><img src="${c.creative_url}" alt="creative" style="width:64px;height:48px;object-fit:cover;border-radius:6px;border:1px solid var(--border);cursor:zoom-in;" onclick="openLightbox('${c.creative_url}','${(c.creative_name||'').replace(/'/g,"\\'")}','image')" title="Click to preview"></td>`
         : c.creative_url && c.creative_type === 'video'
@@ -2928,20 +3078,21 @@ async function forceLiveCampaign(id) {
 }
 
 async function approveCreative(id) {
-  if(!confirm('Approve this creative change? New creative will go live immediately.')) return;
+  const ok = await showConfirm('Naya creative approve karein? Screens reload hongi aur advertiser ko notify kiya jayega.', { title: 'Creative Approve', okLabel: 'Approve', danger: false });
+  if (!ok) return;
   try {
     await api(`/campaigns/${id}/approve-creative`, { method: 'POST' });
-    showToast('Creative change approved', 'success');
+    showToast('Creative change approved — screens reloading', 'success');
     loadCampaigns();
   } catch(e) { showToast('Error: ' + e.message, 'error'); }
 }
 
 async function rejectCreative(id) {
-  const reason = prompt('Reason for rejecting creative change (shown to advertiser):');
-  if(!reason) return;
+  const reason = await showPrompt('Rejection reason (advertiser ko dikhega):', { title: 'Creative Reject', okLabel: 'Reject', danger: true });
+  if (!reason) return;
   try {
     await api(`/campaigns/${id}/reject-creative`, { method: 'POST', body: JSON.stringify({ reason }) });
-    showToast('Creative change rejected', 'success');
+    showToast('Creative change rejected — advertiser notified', 'success');
     loadCampaigns();
   } catch(e) { showToast('Error: ' + e.message, 'error'); }
 }
@@ -3119,14 +3270,16 @@ async function loadScreens() {
     if(!Array.isArray(allScreens)) allScreens = [];
     allScreensData = allScreens;
     loadScreenGroups();
-    tbody.innerHTML = allScreens.map(s => `
+    if (!allScreens.length) { tbody.innerHTML = emptyRow(10, 'No screens. Add your first screen!'); document.getElementById('screens-pager').innerHTML=''; return; }
+    setupPager('screens', allScreens, 25, (slice) => {
+      document.getElementById('screens-table').innerHTML = slice.map(s => `
       <tr>
         <td><code style="font-size:11px;background:var(--surface2);padding:2px 6px;border-radius:4px;">${s.screen_code}</code></td>
         <td style="font-weight:500;">${s.name}</td>
         <td style="font-size:12px;color:var(--text2);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${s.location||'—'}<br>${s.city||''}</td>
         <td><span class="zone-tag zone-${s.zone||'A'}">${s.zone||'A'}</span></td>
         <td style="font-size:12px;font-variant-numeric:tabular-nums;">${s.width_px}×${s.height_px}</td>
-        <td style="font-variant-numeric:tabular-nums;font-weight:600;">${(s.daily_impressions||5000).toLocaleString('en-IN')}</td>
+        <td style="font-variant-numeric:tabular-nums;font-weight:600;">${(s.daily_impressions||2700).toLocaleString('en-IN')}</td>
         <td>
           <span style="display:inline-flex;align-items:center;gap:5px;">
             <span class="status-dot dot-${s.status||'offline'}"></span>
@@ -3147,7 +3300,8 @@ async function loadScreens() {
             <button class="ia-btn ia-danger" title="Delete" onclick="deleteScreen('${s.id}', '${s.screen_code}')"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
           </div>
         </td>
-      </tr>`).join('') || emptyRow(10, 'No screens. Add your first screen!');
+      </tr>`).join('');
+    }, 'screens-pager');
   } catch(e) { tbody.innerHTML = emptyRow(9, 'Error: ' + e.message); }
 }
 
@@ -3167,7 +3321,7 @@ async function openScreenModal(screen = null) {
   document.getElementById('sc-width').value = screen?.width_px || 1920;
   document.getElementById('sc-height').value = screen?.height_px || 1080;
   document.getElementById('sc-price').value = screen?.price_per_day || 900;
-  document.getElementById('sc-impressions').value = screen?.daily_impressions || 5000;
+  document.getElementById('sc-impressions').value = screen?.daily_impressions || 2700;
   document.getElementById('sc-lat').value = screen?.latitude || '';
   document.getElementById('sc-lng').value = screen?.longitude || '';
   document.getElementById('sc-status-group').style.display = screen ? 'block' : 'none';
@@ -3552,9 +3706,10 @@ async function loadAdvertisers() {
 }
 
 function renderAdvertisers(data) {
+  if(!data.length) { document.getElementById('adv-table').innerHTML = emptyRow(8); document.getElementById('adv-pager').innerHTML=''; return; }
+  setupPager('advs', data, 25, (slice) => {
   const tbody = document.getElementById('adv-table');
-  if(!data.length) { tbody.innerHTML = emptyRow(8); return; }
-  tbody.innerHTML = data.map(u => `
+  tbody.innerHTML = slice.map(u => `
     <tr>
       <td style="font-weight:600;">${u.first_name||''} ${u.last_name||''}</td>
       <td style="font-size:12px;">${u.email}</td>
@@ -3585,9 +3740,11 @@ function renderAdvertisers(data) {
         </div>
       </td>
     </tr>`).join('');
+  }, 'adv-pager');
 }
 
 function filterAdvertisers() {
+  pagerReset('advs');
   const q = document.getElementById('adv-search').value.toLowerCase();
   renderAdvertisers(allAdvertisers.filter(u =>
     !q || u.email.toLowerCase().includes(q) || (u.first_name||'').toLowerCase().includes(q) || (u.business_name||'').toLowerCase().includes(q)
@@ -3771,9 +3928,9 @@ async function loadInvoices() {
 }
 
 function renderInvoices(data) {
-  const tbody = document.getElementById('inv-table');
-  if(!data.length) { tbody.innerHTML = emptyRow(8); return; }
-  tbody.innerHTML = data.map(i => `
+  if(!data.length) { document.getElementById('inv-table').innerHTML = emptyRow(8); document.getElementById('inv-pager').innerHTML=''; return; }
+  setupPager('invs', data, 25, (slice) => {
+  document.getElementById('inv-table').innerHTML = slice.map(i => `
     <tr>
       <td><code style="font-size:11px;background:var(--surface2);padding:2px 6px;border-radius:4px;">${i.invoice_number}</code></td>
       <td style="font-size:12px;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${i.campaign_title||i.campaign_code||'—'}</td>
@@ -3784,9 +3941,11 @@ function renderInvoices(data) {
       <td><span class="badge ${i.status==='paid'?'badge-green':i.status==='refunded'?'badge-red':'badge-yellow'}">${i.status}</span></td>
       <td style="font-size:12px;color:var(--text3);">${fmtDate(i.issued_at)}</td>
     </tr>`).join('');
+  }, 'inv-pager');
 }
 
 function filterInvoices() {
+  pagerReset('invs');
   const s = document.getElementById('inv-status-filter').value;
   renderInvoices(s ? allInvoices.filter(i => i.status === s) : allInvoices);
 }
@@ -3798,7 +3957,9 @@ async function loadCoupons() {
   try {
     allCoupons = await api('/coupons');
     if(!Array.isArray(allCoupons)) allCoupons = [];
-    tbody.innerHTML = allCoupons.map(c => `
+    if(!allCoupons.length) { tbody.innerHTML = emptyRow(8, 'No coupons yet'); document.getElementById('coupons-pager').innerHTML=''; return; }
+    setupPager('coupons', allCoupons, 25, (slice) => {
+    document.getElementById('coupons-table').innerHTML = slice.map(c => `
       <tr>
         <td><code style="font-size:12px;font-weight:700;background:var(--primary-light);color:var(--primary);padding:2px 8px;border-radius:4px;">${c.code}</code></td>
         <td><span class="badge ${c.type==='percent'?'badge-blue':'badge-teal'}">${c.type}</span></td>
@@ -3811,7 +3972,8 @@ async function loadCoupons() {
           <button class="btn btn-ghost btn-xs" onclick="editCoupon(${JSON.stringify(c).replace(/"/g,'&quot;')})">Edit</button>
           ${c.is_active ? `<button class="btn btn-danger btn-xs" style="margin-left:4px;" onclick="deactivateCoupon('${c.id}')">Deactivate</button>` : ''}
         </td>
-      </tr>`).join('') || emptyRow(8, 'No coupons yet');
+      </tr>`).join('');
+    }, 'coupons-pager');
   } catch(e) { tbody.innerHTML = emptyRow(8, 'Error: ' + e.message); }
 }
 
@@ -3963,6 +4125,7 @@ async function loadPop() {
     const totalInDb   = data.total_in_db ?? null;
     const totalPlays  = data.total_plays ?? arr.reduce((s,r)=>s+(parseInt(r.play_count)||1),0);
     const totalPlaysInDb = data.total_plays_in_db ?? null;
+    const daily = data.daily_breakdown || [];
 
     // Summary bar
     const summaryEl = document.getElementById('pop-summary');
@@ -3970,6 +4133,23 @@ async function loadPop() {
     document.getElementById('pop-stat-plays').textContent   = fmtNum(totalPlays);
     document.getElementById('pop-stat-db').textContent      = totalPlaysInDb !== null ? fmtNum(totalPlaysInDb) + ' total plays' : (totalInDb !== null ? fmtNum(totalInDb) + ' log entries' : '—');
     summaryEl.style.display = 'flex';
+
+    // Daily breakdown — shows exactly when logs stopped
+    const dailyEl = document.getElementById('pop-daily-breakdown');
+    if (dailyEl) {
+      if (daily.length) {
+        const rows = daily.slice(0,14).map(d => {
+          const dayStr = new Date(d.day).toLocaleDateString('en-IN',{weekday:'short',month:'short',day:'numeric'});
+          const isToday = d.day === new Date().toISOString().slice(0,10);
+          return `<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:4px;background:var(--surface2);font-size:11px;${d.entries===0?'opacity:.45':''}">
+            <b style="color:var(--primary)">${fmtNum(d.plays)}</b> plays ${isToday?'<span style="color:var(--success)">today</span>':dayStr}
+          </span>`;
+        }).join('');
+        dailyEl.innerHTML = `<div style="font-size:11px;color:var(--text3);margin-bottom:4px;">Last 14 days:</div><div style="display:flex;flex-wrap:wrap;gap:4px;">${rows}</div>`;
+      } else {
+        dailyEl.innerHTML = '';
+      }
+    }
 
     // Export button
     document.getElementById('pop-export-btn').style.display = arr.length ? '' : 'none';
@@ -3991,12 +4171,14 @@ async function loadPop() {
           ? 'Play logs table is empty — APK has not submitted proof of play yet.'
           : 'No records match these filters. Try clearing the date range or removing other filters.'}
       </td></tr>`;
+      document.getElementById('pop-pager').innerHTML = '';
       return;
     }
 
     const tierColors = { paid:'var(--primary)', venue_own:'#ca8a04', venue_cross:'#2563EB', filler:'var(--text3)' };
     const tierLabels = { paid:'Paid', venue_own:'Venue Own', venue_cross:'City-wide', filler:'Filler' };
-    tbody.innerHTML = arr.map(p => {
+    setupPager('pop', arr, 100, (slice) => {
+      document.getElementById('pop-table').innerHTML = slice.map(p => {
       const isVenue = ['venue_own','venue_cross'].includes(p.content_tier);
       const whoLabel = isVenue
         ? (p.venue_business_name || p.venue_contact_name || '—')
@@ -4016,6 +4198,7 @@ async function loadPop() {
         <td><span style="font-size:10px;font-weight:700;padding:2px 5px;border-radius:4px;background:${tierColors[p.content_tier]||'var(--text2)'}1a;color:${tierColors[p.content_tier]||'var(--text2)'};">${tierLabels[p.content_tier]||p.content_tier||'paid'}</span></td>
       </tr>`;
     }).join('');
+    }, 'pop-pager');
   } catch(e) { tbody.innerHTML = emptyRow(8, 'Error: ' + e.message); }
 }
 
@@ -4149,8 +4332,9 @@ async function loadBlogPosts() {
   try {
     const data = await api('/blog/drafts');
     const arr = Array.isArray(data) ? data : [];
-    if (!arr.length) { tbody.innerHTML = emptyRow(5, 'No articles yet. Generate your first article!'); return; }
-    tbody.innerHTML = arr.map(p => `
+    if (!arr.length) { tbody.innerHTML = emptyRow(5, 'No articles yet. Generate your first article!'); document.getElementById('blog-pager').innerHTML=''; return; }
+    setupPager('blog', arr, 25, (slice) => {
+    document.getElementById('blog-posts-table').innerHTML = slice.map(p => `
       <tr>
         <td style="max-width:300px"><a href="/blog/generated/${p.slug}" target="_blank" style="color:var(--accent);font-weight:600">${p.title}</a></td>
         <td><span style="font-size:12px;background:var(--surface2);padding:2px 8px;border-radius:50px">${p.category}</span></td>
@@ -4163,6 +4347,7 @@ async function loadBlogPosts() {
           <button class="btn btn-ghost btn-sm" onclick="deleteBlogPost(${p.id})">Delete</button>
         </td>
       </tr>`).join('');
+    }, 'blog-pager');
   } catch(e) { tbody.innerHTML = emptyRow(5, 'Error: ' + e.message); }
 }
 
@@ -4208,8 +4393,9 @@ async function loadActivity() {
   try {
     const data = await api('/reports/activity?limit=100');
     const arr = Array.isArray(data) ? data : [];
-    if(!arr.length) { tbody.innerHTML = emptyRow(5, 'No activity recorded yet'); return; }
-    tbody.innerHTML = arr.map(a => `
+    if(!arr.length) { tbody.innerHTML = emptyRow(5, 'No activity recorded yet'); document.getElementById('activity-pager').innerHTML=''; return; }
+    setupPager('activity', arr, 25, (slice) => {
+    document.getElementById('activity-table').innerHTML = slice.map(a => `
       <tr>
         <td style="font-size:12px;color:var(--text3);white-space:nowrap;">${fmtDateTime(a.created_at)}</td>
         <td style="font-size:12px;">${a.first_name||''} <span style="color:var(--text3);">${a.email||'System'}</span></td>
@@ -4217,7 +4403,155 @@ async function loadActivity() {
         <td style="font-size:12px;text-transform:capitalize;">${a.entity_type||'—'}</td>
         <td style="font-size:11px;color:var(--text3);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${a.details ? JSON.stringify(a.details).slice(0,80) : '—'}</td>
       </tr>`).join('');
+    }, 'activity-pager');
   } catch(e) { tbody.innerHTML = emptyRow(5, 'Error: ' + e.message); }
+}
+
+// ── WA CONTACTS DIRECTORY ────────────────────────────────────────────────────
+let _contactsMeta = null;
+let _contactsPage = 1;
+
+async function loadContactsMeta() {
+  if (_contactsMeta) return _contactsMeta;
+  try {
+    _contactsMeta = await api('/admin-contacts/meta');
+    const cityEl = document.getElementById('contacts-filter-city');
+    const indEl = document.getElementById('contacts-filter-industry');
+    // Clear existing options (keep first "All" option only) to prevent duplicates on refresh
+    while (cityEl.options.length > 1) cityEl.remove(1);
+    while (indEl.options.length > 1) indEl.remove(1);
+    // Dedupe on frontend too (case-insensitive) in case of data inconsistencies
+    const seen = new Set();
+    (_contactsMeta.cities||[]).forEach(c => {
+      if (!c || seen.has(c.toLowerCase())) return; seen.add(c.toLowerCase());
+      const o = document.createElement('option'); o.value=c; o.textContent=c; cityEl.appendChild(o);
+    });
+    seen.clear();
+    (_contactsMeta.industries||[]).forEach(ind => {
+      if (!ind || seen.has(ind.toLowerCase())) return; seen.add(ind.toLowerCase());
+      const o = document.createElement('option'); o.value=ind; o.textContent=ind; indEl.appendChild(o);
+    });
+  } catch(e) { console.warn('[Contacts] meta load error:', e.message); }
+  return _contactsMeta;
+}
+
+async function loadContactsPage(resetPage) {
+  if (resetPage) _contactsPage = 1;
+  await loadContactsMeta();
+  await loadContactsSegments();
+  const city = document.getElementById('contacts-filter-city').value;
+  const industry = document.getElementById('contacts-filter-industry').value;
+  const search = document.getElementById('contacts-search').value;
+  const tbody = document.getElementById('contacts-table');
+  tbody.innerHTML = loadingRow(9);
+  try {
+    const params = new URLSearchParams({ page: _contactsPage, limit: 50 });
+    if (city) params.set('city', city);
+    if (industry) params.set('industry', industry);
+    if (search) params.set('search', search);
+    const data = await api('/admin-contacts?' + params.toString());
+    const list = data.contacts || [];
+    document.getElementById('contacts-total-badge').textContent = `${data.total || 0} contacts`;
+    if (!list.length) { tbody.innerHTML = emptyRow(9, 'No contacts found'); document.getElementById('contacts-pager').innerHTML=''; return; }
+    tbody.innerHTML = list.map(c => `
+      <tr>
+        <td style="font-size:13px;">${c.name||'—'}</td>
+        <td style="font-size:12px;font-family:monospace;">${c.phone}</td>
+        <td style="font-size:11px;color:var(--primary);">${c.email ? `<a href="mailto:${c.email}" style="color:var(--primary);text-decoration:none;">${c.email}</a>` : '—'}</td>
+        <td style="font-size:12px;">${c.city||'—'}</td>
+        <td style="font-size:12px;">${c.area||'—'}</td>
+        <td style="font-size:12px;">${c.industry||'—'}</td>
+        <td style="font-size:11px;color:var(--text3);">${c.last_messaged_at ? fmtDate(c.last_messaged_at) : '—'}</td>
+        <td>${c.is_dnd ? '<span style="color:#ef4444;font-size:11px;font-weight:600;">DND</span>' : ''}</td>
+        <td style="white-space:nowrap;">
+          <button class="btn btn-ghost btn-xs" onclick="toggleContactDnd(${c.id},${c.is_dnd})">${c.is_dnd?'Un-DND':'DND'}</button>
+          <button class="btn btn-ghost btn-xs" style="color:#ef4444;" onclick="deleteContact(${c.id})">Del</button>
+        </td>
+      </tr>`).join('');
+    // Simple prev/next pager
+    const total = data.total || 0;
+    const pages = Math.ceil(total / 50);
+    const pager = document.getElementById('contacts-pager');
+    if (pages > 1) {
+      pager.innerHTML = `<div style="display:flex;align-items:center;gap:8px;padding:12px 0;font-size:13px;">
+        <button class="btn btn-ghost btn-xs" onclick="_contactsPage=${Math.max(1,_contactsPage-1)};loadContactsPage()" ${_contactsPage<=1?'disabled':''}>Prev</button>
+        <span style="color:var(--text2);">Page ${_contactsPage} / ${pages}</span>
+        <button class="btn btn-ghost btn-xs" onclick="_contactsPage=${Math.min(pages,_contactsPage+1)};loadContactsPage()" ${_contactsPage>=pages?'disabled':''}>Next</button>
+      </div>`;
+    } else { pager.innerHTML = ''; }
+  } catch(e) { tbody.innerHTML = emptyRow(9, 'Error: ' + e.message); }
+}
+
+async function loadContactsSegments() {
+  const wrap = document.getElementById('contacts-segments-wrap');
+  try {
+    const segs = await api('/admin-contacts/segments');
+    if (!segs.length) { wrap.innerHTML=''; return; }
+    wrap.innerHTML = `<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:4px;">
+      <span style="font-size:12px;font-weight:600;color:var(--text2);align-self:center;">Segments:</span>
+      ${segs.map(s=>`<span style="display:inline-flex;align-items:center;gap:5px;background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:3px 10px;font-size:12px;">
+        <span>${s.name}</span>
+        <span style="color:var(--text3);">(${Number(s.available_now||0).toLocaleString()} avail)</span>
+        <button onclick="deleteSegment(${s.id})" style="border:none;background:none;cursor:pointer;color:var(--text3);font-size:14px;line-height:1;padding:0 2px;" title="Delete">&times;</button>
+      </span>`).join('')}
+    </div>`;
+  } catch(e) { wrap.innerHTML=''; }
+}
+
+async function importContactsCsv() {
+  const fileInput = document.getElementById('contacts-csv-input');
+  const statusEl = document.getElementById('contacts-import-status');
+  if (!fileInput.files.length) { statusEl.textContent='No file selected'; return; }
+  statusEl.textContent = 'Uploading...';
+  const form = new FormData();
+  form.append('file', fileInput.files[0]);
+  try {
+    const res = await fetch('/api/admin-contacts/import', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') },
+      body: form
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || res.statusText);
+    statusEl.textContent = `Done: ${data.inserted} inserted, ${data.skipped} skipped of ${data.total}`;
+    _contactsMeta = null; // reset meta so dropdowns refresh
+    loadContactsPage(true);
+  } catch(e) { statusEl.textContent = 'Error: ' + e.message; }
+}
+
+async function toggleContactDnd(id, currentDnd) {
+  try {
+    await api(`/admin-contacts/${id}/dnd`, { method:'PATCH' });
+    loadContactsPage();
+  } catch(e) { alert('Error: ' + e.message); }
+}
+
+async function deleteContact(id) {
+  if (!confirm('Delete this contact?')) return;
+  try {
+    await api(`/admin-contacts/${id}`, { method:'DELETE' });
+    loadContactsPage();
+  } catch(e) { alert('Error: ' + e.message); }
+}
+
+async function deleteSegment(id) {
+  if (!confirm('Delete this segment?')) return;
+  try {
+    await api(`/admin-contacts/segments/${id}`, { method:'DELETE' });
+    loadContactsPage();
+  } catch(e) { alert('Error: ' + e.message); }
+}
+
+function openSegmentModal() {
+  const name = prompt('Segment name:');
+  if (!name) return;
+  const city = prompt('City filter (leave blank for all):') || null;
+  const industry = prompt('Industry filter (leave blank for all):') || null;
+  const area = prompt('Area filter (leave blank for all):') || null;
+  api('/admin-contacts/segments', {
+    method: 'POST',
+    body: JSON.stringify({ name, city, industry, area })
+  }).then(() => loadContactsPage()).catch(e => alert('Error: ' + e.message));
 }
 
 // Close modal on backdrop click
@@ -4230,6 +4564,383 @@ const today = new Date().toISOString().slice(0,10);
 const lastMonth = new Date(Date.now() - 30*86400000).toISOString().slice(0,10);
 document.getElementById('pop-start').value = lastMonth;
 document.getElementById('pop-end').value = today;
+
+// -- PAGINATION UTILITY -------------------------------------------------------
+const _pagers = {};
+function setupPager(name, data, perPage, renderFn, pagerElId) {
+  _pagers[name] = { data, page: _pagers[name]?.page || 1, perPage, renderFn, pagerElId };
+  _drawPager(name);
+}
+function _drawPager(name) {
+  const p = _pagers[name]; if (!p) return;
+  const total = p.data.length;
+  const totalPages = Math.ceil(total / p.perPage) || 1;
+  p.page = Math.max(1, Math.min(p.page, totalPages));
+  const start = (p.page - 1) * p.perPage;
+  p.renderFn(p.data.slice(start, start + p.perPage), start, total);
+  const el = document.getElementById(p.pagerElId); if (!el) return;
+  if (total <= p.perPage) { el.innerHTML = ''; return; }
+  el.innerHTML = `<div class="pager-bar">
+    <span class="pager-info">${start+1}–${Math.min(start+p.perPage,total)} of ${total}</span>
+    <button class="pager-btn" ${p.page<=1?'disabled':''} onclick="pagerGo('${name}',${p.page-1})">&#8249; Prev</button>
+    <span class="pager-pages">Page ${p.page} of ${totalPages}</span>
+    <button class="pager-btn" ${p.page>=totalPages?'disabled':''} onclick="pagerGo('${name}',${p.page+1})">Next &#8250;</button>
+  </div>`;
+}
+function pagerGo(name, page) {
+  if (!_pagers[name]) return;
+  _pagers[name].page = page; _drawPager(name);
+}
+function pagerReset(name) { if (_pagers[name]) _pagers[name].page = 1; }
+</script>
+
+<!-- MAP SCRAPER MODAL ──────────────────────────────────────────────────── -->
+<div class="modal-backdrop hidden" id="map-scraper-modal" style="z-index:1200;padding:0;">
+  <div class="modal" style="max-width:100%;width:100%;height:100vh;margin:0;border-radius:0;display:flex;flex-direction:column;padding:0;overflow:hidden;">
+    <!-- Header -->
+    <div class="modal-header" style="flex-shrink:0;">
+      <span class="modal-title">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align:-3px;margin-right:6px;color:var(--primary)"><path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><circle cx="12" cy="11" r="3"/></svg>
+        Find Businesses on Map
+      </span>
+      <button class="modal-close" onclick="closeModal('map-scraper-modal')">&times;</button>
+    </div>
+    <!-- Body: map + sidebar -->
+    <div style="display:flex;flex:1;overflow:hidden;">
+      <!-- Map -->
+      <div style="flex:1;position:relative;">
+        <div id="scraper-map" style="height:100%;width:100%;"></div>
+        <div id="scraper-map-hint" style="position:absolute;bottom:14px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.72);color:#fff;font-size:12px;padding:6px 14px;border-radius:20px;z-index:999;pointer-events:none;white-space:nowrap;">Click on map to set search center</div>
+      </div>
+      <!-- Sidebar -->
+      <div style="width:300px;flex-shrink:0;display:flex;flex-direction:column;border-left:1px solid var(--border);overflow:hidden;">
+        <!-- Controls (fixed top) -->
+        <div style="flex-shrink:0;padding:14px 14px 10px;border-bottom:1px solid var(--border);display:flex;flex-direction:column;gap:10px;">
+          <div>
+            <div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;">Center Location</div>
+            <div id="scraper-loc-display" style="font-size:11px;padding:6px 9px;border:1.5px solid var(--border);border-radius:7px;background:var(--surface2);color:var(--text3);">Click map to select</div>
+          </div>
+          <div>
+            <div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;">Search Radius</div>
+            <div style="display:flex;gap:4px;flex-wrap:wrap;" id="scraper-radius-chips">
+              <span class="scraper-chip" data-r="500" onclick="scraperSetRadius(500)">500 m</span>
+              <span class="scraper-chip scraper-chip-active" data-r="1000" onclick="scraperSetRadius(1000)">1 km</span>
+              <span class="scraper-chip" data-r="2000" onclick="scraperSetRadius(2000)">2 km</span>
+              <span class="scraper-chip" data-r="5000" onclick="scraperSetRadius(5000)">5 km</span>
+            </div>
+          </div>
+          <div>
+            <div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;">Category / Keyword</div>
+            <input id="scraper-keyword" class="form-input" type="text" placeholder="gym, salon, clinic…" oninput="scraperUpdateBtn()" style="font-size:12px;padding:6px 9px;">
+            <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:5px;">
+              <span class="scraper-qp" onclick="scraperSetKeyword('gym')">Gym</span>
+              <span class="scraper-qp" onclick="scraperSetKeyword('restaurant')">Restaurant</span>
+              <span class="scraper-qp" onclick="scraperSetKeyword('salon')">Salon</span>
+              <span class="scraper-qp" onclick="scraperSetKeyword('clinic')">Clinic</span>
+              <span class="scraper-qp" onclick="scraperSetKeyword('cafe')">Cafe</span>
+              <span class="scraper-qp" onclick="scraperSetKeyword('hotel')">Hotel</span>
+              <span class="scraper-qp" onclick="scraperSetKeyword('school')">School</span>
+              <span class="scraper-qp" onclick="scraperSetKeyword('jewellery')">Jewellery</span>
+            </div>
+          </div>
+          <button id="scraper-search-btn" class="btn btn-primary" onclick="scraperSearch()" disabled style="font-size:12px;padding:7px 12px;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            Search Google Places
+          </button>
+        </div>
+        <!-- Results (scrollable) -->
+        <div id="scraper-results-panel" style="flex:1;overflow-y:auto;padding:10px 12px 0;">
+          <div id="scraper-results-body" style="color:var(--text3);font-size:11px;text-align:center;padding-top:20px;">Map pe click karo center set karne ke liye, phir Search karo</div>
+        </div>
+        <!-- Save All fixed bottom bar -->
+        <div id="scraper-save-all-bar" style="display:none;flex-shrink:0;padding:10px 12px;border-top:1px solid var(--border);background:var(--surface);">
+          <button class="btn btn-primary" style="width:100%;font-size:12px;padding:8px;" onclick="_scraperSaveAll()">
+            Save All (<span id="scraper-unsaved-count">0</span> with phone)
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.scraper-chip{padding:4px 10px;border-radius:16px;border:1.5px solid var(--border);background:var(--surface2);color:var(--text2);font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap;user-select:none;}
+.scraper-chip:hover,.scraper-chip-active{background:var(--primary);border-color:var(--primary);color:#fff;}
+.scraper-qp{font-size:11px;padding:2px 7px;border-radius:5px;background:var(--surface2);border:1px solid var(--border);color:var(--text2);cursor:pointer;}
+.scraper-qp:hover{background:var(--primary-light);color:var(--primary);border-color:var(--primary);}
+</style>
+
+<script>
+// ── Map Scraper (Google Maps SDK client-side) ────────────────────────────────
+let _scraperMap = null, _scraperMarker = null, _scraperCircle = null;
+let _scraperLat = null, _scraperLng = null, _scraperRadius = 1000;
+let _gmKey = null, _gLoaded = false, _gProm = null;
+let _scraperResults = [], _scraperMLayer = null;
+
+async function openMapScraper() {
+  document.getElementById('map-scraper-modal').classList.remove('hidden');
+  // Fetch API key once
+  if (!_gmKey) {
+    try { const d = await api('/admin-contacts/gmaps-key'); _gmKey = d.key; } catch {}
+  }
+  setTimeout(() => {
+    if (!_scraperMap) {
+      _scraperMap = L.map('scraper-map').setView([20.5937, 78.9629], 5);
+      L.tileLayer('https://mt{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+        subdomains: ['0','1','2','3'], attribution: '© Google Maps', maxZoom: 20
+      }).addTo(_scraperMap);
+      _scraperMLayer = L.layerGroup().addTo(_scraperMap);
+      _scraperMap.on('click', e => {
+        _scraperLat = e.latlng.lat; _scraperLng = e.latlng.lng;
+        _scraperUpdateMapCenter();
+      });
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(pos => {
+          const { latitude: lat, longitude: lng } = pos.coords;
+          _scraperMap.setView([lat, lng], 14);
+          _scraperLat = lat; _scraperLng = lng;
+          _scraperUpdateMapCenter();
+        }, () => {});
+      }
+    }
+    _scraperMap.invalidateSize();
+  }, 120);
+}
+
+function _loadGMaps() {
+  if (_gLoaded) return Promise.resolve();
+  if (_gProm) return _gProm;
+  if (!_gmKey) return Promise.reject(new Error('GOOGLE_MAPS_API_KEY not set in Railway env'));
+  _gProm = new Promise((res, rej) => {
+    window._gmcb = () => { _gLoaded = true; res(); };
+    const s = document.createElement('script');
+    s.src = `https://maps.googleapis.com/maps/api/js?key=${_gmKey}&libraries=places&callback=_gmcb`;
+    s.onerror = () => rej(new Error('Google Maps load failed — API key check karo'));
+    document.head.appendChild(s);
+  });
+  return _gProm;
+}
+
+function _scraperUpdateMapCenter() {
+  if (!_scraperLat) return;
+  const ll = [_scraperLat, _scraperLng];
+  if (_scraperMarker) _scraperMarker.remove();
+  _scraperMarker = L.marker(ll, {
+    icon: L.divIcon({
+      html: `<div style="width:14px;height:14px;border-radius:50%;background:#7b68c8;border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.4);"></div>`,
+      iconSize:[14,14], iconAnchor:[7,7], className:''
+    })
+  }).addTo(_scraperMap);
+  if (_scraperCircle) _scraperCircle.remove();
+  _scraperCircle = L.circle(ll, { radius:_scraperRadius, color:'#7b68c8', fillColor:'#7b68c8', fillOpacity:.12, weight:2 }).addTo(_scraperMap);
+  document.getElementById('scraper-loc-display').textContent = `${_scraperLat.toFixed(5)}, ${_scraperLng.toFixed(5)}`;
+  document.getElementById('scraper-loc-display').style.cssText = 'font-size:11px;padding:6px 9px;border:1.5px solid #22c55e;border-radius:7px;background:var(--surface2);color:var(--text);';
+  document.getElementById('scraper-map-hint').style.display = 'none';
+  scraperUpdateBtn();
+}
+
+function scraperSetRadius(r) {
+  _scraperRadius = r;
+  document.querySelectorAll('.scraper-chip[data-r]').forEach(c => c.classList.toggle('scraper-chip-active', parseInt(c.dataset.r) === r));
+  if (_scraperCircle) _scraperCircle.setRadius(r);
+}
+
+function scraperSetKeyword(kw) {
+  document.getElementById('scraper-keyword').value = kw;
+  scraperUpdateBtn();
+}
+
+function scraperUpdateBtn() {
+  document.getElementById('scraper-search-btn').disabled = !(_scraperLat !== null && document.getElementById('scraper-keyword').value.trim().length > 0);
+}
+
+function _scraperRenderResults() {
+  const body = document.getElementById('scraper-results-body');
+  const saved = _scraperResults.filter(r => r.saved).length;
+  const unsaved = _scraperResults.filter(r => !r.saved && !r.saving && r.phone).length;
+  const total = _scraperResults.length;
+  if (!total) { body.innerHTML = '<div style="color:var(--text3);text-align:center;padding-top:16px;">No results found</div>'; return; }
+  // Update Save All bottom bar
+  const bar = document.getElementById('scraper-save-all-bar');
+  const countEl = document.getElementById('scraper-unsaved-count');
+  if (bar) bar.style.display = unsaved > 0 ? 'block' : 'none';
+  if (countEl) countEl.textContent = unsaved;
+  body.innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+      <span style="font-size:12px;font-weight:700;">${total} results</span>
+      <span style="font-size:11px;color:var(--success);font-weight:600;">${saved} saved</span>
+    </div>
+    ${_scraperResults.map((r, i) => `
+      <div style="border:1px solid var(--border);border-radius:8px;padding:8px 10px;margin-bottom:6px;background:${r.saved ? 'rgba(34,197,94,.08)' : 'var(--surface2)'};">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:6px;">
+          <div style="min-width:0;flex:1;">
+            <div style="font-size:12px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${r.name}</div>
+            <div style="font-size:10px;color:var(--text3);margin-top:1px;">${r.address||''}</div>
+            <div style="font-size:11px;color:var(--text2);margin-top:3px;">${r.phone || (r.fetching ? '<em style="color:var(--text3)">fetching…</em>' : '<span style="color:var(--text3)">no phone</span>')}</div>
+            ${r.email ? `<div style="font-size:10px;color:var(--primary);margin-top:2px;">✉ ${r.email}</div>` : ''}
+          </div>
+          <div style="flex-shrink:0;">
+            ${r.saved
+              ? r.updated
+                ? `<span style="font-size:10px;color:var(--warning,#f59e0b);font-weight:700;">↻ Updated</span>`
+                : `<span style="font-size:10px;color:var(--success);font-weight:700;">✓ Saved</span>`
+              : r.saving
+                ? `<span style="font-size:10px;color:var(--text3);">Saving…</span>`
+                : r.phone
+                  ? `<button class="btn btn-sm" style="font-size:10px;padding:3px 8px;background:var(--primary);color:#fff;" onclick="_scraperSaveLead(${i})">Save</button>`
+                  : ''
+            }
+          </div>
+        </div>
+        ${r.rating ? `<div style="font-size:10px;color:var(--text3);margin-top:3px;">${r.rating}</div>` : ''}
+      </div>`).join('')}`;
+}
+
+async function _scraperSaveLead(i) {
+  const r = _scraperResults[i];
+  if (!r || r.saved || r.saving) return;
+  _scraperResults[i].saving = true;
+  _scraperRenderResults();
+  try {
+    const data = await api('/admin-contacts/scrape-save', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: r.name, phone: r.phone, city: r.city, area: r.area, industry: r.keyword, place_id: r.placeId, email: r.email || null })
+    });
+    _scraperResults[i].saved = !!data.saved;
+    _scraperResults[i].updated = !!data.updated;
+    if (data.email) _scraperResults[i].email = data.email;
+  } catch {}
+  _scraperResults[i].saving = false;
+  _scraperRenderResults();
+  _contactsMeta = null; loadContactsPage(true);
+}
+
+async function _scraperSaveAll() {
+  const toSave = _scraperResults.map((r, i) => ({ r, i })).filter(({ r }) => !r.saved && !r.saving && r.phone);
+  if (!toSave.length) return;
+  // Mark all as saving immediately
+  toSave.forEach(({ i }) => { _scraperResults[i].saving = true; });
+  _scraperRenderResults();
+  // Save all in parallel
+  await Promise.all(toSave.map(async ({ i }) => {
+    const r = _scraperResults[i];
+    try {
+      const data = await api('/admin-contacts/scrape-save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: r.name, phone: r.phone, city: r.city, area: r.area, industry: r.keyword, place_id: r.placeId, email: r.email || null })
+      });
+      _scraperResults[i].saved = !!data.saved;
+      _scraperResults[i].updated = !!data.updated;
+      if (data.email) _scraperResults[i].email = data.email;
+    } catch {}
+    _scraperResults[i].saving = false;
+  }));
+  _scraperRenderResults();
+  _contactsMeta = null; loadContactsPage(true);
+}
+
+async function scraperSearch() {
+  const keyword = document.getElementById('scraper-keyword').value.trim();
+  const btn = document.getElementById('scraper-search-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span style="display:inline-block;width:12px;height:12px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;"></span> Searching…';
+  document.getElementById('scraper-results-body').innerHTML = '<div style="color:var(--text3);font-size:11px;text-align:center;padding-top:16px;">Loading Google Maps SDK…</div>';
+
+  try {
+    await _loadGMaps();
+    document.getElementById('scraper-results-body').innerHTML = '<div style="color:var(--text3);font-size:11px;text-align:center;padding-top:16px;">Searching nearby…</div>';
+
+    const tmp = document.createElement('div');
+    document.body.appendChild(tmp);
+    const gmap = new window.google.maps.Map(tmp, { center: { lat: _scraperLat, lng: _scraperLng }, zoom: 14 });
+    const svc = new window.google.maps.places.PlacesService(gmap);
+
+    // Nearby search — up to 3 pages × 20 = 60
+    const all = await new Promise((res, rej) => {
+      const acc = [];
+      function handle(results, status, pg) {
+        if (status === window.google.maps.places.PlacesServiceStatus.OK && results) {
+          acc.push(...results);
+          if (pg && pg.hasNextPage && acc.length < 60) setTimeout(() => pg.nextPage(), 2200);
+          else res(acc);
+        } else if (status === window.google.maps.places.PlacesServiceStatus.ZERO_RESULTS) res([]);
+        else rej(new Error(`Places API: ${status}`));
+      }
+      svc.nearbySearch({ location: new window.google.maps.LatLng(_scraperLat, _scraperLng), radius: _scraperRadius, keyword }, handle);
+    });
+
+    // Build results list
+    _scraperResults = all.filter(p => p.geometry && p.name).map(p => ({
+      name: p.name, address: p.vicinity || '', phone: '', website: '', rating: p.rating ? `${p.rating}⭐ (${p.user_ratings_total||0})` : '',
+      lat: p.geometry.location.lat(), lon: p.geometry.location.lng(), placeId: p.place_id,
+      keyword, city: '', area: '', fetching: true, saved: false, saving: false
+    }));
+
+    _scraperRenderResults();
+
+    // Drop numbered markers on map
+    _scraperMLayer.clearLayers();
+    _scraperResults.forEach((r, i) => {
+      L.marker([r.lat, r.lon], {
+        icon: L.divIcon({
+          html: `<div style="background:#7b68c8;color:#fff;font-size:9px;font-weight:800;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.3);">${i+1}</div>`,
+          iconSize:[20,20], iconAnchor:[10,10], className:''
+        })
+      }).addTo(_scraperMLayer).bindPopup(`<b>${r.name}</b><br><small>${r.address}</small>`);
+    });
+    if (_scraperResults.length > 1) _scraperMap.fitBounds(L.latLngBounds(_scraperResults.map(r => [r.lat, r.lon])), { padding:[40,40] });
+
+    // Phase 1: Fetch phone+website+address in batches of 5
+    const BATCH = 5;
+    for (let i = 0; i < _scraperResults.length; i += BATCH) {
+      await Promise.all(_scraperResults.slice(i, i + BATCH).map((r, bi) =>
+        new Promise(resolve => {
+          if (!r.placeId) { _scraperResults[i+bi].fetching = false; resolve(); return; }
+          svc.getDetails({ placeId: r.placeId, fields: ['formatted_phone_number','international_phone_number','website','address_components'] },
+            (place, status) => {
+              if (status === window.google.maps.places.PlacesServiceStatus.OK && place) {
+                _scraperResults[i+bi].phone = place.international_phone_number || place.formatted_phone_number || '';
+                _scraperResults[i+bi].website = place.website || '';
+                if (place.address_components) {
+                  for (const c of place.address_components) {
+                    if (c.types.includes('locality')) _scraperResults[i+bi].city = c.long_name;
+                    if (c.types.includes('sublocality_level_1') || c.types.includes('sublocality')) _scraperResults[i+bi].area = c.long_name;
+                  }
+                }
+              }
+              _scraperResults[i+bi].fetching = false;
+              resolve();
+            });
+        })
+      ));
+      _scraperRenderResults();
+      if (i + BATCH < _scraperResults.length) await new Promise(r => setTimeout(r, 250));
+    }
+
+    document.body.removeChild(tmp);
+
+    // Phase 2: Email scraping in background (don't block button reset)
+    ;(async () => {
+      for (let i = 0; i < _scraperResults.length; i += BATCH) {
+        await Promise.all(_scraperResults.slice(i, i + BATCH).map(async (r, bi) => {
+          if (!r.website) return;
+          try {
+            const ed = await api('/admin-contacts/scrape-email?website=' + encodeURIComponent(r.website));
+            if (ed.email) { _scraperResults[i+bi].email = ed.email; _scraperRenderResults(); }
+          } catch {}
+        }));
+      }
+    })();
+
+  } catch(e) {
+    document.getElementById('scraper-results-body').innerHTML = `<div style="color:var(--danger,red);font-size:11px;padding:8px;">Error: ${e.message}</div>`;
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg> Search Google Places';
+}
 </script>
 </body>
 </html>

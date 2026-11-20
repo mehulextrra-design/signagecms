@@ -26,8 +26,8 @@ router.post('/validate', authenticate, async (req, res, next) => {
     );
     if (!result.rows.length) return res.status(404).json({ error: 'Invalid or expired coupon' });
     const c = result.rows[0];
-    if (orderAmt && parseFloat(orderAmt) < parseFloat(c.min_order)) {
-      return res.status(400).json({ error: `Minimum order amount ₹${c.min_order} required` });
+    if (parseFloat(orderAmt || 0) < parseFloat(c.min_order || 0)) {
+      return res.status(400).json({ error: `Minimum order amount ₹${parseFloat(c.min_order).toLocaleString('en-IN')} required` });
     }
     let discount = c.type === 'percent'
       ? (parseFloat(orderAmt || 0) * parseFloat(c.value) / 100)

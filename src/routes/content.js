@@ -73,9 +73,11 @@ router.get('/storage', authenticate, async (req, res, next) => {
 router.get('/', authenticate, async (req, res, next) => {
   try {
     const result = await query(
-      'SELECT * FROM content WHERE user_id = $1 AND status = $2 ORDER BY created_at DESC',
+      `SELECT id, original_name, file_url, type, file_size, duration_sec, created_at
+       FROM content WHERE user_id = $1 AND status = $2 ORDER BY created_at DESC`,
       [req.user.id, 'active']
     );
+    res.set('Cache-Control', 'private, max-age=30');
     res.json(result.rows);
   } catch (err) { next(err); }
 });

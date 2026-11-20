@@ -4,8 +4,8 @@ const Razorpay = require('razorpay');
 const { query, getClient } = require('../db');
 const { authenticate, requireAdmin } = require('../middleware/auth');
 const { reviewCampaign } = require('../services/aiReview');
-const { sendInvoiceEmail, sendApprovedEmail, sendRejectedEmail, sendPausedEmail, sendResumedEmail, sendOnHoldEmail, sendWalletCreditEmail } = require('../services/email');
-const { sendCampaignApprovedWA, sendInvoiceConfirmedWA } = require('../services/whatsapp');
+const { sendInvoiceEmail, sendApprovedEmail, sendRejectedEmail, sendPausedEmail, sendResumedEmail, sendOnHoldEmail, sendWalletCreditEmail, sendCreativeApprovedEmail, sendCreativeRejectedEmail } = require('../services/email');
+const { sendCampaignApprovedWA, sendInvoiceConfirmedWA, sendCreativeApprovedWA, sendCreativeRejectedWA } = require('../services/whatsapp');
 const { sendWaBroadcast } = require('../services/whatsapp-broadcast');
 const { creditWallet, debitWallet } = require('../services/wallet');
 const { postCampaignToSocial } = require('./facebook');
@@ -47,12 +47,15 @@ router.get('/', authenticate, async (req, res, next) => {
         ARRAY_AGG(DISTINCT s.screen_code) FILTER (WHERE s.id IS NOT NULL) AS screens,
         c.rejection_reason, c.ai_review_status, c.ai_review_notes,
         ct.file_url AS creative_url, ct.type AS creative_type, ct.original_name AS creative_name,
+        ct.duration_sec AS creative_duration, ct.file_size AS creative_size,
+        pct.file_url AS pending_creative_url, pct.original_name AS pending_creative_name,
         COALESCE((SELECT SUM(pl.play_count) FROM play_logs pl WHERE pl.campaign_id = c.id), 0) AS play_count
       FROM campaigns c
       JOIN users u ON u.id = c.user_id
       LEFT JOIN campaign_screens cs ON cs.campaign_id = c.id
       LEFT JOIN screens s ON s.id = cs.screen_id
       LEFT JOIN content ct ON ct.id = c.content_id
+      LEFT JOIN content pct ON pct.id = c.pending_content_id
       WHERE 1=1
     `;
     const params = [];
@@ -60,7 +63,7 @@ router.get('/', authenticate, async (req, res, next) => {
     if (!isAdmin) { params.push(req.user.id); sql += ` AND c.user_id = $${params.length}`; }
     if (status) { params.push(status); sql += ` AND c.status = $${params.length}`; }
 
-    sql += ` GROUP BY c.id, u.first_name, u.last_name, u.business_name, u.email, ct.file_url, ct.type, ct.original_name
+    sql += ` GROUP BY c.id, u.first_name, u.last_name, u.business_name, u.email, ct.file_url, ct.type, ct.original_name, ct.duration_sec, ct.file_size, pct.file_url, pct.original_name
              ORDER BY c.created_at DESC LIMIT $${params.length + 1} OFFSET $${params.length + 2}`;
     params.push(limit, offset);
 
@@ -163,18 +166,35 @@ const PACKAGES = {
   complete: { slot_duration_sec: 15, loop_multiplier: 2, name: 'complete', monthly: 3499, ppd: 117 },
   growth:   { slot_duration_sec: 20, loop_multiplier: 3, name: 'growth',   monthly: 5999, ppd: 200 },
 };
+// V4 pricing — 3 plans: trial=10s free, starter_screen=20s paid, omnichannel_growth=20s paid+social
+// loop_multiplier kept for backwards compat; both paid plans share the same 20s slot
+const V3_PACKAGES = {
+  trial:              { slot_duration_sec: 10, loop_multiplier: 1, name: 'trial',              flat: 0,    fixedDays: 7, bucket: 'filler' },
+  starter_screen:     { slot_duration_sec: 20, loop_multiplier: 2, name: 'starter_screen',     monthly: 3999 },
+  omnichannel_growth: { slot_duration_sec: 20, loop_multiplier: 2, name: 'omnichannel_growth', monthly: 5999 },
+  // legacy aliases so old campaigns/links still resolve
+  starter:  { slot_duration_sec: 20, loop_multiplier: 2, name: 'starter_screen',     monthly: 3999 },
+  complete: { slot_duration_sec: 20, loop_multiplier: 2, name: 'starter_screen',     monthly: 3999 },
+  growth:   { slot_duration_sec: 20, loop_multiplier: 2, name: 'omnichannel_growth', monthly: 5999 },
+};
+const V3_CYCLE_DISCOUNTS = { 1: 0, 3: 0.15, 6: 0.25 };
+// WA is only available on omnichannel_growth (inbuilt, no extra charge); all other v3 plans cannot use WA
+const V3_WA_PLANS = new Set(['omnichannel_growth']);
 
 // POST /api/campaigns — create + pay
 router.post('/', authenticate, async (req, res, next) => {
   const client = await getClient();
   try {
     await client.query('BEGIN');
-    const { screen_ids, content_id, title, start_date, end_date, start_time, end_time, coupon_code, package_name, wallet_amount, wa_broadcast_enabled, wa_caption_template } = req.body;
+    const { screen_ids, content_id, title, start_date, end_date, start_time, end_time, coupon_code, package_name, wallet_amount, wa_caption_template, is_v3, billing_months, wa_directory_source, wa_directory_segment_id } = req.body;
+    let wa_broadcast_enabled = req.body.wa_broadcast_enabled;
 
     if (!screen_ids?.length) throw { status: 400, message: 'At least one screen required' };
 
-    // Resolve package → slot duration
-    const pkg = PACKAGES[(package_name || 'complete').toLowerCase()] || PACKAGES.complete;
+    // Resolve package → slot duration (v3 uses separate rate table)
+    const pkg = is_v3
+      ? (V3_PACKAGES[(package_name || 'complete').toLowerCase()] || V3_PACKAGES.complete)
+      : (PACKAGES[(package_name || 'complete').toLowerCase()] || PACKAGES.complete);
 
     // TEMP: Trial lock disabled for testing
     // if (pkg.fixedDays) {
@@ -205,11 +225,26 @@ router.post('/', authenticate, async (req, res, next) => {
     );
     if (screenResult.rows.length !== screen_ids.length) throw { status: 400, message: 'Invalid screen IDs' };
 
-    // Package pricing — monthly flat or per-day
+    // Package pricing
     const days = Math.ceil((new Date(end_date) - new Date(start_date)) / 86400000) + 1;
     let amount_base;
-    if (pkg.fixedDays) {
-      amount_base = pkg.flat; // trial = 0
+    if (is_v3) {
+      // WA only available on omnichannel_growth; force off for all other v3 plans
+      const waAllowed = V3_WA_PLANS.has(pkg.name);
+      if (!waAllowed) wa_broadcast_enabled = false;
+      if (pkg.fixedDays) {
+        // v3 trial: flat price, WA not available
+        amount_base = pkg.flat;
+      } else {
+        const months = parseInt(billing_months) || 1;
+        const discPct = V3_CYCLE_DISCOUNTS[months] || 0;
+        const rawBase = pkg.monthly * months;
+        const discAmt = Math.round(rawBase * discPct);
+        // omnichannel_growth: WA inbuilt, no extra charge
+        amount_base = rawBase - discAmt;
+      }
+    } else if (pkg.fixedDays) {
+      amount_base = pkg.flat; // v1/v2 trial = 0
     } else if (days >= 28 && pkg.monthly) {
       amount_base = pkg.monthly; // monthly flat rate for ~30-day bookings
     } else {
@@ -244,10 +279,11 @@ router.post('/', authenticate, async (req, res, next) => {
     const code = await generateCampaignCode();
     const campResult = await client.query(
       `INSERT INTO campaigns (campaign_code, user_id, content_id, title, start_date, end_date, start_time, end_time,
-        amount_base, amount_gst, amount_total, wallet_used, coupon_code, discount_amount, slot_duration_sec, package_name, wa_broadcast_enabled, wa_caption_template, status)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,'pending_payment') RETURNING *`,
+        amount_base, amount_gst, amount_total, wallet_used, coupon_code, discount_amount, slot_duration_sec, package_name, wa_broadcast_enabled, wa_caption_template, wa_directory_source, wa_directory_segment_id, status)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,'pending_payment') RETURNING *`,
       [code, req.user.id, content_id, title, start_date, end_date, start_time || '00:00:00', end_time || '23:59:59',
-       amount_base, amount_gst, amount_total, walletUsed, coupon_code, discount, slot_duration_sec, pkg.name, wa_broadcast_enabled || false, wa_caption_template || null]
+       amount_base, amount_gst, amount_total, walletUsed, coupon_code, discount, slot_duration_sec, pkg.name, wa_broadcast_enabled || false, wa_caption_template || null,
+       wa_directory_source || 'own', wa_directory_segment_id || null]
     );
     const campaign = campResult.rows[0];
 
@@ -273,6 +309,10 @@ router.post('/', authenticate, async (req, res, next) => {
          VALUES ($1,$2,$3,$4,$5,$6,$7,'wallet','paid')`,
         [invNum, campaign.id, req.user.id, amount_base, amount_gst, amount_total, `WALLET-${code}`]
       );
+      // Auto-enable WA for omnichannel_growth (WA inbuilt)
+      if (campaign.package_name === 'omnichannel_growth') {
+        await client.query(`UPDATE users SET wa_enabled=true WHERE id=$1`, [req.user.id]);
+      }
       await client.query('COMMIT');
       res.status(201).json({ ...campaign, status: 'pending_approval', payment_status: 'paid', wallet_paid: true, invoice_number: invNum });
       reviewCampaign(campaign.id).catch(e => console.error('[AI Review]', e.message));
@@ -341,6 +381,11 @@ router.post('/:id/confirm-payment', authenticate, async (req, res, next) => {
        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,'paid')`,
       [invNum, campaign.id, req.user.id, campaign.amount_base, campaign.amount_gst, campaign.amount_total, payment_id, payment_method]
     );
+
+    // Auto-enable WA for omnichannel_growth (WA is inbuilt in this plan)
+    if (campaign.package_name === 'omnichannel_growth') {
+      await client.query(`UPDATE users SET wa_enabled=true WHERE id=$1`, [req.user.id]);
+    }
 
     await client.query('COMMIT');
     res.json({ campaign, invoice_number: invNum });
@@ -435,6 +480,127 @@ router.patch('/:id/admin-set-creative', authenticate, requireAdmin, async (req, 
     );
     if (!result.rows.length) return res.status(404).json({ error: 'Campaign not found' });
     res.json(result.rows[0]);
+  } catch (err) { next(err); }
+});
+
+// PUT /api/campaigns/:id/creative — user submits creative change request (1 per week)
+router.put('/:id/creative', authenticate, async (req, res, next) => {
+  try {
+    const { content_id, wa_message } = req.body;
+    if (!content_id) return res.status(400).json({ error: 'content_id required' });
+
+    const campResult = await query(
+      `SELECT id, user_id, status, package_name, creative_change_requested_at
+       FROM campaigns WHERE id=$1`,
+      [req.params.id]
+    );
+    if (!campResult.rows.length) return res.status(404).json({ error: 'Campaign not found' });
+    const c = campResult.rows[0];
+
+    if (!['admin','superadmin'].includes(req.user.role) && c.user_id !== req.user.id)
+      return res.status(403).json({ error: 'Access denied' });
+    if (!['live','approved'].includes(c.status))
+      return res.status(400).json({ error: 'Creative change allowed only on live or approved campaigns' });
+
+    // 1 update per week rate limit
+    if (c.creative_change_requested_at) {
+      const daysSince = (Date.now() - new Date(c.creative_change_requested_at)) / (1000 * 60 * 60 * 24);
+      if (daysSince < 7)
+        return res.status(429).json({ error: 'Creative update allowed once per week. Next update available in ' + Math.ceil(7 - daysSince) + ' day(s).' });
+    }
+
+    const contentRow = await query('SELECT id FROM content WHERE id=$1', [content_id]);
+    if (!contentRow.rows.length) return res.status(404).json({ error: 'Content not found' });
+
+    const updateFields = [
+      'pending_content_id=$1',
+      'creative_change_status=\'pending\'',
+      'creative_change_requested_at=NOW()',
+      'updated_at=NOW()',
+    ];
+    const params = [content_id];
+    if (wa_message !== undefined) { params.push(wa_message || null); updateFields.push(`pending_wa_message=$${params.length}`); }
+    params.push(req.params.id);
+
+    const result = await query(
+      `UPDATE campaigns SET ${updateFields.join(',')} WHERE id=$${params.length} RETURNING *`,
+      params
+    );
+    res.json(result.rows[0]);
+  } catch (err) { next(err); }
+});
+
+// POST /api/campaigns/:id/approve-creative — admin approves pending creative change
+router.post('/:id/approve-creative', authenticate, requireAdmin, async (req, res, next) => {
+  try {
+    const campResult = await query(
+      `SELECT id, user_id, status, package_name, pending_content_id, pending_wa_message
+       FROM campaigns WHERE id=$1 AND creative_change_status='pending'`,
+      [req.params.id]
+    );
+    if (!campResult.rows.length)
+      return res.status(404).json({ error: 'No pending creative change found' });
+    const c = campResult.rows[0];
+    if (!c.pending_content_id)
+      return res.status(400).json({ error: 'No pending content to approve' });
+
+    // Swap creative; update wa_caption_template if new message provided
+    const updateCols = [
+      'content_id=pending_content_id',
+      'pending_content_id=NULL',
+      'creative_change_status=\'approved\'',
+      'updated_at=NOW()',
+    ];
+    if (c.pending_wa_message !== null && c.pending_wa_message !== undefined) {
+      updateCols.push('wa_caption_template=pending_wa_message');
+    }
+    updateCols.push('pending_wa_message=NULL');
+
+    const result = await query(
+      `UPDATE campaigns SET ${updateCols.join(',')} WHERE id=$1 RETURNING *`,
+      [req.params.id]
+    );
+    const updated = result.rows[0];
+    res.json(updated);
+
+    // Reload all screens showing this campaign (content_version hash tracks campaign.id not content_id)
+    query(
+      `INSERT INTO remote_commands (screen_id, command, payload)
+       SELECT cs.screen_id, 'reload', '{"reason":"creative_change"}'
+       FROM campaign_screens cs WHERE cs.campaign_id = $1`,
+      [updated.id]
+    ).catch(e => console.error('[Creative Approve] screen reload error:', e.message));
+
+    // Notify advertiser
+    sendCreativeApprovedEmail(updated.id).catch(e => console.error('[Creative Approve] email error:', e.message));
+    sendCreativeApprovedWA(updated.id).catch(e => console.error('[Creative Approve] WA notify error:', e.message));
+
+    // For omnichannel_growth: re-trigger all channels
+    const omniPkgs = ['omnichannel_growth', 'growth', 'complete'];
+    if (omniPkgs.includes(updated.package_name) && updated.status === 'live') {
+      postCampaignToSocial(updated.id).catch(e => console.error('[Creative Approve] FB/IG error:', e.message));
+      postCampaignToGoogle(updated.id).catch(e => console.error('[Creative Approve] GBP error:', e.message));
+      sendWaBroadcast(updated.id).catch(e => console.error('[Creative Approve] WA broadcast error:', e.message));
+    }
+  } catch (err) { next(err); }
+});
+
+// POST /api/campaigns/:id/reject-creative — admin rejects pending creative change
+router.post('/:id/reject-creative', authenticate, requireAdmin, async (req, res, next) => {
+  try {
+    const { reason } = req.body;
+    const result = await query(
+      `UPDATE campaigns SET pending_content_id=NULL, creative_change_status='rejected',
+       pending_wa_message=NULL, updated_at=NOW()
+       WHERE id=$1 AND creative_change_status='pending' RETURNING *`,
+      [req.params.id]
+    );
+    if (!result.rows.length) return res.status(404).json({ error: 'No pending creative change' });
+    res.json(result.rows[0]);
+
+    // Notify advertiser
+    sendCreativeRejectedEmail(result.rows[0].id, reason).catch(e => console.error('[Creative Reject] email error:', e.message));
+    sendCreativeRejectedWA(result.rows[0].id, reason).catch(e => console.error('[Creative Reject] WA notify error:', e.message));
   } catch (err) { next(err); }
 });
 

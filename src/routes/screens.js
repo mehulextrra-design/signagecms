@@ -29,7 +29,7 @@ router.post('/', authenticate, requireAdmin, async (req, res, next) => {
     const result = await query(
       `INSERT INTO screens (screen_code, name, location, city, zone, latitude, longitude, width_px, height_px, price_per_day, daily_impressions, audio_enabled, venue_type, approx_footfall, venue_partner_id)
        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15) RETURNING *`,
-      [screen_code, name, location, city, zone || 'A', latitude, longitude, width_px || 1920, height_px || 1080, price_per_day || 900, daily_impressions || 5000, audio_enabled || false, venue_type || 'Other', approx_footfall || 0, venue_partner_id || null]
+      [screen_code, name, location, city, zone || 'A', latitude, longitude, width_px || 1920, height_px || 1080, price_per_day || 900, daily_impressions || 2700, audio_enabled || false, venue_type || 'Other', approx_footfall || 0, venue_partner_id || null]
     );
     res.status(201).json(result.rows[0]);
   } catch (err) { next(err); }
@@ -107,7 +107,7 @@ router.delete('/groups/:id', authenticate, requireAdmin, async (req, res, next) 
 router.get('/:id', async (req, res, next) => {
   try {
     const result = await query(
-      'SELECT * FROM screens WHERE id = $1 OR screen_code = $1',
+      'SELECT * FROM screens WHERE id::text = $1 OR screen_code = $1',
       [req.params.id]
     );
     if (!result.rows.length) return res.status(404).json({ error: 'Screen not found' });
@@ -125,7 +125,7 @@ router.get('/:id/availability', authenticate, async (req, res, next) => {
        FROM campaigns c
        JOIN campaign_screens cs ON cs.campaign_id = c.id
        JOIN screens s ON s.id = cs.screen_id
-       WHERE (s.id = $1 OR s.screen_code = $1)
+       WHERE (s.id::text = $1 OR s.screen_code = $1)
          AND c.status NOT IN ('cancelled','rejected')
          AND c.start_date <= $3 AND c.end_date >= $2`,
       [req.params.id, start, end]
