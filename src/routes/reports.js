@@ -22,14 +22,15 @@ router.get('/proof-of-play', authenticate, async (req, res, next) => {
              s.screen_code, s.name AS screen_name, s.city AS screen_city,
              c.title AS campaign_title, c.campaign_code, c.slot_duration_sec,
              u.first_name AS advertiser_name, u.email AS user_email,
-             ct.original_name AS content_name,
+             COALESCE(fc.title, ct.original_name) AS content_name,
              vp.id AS venue_partner_id, vp.business_name AS venue_business_name,
              vp.contact_name AS venue_contact_name
       FROM play_logs pl
       LEFT JOIN screens s ON s.id = pl.screen_id
       LEFT JOIN campaigns c ON c.id = pl.campaign_id
       LEFT JOIN users u ON u.id = c.user_id
-      LEFT JOIN content ct ON ct.id = pl.content_id AND pl.content_tier IN ('venue_own','venue_cross','filler')
+      LEFT JOIN content ct ON ct.id = pl.content_id AND pl.content_tier IN ('venue_own','venue_cross')
+      LEFT JOIN filler_content fc ON fc.id = pl.content_id AND pl.content_tier = 'filler'
       LEFT JOIN users vpu ON vpu.id = ct.user_id
       LEFT JOIN venue_partners vp ON vp.id = vpu.venue_partner_id
       WHERE 1=1
