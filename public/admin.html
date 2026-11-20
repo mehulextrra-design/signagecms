@@ -2641,7 +2641,7 @@ function showConfirm(msg, { title = 'Confirm', okLabel = 'OK', danger = false } 
       <div style="font-size:13px;color:var(--text2);margin-bottom:20px;">${msg}</div>
       <div style="display:flex;gap:8px;justify-content:flex-end;">
         <button id="_sc_cancel" style="padding:7px 16px;border-radius:7px;border:1px solid var(--border);background:transparent;color:var(--text2);font-size:13px;cursor:pointer;">Cancel</button>
-        <button id="_sc_ok" style="padding:7px 16px;border-radius:7px;border:none;background:${danger ? '#ef4444' : 'var(--accent)'};color:#fff;font-size:13px;font-weight:600;cursor:pointer;">${okLabel}</button>
+        <button id="_sc_ok" style="padding:7px 16px;border-radius:7px;border:none;background:${danger ? '#ef4444' : 'var(--primary)'};color:#fff;font-size:13px;font-weight:600;cursor:pointer;">${okLabel}</button>
       </div></div>`;
     document.body.appendChild(overlay);
     const cleanup = v => { document.body.removeChild(overlay); resolve(v); };
@@ -2661,7 +2661,7 @@ function showPrompt(msg, { title = 'Input', okLabel = 'OK', danger = false } = {
       <textarea id="_sp_input" rows="3" style="width:100%;box-sizing:border-box;padding:8px;border-radius:7px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:13px;resize:vertical;"></textarea>
       <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px;">
         <button id="_sp_cancel" style="padding:7px 16px;border-radius:7px;border:1px solid var(--border);background:transparent;color:var(--text2);font-size:13px;cursor:pointer;">Cancel</button>
-        <button id="_sp_ok" style="padding:7px 16px;border-radius:7px;border:none;background:${danger ? '#ef4444' : 'var(--accent)'};color:#fff;font-size:13px;font-weight:600;cursor:pointer;">${okLabel}</button>
+        <button id="_sp_ok" style="padding:7px 16px;border-radius:7px;border:none;background:${danger ? '#ef4444' : 'var(--primary)'};color:#fff;font-size:13px;font-weight:600;cursor:pointer;">${okLabel}</button>
       </div></div>`;
     document.body.appendChild(overlay);
     const inp = overlay.querySelector('#_sp_input');
