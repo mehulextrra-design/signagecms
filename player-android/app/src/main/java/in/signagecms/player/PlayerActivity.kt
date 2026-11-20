@@ -454,11 +454,21 @@ class PlayerActivity : AppCompatActivity() {
         player.volume = 0f
 
         val uri = getContentUri(campaign)
+        var advanced = false  // guard: advance only once per video slot
         player.addListener(object : Player.Listener {
             override fun onPlaybackStateChanged(state: Int) {
-                if (state == Player.STATE_ENDED) {
+                if (state == Player.STATE_ENDED && !advanced) {
+                    advanced = true
                     logPlay(campaign)
                     handler.post { playNext() }
+                }
+            }
+            override fun onPlayerError(error: androidx.media3.common.PlaybackException) {
+                // Video failed (network error, corrupt cache, unsupported codec) — skip to next
+                if (!advanced) {
+                    advanced = true
+                    android.util.Log.w("Player", "Video error (${campaign.storedName}): ${error.message} — skipping")
+                    handler.postDelayed({ playNext() }, 1000L)
                 }
             }
         })
