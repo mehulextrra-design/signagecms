@@ -431,7 +431,7 @@ app.use((err, req, res, next) => {
 // These are hardcoded here so they ALWAYS execute regardless of migration file state.
 async function applyCriticalFixes(pool) {
   // Fix play_logs.duration_sec: must be NUMERIC(10,3) — APK sends decimal seconds like 10.005
-  // Use direct JS queries (no DO $$ block) for maximum reliability
+  // Run unconditionally — idempotent, converting NUMERIC->NUMERIC is a no-op in Postgres
   try {
     const colRes = await pool.query(
       `SELECT atttypid FROM pg_attribute
@@ -440,17 +440,14 @@ async function applyCriticalFixes(pool) {
          AND NOT attisdropped`
     );
     const typid = colRes.rows.length ? Number(colRes.rows[0].atttypid) : null;
-    // OID 23=int4 (INTEGER), 21=int2 (SMALLINT), 20=int8 (BIGINT)
-    if (typid !== null && [23, 21, 20].includes(typid)) {
-      await pool.query(
-        `ALTER TABLE play_logs ALTER COLUMN duration_sec TYPE NUMERIC(10,3) USING duration_sec::NUMERIC(10,3)`
-      );
-      console.log(`[DB] Fixed: play_logs.duration_sec OID=${typid} -> NUMERIC(10,3)`);
-    } else {
-      console.log(`[DB] play_logs.duration_sec OK (OID=${typid}), no fix needed`);
-    }
+    // OID 1700=numeric/decimal; force to NUMERIC(10,3) regardless of current precision
+    // Previously only converted INTEGER types (23,21,20) — but DECIMAL(6,2) also loses precision
+    await pool.query(
+      `ALTER TABLE play_logs ALTER COLUMN duration_sec TYPE NUMERIC(10,3) USING duration_sec::text::NUMERIC(10,3)`
+    );
+    console.log(`[DB] play_logs.duration_sec ensured NUMERIC(10,3) (was OID=${typid})`);
   } catch (err) {
-    console.warn('[DB] Critical fix warn:', err.message);
+    console.warn('[DB] Critical fix warn (duration_sec):', err.message);
   }
   // WA broadcast columns (migration 025)
   try {
