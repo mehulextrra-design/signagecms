@@ -440,7 +440,7 @@ router.post('/proof-of-play', authenticatePlayer, async (req, res, next) => {
              AND (content_id=$2 OR ($2 IS NULL AND content_id IS NULL))
              AND (campaign_id=$3 OR ($3 IS NULL AND campaign_id IS NULL))
              AND played_at BETWEEN ($4::timestamptz - interval '5 minutes') AND ($4::timestamptz + interval '5 minutes')
-             AND duration_sec BETWEEN ($5 - 1) AND ($5 + 1)
+             AND duration_sec BETWEEN ($5::numeric - 1) AND ($5::numeric + 1)
              AND source = 'apk'
            LIMIT 1`,
           [screenId, contentId, campaignId, play.played_at, durSec]
