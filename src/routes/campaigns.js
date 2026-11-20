@@ -219,6 +219,13 @@ router.post('/', authenticate, async (req, res, next) => {
       }
     }
 
+    // Duplicate campaign name check
+    const dupCheck = await client.query(
+      `SELECT id FROM campaigns WHERE user_id=$1 AND LOWER(title)=LOWER($2) AND status NOT IN ('cancelled')`,
+      [req.user.id, title]
+    );
+    if (dupCheck.rows.length) throw { status: 400, message: `You already have a campaign named "${title}". Please use a different name.` };
+
     // Validate screens exist
     const screenResult = await client.query(
       'SELECT id FROM screens WHERE id = ANY($1)', [screen_ids]
