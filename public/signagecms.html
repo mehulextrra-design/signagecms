@@ -4516,8 +4516,7 @@ function openRazorpay(campaign,btn,btnLabel,onSuccess){
         description:campaign.title||campaign.campaign_code,
         prefill:{
           name:currentUser?.first_name||'',
-          email:currentUser?.email||'',
-          contact:currentUser?.mobile||currentUser?.phone||''
+          email:currentUser?.email||''
         },
         theme:{color:'#7b68c8'},
         handler:async function(response){
