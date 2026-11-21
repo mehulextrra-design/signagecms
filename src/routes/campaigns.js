@@ -339,7 +339,7 @@ router.post('/', authenticate, async (req, res, next) => {
 router.post('/:id/create-order', authenticate, async (req, res, next) => {
   try {
     const result = await query(
-      'SELECT id, amount_total, campaign_code, title, user_id, status FROM campaigns WHERE id = $1',
+      'SELECT id, amount_total, wallet_used, campaign_code, title, user_id, status FROM campaigns WHERE id = $1',
       [req.params.id]
     );
     if (!result.rows.length) return res.status(404).json({ error: 'Campaign not found' });
