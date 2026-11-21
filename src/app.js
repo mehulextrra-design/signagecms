@@ -71,7 +71,7 @@ app.use(helmet({
       fontSrc: ["'self'", "https://fonts.gstatic.com", "https://cdnjs.cloudflare.com"],
       imgSrc: ["'self'", "data:", "blob:", "*", "https://maps.gstatic.com", "https://maps.googleapis.com"],
       connectSrc: ["'self'", "*"],
-      frameSrc: ["'self'", "https://api.razorpay.com", "https://checkout.razorpay.com"],
+      frameSrc: ["'self'", "https://*.razorpay.com"],
     }
   }
 }));

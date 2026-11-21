@@ -4505,15 +4505,20 @@ async function submitCampaign(){
 function openRazorpay(campaign,btn,btnLabel,onSuccess){
   return new Promise(async(resolve,reject)=>{
     try{
+      if(typeof Razorpay==='undefined') throw new Error('Payment gateway not loaded. Please refresh the page and try again.');
       const order=await api(`/campaigns/${campaign.id}/create-order`,{method:'POST'});
       const options={
         key:order.key_id,
         amount:order.amount,
         currency:order.currency,
         order_id:order.order_id,
-        name:'SignageCMS',
+        name:'ExtrraVenue Signage',
         description:campaign.title||campaign.campaign_code,
-        prefill:{name:currentUser?.first_name||'',email:currentUser?.email||''},
+        prefill:{
+          name:currentUser?.first_name||'',
+          email:currentUser?.email||'',
+          contact:currentUser?.mobile||currentUser?.phone||''
+        },
         theme:{color:'#7b68c8'},
         handler:async function(response){
           try{

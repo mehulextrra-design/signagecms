@@ -140,7 +140,7 @@ router.post('/login-otp', [
   try {
     const normalized = await verifyOtp(mobile, otp);
     const result = await query(
-      'SELECT id, email, role, is_active, first_name, business_name FROM users WHERE mobile = $1',
+      'SELECT id, email, role, is_active, first_name, last_name, mobile, business_name FROM users WHERE mobile = $1',
       [normalized]
     );
     const user = result.rows[0];
@@ -148,7 +148,7 @@ router.post('/login-otp', [
     if (!user.is_active) return res.status(401).json({ error: 'Account suspended hai. Support se contact karo.' });
 
     const token = generateToken(user.id, user.role);
-    res.json({ token, user: { id: user.id, email: user.email, role: user.role, name: user.first_name, business_name: user.business_name } });
+    res.json({ token, user: { id: user.id, email: user.email, role: user.role, name: user.first_name, first_name: user.first_name, last_name: user.last_name, mobile: user.mobile, business_name: user.business_name } });
   } catch (err) { next(err); }
 });
 
