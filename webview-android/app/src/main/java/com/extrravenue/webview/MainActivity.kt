@@ -182,6 +182,8 @@ class MainActivity : AppCompatActivity() {
         ws.displayZoomControls = false
         ws.cacheMode = WebSettings.LOAD_DEFAULT
         ws.mediaPlaybackRequiresUserGesture = false
+        ws.setSupportMultipleWindows(true)
+        ws.javaScriptCanOpenWindowsAutomatically = true
 
         binding.webView.overScrollMode = View.OVER_SCROLL_NEVER
 
@@ -237,6 +239,38 @@ class MainActivity : AppCompatActivity() {
                     fileUploadCallback = null
                     false
                 }
+            }
+
+            // Required for Razorpay checkout popup (UPI/QR payment options)
+            override fun onCreateWindow(
+                view: WebView, isDialog: Boolean, isUserGesture: Boolean,
+                resultMsg: android.os.Message
+            ): Boolean {
+                val popupWebView = WebView(this@MainActivity).apply {
+                    settings.javaScriptEnabled = true
+                    settings.domStorageEnabled = true
+                    settings.setSupportMultipleWindows(true)
+                    webViewClient = object : WebViewClient() {
+                        override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
+                            val scheme = request.url.scheme ?: ""
+                            if (scheme != "http" && scheme != "https") {
+                                return try {
+                                    val intent = android.content.Intent(android.content.Intent.ACTION_VIEW, request.url)
+                                    intent.addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
+                                    startActivity(intent)
+                                    true
+                                } catch (e: Exception) { true }
+                            }
+                            // Load Razorpay redirect URLs in main WebView
+                            binding.webView.loadUrl(request.url.toString())
+                            return true
+                        }
+                    }
+                }
+                val transport = resultMsg.obj as WebView.WebViewTransport
+                transport.webView = popupWebView
+                resultMsg.sendToTarget()
+                return true
             }
         }
     }
