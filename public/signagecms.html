@@ -3771,6 +3771,7 @@ async function wizardNext(step){
       document.getElementById('btn-next-2').innerHTML='Continue ?';
     }
     updateWizardUI(3);updateNetworkSummary();applyWizardV2();_updateV3PlanCard(selectedPkg);
+    if(_wizardV3 && selectedPkg==='omnichannel_growth') openChannelConnect();
     // Auto-set start time to current time
     const _now=new Date();
     document.getElementById('sch-time-start').value=`${String(_now.getHours()).padStart(2,'0')}:${String(_now.getMinutes()).padStart(2,'0')}`;
